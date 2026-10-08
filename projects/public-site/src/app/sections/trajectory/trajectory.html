@@ -1,0 +1,15 @@
+@let c = content();
+<section class="trajectory" [id]="sectionId" tabindex="-1" aria-labelledby="trajectory-title">
+  <div class="trajectory__inner">
+    <header class="trajectory__header">
+      <h2 id="trajectory-title" class="trajectory__title">{{ c.heading }}</h2>
+      <p class="trajectory__subtitle">{{ c.subtitle }}</p>
+    </header>
+
+    <ui-expandable-card-group
+      [items]="c.items"
+      [groupLabel]="c.heading"
+      [collapseLabel]="c.collapseLabel"
+    />
+  </div>
+</section>
