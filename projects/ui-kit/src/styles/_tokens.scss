@@ -21,11 +21,11 @@
   --color-focus-ring: #1f1f1f; // TODO(diseño): debe cumplir contraste 3:1
 
   // --- Tipografía ----------------------------------------------------------
+  // Amatic SC: títulos display (TODO(diseño): confirmar en qué títulos se usa).
+  --font-family-display: 'Amatic SC', 'Helvetica Neue', Arial, sans-serif;
   --font-family-heading: system-ui, sans-serif; // TODO(diseño): tipografía de títulos
-  // Acumin Variable Concept (Adobe). Mientras no esté cargada se usa el fallback.
-  // 'acumin-variable' es el nombre que expone Adobe Fonts en su kit web.
-  --font-family-body:
-    'Acumin Variable Concept', 'acumin-variable', 'Helvetica Neue', Arial, sans-serif;
+  // Acumin Variable Concept (autoalojada en public-site/assets/fonts).
+  --font-family-body: 'Acumin Variable Concept', 'Helvetica Neue', Arial, sans-serif;
   --font-weight-regular: 400; // TODO(diseño)
   --font-weight-bold: 700; // TODO(diseño)
   --font-size-sm: 0.875rem; // TODO(diseño)
