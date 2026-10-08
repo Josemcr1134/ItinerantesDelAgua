@@ -95,13 +95,13 @@ describe('ExpandableCardGroup', () => {
     expect(document.activeElement).toBe(triggers()[0]);
   });
 
-  it('abre la tarjeta indicada en initialId al cargar', async () => {
+  it('abre la tarjeta indicada en activeId al cargar', async () => {
     const f = TestBed.createComponent(ExpandableCardGroup);
     f.componentRef.setInput('items', ITEMS);
     f.componentRef.setInput('groupLabel', 'Grupo');
     f.componentRef.setInput('openLabel', 'Ver');
     f.componentRef.setInput('closeLabel', 'Cerrar');
-    f.componentRef.setInput('initialId', 'b');
+    f.componentRef.setInput('activeId', 'b');
     await f.whenStable();
     const buttons = (f.nativeElement as HTMLElement).querySelectorAll('.card__trigger');
     expect(buttons[1].getAttribute('aria-expanded')).toBe('true');

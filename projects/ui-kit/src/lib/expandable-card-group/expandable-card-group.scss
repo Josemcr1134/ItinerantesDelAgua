@@ -2,11 +2,18 @@
 
 // Valores del Figma (componente de 1296px): tarjetas de 282px con su botón-
 // pestaña, y panel de 1296×501 con radio de 85px que asoma 12px bajo los
-// botones. Colores ajustables por sección:
-//   --ui-ecg-panel-bg     fondo del panel (y del botón activo)
-//   --ui-ecg-text         texto de las tarjetas
-//   --ui-ecg-trigger-bg   botón inactivo (amarillo)
-//   --ui-ecg-trigger-icon flecha del botón
+// botones. Ajustable por sección con propiedades personalizadas:
+//   --ui-ecg-panel-bg            fondo del panel (y del botón activo)
+//   --ui-ecg-text                texto de tarjetas y panel
+//   --ui-ecg-title-color         títulos de las tarjetas
+//   --ui-ecg-trigger-bg          botón inactivo (amarillo)
+//   --ui-ecg-trigger-icon        flecha del botón
+//   --ui-ecg-trigger-active-icon flecha del botón activo
+//   --ui-ecg-title-gap           separación ilustración → título (4px)
+//   --ui-ecg-desc-size           tamaño de la descripción (24px)
+//   --ui-ecg-card-height         alto de la tarjeta hasta el pie del botón (511px)
+//   --ui-ecg-panel-offset        separación botones → panel (-12px: se solapan)
+//   --ui-ecg-panel-min-height    alto mínimo del panel (501px)
 // TODO(diseño): tablet y móvil pendientes.
 $panel-bg: var(--ui-ecg-panel-bg, #364f84);
 $text: var(--ui-ecg-text, #fff);
@@ -43,35 +50,42 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   flex-direction: column;
   align-items: center; // los títulos largos desbordan centrados
   width: 282px;
-  height: 511px; // el botón termina 511px bajo el inicio de la tarjeta
+  height: var(--ui-ecg-card-height, 511px); // el botón queda al pie
   color: $text;
   text-align: center;
 }
 
+// Caja de 282px de alto; ilustraciones más anchas desbordan centradas.
 .card__image {
-  width: 282px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 282px;
-  object-fit: contain;
+
+  img {
+    max-width: none;
+    object-fit: contain;
+  }
 }
 
 // Amatic SC Bold 40px.
 .card__title {
-  margin-top: 4px;
-  color: inherit;
+  margin-top: var(--ui-ecg-title-gap, 4px);
+  color: var(--ui-ecg-title-color, inherit);
   font-family: var(--font-family-display);
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: pre; // sin cortes automáticos; respeta los `\n` del título
 }
 
-// Acumin Regular 24/28.
+// Acumin Regular 24/28 (configurable).
 .card__description {
   margin-top: 19.6px;
-  font-size: 1.5rem;
+  font-size: var(--ui-ecg-desc-size, 1.5rem);
   line-height: 1.75rem;
-  white-space: pre-line;
+  white-space: pre; // respeta los `\n` y puede desbordar centrada, como en el diseño
 }
 
 // Botón-pestaña de 60×60 con resplandor difuminado debajo.
@@ -128,14 +142,15 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   }
 
   .card__trigger-icon {
+    color: var(--ui-ecg-trigger-active-icon, #{$trigger-icon});
     transform: rotate(-90deg);
   }
 }
 
 .panel {
   position: relative;
-  min-height: 501px;
-  margin-top: -12px;
+  min-height: var(--ui-ecg-panel-min-height, 501px);
+  margin-top: var(--ui-ecg-panel-offset, -12px);
   overflow: hidden;
   border-radius: 85px;
   background-color: $panel-bg;

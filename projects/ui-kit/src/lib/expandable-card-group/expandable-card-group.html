@@ -2,14 +2,15 @@
   @for (item of items(); track item.id; let i = $index) {
     @let expanded = expandedId() === item.id;
     <li class="card">
-      <img
-        class="card__image"
-        [src]="item.image.src"
-        [alt]="item.image.alt"
-        width="282"
-        height="282"
-        loading="lazy"
-      />
+      <div class="card__image">
+        <img
+          [src]="item.image.src"
+          [alt]="item.image.alt"
+          [width]="item.imageSize?.width ?? 282"
+          [height]="item.imageSize?.height ?? 282"
+          loading="lazy"
+        />
+      </div>
       <h3 class="card__title" [id]="titleId(item.id)">{{ item.title }}</h3>
       <p class="card__description">{{ item.description }}</p>
       <button
