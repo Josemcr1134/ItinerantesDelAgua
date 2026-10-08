@@ -3,7 +3,10 @@ import { Button } from 'ui-kit';
 import { SECTION_IDS } from '../../content/section-ids';
 import { ClosingCtaContent } from './closing-cta-content';
 
-/** Sección de cierre sobre fondo oscuro; destino del ancla "Contacto". */
+/**
+ * Sección de cierre "Territorios que cuidan y aprenden" sobre el fondo verde
+ * ondulado; destino del ancla "Contacto". El fondo continúa en el footer.
+ */
 @Component({
   selector: 'pub-closing-cta',
   imports: [Button],

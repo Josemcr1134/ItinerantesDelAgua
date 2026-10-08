@@ -1,34 +1,100 @@
 @use 'breakpoints' as bp;
 
-// TODO(diseño): color oscuro de fondo, tipografía y espaciados finales.
+// Valores tomados del Figma (Landing Desktop, 1440px), relativos al inicio de
+// la onda verde. El fondo (footerBg.svg, 1440×781) continúa en el footer.
+// TODO(diseño): tablet y móvil pendientes.
 :host {
+  position: relative;
+  z-index: 1; // las ilustraciones asoman sobre la sección anterior
   display: block;
 }
 
 .closing {
-  padding: var(--space-7) var(--space-3);
-  background-color: var(--color-dark-bg);
-  color: var(--color-on-dark);
-  text-align: center;
-}
+  --s: calc(min(100vw, 1440px) / 1440);
 
-.closing__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  max-width: 48rem;
-  margin: 0 auto;
-}
+  position: relative;
+  min-height: 588px;
+  padding: 150px var(--space-3) var(--space-6);
+  // Hasta 1440px escala en proporción; más ancho solo se estira en horizontal.
+  background: var(--closing-bg) top center / 100% calc(781 * var(--s)) no-repeat;
+  color: var(--color-surface);
 
-.closing__title {
-  font-size: var(--font-size-xl);
-
-  @include bp.up(md) {
-    font-size: var(--font-size-display);
+  @include bp.up(xl) {
+    // x=182 dentro del marco de 1440px, centrado en pantallas más anchas.
+    padding: 150px 0 0 calc(max(0px, (100% - 1440px) / 2) + 182px);
   }
 }
 
+.closing__illustration {
+  display: none;
+  position: absolute;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+
+  @include bp.up(lg) {
+    display: block;
+  }
+}
+
+// Serpiente: pegada al borde izquierdo, 266px sobre la onda.
+.closing__illustration--left {
+  top: calc(-266 * var(--s));
+  left: 0;
+  width: calc(268 * var(--s));
+}
+
+// Mujer y árboles: desde x=663, 275px sobre la onda (recortada a la derecha).
+.closing__illustration--right {
+  top: calc(-275 * var(--s));
+  right: 0;
+  width: calc(777 * var(--s));
+}
+
+.closing__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.closing__divider {
+  width: 116px;
+  height: 16px;
+  margin: -2px;
+}
+
+// Amatic SC Bold 64px, crema, en dos líneas.
+.closing__title {
+  margin-top: 35px;
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 4.444vw, 4rem);
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+  white-space: pre-line;
+}
+
+// Acumin Regular 20/28, crema.
 .closing__paragraph {
-  font-size: var(--font-size-lg);
+  margin-top: 29px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  white-space: pre-line;
+}
+
+// "Hablemos": contorno crema de 3px que se llena de agua crema (texto verde).
+.closing__cta {
+  --ui-button-color: var(--color-surface);
+  --ui-button-on-color: var(--color-primary);
+  --ui-button-border-width: 3px;
+
+  min-width: 232px;
+  min-height: 68px;
+  margin: 35px 0 0 2px; // en el diseño el botón está 2px más a la derecha que el texto
+  padding: 0 1.5rem;
+  border-radius: 100px;
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.04em;
 }

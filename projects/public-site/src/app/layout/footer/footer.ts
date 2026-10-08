@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { FooterContent } from './footer-content';
 
-/** Footer: logo, tagline y redes sociales. */
+/** Footer: logo, lema y redes sociales sobre el fondo verde. */
 @Component({
   selector: 'pub-footer',
   templateUrl: './footer.html',

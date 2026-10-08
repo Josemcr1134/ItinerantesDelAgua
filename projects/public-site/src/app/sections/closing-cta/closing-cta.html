@@ -1,8 +1,38 @@
 @let c = content();
-<section class="closing" [id]="sectionId" tabindex="-1" aria-labelledby="closing-title">
-  <div class="closing__inner">
+<section
+  class="closing"
+  [id]="sectionId"
+  tabindex="-1"
+  aria-labelledby="closing-title"
+  [style.--closing-bg]="'url(' + c.background.src + ')'"
+>
+  <img
+    class="closing__illustration closing__illustration--left"
+    [src]="c.illustrations.left.src"
+    [alt]="c.illustrations.left.alt"
+    width="268"
+    height="429"
+    loading="lazy"
+  />
+  <img
+    class="closing__illustration closing__illustration--right"
+    [src]="c.illustrations.right.src"
+    [alt]="c.illustrations.right.alt"
+    width="777"
+    height="849"
+    loading="lazy"
+  />
+
+  <div class="closing__content">
+    <img
+      class="closing__divider"
+      [src]="c.divider.src"
+      [alt]="c.divider.alt"
+      width="116"
+      height="16"
+    />
     <h2 id="closing-title" class="closing__title">{{ c.heading }}</h2>
     <p class="closing__paragraph">{{ c.paragraph }}</p>
-    <a uiButton variant="inverse" [href]="c.cta.href">{{ c.cta.label }}</a>
+    <a uiButton variant="secondary" class="closing__cta" [href]="c.cta.href">{{ c.cta.label }}</a>
   </div>
 </section>

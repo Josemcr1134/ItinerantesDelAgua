@@ -1,17 +1,14 @@
 import { FooterContent } from '../layout/footer/footer-content';
 
-// TODO(contenido): tagline y red(es) social(es) reales.
+// Copy tomado del Figma aprobado (Landing Desktop).
 export const FOOTER_CONTENT: FooterContent = {
-  logo: {
-    src: 'assets/placeholders/logo.svg', // TODO(diseño): versión del logo para el footer
-    alt: 'Itinerantes del Agua',
-  },
-  tagline: '[TODO: tagline del footer]',
+  logo: { src: 'assets/images/logoWhite.png', alt: 'Itinerantes del Agua' },
+  tagline: 'Aprendemos del agua · diseñamos con la naturaleza · regeneramos desde el territorio',
   socialLinks: [
     {
-      label: '[TODO: nombre de la red social]',
-      href: '#', // TODO: URL del perfil
-      iconSrc: 'assets/placeholders/social-icon.svg', // TODO(diseño): ícono real
+      label: 'Instagram de Itinerantes del Agua',
+      href: '#', // TODO: URL del perfil de Instagram
+      network: 'instagram',
     },
   ],
 };

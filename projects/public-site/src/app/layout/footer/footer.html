@@ -1,16 +1,39 @@
 @let c = content();
 <footer class="footer">
-  <div class="footer__inner">
-    <img class="footer__logo" [src]="c.logo.src" [alt]="c.logo.alt" width="160" height="48" />
-    <p class="footer__tagline">{{ c.tagline }}</p>
-    <ul class="footer__social">
-      @for (social of c.socialLinks; track social.href) {
-        <li>
-          <a class="footer__social-link" [href]="social.href" [attr.aria-label]="social.label">
-            <img [src]="social.iconSrc" alt="" width="32" height="32" />
-          </a>
-        </li>
-      }
-    </ul>
-  </div>
+  <img
+    class="footer__logo"
+    [src]="c.logo.src"
+    [alt]="c.logo.alt"
+    width="103"
+    height="68"
+    loading="lazy"
+  />
+  <p class="footer__tagline">{{ c.tagline }}</p>
+  <ul class="footer__social">
+    @for (social of c.socialLinks; track social.href) {
+      <li>
+        <a class="footer__social-link" [href]="social.href" [attr.aria-label]="social.label">
+          @switch (social.network) {
+            @case ('instagram') {
+              <svg
+                aria-hidden="true"
+                width="40"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            }
+          }
+        </a>
+      </li>
+    }
+  </ul>
 </footer>
