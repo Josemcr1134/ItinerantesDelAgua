@@ -16,7 +16,8 @@
     "paths": {
       "auth": ["./dist/auth"],
       "data-access": ["./dist/data-access"],
-      "ui-kit": ["./dist/ui-kit"]
+      "ui-kit": ["./dist/ui-kit"],
+      "util": ["./dist/util"]
     }
   },
   "angularCompilerOptions": {
@@ -61,6 +62,12 @@
     },
     {
       "path": "./projects/auth/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/util/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/util/tsconfig.spec.json"
     }
   ]
 }
