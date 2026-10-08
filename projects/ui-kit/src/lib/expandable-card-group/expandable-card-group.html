@@ -1,0 +1,75 @@
+<ul class="cards" [attr.aria-label]="groupLabel()">
+  @for (item of items(); track item.id; let i = $index) {
+    <li class="card" [class.card--active]="expandedId() === item.id">
+      <img class="card__icon" [src]="item.icon.src" [alt]="item.icon.alt" width="48" height="48" />
+      <h3 class="card__title">
+        <button
+          #trigger
+          type="button"
+          class="card__trigger"
+          [id]="triggerId(item.id)"
+          [attr.aria-expanded]="expandedId() === item.id"
+          [attr.aria-controls]="panelId(item.id)"
+          (click)="toggle(item.id)"
+          (keydown)="onTriggerKeydown($event, i)"
+        >
+          {{ item.title }}
+        </button>
+      </h3>
+      <p class="card__description">{{ item.description }}</p>
+      <span class="card__arrow" aria-hidden="true"></span>
+    </li>
+  }
+</ul>
+
+@for (item of items(); track item.id) {
+  <section
+    class="panel"
+    [id]="panelId(item.id)"
+    [attr.aria-labelledby]="panelHeadingId(item.id)"
+    [hidden]="expandedId() !== item.id"
+  >
+    @if (expandedId() === item.id) {
+      <h3 #panelHeading class="panel__title" tabindex="-1" [id]="panelHeadingId(item.id)">
+        {{ item.title }}
+      </h3>
+
+      @for (paragraph of item.detail.paragraphs; track $index) {
+        <p class="panel__paragraph">{{ paragraph }}</p>
+      }
+
+      @if (item.detail.columns; as columns) {
+        @if (item.detail.columnsHeading; as columnsHeading) {
+          <h4 class="panel__columns-heading">{{ columnsHeading }}</h4>
+        }
+        <div class="panel__columns">
+          @for (column of columns; track column.heading) {
+            <div class="panel__column">
+              <h5 class="panel__column-heading">{{ column.heading }}</h5>
+              <ul class="panel__list">
+                @for (entry of column.items; track $index) {
+                  <li>{{ entry }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="panel__actions">
+        <button
+          uiButton
+          variant="secondary"
+          type="button"
+          [attr.aria-controls]="panelId(item.id)"
+          (click)="collapse()"
+        >
+          {{ collapseLabel() }}
+        </button>
+        @if (item.detail.cta; as cta) {
+          <a uiButton [href]="cta.href">{{ cta.label }}</a>
+        }
+      </div>
+    }
+  </section>
+}
