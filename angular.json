@@ -229,6 +229,32 @@
           }
         }
       }
+    },
+    "data-access": {
+      "projectType": "library",
+      "root": "projects/data-access",
+      "sourceRoot": "projects/data-access/src",
+      "prefix": "da",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/data-access/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/data-access/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/data-access/tsconfig.spec.json"
+          }
+        }
+      }
     }
   }
 }

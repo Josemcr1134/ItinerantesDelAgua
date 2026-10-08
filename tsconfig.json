@@ -14,6 +14,7 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
+      "data-access": ["./dist/data-access"],
       "ui-kit": ["./dist/ui-kit"]
     }
   },
@@ -47,6 +48,12 @@
     },
     {
       "path": "./projects/ui-kit/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/data-access/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/data-access/tsconfig.spec.json"
     }
   ]
 }
