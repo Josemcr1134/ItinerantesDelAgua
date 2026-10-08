@@ -11,6 +11,7 @@ import {
 import { Button } from 'ui-kit';
 import { SECTION_IDS } from '../../content/section-ids';
 import { ClosingCtaContent } from './closing-cta-content';
+import { ContactForm } from './contact-form/contact-form';
 
 /**
  * Sección de cierre "Territorios que cuidan y aprenden" sobre el fondo verde
@@ -19,7 +20,7 @@ import { ClosingCtaContent } from './closing-cta-content';
  */
 @Component({
   selector: 'pub-closing-cta',
-  imports: [Button],
+  imports: [Button, ContactForm],
   templateUrl: './closing-cta.html',
   styleUrl: './closing-cta.scss',
 })
@@ -31,12 +32,10 @@ export class ClosingCta {
 
   private readonly injector = inject(Injector);
   private readonly ctaButton = viewChild('cta', { read: ElementRef<HTMLButtonElement> });
-  private readonly form = viewChild<ElementRef<HTMLElement>>('form');
 
+  /** El formulario lleva el foco a su primer campo al aparecer. */
   protected openForm(): void {
     this.showForm.set(true);
-    // Lleva el foco al formulario para teclado y lectores de pantalla.
-    afterNextRender(() => this.form()?.nativeElement.focus(), { injector: this.injector });
   }
 
   protected closeForm(): void {

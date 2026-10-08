@@ -25,20 +25,16 @@
 
   <div class="closing__content">
     @if (showForm()) {
-      <div
-        #form
-        class="closing__form"
-        role="region"
-        tabindex="-1"
-        aria-labelledby="closing-title"
-        (keydown.escape)="closeForm()"
-      >
-        <!-- TODO(diseño): campos y estilos de la variante "Contacto=Variante2"
-             (Figma 107:3349). El envío usa ContactService (data-access). -->
+      <div class="closing__form" (keydown.escape)="closeForm()">
+        <img
+          class="closing__divider"
+          [src]="c.divider.src"
+          [alt]="c.divider.alt"
+          width="116"
+          height="16"
+        />
         <h2 id="closing-title" class="visually-hidden">{{ c.heading }}</h2>
-        <button type="button" class="closing__back" (click)="closeForm()">
-          {{ c.backLabel }}
-        </button>
+        <pub-contact-form [content]="c.form" (back)="closeForm()" />
       </div>
     } @else {
       <img

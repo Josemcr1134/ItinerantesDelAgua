@@ -1,0 +1,73 @@
+@let c = content();
+<form class="contact-form" novalidate [formGroup]="form" (ngSubmit)="submit()">
+  <label class="contact-form__label" for="contact-email">{{ c.emailLabel }}</label>
+  <input
+    #email
+    id="contact-email"
+    class="contact-form__field"
+    type="email"
+    autocomplete="email"
+    formControlName="email"
+    required
+    [placeholder]="c.emailPlaceholder"
+    [attr.aria-invalid]="showError('email')"
+    [attr.aria-describedby]="showError('email') ? 'contact-email-error' : null"
+  />
+  @if (showError('email')) {
+    <p id="contact-email-error" class="contact-form__error">{{ emailError() }}</p>
+  }
+
+  <label class="contact-form__label" for="contact-message">{{ c.messageLabel }}</label>
+  <textarea
+    #message
+    id="contact-message"
+    class="contact-form__field contact-form__field--multiline"
+    formControlName="message"
+    required
+    [placeholder]="c.messagePlaceholder"
+    [attr.aria-invalid]="showError('message')"
+    [attr.aria-describedby]="showError('message') ? 'contact-message-error' : null"
+  ></textarea>
+  @if (showError('message')) {
+    <p id="contact-message-error" class="contact-form__error">{{ c.errors.messageRequired }}</p>
+  }
+
+  <div class="contact-form__actions">
+    <button
+      uiButton
+      variant="secondary"
+      type="submit"
+      class="contact-form__submit"
+      [disabled]="status() === 'sending'"
+    >
+      {{ status() === 'sending' ? c.sendingLabel : c.submitLabel }}
+    </button>
+    <button type="button" class="contact-form__back" (click)="back.emit()">
+      <svg
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      {{ c.backLabel }}
+    </button>
+  </div>
+
+  <p class="contact-form__status" role="status">
+    @if (status() === 'sent') {
+      {{ c.successMessage }}
+    }
+  </p>
+  @if (status() === 'error') {
+    <p class="contact-form__status contact-form__status--error" role="alert">
+      {{ c.failureMessage }}
+    </p>
+  }
+</form>
