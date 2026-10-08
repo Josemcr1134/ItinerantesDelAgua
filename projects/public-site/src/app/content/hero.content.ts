@@ -15,7 +15,7 @@ export const HERO_CONTENT: HeroContent = {
     href: `#${SECTION_IDS.objectives}`,
   },
   background: {
-    src: 'images/placeholders/hero-background.svg', // TODO(diseño): ilustración real
+    src: 'assets/placeholders/hero-background.svg', // TODO(diseño): ilustración real
     alt: '',
   },
 };

@@ -1,6 +1,6 @@
 import { CardGroupSectionContent } from '../shared/card-group-section-content';
 
-const CARD_ICON = 'images/placeholders/card-icon.svg'; // TODO(diseño): íconos reales por tarjeta
+const CARD_ICON = 'assets/placeholders/card-icon.svg'; // TODO(diseño): íconos reales por tarjeta
 
 // TODO(contenido): subtítulo, descripciones y detalle reales (equipo, premios).
 export const TRAJECTORY_CONTENT: CardGroupSectionContent = {
