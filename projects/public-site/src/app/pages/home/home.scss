@@ -3,9 +3,12 @@
 }
 
 // "fondo marino" del Figma (arco azul con siluetas marinas), 1440×2352.
+// Hasta 1440px escala en proporción; en pantallas más anchas se estira solo
+// en horizontal para no crecer en altura y tapar lo que viene después (el
+// botón "Conoce más" quedaba azul sobre azul).
 .home__sea {
   container-type: inline-size;
   // En el diseño la franja empieza 10px a la izquierda del borde (a 1440px).
-  background: url('/assets/images/seaBackground.svg') calc(-10 / 1440 * 100cqw) 0 / 100% auto
-    no-repeat;
+  background: url('/assets/images/seaBackground.svg') calc(-10 / 1440 * 100cqw) 0 / 100%
+    calc(2352 * min(100cqw, 1440px) / 1440) no-repeat;
 }
