@@ -1,0 +1,152 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): colores, tipografía, transparencia sobre el hero y animación
+// del menú móvil.
+:host {
+  display: block;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 200;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  transform: translateY(-200%);
+
+  &:focus {
+    transform: none;
+  }
+}
+
+.navbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  background-color: var(--color-surface);
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+.navbar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--container-max-width);
+  min-height: var(--navbar-height);
+  margin: 0 auto;
+  padding: 0 var(--space-3);
+
+  @include bp.up(lg) {
+    flex-wrap: nowrap;
+    gap: var(--space-5);
+  }
+}
+
+.navbar__brand img {
+  width: auto;
+  height: 2.5rem;
+}
+
+.navbar__toggle {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+
+  @include bp.up(lg) {
+    display: none;
+  }
+}
+
+// Ícono hamburguesa / cerrar.
+.navbar__toggle-icon,
+.navbar__toggle-icon::before,
+.navbar__toggle-icon::after {
+  display: block;
+  width: 1.5rem;
+  height: 2px;
+  background-color: currentColor;
+}
+
+.navbar__toggle-icon {
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  &::before {
+    top: -0.5rem;
+  }
+
+  &::after {
+    top: 0.5rem;
+  }
+}
+
+[aria-expanded='true'] .navbar__toggle-icon {
+  background-color: transparent;
+
+  &::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    top: 0;
+    transform: rotate(-45deg);
+  }
+}
+
+.navbar__menu {
+  display: none;
+  flex-basis: 100%;
+  padding-bottom: var(--space-4);
+
+  @include bp.up(lg) {
+    display: flex;
+    flex-basis: auto;
+    align-items: center;
+    gap: var(--space-5);
+    padding-bottom: 0;
+  }
+}
+
+.navbar__menu--open {
+  display: block;
+}
+
+.navbar__links {
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+
+  @include bp.up(lg) {
+    display: flex;
+    gap: var(--space-4);
+    margin: 0;
+  }
+}
+
+.navbar__link {
+  display: block;
+  padding: var(--space-2) 0;
+  color: inherit;
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

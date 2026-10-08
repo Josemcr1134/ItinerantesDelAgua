@@ -1,0 +1,42 @@
+@let c = content();
+<a class="skip-link" pubAnchorLink href="#main">{{ c.skipLinkLabel }}</a>
+
+<header class="navbar">
+  <div class="navbar__inner">
+    <a class="navbar__brand" pubAnchorLink [href]="c.homeHref" (click)="closeMenu()">
+      <img [src]="c.logo.src" [alt]="c.logo.alt" width="160" height="48" />
+    </a>
+
+    <button
+      #toggle
+      type="button"
+      class="navbar__toggle"
+      aria-controls="navbar-menu"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="toggleMenu()"
+    >
+      <span class="visually-hidden">{{ menuOpen() ? c.menuCloseLabel : c.menuOpenLabel }}</span>
+      <span class="navbar__toggle-icon" aria-hidden="true"></span>
+    </button>
+
+    <nav
+      id="navbar-menu"
+      class="navbar__menu"
+      [class.navbar__menu--open]="menuOpen()"
+      [attr.aria-label]="c.navLabel"
+    >
+      <ul class="navbar__links">
+        @for (link of c.links; track link.href) {
+          <li>
+            <a class="navbar__link" pubAnchorLink [href]="link.href" (click)="closeMenu()">
+              {{ link.label }}
+            </a>
+          </li>
+        }
+      </ul>
+      <a uiButton class="navbar__cta" [href]="c.cta.href" (click)="closeMenu()">
+        {{ c.cta.label }}
+      </a>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,48 @@
+import { TestBed } from '@angular/core/testing';
+import { NAVBAR_CONTENT } from '../../content/navbar.content';
+import { Navbar } from './navbar';
+
+describe('Navbar', () => {
+  async function setup() {
+    const fixture = TestBed.createComponent(Navbar);
+    fixture.componentRef.setInput('content', NAVBAR_CONTENT);
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+    const toggle = host.querySelector<HTMLButtonElement>('.navbar__toggle')!;
+    return { fixture, host, toggle };
+  }
+
+  it('renderiza un enlace por cada sección y el CTA', async () => {
+    const { host } = await setup();
+    const hrefs = Array.from(host.querySelectorAll('.navbar__link')).map((a) =>
+      a.getAttribute('href'),
+    );
+    expect(hrefs).toEqual(['#objetivos', '#trayectoria', '#itinerantes', '#contacto']);
+    expect(host.querySelector('.navbar__cta')?.textContent?.trim()).toBe('Regístrate');
+  });
+
+  it('abre y cierra el menú móvil reflejándolo en aria-expanded', async () => {
+    const { fixture, toggle } = await setup();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+
+    toggle.click();
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
+    toggle.click();
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('cierra el menú con Escape y devuelve el foco al botón', async () => {
+    const { fixture, toggle } = await setup();
+    toggle.click();
+    await fixture.whenStable();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await fixture.whenStable();
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(toggle);
+  });
+});
