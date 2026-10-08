@@ -1,0 +1,15 @@
+@let c = content();
+<section class="areas" [id]="sectionId" tabindex="-1" aria-labelledby="areas-title">
+  <div class="areas__inner">
+    <header class="areas__header">
+      <h2 id="areas-title" class="areas__title">{{ c.heading }}</h2>
+      <p class="areas__subtitle">{{ c.subtitle }}</p>
+    </header>
+
+    <ui-expandable-card-group
+      [items]="c.items"
+      [groupLabel]="c.heading"
+      [collapseLabel]="c.collapseLabel"
+    />
+  </div>
+</section>
