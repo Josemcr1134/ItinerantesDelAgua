@@ -1,13 +1,13 @@
 // Fuentes autoalojadas en public/assets/fonts.
 
-// Acumin Variable Concept (Adobe): fuente variable de texto.
-// Ejes: wght 100–900, wdth 50–115, slnt 0–12.
-// TODO: convertir a WOFF2 (pesa ~1 MB en OTF) y confirmar licencia de uso web.
+// Acumin Variable Concept (Adobe): fuente variable de texto, eje wght 100–900.
+// Generada desde el OTF original (ver git 41bd37b) con fonttools: ancho fijado
+// en 100 e inclinación en 0, subconjunto latin. 1 MB -> 56 KB.
+// TODO: confirmar con el cliente la licencia de uso web.
 @font-face {
   font-family: 'Acumin Variable Concept';
-  src: url('/assets/fonts/AcuminVariableConcept.otf') format('opentype');
+  src: url('/assets/fonts/AcuminVariableConcept.woff2') format('woff2');
   font-weight: 100 900;
-  font-stretch: 50% 115%;
   font-style: normal;
   font-display: swap;
 }
