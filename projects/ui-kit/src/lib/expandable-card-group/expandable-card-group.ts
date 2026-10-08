@@ -6,7 +6,7 @@ import {
   contentChildren,
   ElementRef,
   input,
-  signal,
+  linkedSignal,
   viewChildren,
 } from '@angular/core';
 import { CardPanel, CardPanelDefault } from './card-panel';
@@ -36,8 +36,10 @@ export class ExpandableCardGroup {
   readonly openLabel = input.required<string>();
   /** Prefijo del nombre accesible del botón para cerrar ("Cerrar"). */
   readonly closeLabel = input.required<string>();
+  /** Tarjeta activa al cargar; sin valor se muestra el panel por defecto. */
+  readonly initialId = input<string | null>(null);
 
-  protected readonly expandedId = signal<string | null>(null);
+  protected readonly expandedId = linkedSignal<string | null>(() => this.initialId());
 
   private readonly panels = contentChildren(CardPanel);
   private readonly defaultPanel = contentChild(CardPanelDefault);

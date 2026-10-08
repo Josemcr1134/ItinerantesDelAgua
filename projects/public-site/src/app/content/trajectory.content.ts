@@ -30,6 +30,7 @@ export const TRAJECTORY_CONTENT: TrajectoryContent = {
       description: 'Conoce a quiénes\nlo hacen posible',
     },
   ],
+  initialItemId: 'historia',
   // TODO(diseño): exportar desde Figma la ilustración del panel por defecto
   // (plantas, rocas y rana) a assets/images y enlazarla aquí.
   defaultIllustration: undefined,

@@ -24,6 +24,8 @@ export interface TrajectoryContent {
   readonly closeLabel: string;
   /** Tarjetas en orden: historia, premios, equipo. */
   readonly items: readonly ExpandableItem[];
+  /** Tarjeta abierta al cargar la página. */
+  readonly initialItemId?: string;
   /** Ilustración del panel cuando no hay tarjeta activa. */
   readonly defaultIllustration?: UiImage;
   readonly history: {
