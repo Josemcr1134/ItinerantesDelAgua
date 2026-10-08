@@ -1,0 +1,101 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): colores de texto sobre la ilustración, tamaños y posición del
+// contenido según el diseño aprobado.
+:host {
+  display: block;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: calc(var(--navbar-height) + var(--space-5)) var(--space-3) var(--space-7);
+  overflow: hidden;
+  isolation: isolate; // la ilustración (z-index: -1) queda detrás solo del hero
+  text-align: center;
+}
+
+.hero__background {
+  z-index: -1;
+  object-fit: cover;
+}
+
+.hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 48rem;
+
+  @include bp.up(md) {
+    gap: var(--space-4);
+  }
+}
+
+.hero__title {
+  font-size: var(--font-size-display);
+
+  @include bp.up(md) {
+    font-size: calc(var(--font-size-display) * 1.5);
+  }
+}
+
+.hero__subtitle {
+  font-size: var(--font-size-lg);
+}
+
+.hero__keywords {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: var(--font-weight-bold);
+
+  // El separador "·" es decorativo: texto alternativo vacío para lectores.
+  li + li::before {
+    content: '·' / '';
+    margin-inline-end: var(--space-2);
+  }
+}
+
+.hero__cta {
+  margin-top: var(--space-2);
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: inherit;
+  transform: translateX(-50%);
+}
+
+// TODO(diseño): reemplazar por el indicador de scroll del diseño.
+.hero__scroll-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: hero-scroll-bounce 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes hero-scroll-bounce {
+  50% {
+    transform: translateY(0.35rem) rotate(45deg);
+  }
+}
