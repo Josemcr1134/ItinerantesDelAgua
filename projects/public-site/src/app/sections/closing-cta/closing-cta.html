@@ -24,15 +24,43 @@
   />
 
   <div class="closing__content">
-    <img
-      class="closing__divider"
-      [src]="c.divider.src"
-      [alt]="c.divider.alt"
-      width="116"
-      height="16"
-    />
-    <h2 id="closing-title" class="closing__title">{{ c.heading }}</h2>
-    <p class="closing__paragraph">{{ c.paragraph }}</p>
-    <a uiButton variant="secondary" class="closing__cta" [href]="c.cta.href">{{ c.cta.label }}</a>
+    @if (showForm()) {
+      <div
+        #form
+        class="closing__form"
+        role="region"
+        tabindex="-1"
+        aria-labelledby="closing-title"
+        (keydown.escape)="closeForm()"
+      >
+        <!-- TODO(diseño): campos y estilos de la variante "Contacto=Variante2"
+             (Figma 107:3349). El envío usa ContactService (data-access). -->
+        <h2 id="closing-title" class="visually-hidden">{{ c.heading }}</h2>
+        <button type="button" class="closing__back" (click)="closeForm()">
+          {{ c.backLabel }}
+        </button>
+      </div>
+    } @else {
+      <img
+        class="closing__divider"
+        [src]="c.divider.src"
+        [alt]="c.divider.alt"
+        width="116"
+        height="16"
+      />
+      <h2 id="closing-title" class="closing__title">{{ c.heading }}</h2>
+      <p class="closing__paragraph">{{ c.paragraph }}</p>
+      <button
+        #cta
+        uiButton
+        variant="secondary"
+        type="button"
+        class="closing__cta"
+        aria-controls="contacto"
+        (click)="openForm()"
+      >
+        {{ c.ctaLabel }}
+      </button>
+    }
   </div>
 </section>

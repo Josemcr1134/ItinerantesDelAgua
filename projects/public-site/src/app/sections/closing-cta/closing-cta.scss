@@ -98,3 +98,19 @@
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
 }
+
+// TODO(diseño): estilos del formulario según la variante del Figma.
+.closing__form:focus {
+  outline: none;
+}
+
+.closing__back {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+  cursor: pointer;
+}
