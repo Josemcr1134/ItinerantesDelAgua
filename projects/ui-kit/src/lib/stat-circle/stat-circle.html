@@ -1,9 +1,37 @@
-<p class="stat-circle">
-  <span class="stat-circle__value">
-    {{ value() }}
-    @if (unit(); as unit) {
-      <span class="stat-circle__unit">{{ unit }}</span>
-    }
-  </span>
-  <span class="stat-circle__label">{{ label() }}</span>
-</p>
+<div class="stat-circle">
+  <div class="stat-circle__ring">
+    <svg
+      aria-hidden="true"
+      [attr.width]="size"
+      [attr.height]="size"
+      [attr.viewBox]="'0 0 ' + size + ' ' + size"
+    >
+      <circle
+        class="stat-circle__track"
+        [attr.cx]="size / 2"
+        [attr.cy]="size / 2"
+        [attr.r]="radius"
+        fill="none"
+        stroke-width="13"
+      />
+      <circle
+        class="stat-circle__arc"
+        [attr.cx]="size / 2"
+        [attr.cy]="size / 2"
+        [attr.r]="radius"
+        fill="none"
+        [attr.stroke-width]="stroke"
+        stroke-linecap="round"
+        [attr.stroke-dasharray]="dashArray()"
+        [attr.transform]="rotation"
+      />
+    </svg>
+    <span class="stat-circle__value">
+      {{ value() }}
+      @if (unit(); as unit) {
+        <span class="stat-circle__unit">{{ unit }}</span>
+      }
+    </span>
+  </div>
+  <p class="stat-circle__label">{{ label() }}</p>
+</div>

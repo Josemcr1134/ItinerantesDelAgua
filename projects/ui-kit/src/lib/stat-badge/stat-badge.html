@@ -1,8 +1,10 @@
 <p class="stat-badge">
-  <span class="stat-badge__value">{{ value() }}</span>
-  @if (unit(); as unit) {
-    <span class="stat-badge__unit">{{ unit }}</span>
-  }
+  <span class="stat-badge__value">
+    {{ value() }}
+    @if (unit(); as unit) {
+      {{ unit }}
+    }
+  </span>
   @if (label(); as label) {
     <span class="stat-badge__label">{{ label }}</span>
   }

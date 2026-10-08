@@ -1,6 +1,6 @@
-@use 'breakpoints' as bp;
-
-// TODO(diseño): tamaño, borde y colores finales del círculo.
+// Valores del Figma: anillo de 182px (pista Columbia Blue, arco azul de
+// acento), cifra en Satoshi Bold 40px y etiqueta en Acumin Semibold 24/28.
+// Colores ajustables con --ui-stat-track-color / --ui-stat-arc-color.
 :host {
   display: block;
 }
@@ -9,33 +9,45 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
-  width: 9rem;
-  aspect-ratio: 1;
-  margin: 0 auto;
-  padding: var(--space-3);
-  border: 2px solid currentColor;
-  border-radius: 50%;
+  gap: 29px;
   text-align: center;
+}
 
-  @include bp.up(md) {
-    width: 11rem;
+.stat-circle__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 182px;
+  height: 182px;
+
+  svg {
+    position: absolute;
+    inset: 0;
   }
 }
 
-.stat-circle__value {
-  font-family: var(--font-family-heading);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  line-height: var(--line-height-tight);
+.stat-circle__track {
+  stroke: var(--ui-stat-track-color, var(--color-columbia-blue));
 }
 
-.stat-circle__unit {
-  font-size: var(--font-size-md);
+.stat-circle__arc {
+  stroke: var(--ui-stat-arc-color, var(--color-accent));
+}
+
+.stat-circle__value {
+  position: relative;
+  color: var(--color-raisin-black);
+  font-family: var(--font-family-numeric);
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: lining-nums proportional-nums;
+  line-height: 61.333px;
 }
 
 .stat-circle__label {
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-tight);
+  color: var(--color-on-surface);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  white-space: pre-line;
 }
