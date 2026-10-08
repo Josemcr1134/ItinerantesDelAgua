@@ -3,6 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
@@ -14,16 +15,17 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "auth": ["./dist/auth"],
-      "data-access": ["./dist/data-access"],
-      "ui-kit": ["./dist/ui-kit"],
-      "util": ["./dist/util"]
+      "auth": ["./projects/auth/src/public-api.ts"],
+      "data-access": ["./projects/data-access/src/public-api.ts"],
+      "ui-kit": ["./projects/ui-kit/src/public-api.ts"],
+      "util": ["./projects/util/src/public-api.ts"]
     }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   },
   "files": [],
   "references": [
