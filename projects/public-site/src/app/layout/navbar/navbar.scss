@@ -1,7 +1,9 @@
 @use 'breakpoints' as bp;
 
-// TODO(diseño): colores, tipografía, transparencia sobre el hero y animación
-// del menú móvil.
+// Desktop (xl+) según el diseño aprobado: barra crema a todo el ancho y, al
+// hacer scroll, cápsula flotante con fondo de vidrio.
+// TODO(diseño): móvil y tablet pendientes; hasta entonces se usa menú
+// desplegable con hamburguesa por debajo de xl.
 :host {
   display: block;
 }
@@ -26,7 +28,16 @@
   inset: 0 0 auto;
   z-index: 100;
   background-color: var(--color-surface);
-  box-shadow: 0 1px 0 var(--color-border);
+
+  @include bp.up(xl) {
+    padding-inline: 4.375rem; // margen lateral de la cápsula flotante
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      background-color 0.3s ease,
+      padding-top 0.3s ease;
+  }
 }
 
 .navbar__inner {
@@ -34,20 +45,73 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  max-width: var(--container-max-width);
+  max-width: 81.25rem;
   min-height: var(--navbar-height);
   margin: 0 auto;
   padding: 0 var(--space-3);
 
-  @include bp.up(lg) {
+  @include bp.up(xl) {
     flex-wrap: nowrap;
     gap: var(--space-5);
+    min-height: 6.875rem;
+    padding-inline: 2.25rem;
+    border-radius: var(--radius-pill);
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      min-height 0.3s ease,
+      padding 0.3s ease,
+      background-color 0.3s ease;
+  }
+}
+
+// Estado al hacer scroll: cápsula flotante de vidrio (solo desktop).
+@include bp.up(xl) {
+  .navbar--scrolled {
+    padding-top: 0.75rem;
+    background-color: transparent;
+
+    .navbar__inner {
+      min-height: 5.25rem;
+      padding-right: 1.125rem;
+      background-color: var(--navbar-glass-bg);
+      -webkit-backdrop-filter: blur(var(--navbar-glass-blur));
+      backdrop-filter: blur(var(--navbar-glass-blur));
+    }
+
+    .navbar__brand img {
+      height: 4rem;
+    }
+  }
+}
+
+// Por debajo de xl, al hacer scroll solo se separa del contenido con una línea.
+.navbar--scrolled {
+  box-shadow: 0 1px 0 var(--color-border);
+
+  @include bp.up(xl) {
+    box-shadow: none;
+  }
+}
+
+.navbar__brand {
+  display: block;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
 }
 
 .navbar__brand img {
   width: auto;
-  height: 2.5rem;
+  height: 3rem;
+
+  @include bp.up(xl) {
+    height: 4.5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: height 0.3s ease;
+  }
 }
 
 .navbar__toggle {
@@ -58,10 +122,10 @@
   padding: 0;
   border: 0;
   background: none;
-  color: inherit;
+  color: var(--color-on-surface);
   cursor: pointer;
 
-  @include bp.up(lg) {
+  @include bp.up(xl) {
     display: none;
   }
 }
@@ -114,11 +178,11 @@
   flex-basis: 100%;
   padding-bottom: var(--space-4);
 
-  @include bp.up(lg) {
+  @include bp.up(xl) {
     display: flex;
     flex-basis: auto;
     align-items: center;
-    gap: var(--space-5);
+    gap: 2.5rem;
     padding-bottom: 0;
   }
 }
@@ -132,9 +196,9 @@
   padding: 0;
   list-style: none;
 
-  @include bp.up(lg) {
+  @include bp.up(xl) {
     display: flex;
-    gap: var(--space-4);
+    gap: 2.5rem;
     margin: 0;
   }
 }
@@ -142,11 +206,22 @@
 .navbar__link {
   display: block;
   padding: var(--space-2) 0;
-  color: inherit;
-  font-weight: var(--font-weight-bold);
+  color: var(--color-on-surface);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-regular);
   text-decoration: none;
+  white-space: nowrap;
 
   &:hover {
     text-decoration: underline;
+    text-underline-offset: 0.25em;
   }
+}
+
+.navbar__cta {
+  min-height: 2.875rem;
+  padding-inline: 1.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  background-color: transparent;
 }

@@ -45,4 +45,20 @@ describe('Navbar', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement).toBe(toggle);
   });
+
+  it('pasa a cápsula flotante al hacer scroll y vuelve arriba', async () => {
+    const { fixture, host } = await setup();
+    const header = host.querySelector('.navbar')!;
+    const scrollTo = async (y: number) => {
+      Object.defineProperty(window, 'scrollY', { value: y, configurable: true });
+      window.dispatchEvent(new Event('scroll'));
+      await fixture.whenStable();
+    };
+
+    expect(header.classList).not.toContain('navbar--scrolled');
+    await scrollTo(200);
+    expect(header.classList).toContain('navbar--scrolled');
+    await scrollTo(0);
+    expect(header.classList).not.toContain('navbar--scrolled');
+  });
 });

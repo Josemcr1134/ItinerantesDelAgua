@@ -4,7 +4,7 @@ import { SECTION_IDS } from './section-ids';
 export const NAVBAR_CONTENT: NavbarContent = {
   skipLinkLabel: 'Saltar al contenido principal',
   logo: {
-    src: 'assets/placeholders/logo.svg', // TODO(diseño): logo real
+    src: 'assets/images/logoGreen.png',
     alt: 'Itinerantes del Agua, ir al inicio',
   },
   homeHref: `#${SECTION_IDS.hero}`,

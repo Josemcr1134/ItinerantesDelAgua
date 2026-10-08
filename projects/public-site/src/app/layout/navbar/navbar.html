@@ -1,10 +1,10 @@
 @let c = content();
 <a class="skip-link" pubAnchorLink href="#main">{{ c.skipLinkLabel }}</a>
 
-<header class="navbar">
+<header class="navbar" [class.navbar--scrolled]="scrolled()">
   <div class="navbar__inner">
     <a class="navbar__brand" pubAnchorLink [href]="c.homeHref" (click)="closeMenu()">
-      <img [src]="c.logo.src" [alt]="c.logo.alt" width="160" height="48" />
+      <img [src]="c.logo.src" [alt]="c.logo.alt" width="412" height="272" fetchpriority="high" />
     </a>
 
     <button
@@ -34,7 +34,7 @@
           </li>
         }
       </ul>
-      <a uiButton class="navbar__cta" [href]="c.cta.href" (click)="closeMenu()">
+      <a uiButton variant="secondary" class="navbar__cta" [href]="c.cta.href" (click)="closeMenu()">
         {{ c.cta.label }}
       </a>
     </nav>
