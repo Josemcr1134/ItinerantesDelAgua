@@ -212,8 +212,16 @@
   }
 }
 
+// Onda de la superficie del agua (máscara SVG; el color lo pone el token).
+$wave-height: 8px;
+$wave-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q15 0 30 4 T60 4 T90 4 T120 4 V8 H0 Z'/%3E%3C/svg%3E");
+
 // "Regístrate": Acumin 700, 20px, line-height 100%, letter-spacing -4%.
 .navbar__cta {
+  // Contenedor del "agua" del hover.
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   order: 1;
   // La altura la define el padding (no el min-height del botón base).
   min-height: auto;
@@ -238,17 +246,55 @@
     justify-self: end;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
+  // Agua: sube desde abajo con una onda en la superficie que se desplaza en
+  // horizontal. Mide el doble del botón para que la onda se repita sin cortes.
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    width: 200%;
+    height: calc(100% + #{$wave-height});
+    background-color: var(--color-primary);
+    mask:
+      $wave-mask top left / 50% $wave-height repeat-x,
+      linear-gradient(#000, #000) bottom / 100% calc(100% - #{$wave-height} + 1px) no-repeat;
+    translate: 0 100%;
   }
 
-  // Hover: relleno verde con texto claro.
   @media (hover: hover) {
     &:hover {
-      background-color: var(--color-primary);
       color: var(--color-on-primary);
     }
+
+    &:hover::before {
+      translate: 0 0;
+      animation-play-state: running;
+    }
+  }
+
+  &:focus-visible {
+    color: var(--color-on-primary);
+
+    &::before {
+      translate: 0 0;
+      animation-play-state: running;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: color 0.3s ease 0.25s;
+
+    &::before {
+      transition: translate 0.8s cubic-bezier(0.45, 0, 0.25, 1);
+      animation: navbar-cta-wave 1.4s linear infinite paused;
+    }
+  }
+}
+
+@keyframes navbar-cta-wave {
+  to {
+    transform: translateX(-50%);
   }
 }
