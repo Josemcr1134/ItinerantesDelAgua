@@ -1,0 +1,30 @@
+// Fuentes autoalojadas en public/assets/fonts.
+
+// Acumin Variable Concept (Adobe): fuente variable de texto.
+// Ejes: wght 100–900, wdth 50–115, slnt 0–12.
+// TODO: convertir a WOFF2 (pesa ~1 MB en OTF) y confirmar licencia de uso web.
+@font-face {
+  font-family: 'Acumin Variable Concept';
+  src: url('/assets/fonts/AcuminVariableConcept.otf') format('opentype');
+  font-weight: 100 900;
+  font-stretch: 50% 115%;
+  font-style: normal;
+  font-display: swap;
+}
+
+// Amatic SC (Google Fonts, licencia OFL), subconjunto latin (incluye ñ y tildes).
+@font-face {
+  font-family: 'Amatic SC';
+  src: url('/assets/fonts/AmaticSC-Regular-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Amatic SC';
+  src: url('/assets/fonts/AmaticSC-Bold-latin.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
