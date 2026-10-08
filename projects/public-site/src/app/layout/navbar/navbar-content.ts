@@ -1,7 +1,6 @@
 import { UiImage, UiLink } from 'ui-kit';
 
 export interface NavbarContent {
-  readonly skipLinkLabel: string;
   /** Logo; su `alt` es el nombre accesible del enlace al inicio. */
   readonly logo: UiImage;
   /** Ancla del inicio de la página, destino del logo. */

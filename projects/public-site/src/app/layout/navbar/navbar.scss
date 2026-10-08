@@ -1,26 +1,12 @@
 @use 'breakpoints' as bp;
 
-// Desktop (xl+) según el diseño aprobado: barra crema a todo el ancho y, al
-// hacer scroll, cápsula flotante con fondo de vidrio.
+// Desktop (xl+) según el diseño aprobado: logo a la izquierda, enlaces al
+// centro y "Regístrate" a la derecha. Barra crema a todo el ancho arriba y
+// cápsula flotante translúcida al hacer scroll.
 // TODO(diseño): móvil y tablet pendientes; hasta entonces se usa menú
 // desplegable con hamburguesa por debajo de xl.
 :host {
   display: block;
-}
-
-.skip-link {
-  position: fixed;
-  top: var(--space-2);
-  left: var(--space-2);
-  z-index: 200;
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--color-surface);
-  color: var(--color-on-surface);
-  transform: translateY(-200%);
-
-  &:focus {
-    transform: none;
-  }
 }
 
 .navbar {
@@ -30,7 +16,7 @@
   background-color: var(--color-surface);
 
   @include bp.up(xl) {
-    padding-inline: 4.375rem; // margen lateral de la cápsula flotante
+    padding-inline: clamp(1.5rem, 4.86vw, 4.375rem); // 70px a 1440px
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -44,15 +30,16 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-2);
   max-width: 81.25rem;
   min-height: var(--navbar-height);
   margin: 0 auto;
   padding: 0 var(--space-3);
 
   @include bp.up(xl) {
-    flex-wrap: nowrap;
-    gap: var(--space-5);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--space-4);
     min-height: 6.875rem;
     padding-inline: 2.25rem;
     border-radius: var(--radius-pill);
@@ -61,12 +48,11 @@
   @media (prefers-reduced-motion: no-preference) {
     transition:
       min-height 0.3s ease,
-      padding 0.3s ease,
-      background-color 0.3s ease;
+      padding 0.3s ease;
   }
 }
 
-// Estado al hacer scroll: cápsula flotante de vidrio (solo desktop).
+// Estado al hacer scroll: cápsula flotante translúcida (solo desktop).
 @include bp.up(xl) {
   .navbar--scrolled {
     padding-top: 0.75rem;
@@ -75,9 +61,7 @@
     .navbar__inner {
       min-height: 5.25rem;
       padding-right: 1.125rem;
-      background-color: var(--navbar-glass-bg);
-      -webkit-backdrop-filter: blur(var(--navbar-glass-blur));
-      backdrop-filter: blur(var(--navbar-glass-blur));
+      background: var(--navbar-glass-bg);
     }
 
     .navbar__brand img {
@@ -98,7 +82,14 @@
 .navbar__brand {
   display: block;
   flex-shrink: 0;
+  margin-inline-end: auto;
   border-radius: var(--radius-sm);
+
+  @include bp.up(xl) {
+    grid-area: 1 / 1;
+    justify-self: start;
+    margin: 0;
+  }
 }
 
 .navbar__brand img {
@@ -116,6 +107,7 @@
 
 .navbar__toggle {
   display: grid;
+  order: 2;
   place-items: center;
   width: 2.75rem;
   height: 2.75rem;
@@ -176,13 +168,12 @@
 .navbar__menu {
   display: none;
   flex-basis: 100%;
+  order: 3;
   padding-bottom: var(--space-4);
 
   @include bp.up(xl) {
-    display: flex;
-    flex-basis: auto;
-    align-items: center;
-    gap: 2.5rem;
+    display: block;
+    grid-area: 1 / 2;
     padding-bottom: 0;
   }
 }
@@ -192,23 +183,26 @@
 }
 
 .navbar__links {
-  margin: 0 0 var(--space-3);
+  margin: 0;
   padding: 0;
   list-style: none;
 
   @include bp.up(xl) {
     display: flex;
-    gap: 2.5rem;
-    margin: 0;
+    gap: clamp(1.5rem, 2.78vw, 2.5rem); // 40px a 1440px
   }
 }
 
+// Items del header: Acumin 400, 20px / 28px.
 .navbar__link {
   display: block;
   padding: var(--space-2) 0;
   color: var(--color-on-surface);
-  font-size: 1.125rem;
+  font-family: var(--font-family-body);
+  font-size: 1.25rem;
   font-weight: var(--font-weight-regular);
+  line-height: 1.75rem;
+  letter-spacing: 0;
   text-decoration: none;
   white-space: nowrap;
 
@@ -218,10 +212,23 @@
   }
 }
 
+// "Regístrate": Acumin 700, 20px, line-height 100%, letter-spacing -4%.
 .navbar__cta {
+  order: 1;
   min-height: 2.875rem;
   padding-inline: 1.75rem;
-  font-size: 1.125rem;
-  font-weight: 600;
   background-color: transparent;
+  font-family: var(--font-family-body);
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+
+  @include bp.up(xl) {
+    grid-area: 1 / 3;
+    justify-self: end;
+  }
 }

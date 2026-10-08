@@ -10,7 +10,7 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('renderiza el contenido principal como destino del skip link', async () => {
+  it('renderiza el contenido principal', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const main = (fixture.nativeElement as HTMLElement).querySelector('main#main');
