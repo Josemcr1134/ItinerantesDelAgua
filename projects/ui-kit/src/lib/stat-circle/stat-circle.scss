@@ -1,0 +1,41 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): tamaño, borde y colores finales del círculo.
+:host {
+  display: block;
+}
+
+.stat-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 9rem;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  padding: var(--space-3);
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  text-align: center;
+
+  @include bp.up(md) {
+    width: 11rem;
+  }
+}
+
+.stat-circle__value {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.stat-circle__unit {
+  font-size: var(--font-size-md);
+}
+
+.stat-circle__label {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-tight);
+}

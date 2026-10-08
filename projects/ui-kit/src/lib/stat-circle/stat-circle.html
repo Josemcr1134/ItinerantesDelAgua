@@ -1,0 +1,9 @@
+<p class="stat-circle">
+  <span class="stat-circle__value">
+    {{ value() }}
+    @if (unit(); as unit) {
+      <span class="stat-circle__unit">{{ unit }}</span>
+    }
+  </span>
+  <span class="stat-circle__label">{{ label() }}</span>
+</p>

@@ -1,0 +1,40 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): forma y colores finales del badge.
+:host {
+  display: inline-block;
+}
+
+.stat-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1) var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  text-align: center;
+}
+
+.stat-badge__value {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+
+  @include bp.up(md) {
+    font-size: calc(var(--font-size-display) * 1.4);
+  }
+}
+
+.stat-badge__unit {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.stat-badge__label {
+  flex-basis: 100%;
+  font-size: var(--font-size-sm);
+}
