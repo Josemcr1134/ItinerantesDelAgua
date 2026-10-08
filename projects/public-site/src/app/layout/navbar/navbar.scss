@@ -215,9 +215,10 @@
 // "Regístrate": Acumin 700, 20px, line-height 100%, letter-spacing -4%.
 .navbar__cta {
   order: 1;
-  min-height: 2.6875rem; // 43px
-  padding: 0.3125rem 1.5625rem; // 5px 25px
-  border: 3px solid var(--color-primary);
+  // La altura la define el padding (no el min-height del botón base).
+  min-height: auto;
+  padding: 0.59375rem 1.75rem; // 9.5px 28px
+  border: 2px solid var(--color-primary);
   border-radius: 44px;
   background-color: transparent;
   font-family: var(--font-family-body);
