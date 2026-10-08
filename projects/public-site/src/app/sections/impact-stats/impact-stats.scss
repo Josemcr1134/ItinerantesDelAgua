@@ -1,13 +1,17 @@
 @use 'breakpoints' as bp;
 
-// TODO(diseño): color sólido de fondo, tipografía y tamaños finales.
+// TODO(diseño): contenido de la sección pendiente de implementar con el Figma.
 :host {
   display: block;
 }
 
+// Franja azul con borde superior en arco ("fondo marino" del Figma). El SVG
+// también cubre la sección siguiente en el diseño.
 .impact {
-  padding: var(--space-7) var(--space-3);
-  background-color: var(--color-impact-bg);
+  // Deja libre la zona donde caen las ilustraciones y el "Desliza para
+  // explorar" del hero (el titular empieza 377px bajo el arco en el diseño).
+  padding: max(160px, calc(377 * min(100vw, 1440px) / 1440)) var(--space-3) var(--space-7);
+  background: url('/assets/images/fondo%20marino.svg') top center / 100% auto no-repeat;
   color: var(--color-on-impact);
   text-align: center;
 }
