@@ -1,0 +1,20 @@
+@let c = content();
+<section class="impact" [id]="sectionId" tabindex="-1" aria-labelledby="impact-title">
+  <div class="impact__inner">
+    <h2 id="impact-title" class="impact__title">{{ c.heading }}</h2>
+
+    <ui-stat-badge
+      [value]="c.highlight.value"
+      [unit]="c.highlight.unit"
+      [label]="c.highlight.label"
+    />
+
+    <ul class="impact__stats">
+      @for (stat of c.stats; track stat.label) {
+        <li>
+          <ui-stat-circle [value]="stat.value" [unit]="stat.unit" [label]="stat.label" />
+        </li>
+      }
+    </ul>
+  </div>
+</section>
