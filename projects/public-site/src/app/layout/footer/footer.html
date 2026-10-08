@@ -1,0 +1,16 @@
+@let c = content();
+<footer class="footer">
+  <div class="footer__inner">
+    <img class="footer__logo" [src]="c.logo.src" [alt]="c.logo.alt" width="160" height="48" />
+    <p class="footer__tagline">{{ c.tagline }}</p>
+    <ul class="footer__social">
+      @for (social of c.socialLinks; track social.href) {
+        <li>
+          <a class="footer__social-link" [href]="social.href" [attr.aria-label]="social.label">
+            <img [src]="social.iconSrc" alt="" width="32" height="32" />
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</footer>
