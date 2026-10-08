@@ -62,6 +62,8 @@
       min-height: 5.25rem;
       padding-right: 1.125rem;
       background: var(--navbar-glass-bg);
+      -webkit-backdrop-filter: blur(var(--navbar-glass-blur));
+      backdrop-filter: blur(var(--navbar-glass-blur));
     }
 
     .navbar__brand img {

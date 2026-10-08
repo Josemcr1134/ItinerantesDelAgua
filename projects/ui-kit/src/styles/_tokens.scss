@@ -67,4 +67,7 @@
     rgb(251 248 240 / 75%) 1.97%,
     rgb(251 248 240 / 50%) 100%
   );
+  // Desenfoque del fondo de la cápsula para que el menú se lea sobre
+  // ilustraciones y la franja azul.
+  --navbar-glass-blur: 20px;
 }
