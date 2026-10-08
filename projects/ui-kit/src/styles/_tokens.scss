@@ -1,17 +1,17 @@
 // Design tokens de Itinerantes del Agua.
 //
-// TODO(diseño): TODOS los valores de este archivo son PLACEHOLDERS neutros en
-// escala de grises. Se reemplazarán por la paleta, tipografías y escalas del
-// diseño aprobado, sección por sección. No usar colores fuera de estos tokens.
+// Los valores marcados TODO(diseño) siguen siendo PLACEHOLDERS neutros y se
+// reemplazan por los del diseño aprobado sección por sección. Los que no
+// llevan TODO ya están confirmados. No usar colores fuera de estos tokens.
 
 :root {
   // --- Color ---------------------------------------------------------------
-  --color-primary: #4a4a4a; // TODO(diseño): color primario de marca
-  --color-on-primary: #ffffff; // TODO(diseño)
+  --color-primary: #3f5644; // verde de marca (CTA "Regístrate", logo)
+  --color-on-primary: #fbf8f0; // TODO(diseño): confirmar texto sobre verde
   --color-secondary: #7a7a7a; // TODO(diseño): color secundario
   --color-on-secondary: #ffffff; // TODO(diseño)
-  --color-surface: #ffffff; // TODO(diseño): fondo general
-  --color-on-surface: #1f1f1f; // TODO(diseño): texto sobre fondo general
+  --color-surface: #fbf8f0; // crema de fondo (medido del diseño, TODO confirmar hex)
+  --color-on-surface: #000000; // negro de textos y enlaces del navbar
   --color-surface-alt: #f2f2f2; // TODO(diseño): fondo de tarjetas/paneles
   --color-impact-bg: #d9d9d9; // TODO(diseño): fondo sólido de la sección de métricas
   --color-on-impact: #1f1f1f; // TODO(diseño)
@@ -47,5 +47,10 @@
   --container-max-width: 72rem; // TODO(diseño)
 
   // --- Layout --------------------------------------------------------------
-  --navbar-height: 4rem; // TODO(diseño): altura real del navbar fijo
+  --navbar-height: 4rem; // TODO(diseño): altura en móvil/tablet pendiente
+
+  // --- Navbar --------------------------------------------------------------
+  // Fondo de vidrio de la cápsula flotante al hacer scroll (medido del diseño).
+  --navbar-glass-bg: rgb(255 255 255 / 72%);
+  --navbar-glass-blur: 12px;
 }
