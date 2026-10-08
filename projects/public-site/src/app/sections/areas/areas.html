@@ -1,41 +1,145 @@
 @let c = content();
 <section class="areas" [id]="sectionId" tabindex="-1" aria-labelledby="areas-title">
-  <div class="areas__inner">
-    <header class="areas__header">
-      <h2 id="areas-title" class="areas__title">{{ c.heading }}</h2>
-      <p class="areas__subtitle">{{ c.subtitle }}</p>
-    </header>
+  <img class="areas__divider" [src]="c.divider.src" [alt]="c.divider.alt" width="116" height="16" />
+  <h2 id="areas-title" class="areas__title">{{ c.heading }}</h2>
+  <p class="areas__subtitle">{{ c.subtitle }}</p>
 
-    <!-- TODO(diseño): aplicar el diseño del Figma (panel crema, texto verde). -->
+  <div class="areas__group">
+    <!-- Formas de fondo de cada tarjeta. TODO(diseño): reemplazar por los
+         vectores exportados de Figma (Vector 4, 5 y 6). -->
+    <div class="areas__backdrops" aria-hidden="true">
+      <span class="areas__backdrop"></span>
+      <span class="areas__backdrop"></span>
+      <span class="areas__backdrop"></span>
+    </div>
+
     <ui-expandable-card-group
       [items]="c.items"
       [groupLabel]="c.heading"
       [openLabel]="c.openLabel"
       [closeLabel]="c.closeLabel"
+      [(activeId)]="activeId"
     >
-      @for (item of c.items; track item.id) {
-        <ng-template [uiCardPanel]="item.id">
-          <div class="area-panel">
-            <h3>{{ item.title }}</h3>
-            @for (paragraph of item.detail.paragraphs; track $index) {
-              <p>{{ paragraph }}</p>
+      <ng-template uiCardPanel="escuela">
+        <div class="area-panel">
+          <img
+            class="area-panel__image area-panel__image--school"
+            [src]="c.school.image.src"
+            [alt]="c.school.image.alt"
+            width="389"
+            height="360"
+            loading="lazy"
+          />
+          <h3 class="area-panel__title area-panel__title--school">{{ c.school.title }}</h3>
+          <p class="area-panel__subtitle area-panel__subtitle--school">{{ c.school.subtitle }}</p>
+          <div class="area-panel__text area-panel__text--school">
+            @for (paragraph of c.school.paragraphs; track $index) {
+              <p>
+                @if (paragraph.lead) {
+                  <strong>{{ paragraph.lead }}</strong>
+                }
+                {{ paragraph.text }}
+              </p>
             }
-            @if (item.detail.columns; as columns) {
-              @if (item.detail.columnsHeading; as columnsHeading) {
-                <h4>{{ columnsHeading }}</h4>
-              }
-              @for (column of columns; track column.heading) {
-                <h5>{{ column.heading }}</h5>
-                <ul>
-                  @for (entry of column.items; track $index) {
+          </div>
+          <h4 class="area-panel__heading area-panel__heading--paths">{{ c.school.pathsTitle }}</h4>
+          <div class="area-columns area-columns--paths">
+            @for (path of c.school.paths; track path.heading) {
+              <div class="area-column">
+                <img
+                  class="area-column__wave"
+                  [src]="c.divider.src"
+                  alt=""
+                  width="116"
+                  height="16"
+                />
+                <h5 class="area-column__heading">{{ path.heading }}</h5>
+                <ul class="area-list area-list--spiral">
+                  @for (entry of path.items; track $index) {
                     <li>{{ entry }}</li>
                   }
                 </ul>
-              }
+              </div>
             }
           </div>
-        </ng-template>
-      }
+        </div>
+      </ng-template>
+
+      <ng-template uiCardPanel="diseno">
+        <div class="area-panel">
+          <img
+            class="area-panel__image area-panel__image--design"
+            [src]="c.design.image.src"
+            [alt]="c.design.image.alt"
+            width="444"
+            height="444"
+            loading="lazy"
+          />
+          <h3 class="area-panel__title area-panel__title--design">{{ c.design.title }}</h3>
+          <p class="area-panel__subtitle area-panel__subtitle--design">{{ c.design.subtitle }}</p>
+          <p class="area-panel__text area-panel__text--design">{{ c.design.paragraph }}</p>
+          <h4 class="area-panel__heading area-panel__heading--services">
+            {{ c.design.servicesTitle }}
+          </h4>
+          <img
+            class="area-panel__wave area-panel__wave--services"
+            [src]="c.divider.src"
+            alt=""
+            width="116"
+            height="16"
+          />
+          <ul class="area-list area-list--drop area-list--services">
+            @for (service of c.design.services; track $index) {
+              <li>{{ service }}</li>
+            }
+          </ul>
+        </div>
+      </ng-template>
+
+      <ng-template uiCardPanel="innovacion">
+        @let inn = c.innovation;
+        <div class="area-panel">
+          <h3 class="area-panel__title area-panel__title--innovation">{{ inn.title }}</h3>
+          <p class="area-panel__subtitle area-panel__subtitle--innovation">{{ inn.subtitle }}</p>
+          <p class="area-panel__text area-panel__text--innovation">{{ inn.paragraph }}</p>
+          <h4 class="area-panel__lines-title">{{ inn.linesTitle }}</h4>
+          <div class="area-columns area-columns--lines">
+            @for (line of inn.lines; track line.heading) {
+              <div class="area-column">
+                <img
+                  class="area-column__wave"
+                  [src]="c.divider.src"
+                  alt=""
+                  width="116"
+                  height="16"
+                />
+                <h5 class="area-column__heading">{{ line.heading }}</h5>
+                <p class="area-column__text">{{ line.text }}</p>
+              </div>
+            }
+          </div>
+          <h4 class="area-panel__heading area-panel__heading--featured">
+            {{ inn.featured.title }}
+          </h4>
+          <p class="area-panel__subtitle area-panel__subtitle--featured">
+            {{ inn.featured.subtitle }}
+          </p>
+          <div class="area-panel__text area-panel__text--featured">
+            @for (paragraph of inn.featured.paragraphs; track $index) {
+              <p>{{ paragraph }}</p>
+            }
+          </div>
+          <ul class="area-list area-list--drop-small area-list--featured">
+            @for (entry of inn.featured.items; track $index) {
+              <li>{{ entry }}</li>
+            }
+          </ul>
+        </div>
+      </ng-template>
     </ui-expandable-card-group>
   </div>
+
+  @if (activeCta(); as cta) {
+    <a uiButton variant="secondary" class="areas__cta" [href]="cta.href">{{ cta.label }}</a>
+  }
 </section>

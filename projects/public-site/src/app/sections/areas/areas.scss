@@ -1,39 +1,363 @@
 @use 'breakpoints' as bp;
 
-// TODO(diseño): fondo, tipografía y espaciados finales.
+// Valores tomados del Figma (Landing Desktop, 1440px, y paneles de cada área
+// de 1296×801). Las posiciones de los paneles salen de los metadatos de Figma.
+// TODO(diseño): tablet y móvil pendientes.
 :host {
   display: block;
 }
 
 .areas {
-  padding: var(--space-7) var(--space-3);
-}
-
-.areas__inner {
-  max-width: var(--container-max-width);
-  margin: 0 auto;
-}
-
-.areas__header {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  margin-bottom: var(--space-5);
+  align-items: center;
+  padding: 0 var(--space-3) 60px;
+  color: var(--color-primary);
   text-align: center;
 }
 
-.areas__title {
-  font-size: var(--font-size-xl);
+.areas__divider {
+  width: 116px;
+  height: 16px;
+  margin: -2px;
+}
 
-  @include bp.up(md) {
-    font-size: var(--font-size-display);
+// Amatic SC Bold 64px, verde.
+.areas__title {
+  margin-top: 15px;
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 4.444vw, 4rem);
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+// Acumin Regular 20/28, verde.
+.areas__subtitle {
+  max-width: 600px;
+  margin-top: 30px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.areas__group {
+  position: relative;
+  width: 100%;
+  max-width: 1296px;
+  margin-top: 15px;
+  text-align: start;
+
+  ui-expandable-card-group {
+    --ui-ecg-panel-bg: #f5f0e5;
+    --ui-ecg-text: var(--color-primary);
+    --ui-ecg-title-color: var(--color-primary);
+    --ui-ecg-trigger-bg: var(--color-sun);
+    --ui-ecg-trigger-active-icon: var(--color-primary);
+    --ui-ecg-title-gap: 18px;
+    --ui-ecg-desc-size: 1.25rem;
+    --ui-ecg-card-height: 562px;
+    --ui-ecg-panel-offset: 27px;
+    --ui-ecg-panel-min-height: 801px;
   }
 }
 
-.areas__subtitle {
-  font-size: var(--font-size-lg);
+// Formas de fondo de las tarjetas (440/464/440 × 482), 55px bajo las
+// ilustraciones. TODO(diseño): sustituir por los vectores de Figma; ahora
+// son aproximaciones con los colores exactos del diseño.
+.areas__backdrops {
+  display: none;
+
+  @include bp.up(xl) {
+    display: block;
+  }
 }
 
+.areas__backdrop {
+  position: absolute;
+  top: 55px;
+  width: 440px;
+  height: 482px;
+  border-radius: 46% 54% 42% 48% / 40% 44% 56% 52%;
+
+  &:nth-child(1) {
+    left: 0;
+    background-color: #d8e7fb;
+  }
+
+  &:nth-child(2) {
+    left: 416px;
+    width: 464px;
+    background-color: #e3e5d6;
+  }
+
+  &:nth-child(3) {
+    left: 856px;
+    background-color: #fbebc9;
+  }
+}
+
+// "Conoce la Escuela": mismo botón que "Quiero implementar".
+.areas__cta {
+  --ui-button-color: var(--color-accent);
+  --ui-button-border-width: 3px;
+
+  min-width: 232px;
+  min-height: 68px;
+  margin-top: 55px;
+  padding: 0 1.5rem;
+  border-radius: 100px;
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.04em;
+}
+
+// --- Paneles (1296×801, coordenadas del Figma) -----------------------------
+
 .area-panel {
-  padding: 60px 110px;
+  position: absolute;
+  inset: 0;
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+
+  > * {
+    position: absolute;
+    margin: 0;
+  }
+}
+
+// Amatic SC Bold 64px, azul de acento.
+.area-panel__title {
+  left: 110px;
+  color: var(--color-accent);
+  font-family: var(--font-family-display);
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+// Acumin Bold 20/28.
+.area-panel__subtitle {
+  left: 110px;
+  font-weight: var(--font-weight-bold);
+}
+
+.area-panel__text {
+  left: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+// Amatic SC Bold 48px, verde.
+.area-panel__heading {
+  left: 110px;
+  font-family: var(--font-family-display);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.area-panel__wave {
+  width: 116px;
+  height: 16px;
+}
+
+// Escuela
+.area-panel__image--school {
+  top: 58px;
+  left: 878px;
+  width: 389px;
+  height: 360px;
+}
+.area-panel__title--school {
+  top: 72px;
+}
+.area-panel__subtitle--school {
+  top: 151px;
+}
+.area-panel__text--school {
+  top: 197px;
+  width: 795px;
+}
+.area-panel__heading--paths {
+  top: 446px;
+}
+
+// Diseño y Asesoría
+.area-panel__image--design {
+  top: 56px;
+  left: 852px;
+  width: 444px;
+  height: 444px;
+}
+.area-panel__title--design {
+  top: 72px;
+}
+.area-panel__subtitle--design {
+  top: 151px;
+}
+.area-panel__text--design {
+  top: 197px;
+  width: 746px;
+}
+.area-panel__heading--services {
+  top: 401px;
+}
+.area-panel__wave--services {
+  top: calc(474px - 2px);
+  left: calc(108px - 2px);
+}
+.area-list--services {
+  top: 500px;
+  left: 108px;
+  width: 750px;
+}
+
+// Innovación y tecnologías regenerativas
+.area-panel__title--innovation {
+  top: 55px;
+}
+.area-panel__subtitle--innovation {
+  top: 134px;
+}
+.area-panel__text--innovation {
+  top: 180px;
+  width: 1076px;
+}
+// TODO(diseño): confirmar estilo (en el Figma es una caja de 419×23).
+.area-panel__lines-title {
+  top: 258px;
+  left: 110px;
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 23px;
+}
+.area-panel__heading--featured {
+  top: 470px;
+}
+.area-panel__subtitle--featured {
+  top: 534px;
+}
+.area-panel__text--featured {
+  top: 580px;
+  width: 600px;
+}
+.area-list--featured {
+  top: 534px;
+  left: 750px;
+  width: 463px;
+}
+
+// Columnas (onda + título azul + contenido) en x = 108 / 483 / 871.
+.area-columns {
+  left: 108px;
+  display: grid;
+  grid-template-columns: 375px 388px auto;
+}
+
+.area-columns--paths {
+  top: 519px;
+}
+.area-columns--lines {
+  top: 299px;
+}
+
+.area-column__wave {
+  width: 116px;
+  height: 16px;
+  margin: -2px;
+}
+
+// Acumin Bold 24/28, azul de acento.
+.area-column__heading {
+  margin: 14px 0 0 2px;
+  color: var(--color-accent);
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.75rem;
+}
+
+.area-column__text {
+  width: 263px;
+  margin: 16px 0 0 2px;
+}
+
+// Listas con viñetas gráficas. TODO(diseño): sustituir los marcadores CSS por
+// los vectores de Figma (espiral 23×23, gota 24×33 y gota 16×22).
+.area-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    position: relative;
+    white-space: pre-line;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      background-color: var(--color-accent);
+    }
+  }
+}
+
+.area-list--spiral {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 16px;
+
+  li {
+    padding-left: 34px;
+
+    &::before {
+      top: 2px;
+      width: 23px;
+      height: 23px;
+      border: 4px solid var(--color-accent);
+      border-radius: 50%;
+      background: none;
+    }
+  }
+}
+
+.area-column:nth-child(1) .area-list--spiral {
+  width: 297px;
+}
+.area-column:nth-child(2) .area-list--spiral {
+  width: 327px;
+}
+.area-column:nth-child(3) .area-list--spiral {
+  width: 324px;
+}
+
+.area-list--drop li {
+  padding-left: 35px;
+  line-height: 44px;
+
+  &::before {
+    top: 4px;
+    width: 24px;
+    height: 33px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  }
+}
+
+.area-list--drop-small li {
+  padding-left: 30px;
+  line-height: 36px;
+
+  &::before {
+    top: 5px;
+    left: 3px;
+    width: 16px;
+    height: 22px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  }
 }
