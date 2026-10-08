@@ -206,9 +206,15 @@
   text-decoration: none;
   white-space: nowrap;
 
-  &:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
+  @media (prefers-reduced-motion: no-preference) {
+    transition: color 0.2s ease;
+  }
+
+  // Hover: texto en el verde principal (no definido en Figma).
+  @media (hover: hover) {
+    &:hover {
+      color: var(--color-primary);
+    }
   }
 }
 
