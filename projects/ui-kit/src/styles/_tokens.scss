@@ -22,7 +22,10 @@
 
   // --- Tipografía ----------------------------------------------------------
   --font-family-heading: system-ui, sans-serif; // TODO(diseño): tipografía de títulos
-  --font-family-body: system-ui, sans-serif; // TODO(diseño): tipografía de texto
+  // Acumin Variable Concept (Adobe). Mientras no esté cargada se usa el fallback.
+  // 'acumin-variable' es el nombre que expone Adobe Fonts en su kit web.
+  --font-family-body:
+    'Acumin Variable Concept', 'acumin-variable', 'Helvetica Neue', Arial, sans-serif;
   --font-weight-regular: 400; // TODO(diseño)
   --font-weight-bold: 700; // TODO(diseño)
   --font-size-sm: 0.875rem; // TODO(diseño)
@@ -50,7 +53,10 @@
   --navbar-height: 4rem; // TODO(diseño): altura en móvil/tablet pendiente
 
   // --- Navbar --------------------------------------------------------------
-  // Fondo de vidrio de la cápsula flotante al hacer scroll (medido del diseño).
-  --navbar-glass-bg: rgb(255 255 255 / 72%);
-  --navbar-glass-blur: 12px;
+  // Fondo de la cápsula flotante al hacer scroll (crema translúcido).
+  --navbar-glass-bg: linear-gradient(
+    89.99deg,
+    rgb(251 248 240 / 75%) 1.97%,
+    rgb(251 248 240 / 50%) 100%
+  );
 }
