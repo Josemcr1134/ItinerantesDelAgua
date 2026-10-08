@@ -1,17 +1,17 @@
 import { Component, input } from '@angular/core';
-import { ExpandableCardGroup } from 'ui-kit';
+import { CardPanel, ExpandableCardGroup } from 'ui-kit';
 import { SECTION_IDS } from '../../content/section-ids';
-import { CardGroupSectionContent } from '../../shared/card-group-section-content';
+import { AreasContent } from './areas-content';
 
 /** "Itinerantes del Agua": áreas del ecosistema. */
 @Component({
   selector: 'pub-areas',
-  imports: [ExpandableCardGroup],
+  imports: [ExpandableCardGroup, CardPanel],
   templateUrl: './areas.html',
   styleUrl: './areas.scss',
 })
 export class Areas {
-  readonly content = input.required<CardGroupSectionContent>();
+  readonly content = input.required<AreasContent>();
 
   protected readonly sectionId = SECTION_IDS.areas;
 }

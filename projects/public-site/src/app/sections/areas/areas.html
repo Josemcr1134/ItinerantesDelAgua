@@ -6,10 +6,36 @@
       <p class="areas__subtitle">{{ c.subtitle }}</p>
     </header>
 
+    <!-- TODO(diseño): aplicar el diseño del Figma (panel crema, texto verde). -->
     <ui-expandable-card-group
       [items]="c.items"
       [groupLabel]="c.heading"
-      [collapseLabel]="c.collapseLabel"
-    />
+      [openLabel]="c.openLabel"
+      [closeLabel]="c.closeLabel"
+    >
+      @for (item of c.items; track item.id) {
+        <ng-template [uiCardPanel]="item.id">
+          <div class="area-panel">
+            <h3>{{ item.title }}</h3>
+            @for (paragraph of item.detail.paragraphs; track $index) {
+              <p>{{ paragraph }}</p>
+            }
+            @if (item.detail.columns; as columns) {
+              @if (item.detail.columnsHeading; as columnsHeading) {
+                <h4>{{ columnsHeading }}</h4>
+              }
+              @for (column of columns; track column.heading) {
+                <h5>{{ column.heading }}</h5>
+                <ul>
+                  @for (entry of column.items; track $index) {
+                    <li>{{ entry }}</li>
+                  }
+                </ul>
+              }
+            }
+          </div>
+        </ng-template>
+      }
+    </ui-expandable-card-group>
   </div>
 </section>

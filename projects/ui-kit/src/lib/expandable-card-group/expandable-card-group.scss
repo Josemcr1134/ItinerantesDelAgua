@@ -1,20 +1,39 @@
 @use 'breakpoints' as bp;
 
-// TODO(diseño): colores, sombras, ícono de flecha y animación finales.
+// Valores del Figma (componente de 1296px): tarjetas de 282px con su botón-
+// pestaña, y panel de 1296×501 con radio de 85px que asoma 12px bajo los
+// botones. Colores ajustables por sección:
+//   --ui-ecg-panel-bg     fondo del panel (y del botón activo)
+//   --ui-ecg-text         texto de las tarjetas
+//   --ui-ecg-trigger-bg   botón inactivo (amarillo)
+//   --ui-ecg-trigger-icon flecha del botón
+// TODO(diseño): tablet y móvil pendientes.
+$panel-bg: var(--ui-ecg-panel-bg, #364f84);
+$text: var(--ui-ecg-text, #fff);
+$trigger-bg: var(--ui-ecg-trigger-bg, #eaa700);
+$trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
+
 :host {
   display: block;
+  max-width: 1296px;
+  margin: 0 auto;
 }
 
 .cards {
-  display: grid;
-  gap: var(--space-3);
+  position: relative;
+  z-index: 1; // los botones quedan sobre el borde del panel
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-6) var(--space-5);
   margin: 0;
   padding: 0;
   list-style: none;
 
-  @include bp.up(md) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
+  @include bp.up(xl) {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    padding: 0 68px;
   }
 }
 
@@ -22,139 +41,103 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  border: 2px solid transparent;
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-alt);
-
-  &:has(.card__trigger:focus-visible) {
-    outline: 3px solid var(--color-focus-ring);
-    outline-offset: 3px;
-  }
+  align-items: center; // los títulos largos desbordan centrados
+  width: 282px;
+  height: 511px; // el botón termina 511px bajo el inicio de la tarjeta
+  color: $text;
+  text-align: center;
 }
 
-.card--active {
-  border-color: var(--color-primary);
+.card__image {
+  width: 282px;
+  height: 282px;
+  object-fit: contain;
 }
 
-.card__icon {
-  width: 3rem;
-  height: 3rem;
-}
-
+// Amatic SC Bold 40px.
 .card__title {
-  font-size: var(--font-size-lg);
-}
-
-.card__trigger {
-  padding: 0;
-  border: 0;
-  background: none;
+  margin-top: 4px;
   color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-
-  // Toda la tarjeta es clicable; el foco se dibuja en la tarjeta (:has).
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-  }
-
-  &:focus-visible {
-    outline: none;
-  }
+  font-family: var(--font-family-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.card__arrow {
+// Acumin Regular 24/28.
+.card__description {
+  margin-top: 19.6px;
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  white-space: pre-line;
+}
+
+// Botón-pestaña de 60×60 con resplandor difuminado debajo.
+.card__trigger {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  isolation: isolate;
   display: grid;
   place-items: center;
-  align-self: flex-end;
-  width: 2.5rem;
-  height: 2.5rem;
-  margin-top: auto;
-  border-radius: 50%;
-  background-color: var(--color-primary);
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background-color: $trigger-bg;
+  color: $trigger-icon;
+  cursor: pointer;
+  transform: translateX(-50%);
 
-  // TODO(diseño): reemplazar el chevron CSS por el ícono de flecha del diseño.
   &::before {
     content: '';
-    width: 0.6rem;
-    height: 0.6rem;
-    border-right: 2px solid var(--color-on-primary);
-    border-bottom: 2px solid var(--color-on-primary);
-    transform: translateY(-2px) rotate(45deg);
+    position: absolute;
+    top: 39px;
+    left: 14px;
+    z-index: -1;
+    width: 32px;
+    height: 31px;
+    border-radius: 6px;
+    background-color: inherit;
+    filter: blur(10.75px);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: background-color 0.2s ease;
   }
 }
 
-.card--active .card__arrow::before {
-  transform: translateY(2px) rotate(-135deg);
+.card__trigger-icon {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform 0.2s ease;
+  }
+}
+
+// Activo: del color del panel, con la flecha hacia arriba.
+.card__trigger--active {
+  background-color: $panel-bg;
+
+  &::before {
+    top: 15px;
+    left: 14px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .card__trigger-icon {
+    transform: rotate(-90deg);
+  }
 }
 
 .panel {
-  margin-top: var(--space-4);
-  padding: var(--space-4);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-alt);
-
-  @include bp.up(md) {
-    padding: var(--space-6);
-  }
-
-  &[hidden] {
-    display: none;
-  }
-}
-
-.panel__title {
-  margin-bottom: var(--space-3);
-  font-size: var(--font-size-xl);
-  scroll-margin-top: calc(var(--navbar-height) + var(--space-3));
-
-  &:focus {
-    outline: none;
-  }
-
-  &:focus-visible {
-    outline: 3px solid var(--color-focus-ring);
-  }
-}
-
-.panel__paragraph + .panel__paragraph {
-  margin-top: var(--space-3);
-}
-
-.panel__columns-heading {
-  margin-top: var(--space-5);
-  font-size: var(--font-size-lg);
-}
-
-.panel__columns {
-  display: grid;
-  gap: var(--space-4);
-  margin-top: var(--space-3);
-
-  @include bp.up(md) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.panel__column-heading {
-  margin: 0 0 var(--space-2);
-  font-size: var(--font-size-md);
-}
-
-.panel__list {
-  margin: 0;
-  padding-inline-start: var(--space-4);
-}
-
-.panel__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-top: var(--space-5);
+  position: relative;
+  min-height: 501px;
+  margin-top: -12px;
+  overflow: hidden;
+  border-radius: 85px;
+  background-color: $panel-bg;
+  color: $text;
 }

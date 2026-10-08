@@ -1,15 +1,135 @@
 @let c = content();
 <section class="trajectory" [id]="sectionId" tabindex="-1" aria-labelledby="trajectory-title">
-  <div class="trajectory__inner">
-    <header class="trajectory__header">
-      <h2 id="trajectory-title" class="trajectory__title">{{ c.heading }}</h2>
-      <p class="trajectory__subtitle">{{ c.subtitle }}</p>
-    </header>
+  <img
+    class="trajectory__divider"
+    [src]="c.divider.src"
+    [alt]="c.divider.alt"
+    width="116"
+    height="16"
+  />
+  <h2 id="trajectory-title" class="trajectory__title">{{ c.heading }}</h2>
+  <p class="trajectory__subtitle">{{ c.subtitle }}</p>
 
-    <ui-expandable-card-group
-      [items]="c.items"
-      [groupLabel]="c.heading"
-      [collapseLabel]="c.collapseLabel"
-    />
-  </div>
+  <ui-expandable-card-group
+    class="trajectory__group"
+    [items]="c.items"
+    [groupLabel]="c.heading"
+    [openLabel]="c.openLabel"
+    [closeLabel]="c.closeLabel"
+  >
+    <ng-template uiCardPanelDefault>
+      @if (c.defaultIllustration; as illustration) {
+        <img
+          class="panel-default__illustration"
+          [src]="illustration.src"
+          [alt]="illustration.alt"
+          loading="lazy"
+        />
+      }
+    </ng-template>
+
+    <ng-template uiCardPanel="historia">
+      <div class="panel-history">
+        <h3 class="panel-title">{{ c.history.title }}</h3>
+        <div class="panel-history__text">
+          @for (paragraph of c.history.paragraphs; track $index) {
+            <p>{{ paragraph }}</p>
+          }
+        </div>
+        <img
+          class="panel-history__image"
+          [src]="c.history.image.src"
+          [alt]="c.history.image.alt"
+          width="622"
+          height="299"
+          loading="lazy"
+        />
+      </div>
+    </ng-template>
+
+    <ng-template uiCardPanel="premios">
+      <div class="panel-awards" [class.panel-awards--detail]="awardsDetail()">
+        <h3 class="panel-title panel-awards__title">{{ c.awards.title }}</h3>
+        <img
+          class="panel-awards__timeline"
+          [src]="c.awards.timeline.src"
+          [alt]="c.awards.timeline.alt"
+          width="1224"
+          height="83.7"
+        />
+        <ol class="panel-awards__list">
+          @for (award of c.awards.items; track award.year) {
+            <li class="award">
+              @if (awardsDetail()) {
+                <span class="award__dot" aria-hidden="true"></span>
+              } @else {
+                <img
+                  class="award__icon"
+                  [src]="award.icon.src"
+                  [alt]="award.icon.alt"
+                  width="79"
+                  height="79"
+                />
+              }
+              <span class="award__year">{{ award.year }}</span>
+              @if (awardsDetail()) {
+                <span class="award__description">{{ award.description }}</span>
+              } @else {
+                <span class="award__label">{{ award.label }}</span>
+              }
+            </li>
+          }
+        </ol>
+        <button
+          type="button"
+          class="panel-awards__toggle"
+          [attr.aria-expanded]="awardsDetail()"
+          [attr.aria-label]="awardsDetail() ? c.awards.hideDetailLabel : c.awards.showDetailLabel"
+          (click)="awardsDetail.set(!awardsDetail())"
+        >
+          <svg
+            aria-hidden="true"
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 12l4 4 4-4M12 8v8" />
+          </svg>
+        </button>
+      </div>
+    </ng-template>
+
+    <ng-template uiCardPanel="equipo">
+      <div class="panel-team">
+        <h3 class="panel-title">{{ c.team.title }}</h3>
+        <ul class="panel-team__list">
+          @for (member of c.team.members; track $index) {
+            <li class="member">
+              <span class="member__photo">
+                @if (member.photo; as photo) {
+                  <img
+                    [src]="photo.src"
+                    [alt]="photo.alt"
+                    width="136"
+                    height="136"
+                    loading="lazy"
+                  />
+                }
+              </span>
+              <span class="member__role">{{ member.role }}</span>
+              <span class="member__name">{{ member.name }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </ng-template>
+  </ui-expandable-card-group>
+
+  <a uiButton variant="secondary" class="trajectory__cta" [href]="c.cta.href">{{ c.cta.label }}</a>
 </section>

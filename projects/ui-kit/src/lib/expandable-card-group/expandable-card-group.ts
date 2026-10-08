@@ -1,73 +1,63 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
-  afterNextRender,
   Component,
+  computed,
+  contentChild,
+  contentChildren,
   ElementRef,
-  Injector,
-  inject,
   input,
   signal,
   viewChildren,
 } from '@angular/core';
-import { Button } from '../button/button';
+import { CardPanel, CardPanelDefault } from './card-panel';
 import { ExpandableItem } from './expandable-item';
 
 let nextGroupId = 0;
 
 /**
- * Grupo de tarjetas con un único panel de detalle debajo del grupo.
- * Solo una tarjeta puede estar expandida a la vez.
+ * Grupo de tarjetas con un panel siempre visible debajo. Cada tarjeta tiene
+ * un botón-pestaña que muestra su contenido en el panel; al volver a pulsarlo
+ * el panel regresa a su contenido por defecto. Solo una tarjeta activa a la vez.
  *
- * Accesibilidad: cada tarjeta expone un `<button>` con `aria-expanded` y
- * `aria-controls`; las flechas, Home y End mueven el foco entre tarjetas; al
- * abrir un panel el foco pasa a su título y al colapsarlo vuelve a la tarjeta.
+ * Accesibilidad: los botones exponen `aria-expanded` y `aria-controls`; las
+ * flechas, Home y End mueven el foco entre ellos.
  */
 @Component({
   selector: 'ui-expandable-card-group',
-  imports: [Button],
+  imports: [NgTemplateOutlet],
   templateUrl: './expandable-card-group.html',
   styleUrl: './expandable-card-group.scss',
 })
 export class ExpandableCardGroup {
   readonly items = input.required<readonly ExpandableItem[]>();
-  /** Nombre accesible de la lista de tarjetas. */
+  /** Nombre accesible de la lista de tarjetas y del panel por defecto. */
   readonly groupLabel = input.required<string>();
-  /** Texto del botón que colapsa el panel. */
-  readonly collapseLabel = input.required<string>();
+  /** Prefijo del nombre accesible del botón para abrir ("Ver"). */
+  readonly openLabel = input.required<string>();
+  /** Prefijo del nombre accesible del botón para cerrar ("Cerrar"). */
+  readonly closeLabel = input.required<string>();
 
   protected readonly expandedId = signal<string | null>(null);
 
-  private readonly groupId = `ui-ecg-${nextGroupId++}`;
-  private readonly injector = inject(Injector);
+  private readonly panels = contentChildren(CardPanel);
+  private readonly defaultPanel = contentChild(CardPanelDefault);
   private readonly triggers = viewChildren<ElementRef<HTMLButtonElement>>('trigger');
-  private readonly panelHeading = viewChildren<ElementRef<HTMLElement>>('panelHeading');
 
-  protected triggerId(itemId: string): string {
-    return `${this.groupId}-trigger-${itemId}`;
-  }
+  protected readonly activeTemplate = computed(() => {
+    const id = this.expandedId();
+    const panel = id ? this.panels().find((p) => p.itemId() === id) : undefined;
+    return panel?.template ?? this.defaultPanel()?.template ?? null;
+  });
 
-  protected panelId(itemId: string): string {
-    return `${this.groupId}-panel-${itemId}`;
-  }
+  private readonly groupId = `ui-ecg-${nextGroupId++}`;
+  protected readonly panelId = `${this.groupId}-panel`;
 
-  protected panelHeadingId(itemId: string): string {
-    return `${this.groupId}-panel-heading-${itemId}`;
+  protected titleId(itemId: string): string {
+    return `${this.groupId}-title-${itemId}`;
   }
 
   protected toggle(itemId: string): void {
-    if (this.expandedId() === itemId) {
-      this.expandedId.set(null);
-      return;
-    }
-    this.expandedId.set(itemId);
-    afterNextRender(() => this.panelHeading()[0]?.nativeElement.focus(), {
-      injector: this.injector,
-    });
-  }
-
-  protected collapse(): void {
-    const index = this.items().findIndex((item) => item.id === this.expandedId());
-    this.expandedId.set(null);
-    this.triggers()[index]?.nativeElement.focus();
+    this.expandedId.update((current) => (current === itemId ? null : itemId));
   }
 
   protected onTriggerKeydown(event: KeyboardEvent, index: number): void {
