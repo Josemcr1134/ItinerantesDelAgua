@@ -19,17 +19,17 @@ describe('ContactService', () => {
 
   it('falla con un error claro mientras el endpoint no esté configurado', async () => {
     const { service } = setup(null);
-    await expect(firstValueFrom(service.send({ nombre: 'Ana' }))).rejects.toBeInstanceOf(
-      ContactEndpointMissingError,
-    );
+    await expect(
+      firstValueFrom(service.send({ email: 'ana@example.test', message: 'Hola' })),
+    ).rejects.toBeInstanceOf(ContactEndpointMissingError);
   });
 
   it('envía el mensaje por POST al endpoint configurado', async () => {
     const { service, http } = setup('https://api.example.test/contacto');
-    const sent = firstValueFrom(service.send({ nombre: 'Ana' }));
+    const sent = firstValueFrom(service.send({ email: 'ana@example.test', message: 'Hola' }));
     const req = http.expectOne('https://api.example.test/contacto');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ nombre: 'Ana' });
+    expect(req.request.body).toEqual({ email: 'ana@example.test', message: 'Hola' });
     req.flush(null);
     await sent;
     http.verify();
