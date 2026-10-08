@@ -1,27 +1,57 @@
 @let c = content();
 <section class="hero" [id]="sectionId" tabindex="-1" aria-labelledby="hero-title">
   <img
-    class="hero__background"
-    [ngSrc]="c.background.src"
-    [alt]="c.background.alt"
-    fill
-    priority
-    sizes="100vw"
+    class="hero__illustration hero__illustration--left"
+    [src]="c.illustrations.left.src"
+    [alt]="c.illustrations.left.alt"
+    width="596"
+    height="949"
+    fetchpriority="high"
+  />
+  <img
+    class="hero__illustration hero__illustration--right"
+    [src]="c.illustrations.right.src"
+    [alt]="c.illustrations.right.alt"
+    width="478"
+    height="817"
+    fetchpriority="high"
   />
 
   <div class="hero__content">
     <h1 id="hero-title" class="hero__title">{{ c.title }}</h1>
-    <p class="hero__subtitle">{{ c.subtitle }}</p>
-    <ul class="hero__keywords">
-      @for (keyword of c.keywords; track keyword) {
-        <li>{{ keyword }}</li>
-      }
-    </ul>
+    <img
+      class="hero__divider"
+      [src]="c.divider.src"
+      [alt]="c.divider.alt"
+      width="116"
+      height="16"
+    />
+    <div class="hero__text">
+      <p>{{ c.subtitle }}</p>
+      <ul class="hero__keywords">
+        @for (keyword of c.keywords; track keyword) {
+          <li>{{ keyword }}</li>
+        }
+      </ul>
+    </div>
     <a uiButton class="hero__cta" [href]="c.cta.href">{{ c.cta.label }}</a>
   </div>
 
   <a class="hero__scroll" pubAnchorLink [href]="c.scrollHint.href">
-    <span class="visually-hidden">{{ c.scrollHint.label }}</span>
-    <span class="hero__scroll-icon" aria-hidden="true"></span>
+    {{ c.scrollHint.label }}
+    <svg
+      class="hero__scroll-icon"
+      aria-hidden="true"
+      width="48"
+      height="48"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 5v14M19 12l-7 7-7-7" />
+    </svg>
   </a>
 </section>

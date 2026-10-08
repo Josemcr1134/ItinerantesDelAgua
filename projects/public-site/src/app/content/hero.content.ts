@@ -1,21 +1,22 @@
 import { HeroContent } from '../sections/hero/hero-content';
 import { SECTION_IDS } from './section-ids';
 
-// TODO(contenido): reemplazar todos los textos [TODO ...] por el copy final.
+// Copy tomado del Figma aprobado (Landing Desktop).
 export const HERO_CONTENT: HeroContent = {
-  title: '[TODO: título del hero]',
-  subtitle: '[TODO: subtítulo del hero]',
-  keywords: ['[TODO palabra 1]', '[TODO palabra 2]', '[TODO palabra 3]'],
+  title: 'Itinerantes del Agua',
+  subtitle: 'Tecnologías regenerativas para las aguas vivas.',
+  keywords: ['Saberes indígenas', 'Tecnologías regenerativas', 'Bioingeniería'],
   cta: {
-    label: '[TODO: CTA primario]',
-    href: '#', // TODO: confirmar destino del CTA del hero
+    label: 'Quiero implementar',
+    href: '#', // TODO: confirmar destino del CTA "Quiero implementar"
   },
   scrollHint: {
-    label: 'Ir a la siguiente sección',
+    label: 'Desliza para explorar',
     href: `#${SECTION_IDS.objectives}`,
   },
-  background: {
-    src: 'assets/placeholders/hero-background.svg', // TODO(diseño): ilustración real
-    alt: '',
+  divider: { src: 'assets/images/blueLine.svg', alt: '' },
+  illustrations: {
+    left: { src: 'assets/images/heroLeft.webp', alt: '' },
+    right: { src: 'assets/images/heroRight.webp', alt: '' },
   },
 };

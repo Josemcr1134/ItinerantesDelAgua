@@ -6,8 +6,10 @@ export interface HeroContent {
   /** Palabras clave mostradas en una línea separadas por "·". */
   readonly keywords: readonly string[];
   readonly cta: UiLink;
-  /** Indicador de scroll: su `label` es solo para lectores de pantalla. */
+  /** Indicador de scroll ("Desliza para explorar"). */
   readonly scrollHint: UiLink;
-  /** Ilustración de fondo; `alt` vacío porque es decorativa. */
-  readonly background: UiImage;
+  /** Onda decorativa bajo el título. */
+  readonly divider: UiImage;
+  /** Ilustraciones decorativas a cada lado (`alt` vacío). */
+  readonly illustrations: { readonly left: UiImage; readonly right: UiImage };
 }

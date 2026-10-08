@@ -1,103 +1,141 @@
 @use 'breakpoints' as bp;
 
-// TODO(diseño): colores de texto sobre la ilustración, tamaños y posición del
-// contenido según el diseño aprobado.
+// Valores tomados del Figma (Landing Desktop, 1440px). Las ilustraciones
+// escalan proporcionalmente por debajo de 1440px con la unidad --s.
+// TODO(diseño): tablet y móvil pendientes; por debajo de lg se ocultan las
+// ilustraciones y el contenido se centra.
 :host {
   display: block;
+  position: relative;
+  // Las ilustraciones y el indicador de scroll se superponen a la sección
+  // siguiente (franja azul).
+  z-index: 1;
 }
 
 .hero {
+  // 1px de diseño a 1440px de ancho, nunca mayor.
+  --s: calc(min(100vw, 1440px) / 1440);
+
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: 642px; // donde empieza la franja azul en el diseño
+  padding: calc(var(--navbar-height) + var(--space-5)) var(--space-3) var(--space-7);
+  background-color: var(--color-surface);
+
+  @include bp.up(xl) {
+    padding: 158px 100px 0;
+  }
+}
+
+.hero__illustration {
+  display: none;
+  position: absolute;
+  top: calc(139 * var(--s));
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+
+  @include bp.up(lg) {
+    display: block;
+  }
+}
+
+.hero__illustration--left {
+  left: 0;
+  width: calc(596 * var(--s));
+}
+
+.hero__illustration--right {
+  right: 0;
+  width: calc(478 * var(--s));
+}
+
+.hero__content {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100svh;
-  padding: calc(var(--navbar-height) + var(--space-5)) var(--space-3) var(--space-7);
-  overflow: hidden;
-  isolation: isolate; // la ilustración (z-index: -1) queda detrás solo del hero
+  gap: 35px;
+  width: 100%;
+  max-width: 600px;
   text-align: center;
 }
 
-.hero__background {
-  z-index: -1;
-  object-fit: cover;
+// Amatic SC Bold 96px, line-height 0.96, mayúsculas, verde principal.
+.hero__title {
+  color: var(--color-primary);
+  font-family: var(--font-family-display);
+  font-size: clamp(3.5rem, 6.667vw, 6rem);
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
-.hero__content {
+.hero__divider {
+  // Caja de layout de 112×12 como en el diseño; el trazo del SVG (116×16)
+  // sobresale 2px por lado.
+  width: 116px;
+  height: 16px;
+  margin: -2px;
+}
+
+// Acumin 20px / 28px; las palabras clave en Semibold. El diseño deja una
+// línea en blanco (28px) entre ambos textos y otra al final.
+.hero__text {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  max-width: 48rem;
-
-  @include bp.up(md) {
-    gap: var(--space-4);
-  }
-}
-
-.hero__title {
-  font-size: var(--font-size-display);
-  overflow-wrap: anywhere;
-
-  @include bp.up(md) {
-    font-size: calc(var(--font-size-display) * 1.5);
-  }
-}
-
-.hero__subtitle {
-  font-size: var(--font-size-lg);
+  gap: 28px;
+  padding-bottom: 28px;
+  color: var(--color-on-surface);
+  font-size: 1.25rem;
+  line-height: 1.75rem;
 }
 
 .hero__keywords {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
-  font-weight: var(--font-weight-bold);
+  font-weight: 600;
+
+  li {
+    display: inline;
+  }
 
   // El separador "·" es decorativo: texto alternativo vacío para lectores.
   li + li::before {
-    content: '·' / '';
-    margin-inline-end: var(--space-2);
+    content: ' · ' / '';
   }
 }
 
+// CTA "Quiero implementar": 232×68, contorno azul de 3px, Acumin Bold 20px.
 .hero__cta {
-  margin-top: var(--space-2);
+  min-width: 232px;
+  min-height: 68px;
+  padding: 0 1.5rem;
+  border: 3px solid var(--color-accent);
+  border-radius: 100px;
+  background-color: transparent;
+  color: var(--color-accent);
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
 }
 
+// "Desliza para explorar" + flecha, en crema sobre la franja azul.
 .hero__scroll {
   position: absolute;
-  bottom: var(--space-4);
+  top: calc(100% + 36px);
   left: 50%;
-  display: grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-surface);
+  font-size: 1rem;
+  line-height: 1.75rem;
+  text-decoration: none;
+  white-space: nowrap;
   transform: translateX(-50%);
-}
-
-// TODO(diseño): reemplazar por el indicador de scroll del diseño.
-.hero__scroll-icon {
-  width: 0.9rem;
-  height: 0.9rem;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
-
-  @media (prefers-reduced-motion: no-preference) {
-    animation: hero-scroll-bounce 1.6s ease-in-out infinite;
-  }
-}
-
-@keyframes hero-scroll-bounce {
-  50% {
-    transform: translateY(0.35rem) rotate(45deg);
-  }
 }
