@@ -1,0 +1,18 @@
+// Breakpoints mobile-first: los estilos base son para móvil y se amplían con
+// `@include bp.up(md) { ... }`.
+// TODO(diseño): ajustar valores a los breakpoints del diseño aprobado.
+
+@use 'sass:map';
+
+$breakpoints: (
+  sm: 36rem,
+  md: 48rem,
+  lg: 64rem,
+  xl: 80rem,
+);
+
+@mixin up($name) {
+  @media (min-width: map.get($breakpoints, $name)) {
+    @content;
+  }
+}

@@ -29,7 +29,10 @@
                 "input": "projects/public-site/public"
               }
             ],
-            "styles": ["projects/public-site/src/styles.scss"]
+            "styles": ["projects/public-site/src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/ui-kit/src/styles"]
+            }
           },
           "configurations": {
             "production": {
@@ -95,7 +98,10 @@
                 "input": "projects/portal/public"
               }
             ],
-            "styles": ["projects/portal/src/styles.scss"]
+            "styles": ["projects/portal/src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/ui-kit/src/styles"]
+            }
           },
           "configurations": {
             "production": {
@@ -161,7 +167,10 @@
                 "input": "projects/admin/public"
               }
             ],
-            "styles": ["projects/admin/src/styles.scss"]
+            "styles": ["projects/admin/src/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["projects/ui-kit/src/styles"]
+            }
           },
           "configurations": {
             "production": {

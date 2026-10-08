@@ -1,0 +1,51 @@
+// Design tokens de Itinerantes del Agua.
+//
+// TODO(diseño): TODOS los valores de este archivo son PLACEHOLDERS neutros en
+// escala de grises. Se reemplazarán por la paleta, tipografías y escalas del
+// diseño aprobado, sección por sección. No usar colores fuera de estos tokens.
+
+:root {
+  // --- Color ---------------------------------------------------------------
+  --color-primary: #4a4a4a; // TODO(diseño): color primario de marca
+  --color-on-primary: #ffffff; // TODO(diseño)
+  --color-secondary: #7a7a7a; // TODO(diseño): color secundario
+  --color-on-secondary: #ffffff; // TODO(diseño)
+  --color-surface: #ffffff; // TODO(diseño): fondo general
+  --color-on-surface: #1f1f1f; // TODO(diseño): texto sobre fondo general
+  --color-surface-alt: #f2f2f2; // TODO(diseño): fondo de tarjetas/paneles
+  --color-impact-bg: #d9d9d9; // TODO(diseño): fondo sólido de la sección de métricas
+  --color-on-impact: #1f1f1f; // TODO(diseño)
+  --color-dark-bg: #2b2b2b; // TODO(diseño): fondo oscuro de la sección de cierre
+  --color-on-dark: #ffffff; // TODO(diseño)
+  --color-border: #c4c4c4; // TODO(diseño)
+  --color-focus-ring: #1f1f1f; // TODO(diseño): debe cumplir contraste 3:1
+
+  // --- Tipografía ----------------------------------------------------------
+  --font-family-heading: system-ui, sans-serif; // TODO(diseño): tipografía de títulos
+  --font-family-body: system-ui, sans-serif; // TODO(diseño): tipografía de texto
+  --font-weight-regular: 400; // TODO(diseño)
+  --font-weight-bold: 700; // TODO(diseño)
+  --font-size-sm: 0.875rem; // TODO(diseño)
+  --font-size-md: 1rem; // TODO(diseño)
+  --font-size-lg: 1.25rem; // TODO(diseño)
+  --font-size-xl: 1.75rem; // TODO(diseño)
+  --font-size-display: 2.5rem; // TODO(diseño): títulos de hero
+  --line-height-tight: 1.2; // TODO(diseño)
+  --line-height-body: 1.5; // TODO(diseño)
+
+  // --- Espaciado / forma ---------------------------------------------------
+  --space-1: 0.25rem; // TODO(diseño): escala de espaciado
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 4rem;
+  --radius-sm: 0.25rem; // TODO(diseño)
+  --radius-md: 0.75rem; // TODO(diseño)
+  --radius-pill: 999px;
+  --container-max-width: 72rem; // TODO(diseño)
+
+  // --- Layout --------------------------------------------------------------
+  --navbar-height: 4rem; // TODO(diseño): altura real del navbar fijo
+}
