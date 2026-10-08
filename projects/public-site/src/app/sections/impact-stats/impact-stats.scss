@@ -1,47 +1,101 @@
 @use 'breakpoints' as bp;
 
-// TODO(diseño): contenido de la sección pendiente de implementar con el Figma.
+// Valores tomados del Figma (Landing Desktop, 1440px). La franja azul de
+// fondo la pone la página (compartida con "Nuestra trayectoria").
+// TODO(diseño): tablet y móvil pendientes; por debajo de ~1300px las tarjetas
+// pasan a varias filas.
 :host {
   display: block;
 }
 
-// Franja azul con borde superior en arco ("fondo marino" del Figma). El SVG
-// también cubre la sección siguiente en el diseño.
 .impact {
-  // Deja libre la zona donde caen las ilustraciones y el "Desliza para
-  // explorar" del hero (el titular empieza 377px bajo el arco en el diseño).
-  padding: max(160px, calc(377 * min(100vw, 1440px) / 1440)) var(--space-3) var(--space-7);
-  background: url('/assets/images/fondo%20marino.svg') top center / 100% auto no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  // La onda está 335px bajo el inicio del arco en el diseño (deja libre el
+  // "Desliza para explorar" y las ilustraciones del hero).
+  padding: max(160px, calc(335 * min(100vw, 1440px) / 1440)) var(--space-3) 80px;
   color: var(--color-on-impact);
   text-align: center;
 }
 
-.impact__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-5);
-  max-width: var(--container-max-width);
-  margin: 0 auto;
+.impact__divider {
+  // Caja de layout de 112×12; el trazo del SVG (116×16) sobresale 2px.
+  width: 116px;
+  height: 16px;
+  margin: -2px;
 }
 
+// Amatic SC Bold 64px, line-height 0.96, mayúsculas, blanco.
 .impact__title {
-  font-size: var(--font-size-xl);
-
-  @include bp.up(md) {
-    font-size: var(--font-size-display);
-  }
+  margin-top: 30px;
+  color: #fff;
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 4.444vw, 4rem);
+  font-weight: 700;
+  line-height: 0.96;
+  text-transform: uppercase;
 }
 
-.impact__stats {
-  display: grid;
-  gap: var(--space-4);
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.impact__highlight {
+  position: relative;
+  margin-top: 23px;
+  color: #fff;
+  text-transform: uppercase;
+}
 
-  @include bp.up(md) {
-    grid-template-columns: repeat(3, 1fr);
+// Trazo a mano de 463×130 (el SVG viene en vertical, 130×463).
+.impact__highlight-outline {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  pointer-events: none;
+  transform: translate(-50%, calc(-50% - 1px)) rotate(-90deg);
+}
+
+// Tarjetas: 414/408/414 de ancho con separaciones de 30 y 27px.
+.impact__stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 27px;
+  margin: 45px 0 0;
+  // La fila del diseño (1293px) está 1.5px a la izquierda del centro.
+  padding: 0 3px 0 0;
+  list-style: none;
+}
+
+.impact__card {
+  position: relative;
+  isolation: isolate;
+  width: 414px;
+  height: 414px;
+  padding-top: 76px;
+
+  // Forma orgánica de fondo (414×408), rotada o reflejada según la tarjeta.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: -1;
+    width: 414px;
+    height: 408px;
+    background: var(--impact-card-shape) center / 100% 100% no-repeat;
+    transform: translate(-50%, -50%);
+  }
+
+  &:nth-child(2) {
+    width: 408px;
+    margin-left: 3px;
+
+    &::before {
+      transform: translate(-50%, -50%) rotate(-90deg);
+    }
+  }
+
+  &:nth-child(3)::before {
+    transform: translate(-50%, -50%) scaleX(-1);
   }
 }

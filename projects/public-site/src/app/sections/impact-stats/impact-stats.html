@@ -1,20 +1,45 @@
 @let c = content();
-<section class="impact" [id]="sectionId" tabindex="-1" aria-labelledby="impact-title">
-  <div class="impact__inner">
-    <h2 id="impact-title" class="impact__title">{{ c.heading }}</h2>
+<section
+  class="impact"
+  [id]="sectionId"
+  tabindex="-1"
+  aria-labelledby="impact-title"
+  [style.--impact-card-shape]="'url(' + c.cardShape.src + ')'"
+>
+  <img
+    class="impact__divider"
+    [src]="c.divider.src"
+    [alt]="c.divider.alt"
+    width="116"
+    height="16"
+  />
+  <h2 id="impact-title" class="impact__title">{{ c.heading }}</h2>
 
+  <div class="impact__highlight">
+    <img
+      class="impact__highlight-outline"
+      [src]="c.highlightOutline.src"
+      [alt]="c.highlightOutline.alt"
+      width="130"
+      height="463"
+    />
     <ui-stat-badge
       [value]="c.highlight.value"
       [unit]="c.highlight.unit"
       [label]="c.highlight.label"
     />
-
-    <ul class="impact__stats">
-      @for (stat of c.stats; track stat.label) {
-        <li>
-          <ui-stat-circle [value]="stat.value" [unit]="stat.unit" [label]="stat.label" />
-        </li>
-      }
-    </ul>
   </div>
+
+  <ul class="impact__stats">
+    @for (stat of c.stats; track stat.label) {
+      <li class="impact__card">
+        <ui-stat-circle
+          [value]="stat.value"
+          [unit]="stat.unit"
+          [label]="stat.label"
+          [progress]="stat.progress ?? 1"
+        />
+      </li>
+    }
+  </ul>
 </section>
