@@ -1,0 +1,8 @@
+@let c = content();
+<section class="closing" [id]="sectionId" tabindex="-1" aria-labelledby="closing-title">
+  <div class="closing__inner">
+    <h2 id="closing-title" class="closing__title">{{ c.heading }}</h2>
+    <p class="closing__paragraph">{{ c.paragraph }}</p>
+    <a uiButton variant="inverse" [href]="c.cta.href">{{ c.cta.label }}</a>
+  </div>
+</section>
