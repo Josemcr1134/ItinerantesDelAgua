@@ -1,3 +1,13 @@
 // Estilos globales de la landing. Los tokens y la base vienen de ui-kit.
 @use 'tokens';
 @use 'base';
+
+// Las secciones son destino de anclas: dejan espacio para el navbar fijo y
+// reciben foco programático sin mostrar contorno al hacer clic.
+section[id] {
+  scroll-margin-top: var(--navbar-height);
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}

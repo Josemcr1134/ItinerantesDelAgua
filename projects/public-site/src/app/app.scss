@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+main:focus:not(:focus-visible) {
+  outline: none;
+}
