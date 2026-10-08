@@ -218,26 +218,15 @@
   }
 }
 
-// Onda de la superficie del agua (máscara SVG; el color lo pone el token).
-$wave-height: 8px;
-$wave-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q15 0 30 4 T60 4 T90 4 T120 4 V8 H0 Z'/%3E%3C/svg%3E");
-
 // "Regístrate": Acumin 700, 20px, line-height 100%, letter-spacing -4%.
 .navbar__cta {
-  // Contenedor del "agua" del hover.
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
+  --ui-button-border-width: 2.5px;
+
   order: 1;
   // La altura la define el padding (no el min-height del botón base).
   min-height: auto;
-  // Contorno de 2.5px con box-shadow: los navegadores redondean `border` a
-  // píxeles enteros. El padding suma el grosor del contorno (9.5px 28px + 2.5px).
-  padding: calc(0.59375rem + 2.5px) calc(1.75rem + 2.5px);
-  border: 0;
+  padding: calc(0.59375rem + 2.5px) calc(1.75rem + 2.5px); // 9.5px 28px + contorno
   border-radius: 44px;
-  box-shadow: inset 0 0 0 2.5px var(--color-primary);
-  background-color: transparent;
   font-family: var(--font-family-body);
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
@@ -250,57 +239,5 @@ $wave-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
   @include bp.up(xl) {
     grid-area: 1 / 3;
     justify-self: end;
-  }
-
-  // Agua: sube desde abajo con una onda en la superficie que se desplaza en
-  // horizontal. Mide el doble del botón para que la onda se repita sin cortes.
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-    width: 200%;
-    height: calc(100% + #{$wave-height});
-    background-color: var(--color-primary);
-    mask:
-      $wave-mask top left / 50% $wave-height repeat-x,
-      linear-gradient(#000, #000) bottom / 100% calc(100% - #{$wave-height} + 1px) no-repeat;
-    translate: 0 100%;
-  }
-
-  @media (hover: hover) {
-    &:hover {
-      color: var(--color-on-primary);
-    }
-
-    &:hover::before {
-      translate: 0 0;
-      animation-play-state: running;
-    }
-  }
-
-  &:focus-visible {
-    color: var(--color-on-primary);
-
-    &::before {
-      translate: 0 0;
-      animation-play-state: running;
-    }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    transition: color 0.3s ease 0.25s;
-
-    &::before {
-      transition: translate 0.8s cubic-bezier(0.45, 0, 0.25, 1);
-      animation: navbar-cta-wave 1.4s linear infinite paused;
-    }
-  }
-}
-
-@keyframes navbar-cta-wave {
-  to {
-    transform: translateX(-50%);
   }
 }

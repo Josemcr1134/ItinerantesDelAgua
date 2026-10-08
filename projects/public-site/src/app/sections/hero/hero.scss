@@ -110,14 +110,15 @@
 }
 
 // CTA "Quiero implementar": 232×68, contorno azul de 3px, Acumin Bold 20px.
+// La animación de llenado con agua viene del botón de ui-kit.
 .hero__cta {
+  --ui-button-color: var(--color-accent);
+  --ui-button-border-width: 3px;
+
   min-width: 232px;
   min-height: 68px;
   padding: 0 1.5rem;
-  border: 3px solid var(--color-accent);
   border-radius: 100px;
-  background-color: transparent;
-  color: var(--color-accent);
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
