@@ -50,7 +50,11 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   flex-direction: column;
   align-items: center; // los títulos largos desbordan centrados
   width: 282px;
-  height: var(--ui-ecg-card-height, 511px); // el botón queda al pie
+  // En escritorio la tarjeta tiene alto fijo con el botón al pie; en
+  // pantallas estrechas el botón sigue al texto.
+  @include bp.up(xl) {
+    height: var(--ui-ecg-card-height, 511px);
+  }
   color: $text;
   text-align: center;
 }
@@ -60,11 +64,18 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   height: 282px;
 
   img {
-    max-width: none;
+    max-width: 100%;
+    height: auto;
     object-fit: contain;
+
+    // En escritorio una ilustración ancha puede desbordar la tarjeta centrada.
+    @include bp.up(xl) {
+      max-width: none;
+    }
   }
 }
 
@@ -77,7 +88,13 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  white-space: pre; // sin cortes automáticos; respeta los `\n` del título
+  // Los `\n` son cortes del diseño de escritorio; en pantallas estrechas el
+  // texto fluye con normalidad.
+  white-space: normal;
+
+  @include bp.up(xl) {
+    white-space: pre; // en escritorio, sin cortes automáticos (como en el diseño)
+  }
 }
 
 // Acumin Regular 24/28 (configurable).
@@ -85,15 +102,21 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   margin-top: 19.6px;
   font-size: var(--ui-ecg-desc-size, 1.5rem);
   line-height: 1.75rem;
-  white-space: pre; // respeta los `\n` y puede desbordar centrada, como en el diseño
+  white-space: normal;
+  max-width: 100%;
+
+  @include bp.up(xl) {
+    max-width: none;
+    white-space: pre; // respeta los `\n` y puede desbordar centrada, como en el diseño
+  }
 }
 
 // Botón-pestaña de 60×60 con resplandor difuminado debajo.
 .card__trigger {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
+  position: relative;
   isolation: isolate;
+  margin-top: var(--space-4);
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 60px;
@@ -104,7 +127,14 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   background-color: $trigger-bg;
   color: $trigger-icon;
   cursor: pointer;
-  transform: translateX(-50%);
+
+  @include bp.up(xl) {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-top: 0;
+    transform: translateX(-50%);
+  }
 
   &::before {
     content: '';
@@ -152,7 +182,12 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   min-height: var(--ui-ecg-panel-min-height, 501px);
   margin-top: var(--ui-ecg-panel-offset, -12px);
   overflow: hidden;
-  border-radius: 85px;
+  border-radius: 40px; // en pantallas estrechas un radio menor no recorta el texto
+
+  @include bp.up(xl) {
+    border-radius: 85px;
+  }
+
   background-color: $panel-bg;
   color: $text;
 }
