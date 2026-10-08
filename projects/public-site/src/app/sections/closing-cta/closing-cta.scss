@@ -19,6 +19,15 @@
   background: var(--closing-bg) top center / 100% calc(781 * var(--s)) no-repeat;
   color: var(--color-surface);
 
+  // TODO(diseño): móvil/tablet pendientes. Por debajo de xl la onda escalada
+  // queda muy corta: se rellena de verde bajo ella.
+  @media (max-width: 79.9988rem) {
+    background:
+      var(--closing-bg) top center / 100% calc(781 * var(--s)) no-repeat,
+      linear-gradient(var(--color-primary), var(--color-primary)) 0 calc(110 * var(--s)) / 100% 100%
+        no-repeat;
+  }
+
   @include bp.up(xl) {
     // x=182 dentro del marco de 1440px, centrado en pantallas más anchas.
     padding: 150px 0 0 calc(max(0px, (100% - 1440px) / 2) + 182px);
@@ -72,7 +81,11 @@
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  white-space: pre-line;
+  white-space: normal; // los `\n` son cortes del diseño de escritorio
+
+  @include bp.up(xl) {
+    white-space: pre-line;
+  }
 }
 
 // Acumin Regular 20/28, crema.
@@ -80,7 +93,11 @@
   margin-top: 29px;
   font-size: 1.25rem;
   line-height: 1.75rem;
-  white-space: pre-line;
+  white-space: normal; // los `\n` son cortes del diseño de escritorio
+
+  @include bp.up(xl) {
+    white-space: pre-line;
+  }
 }
 
 // "Hablemos": contorno crema de 3px que se llena de agua crema (texto verde).

@@ -6,9 +6,20 @@
 // Hasta 1440px escala en proporción; en pantallas más anchas se estira solo
 // en horizontal para no crecer en altura y tapar lo que viene después (el
 // botón "Conoce más" quedaba azul sobre azul).
+
 .home__sea {
   container-type: inline-size;
   // En el diseño la franja empieza 10px a la izquierda del borde (a 1440px).
   background: url('/assets/images/seaBackground.svg') calc(-10 / 1440 * 100cqw) 0 / 100%
     calc(2352 * min(100cqw, 1440px) / 1440) no-repeat;
+
+  // TODO(diseño): móvil/tablet pendientes. Por debajo de xl el SVG escalado
+  // al ancho queda muy corto: se rellena de azul bajo el arco hasta antes del
+  // botón "Conoce más" (que debe quedar sobre crema).
+  @media (max-width: 79.9988rem) {
+    background:
+      url('/assets/images/seaBackground.svg') top center / 100% auto no-repeat,
+      linear-gradient(var(--color-sea), var(--color-sea)) 0 calc(195 / 1440 * 100cqw) / 100%
+        calc(100% - 195 / 1440 * 100cqw - 183px) no-repeat;
+  }
 }

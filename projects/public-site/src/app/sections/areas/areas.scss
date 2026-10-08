@@ -43,11 +43,15 @@
 .areas__group {
   position: relative;
   width: 100%;
+  // Las formas de fondo están colocadas para 1296px: entre 1280 y 1328px
+  // de pantalla se recortan en lugar de desbordar la página.
+  overflow-x: clip;
   max-width: 1296px;
   margin-top: 15px;
   text-align: start;
 
   ui-expandable-card-group {
+    --ui-ecg-panel-min-height: auto;
     --ui-ecg-panel-bg: #f5f0e5;
     --ui-ecg-text: var(--color-primary);
     --ui-ecg-title-color: var(--color-primary);
@@ -57,7 +61,10 @@
     --ui-ecg-desc-size: 1.25rem;
     --ui-ecg-card-height: 562px;
     --ui-ecg-panel-offset: 27px;
-    --ui-ecg-panel-min-height: 801px;
+
+    @include bp.up(xl) {
+      --ui-ecg-panel-min-height: 801px;
+    }
   }
 }
 
@@ -112,40 +119,59 @@
 }
 
 // --- Paneles (1296×801, coordenadas del Figma) -----------------------------
+// Tipografía y color en todos los tamaños. Las posiciones absolutas del
+// diseño solo desde xl; por debajo el contenido va en columna.
+// TODO(diseño): ajustar al diseño móvil/tablet cuando esté disponible.
 
 .area-panel {
-  position: absolute;
-  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
   color: var(--color-primary);
   font-size: 1.25rem;
   line-height: 1.75rem;
 
   > * {
-    position: absolute;
+    max-width: 100%;
     margin: 0;
+  }
+
+  @include bp.up(xl) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 0;
+
+    > * {
+      position: absolute;
+      max-width: none;
+    }
   }
 }
 
 // Amatic SC Bold 64px, azul de acento.
 .area-panel__title {
-  left: 110px;
   color: var(--color-accent);
   font-family: var(--font-family-display);
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 4.444vw, 4rem);
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  white-space: nowrap;
+
+  @include bp.up(xl) {
+    left: 110px;
+    font-size: 4rem;
+    white-space: nowrap;
+  }
 }
 
 // Acumin Bold 20/28.
 .area-panel__subtitle {
-  left: 110px;
   font-weight: var(--font-weight-bold);
 }
 
 .area-panel__text {
-  left: 110px;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -153,13 +179,17 @@
 
 // Amatic SC Bold 48px, verde.
 .area-panel__heading {
-  left: 110px;
+  margin-top: var(--space-3);
   font-family: var(--font-family-display);
   font-size: 3rem;
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  white-space: nowrap;
+}
+
+.area-panel__image {
+  align-self: center;
+  height: auto;
 }
 
 .area-panel__wave {
@@ -167,104 +197,19 @@
   height: 16px;
 }
 
-// Escuela
-.area-panel__image--school {
-  top: 58px;
-  left: 878px;
-  width: 389px;
-  height: 360px;
-}
-.area-panel__title--school {
-  top: 72px;
-}
-.area-panel__subtitle--school {
-  top: 151px;
-}
-.area-panel__text--school {
-  top: 197px;
-  width: 795px;
-}
-.area-panel__heading--paths {
-  top: 446px;
-}
-
-// Diseño y Asesoría
-.area-panel__image--design {
-  top: 56px;
-  left: 852px;
-  width: 444px;
-  height: 444px;
-}
-.area-panel__title--design {
-  top: 72px;
-}
-.area-panel__subtitle--design {
-  top: 151px;
-}
-.area-panel__text--design {
-  top: 197px;
-  width: 746px;
-}
-.area-panel__heading--services {
-  top: 401px;
-}
-.area-panel__wave--services {
-  top: calc(474px - 2px);
-  left: calc(108px - 2px);
-}
-.area-list--services {
-  top: 500px;
-  left: 108px;
-  width: 750px;
-}
-
-// Innovación y tecnologías regenerativas
-.area-panel__title--innovation {
-  top: 55px;
-}
-.area-panel__subtitle--innovation {
-  top: 134px;
-}
-.area-panel__text--innovation {
-  top: 180px;
-  width: 1076px;
-}
 // TODO(diseño): confirmar estilo (en el Figma es una caja de 419×23).
 .area-panel__lines-title {
-  top: 258px;
-  left: 110px;
+  margin-top: var(--space-3);
   font-size: 1.5rem;
   font-weight: var(--font-weight-bold);
   line-height: 23px;
 }
-.area-panel__heading--featured {
-  top: 470px;
-}
-.area-panel__subtitle--featured {
-  top: 534px;
-}
-.area-panel__text--featured {
-  top: 580px;
-  width: 600px;
-}
-.area-list--featured {
-  top: 534px;
-  left: 750px;
-  width: 463px;
-}
 
-// Columnas (onda + título azul + contenido) en x = 108 / 483 / 871.
+// Columnas (onda + título azul + contenido).
 .area-columns {
-  left: 108px;
-  display: grid;
-  grid-template-columns: 375px 388px auto;
-}
-
-.area-columns--paths {
-  top: 519px;
-}
-.area-columns--lines {
-  top: 299px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
 .area-column__wave {
@@ -283,8 +228,138 @@
 }
 
 .area-column__text {
-  width: 263px;
+  max-width: 263px;
   margin: 16px 0 0 2px;
+}
+
+// Coordenadas del Figma (solo escritorio).
+@include bp.up(xl) {
+  .area-panel__subtitle,
+  .area-panel__text,
+  .area-panel__heading,
+  .area-panel__lines-title {
+    left: 110px;
+  }
+
+  .area-panel__heading {
+    margin-top: 0;
+    white-space: nowrap;
+  }
+
+  .area-panel__lines-title {
+    margin-top: 0;
+  }
+
+  // Escuela
+  .area-panel__image--school {
+    top: 58px;
+    left: 878px;
+    width: 389px;
+    height: 360px;
+  }
+  .area-panel__title--school {
+    top: 72px;
+  }
+  .area-panel__subtitle--school {
+    top: 151px;
+  }
+  .area-panel__text--school {
+    top: 197px;
+    width: 795px;
+  }
+  .area-panel__heading--paths {
+    top: 446px;
+  }
+
+  // Diseño y Asesoría
+  .area-panel__image--design {
+    top: 56px;
+    left: 852px;
+    width: 444px;
+    height: 444px;
+  }
+  .area-panel__title--design {
+    top: 72px;
+  }
+  .area-panel__subtitle--design {
+    top: 151px;
+  }
+  .area-panel__text--design {
+    top: 197px;
+    width: 746px;
+  }
+  .area-panel__heading--services {
+    top: 401px;
+  }
+  .area-panel__wave--services {
+    top: calc(474px - 2px);
+    left: calc(108px - 2px);
+  }
+  .area-list--services {
+    top: 500px;
+    left: 108px;
+    width: 750px;
+  }
+
+  // Innovación y tecnologías regenerativas
+  .area-panel__title--innovation {
+    top: 55px;
+  }
+  .area-panel__subtitle--innovation {
+    top: 134px;
+  }
+  .area-panel__text--innovation {
+    top: 180px;
+    width: 1076px;
+  }
+  .area-panel__lines-title {
+    top: 258px;
+  }
+  .area-panel__heading--featured {
+    top: 470px;
+  }
+  .area-panel__subtitle--featured {
+    top: 534px;
+  }
+  .area-panel__text--featured {
+    top: 580px;
+    width: 600px;
+  }
+  .area-list--featured {
+    top: 534px;
+    left: 750px;
+    width: 463px;
+  }
+
+  // Columnas en x = 108 / 483 / 871.
+  .area-columns {
+    left: 108px;
+    display: grid;
+    grid-template-columns: 375px 388px auto;
+    gap: 0;
+  }
+
+  .area-columns--paths {
+    top: 519px;
+  }
+  .area-columns--lines {
+    top: 299px;
+  }
+
+  .area-column__text {
+    width: 263px;
+    max-width: none;
+  }
+
+  .area-column:nth-child(1) .area-list--spiral {
+    width: 297px;
+  }
+  .area-column:nth-child(2) .area-list--spiral {
+    width: 327px;
+  }
+  .area-column:nth-child(3) .area-list--spiral {
+    width: 324px;
+  }
 }
 
 // Listas con viñetas gráficas. TODO(diseño): sustituir los marcadores CSS por
@@ -327,25 +402,33 @@
   }
 }
 
-.area-column:nth-child(1) .area-list--spiral {
-  width: 297px;
-}
-.area-column:nth-child(2) .area-list--spiral {
-  width: 327px;
-}
-.area-column:nth-child(3) .area-list--spiral {
-  width: 324px;
-}
-
 .area-list--drop li {
   padding-left: 35px;
-  line-height: 44px;
+  line-height: 1.75rem;
 
   &::before {
-    top: 4px;
+    top: 0;
     width: 24px;
     height: 33px;
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform: scale(0.8);
+  }
+
+  & + li {
+    margin-top: var(--space-2);
+  }
+
+  @include bp.up(xl) {
+    line-height: 44px;
+
+    &::before {
+      top: 4px;
+      transform: none;
+    }
+
+    & + li {
+      margin-top: 0;
+    }
   }
 }
 

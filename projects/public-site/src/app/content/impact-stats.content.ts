@@ -5,7 +5,7 @@ export const IMPACT_STATS_CONTENT: ImpactStatsContent = {
   heading: 'Soñamos con ríos libres y limpios.',
   divider: { src: 'assets/images/whiteLine.svg', alt: '' },
   highlight: { value: '+3,000,000', unit: 'L', label: 'De agua revitaliza' },
-  highlightOutline: { src: 'assets/images/badgeOutline.svg', alt: '' },
+  highlightOutline: { src: 'assets/images/badgeOutlineWide.svg', alt: '' },
   stats: [
     { value: '1800+', label: 'Personas\nformadas', progress: 0.949 },
     {

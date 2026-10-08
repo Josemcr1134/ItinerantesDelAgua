@@ -45,6 +45,11 @@
 .trajectory__group {
   --ui-ecg-panel-bg: var(--color-deep-blue);
   --ui-ecg-trigger-bg: var(--color-sun);
+  --ui-ecg-panel-min-height: auto;
+
+  @include bp.up(xl) {
+    --ui-ecg-panel-min-height: 501px;
+  }
 
   width: 100%;
   margin-top: 41px;
@@ -67,16 +72,22 @@
 }
 
 // --- Contenido de los paneles (panel de 1296×501) --------------------------
+// Las posiciones exactas del Figma solo desde xl; por debajo el contenido va
+// en columna. TODO(diseño): ajustar al diseño móvil/tablet cuando exista.
 
 // Amatic SC Bold 64px.
 .panel-title {
   color: #fff;
   font-family: var(--font-family-display);
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 4.444vw, 4rem);
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  white-space: nowrap;
+
+  @include bp.up(xl) {
+    font-size: 4rem;
+    white-space: nowrap;
+  }
 }
 
 .panel-default__illustration {
@@ -89,7 +100,15 @@
 
 // Historia: título y texto a la izquierda, biofiltro a la derecha.
 .panel-history {
-  padding: 60px 0 0 110px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4);
+
+  @include bp.up(xl) {
+    display: block;
+    padding: 60px 0 0 110px;
+  }
 }
 
 .panel-history__text {
@@ -97,44 +116,75 @@
   flex-direction: column;
   gap: 28px;
   max-width: 500px;
-  margin-top: 28px;
   font-size: 1.25rem;
   line-height: 1.75rem;
+
+  @include bp.up(xl) {
+    margin-top: 28px;
+  }
 }
 
 .panel-history__image {
-  position: absolute;
-  top: 96px;
-  left: 648px;
-  width: 622px;
-  height: 299px;
+  width: 100%;
+  max-width: 622px;
+  height: auto;
+
+  @include bp.up(xl) {
+    position: absolute;
+    top: 96px;
+    left: 648px;
+    width: 622px;
+    height: 299px;
+  }
 }
 
-// Premios: línea de tiempo ondulada con 5 hitos.
+// Premios: línea de tiempo ondulada con 5 hitos (lista vertical en móvil).
 .panel-awards {
-  position: absolute;
-  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-4);
+
+  @include bp.up(xl) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 0;
+  }
 }
 
 .panel-awards__title {
-  position: absolute;
-  top: 49px;
-  left: 110px;
+  align-self: flex-start;
+
+  @include bp.up(xl) {
+    position: absolute;
+    top: 49px;
+    left: 110px;
+  }
 }
 
 // La onda del diseño está reflejada en horizontal; el SVG trae 3.5px de
 // margen para el grosor del trazo.
 .panel-awards__timeline {
-  position: absolute;
-  top: calc(145px - 3.85px);
-  left: calc(48px - 3.5px);
-  width: 1224px;
-  max-width: none;
-  height: 83.7px;
-  transform: scaleX(-1);
+  display: none;
+
+  @include bp.up(xl) {
+    position: absolute;
+    top: calc(145px - 3.85px);
+    left: calc(48px - 3.5px);
+    display: block;
+    width: 1224px;
+    max-width: none;
+    height: 83.7px;
+    transform: scaleX(-1);
+  }
 }
 
 .panel-awards__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -144,23 +194,26 @@
 $awards: (133px 158px, 390px 141px, 647.5px 133px, 904.5px 166px, 1161.5px 111px);
 
 .award {
-  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 185px;
   text-align: center;
 
-  @each $pos in $awards {
-    $i: list.index($awards, $pos);
+  @include bp.up(xl) {
+    position: absolute;
 
-    &:nth-child(#{$i}) {
-      top: list.nth($pos, 2) - 2.5px;
-      left: list.nth($pos, 1) - 92.5px;
+    @each $pos in $awards {
+      $i: list.index($awards, $pos);
 
-      .panel-awards--detail & {
-        // En el desglose un punto de 22px sustituye al ícono, en el mismo centro.
-        top: list.nth($pos, 2) + 37px - 11px;
+      &:nth-child(#{$i}) {
+        top: list.nth($pos, 2) - 2.5px;
+        left: list.nth($pos, 1) - 92.5px;
+
+        .panel-awards--detail & {
+          // En el desglose un punto de 22px sustituye al ícono, en el mismo centro.
+          top: list.nth($pos, 2) + 37px - 11px;
+        }
       }
     }
   }
@@ -209,9 +262,6 @@ $awards: (133px 158px, 390px 141px, 647.5px 133px, 904.5px 166px, 1161.5px 111px
 }
 
 .panel-awards__toggle {
-  position: absolute;
-  top: 389px;
-  left: 50%;
   display: grid;
   place-items: center;
   width: 48px;
@@ -222,7 +272,13 @@ $awards: (133px 158px, 390px 141px, 647.5px 133px, 904.5px 166px, 1161.5px 111px
   background: none;
   color: var(--color-sun);
   cursor: pointer;
-  transform: translateX(-50%);
+
+  @include bp.up(xl) {
+    position: absolute;
+    top: 389px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 
   svg {
     @media (prefers-reduced-motion: no-preference) {
@@ -237,18 +293,35 @@ $awards: (133px 158px, 390px 141px, 647.5px 133px, 904.5px 166px, 1161.5px 111px
 
 // Equipo: 5 retratos circulares de 136px cada 222px.
 .panel-team {
-  padding: 40px 0 0 110px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-4);
+
+  @include bp.up(xl) {
+    display: block;
+    padding: 40px 0 0 110px;
+  }
 }
 
 .panel-team__list {
   display: flex;
-  gap: 86px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-5) var(--space-4);
   margin: 0;
-  padding: 0 0 0 23px; // primer retrato a 133px del borde del panel
+  padding: 0;
   list-style: none;
-  position: absolute;
-  top: 140px;
-  left: 110px;
+
+  @include bp.up(xl) {
+    position: absolute;
+    top: 140px;
+    left: 110px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 86px;
+    padding-left: 23px; // primer retrato a 133px del borde del panel
+  }
 }
 
 .member {
