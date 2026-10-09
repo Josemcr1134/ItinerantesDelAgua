@@ -14,14 +14,14 @@
 }
 
 .stat-badge__value {
-  font-size: clamp(2.25rem, 10vw, 4rem); // 64px en escritorio
+  font-size: clamp(2.25rem, 11.2vw, 4rem); // 48px a 428px; 64px en escritorio
   line-height: normal;
   white-space: nowrap;
 }
 
 .stat-badge__label {
   margin-top: -6px; // Acumin rinde la línea de 64px más alta que en Figma
-  font-size: clamp(1rem, 5vw, 1.5rem); // 24px en escritorio
+  font-size: clamp(1rem, 4.67vw, 1.5rem); // 20px a 428px; 24px en escritorio
   line-height: 1.3314;
 }
 
