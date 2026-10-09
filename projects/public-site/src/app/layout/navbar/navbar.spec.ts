@@ -61,4 +61,29 @@ describe('Navbar', () => {
     await scrollTo(0);
     expect(header.classList).not.toContain('navbar--scrolled');
   });
+
+  it('cierra el menú al pulsar fuera del header, pero no al pulsar dentro', async () => {
+    const { fixture, host, toggle } = await setup();
+    toggle.click();
+    await fixture.whenStable();
+
+    host.querySelector<HTMLElement>('.navbar__menu')!.click();
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
+    document.body.click();
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('marca el menú como abierto solo mientras está desplegado', async () => {
+    const { fixture, host, toggle } = await setup();
+    const menu = host.querySelector('.navbar__menu')!;
+    expect(menu.classList).not.toContain('navbar__menu--open');
+
+    toggle.click();
+    await fixture.whenStable();
+    expect(menu.classList).toContain('navbar__menu--open');
+    expect(host.querySelector('.navbar')!.classList).toContain('navbar--menu-open');
+  });
 });

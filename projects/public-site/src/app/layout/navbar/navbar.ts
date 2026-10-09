@@ -16,6 +16,9 @@ import { NavbarContent } from './navbar-content';
 /** Desplazamiento (px) a partir del cual el navbar pasa a cápsula flotante. */
 const SCROLL_THRESHOLD = 8;
 
+/** A partir de este ancho el menú se muestra en línea (breakpoint xl). */
+const DESKTOP_QUERY = '(min-width: 80rem)';
+
 /**
  * Navbar fijo con enlaces a anclas de la landing y menú desplegable en móvil.
  * En la parte superior se muestra como barra a todo el ancho; al hacer scroll
@@ -26,7 +29,10 @@ const SCROLL_THRESHOLD = 8;
   imports: [AnchorLink, Button],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
-  host: { '(document:keydown.escape)': 'closeMenu(true)' },
+  host: {
+    '(document:keydown.escape)': 'closeMenu(true)',
+    '(document:click)': 'onDocumentClick($event)',
+  },
 })
 export class Navbar {
   readonly content = input.required<NavbarContent>();
@@ -34,6 +40,7 @@ export class Navbar {
   protected readonly menuOpen = signal(false);
   protected readonly scrolled = signal(false);
   private readonly toggleButton = viewChild.required<ElementRef<HTMLButtonElement>>('toggle');
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   constructor() {
     const view = inject(DOCUMENT).defaultView;
@@ -48,7 +55,21 @@ export class Navbar {
       update();
       view.addEventListener('scroll', update, { passive: true });
       destroyRef.onDestroy(() => view.removeEventListener('scroll', update));
+
+      // Al pasar a escritorio (menú en línea) el desplegable se cierra.
+      const desktop = view.matchMedia(DESKTOP_QUERY);
+      const onDesktopChange = (event: MediaQueryListEvent) => event.matches && this.closeMenu();
+      desktop.addEventListener('change', onDesktopChange);
+      destroyRef.onDestroy(() => desktop.removeEventListener('change', onDesktopChange));
     });
+  }
+
+  /** Un clic fuera del header cierra el menú. */
+  protected onDocumentClick(event: MouseEvent): void {
+    const target = event.target;
+    if (this.menuOpen() && target instanceof Node && !this.host.nativeElement.contains(target)) {
+      this.closeMenu();
+    }
   }
 
   protected toggleMenu(): void {

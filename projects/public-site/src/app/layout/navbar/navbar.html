@@ -1,5 +1,5 @@
 @let c = content();
-<header class="navbar" [class.navbar--scrolled]="scrolled()">
+<header class="navbar" [class.navbar--scrolled]="scrolled()" [class.navbar--menu-open]="menuOpen()">
   <div class="navbar__inner">
     <a class="navbar__brand" pubAnchorLink [href]="c.homeHref" (click)="closeMenu()">
       <img [src]="c.logo.src" [alt]="c.logo.alt" width="412" height="272" fetchpriority="high" />
@@ -23,15 +23,17 @@
       [class.navbar__menu--open]="menuOpen()"
       [attr.aria-label]="c.navLabel"
     >
-      <ul class="navbar__links">
-        @for (link of c.links; track link.href) {
-          <li>
-            <a class="navbar__link" pubAnchorLink [href]="link.href" (click)="closeMenu()">
-              {{ link.label }}
-            </a>
-          </li>
-        }
-      </ul>
+      <div class="navbar__menu-inner">
+        <ul class="navbar__links">
+          @for (link of c.links; track link.href; let i = $index) {
+            <li [style.--i]="i">
+              <a class="navbar__link" pubAnchorLink [href]="link.href" (click)="closeMenu()">
+                {{ link.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
     </nav>
 
     <a uiButton variant="secondary" class="navbar__cta" [href]="c.cta.href" (click)="closeMenu()">
