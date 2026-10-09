@@ -133,29 +133,30 @@
 }
 
 // --- Paneles (1296×801, coordenadas del Figma) -----------------------------
-// Tipografía y color en todos los tamaños. Las posiciones absolutas del
-// diseño solo desde xl; por debajo el contenido va en columna.
-// TODO(diseño): ajustar al diseño móvil/tablet cuando esté disponible.
+// Móvil (por debajo de xl): textos centrados y más pequeños, medidos sobre el
+// diseño móvil (frame de 428px); las listas, en un bloque centrado con el
+// texto alineado a la izquierda. Escritorio: posiciones absolutas del Figma.
 
 .area-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-6) var(--space-4);
+  padding: 39.5px var(--space-4) var(--space-6);
   color: var(--color-primary);
-  font-size: 1.25rem;
+  font-size: 1rem;
   line-height: 1.75rem;
+  text-align: center;
 
-  > * {
-    max-width: 100%;
-    margin: 0;
-  }
+  // Sin reglas sobre `> *` en móvil: con el encapsulado de Angular ese
+  // selector ganaría a los márgenes y anchos de cada elemento (la base ya anula
+  // los márgenes de títulos y párrafos y limita las imágenes al 100%).
 
   @include bp.up(xl) {
     position: absolute;
     inset: 0;
     display: block;
     padding: 0;
+    font-size: 1.25rem;
+    text-align: start;
 
     > * {
       position: absolute;
@@ -164,56 +165,85 @@
   }
 }
 
-// Amatic SC Bold 64px, azul de acento.
+// Amatic SC Bold, azul de acento: 48px en dos líneas en móvil, 64px en
+// escritorio.
 .area-panel__title {
+  max-width: 290px;
+  margin-inline: auto;
   color: var(--color-accent);
   font-family: var(--font-family-display);
-  font-size: clamp(2.5rem, 4.444vw, 4rem);
+  font-size: 3rem;
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
 
   @include bp.up(xl) {
     left: 110px;
+    max-width: none;
     font-size: 4rem;
     white-space: nowrap;
   }
 }
 
-// Acumin Bold 20/28.
+// Acumin Bold: 18px en móvil, 20/28 en escritorio.
 .area-panel__subtitle {
+  margin-top: 15px;
+  font-size: 1.125rem;
   font-weight: var(--font-weight-bold);
+
+  @include bp.up(xl) {
+    margin-top: 0;
+    font-size: 1.25rem;
+  }
 }
 
+// Acumin Regular: 16/28 en móvil, 20/28 en escritorio.
 .area-panel__text {
   display: flex;
   flex-direction: column;
   gap: 28px;
+  max-width: 315px;
+  margin: 15px auto 0;
+
+  @include bp.up(xl) {
+    max-width: none;
+    margin: 0;
+  }
 }
 
-// Amatic SC Bold 48px, verde.
+// Amatic SC Bold, verde: 36px en móvil, 48px en escritorio.
 .area-panel__heading {
-  margin-top: var(--space-3);
+  margin-top: 29px;
   font-family: var(--font-family-display);
-  font-size: 3rem;
+  font-size: 2.25rem;
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
+
+  @include bp.up(xl) {
+    margin-top: 0;
+    font-size: 3rem;
+  }
 }
 
+// En móvil la ilustración va al final del panel.
 .area-panel__image {
+  order: 1;
   align-self: center;
   height: auto;
+  margin-top: var(--space-5);
 }
 
 .area-panel__wave {
+  align-self: center;
   width: 116px;
   height: 16px;
+  margin-top: 10px;
 }
 
 // TODO(diseño): confirmar estilo (en el Figma es una caja de 419×23).
 .area-panel__lines-title {
-  margin-top: var(--space-3);
+  margin-top: 26px;
   font-size: 1.5rem;
   font-weight: var(--font-weight-bold);
   line-height: 23px;
@@ -224,17 +254,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  margin-top: 47px;
 }
 
 .area-column__wave {
   width: 116px;
   height: 16px;
-  margin: -2px;
+  margin: -2px auto;
 }
 
 // Acumin Bold 24/28, azul de acento.
 .area-column__heading {
-  margin: 14px 0 0 2px;
+  margin: 13px 0 0;
   color: var(--color-accent);
   font-size: 1.5rem;
   font-weight: var(--font-weight-bold);
@@ -243,7 +274,7 @@
 
 .area-column__text {
   max-width: 263px;
-  margin: 16px 0 0 2px;
+  margin: 16px auto 0;
 }
 
 // Coordenadas del Figma (solo escritorio).
@@ -262,6 +293,23 @@
 
   .area-panel__lines-title {
     margin-top: 0;
+  }
+
+  .area-panel__image,
+  .area-panel__wave {
+    margin-top: 0;
+  }
+
+  .area-columns {
+    margin-top: 0;
+  }
+
+  .area-column__wave {
+    margin: -2px;
+  }
+
+  .area-column__heading {
+    margin: 14px 0 0 2px;
   }
 
   // Escuela
@@ -363,6 +411,7 @@
   .area-column__text {
     width: 263px;
     max-width: none;
+    margin: 16px 0 0 2px;
   }
 
   .area-column:nth-child(1) .area-list--spiral {
@@ -381,7 +430,21 @@
 .area-list {
   margin: 0;
   padding: 0;
+  // Las listas mantienen 20px también en móvil (solo se reduce el resto).
+  font-size: 1.25rem;
   list-style: none;
+
+  // Móvil: bloque centrado con el texto alineado a la izquierda.
+  @media (max-width: 79.9988rem) {
+    width: fit-content;
+    margin-inline: auto;
+    text-align: start;
+
+    &--services,
+    &--featured {
+      margin-top: var(--space-3);
+    }
+  }
 
   li {
     position: relative;
@@ -400,7 +463,15 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  margin-top: 16px;
+  width: 297px;
+  max-width: 100%;
+  margin-top: 14px;
+
+  @include bp.up(xl) {
+    width: auto;
+    max-width: none;
+    margin-top: 16px;
+  }
 
   li {
     padding-left: 34px;
