@@ -1,9 +1,9 @@
 @use 'breakpoints' as bp;
 
-// Valores tomados del Figma (Landing Desktop, 1440px). Las ilustraciones
-// escalan proporcionalmente por debajo de 1440px con la unidad --s.
-// TODO(diseño): tablet y móvil pendientes; por debajo de lg se ocultan las
-// ilustraciones y el contenido se centra.
+// Valores tomados del Figma: escritorio (1440px) desde lg y móvil (frame de
+// 428px) por debajo. Las ilustraciones escalan con el ancho: --s en
+// escritorio (1px a 1440px) y --m en móvil (1px a 428px).
+// TODO(diseño): tablet pendiente; entre 768 y 1023px se usa el diseño móvil.
 :host {
   display: block;
   position: relative;
@@ -15,13 +15,22 @@
 .hero {
   // 1px de diseño a 1440px de ancho, nunca mayor.
   --s: calc(min(100vw, 1440px) / 1440);
+  // 1px de diseño en el frame móvil de 428px.
+  --m: calc(100vw / 428);
 
   position: relative;
   display: flex;
   justify-content: center;
-  min-height: 642px; // donde empieza la franja azul en el diseño
-  padding: calc(var(--navbar-height) + var(--space-5)) var(--space-3) var(--space-7);
+  // Móvil: el título empieza 40px bajo el header y la franja azul 182px bajo
+  // el botón (ahí van las ilustraciones y "Desliza para explorar").
+  padding: calc(var(--navbar-height) + 40px) var(--space-3) 182px;
+  overflow-x: clip; // la ilustración derecha sobresale 3px en el diseño
   background-color: var(--color-surface);
+
+  @include bp.up(lg) {
+    min-height: 642px; // donde empieza la franja azul en el diseño
+    padding: calc(var(--navbar-height) + var(--space-5)) var(--space-3) var(--space-7);
+  }
 
   @include bp.up(xl) {
     padding: 158px 100px 0;
@@ -29,26 +38,36 @@
 }
 
 .hero__illustration {
-  display: none;
   position: absolute;
-  top: calc(139 * var(--s));
+  // Móvil: 214.5px de diseño sobre el inicio de la franja azul.
+  top: calc(100% - 214.5 * var(--m));
   height: auto;
   pointer-events: none;
   user-select: none;
 
   @include bp.up(lg) {
-    display: block;
+    top: calc(139 * var(--s));
   }
 }
 
 .hero__illustration--left {
-  left: 0;
-  width: calc(596 * var(--s));
+  left: calc(-4 * var(--m));
+  width: calc(242 * var(--m));
+
+  @include bp.up(lg) {
+    left: 0;
+    width: calc(596 * var(--s));
+  }
 }
 
 .hero__illustration--right {
-  right: 0;
-  width: calc(478 * var(--s));
+  right: calc(-3 * var(--m));
+  width: calc(193 * var(--m));
+
+  @include bp.up(lg) {
+    right: 0;
+    width: calc(478 * var(--s));
+  }
 }
 
 .hero__content {
@@ -62,11 +81,20 @@
   text-align: center;
 }
 
-// Amatic SC Bold 96px, line-height 0.96, mayúsculas, verde principal.
+// Amatic SC Bold, line-height 0.96, mayúsculas, verde principal: 64px en
+// móvil y 96px en escritorio.
 .hero__title {
   color: var(--color-primary);
   font-family: var(--font-family-display);
-  font-size: clamp(3.5rem, 6.667vw, 6rem);
+  // Móvil: "ITINERANTES / DEL AGUA" en dos líneas, como en el diseño.
+  max-width: 260px;
+  font-size: 4rem;
+
+  @include bp.up(lg) {
+    max-width: none;
+    font-size: clamp(3.5rem, 6.667vw, 6rem);
+  }
+
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
@@ -82,30 +110,46 @@
 }
 
 // Acumin 20px / 28px; las palabras clave en Semibold. El diseño deja una
-// línea en blanco (28px) entre ambos textos y otra al final.
+// línea en blanco (28px) entre ambos textos y, en escritorio, otra al final.
 .hero__text {
   display: flex;
   flex-direction: column;
   gap: 28px;
-  padding-bottom: 28px;
   color: var(--color-on-surface);
   font-size: 1.25rem;
   line-height: 1.75rem;
+
+  @include bp.up(lg) {
+    padding-bottom: 28px;
+  }
 }
 
+// Móvil: "Tecnologías regenerativas / para las aguas vivas." en dos líneas.
+.hero__subtitle {
+  max-width: 260px;
+  margin-inline: auto;
+
+  @include bp.up(lg) {
+    max-width: none;
+  }
+}
+
+// Móvil: una palabra clave por línea. Escritorio: en línea, separadas por "·".
 .hero__keywords {
   margin: 0;
   padding: 0;
   list-style: none;
   font-weight: 600;
 
-  li {
-    display: inline;
-  }
+  @include bp.up(lg) {
+    li {
+      display: inline;
+    }
 
-  // El separador "·" es decorativo: texto alternativo vacío para lectores.
-  li + li::before {
-    content: ' · ' / '';
+    // El separador "·" es decorativo: texto alternativo vacío para lectores.
+    li + li::before {
+      content: ' · ' / '';
+    }
   }
 }
 
@@ -125,18 +169,28 @@
   white-space: nowrap;
 }
 
-// "Desliza para explorar" + flecha, en crema sobre la franja azul.
+// "Desliza para explorar" + flecha. Móvil: en verde sobre el crema, entre
+// las ilustraciones, en dos líneas. Escritorio: en crema sobre la franja azul.
 .hero__scroll {
   position: absolute;
-  top: calc(100% + 36px);
+  top: calc(100% - 133.5px);
   left: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--color-surface);
+  max-width: 100px;
+  color: var(--color-primary);
   font-size: 1rem;
-  line-height: 1.75rem;
+  line-height: 1.25rem;
+  text-align: center;
   text-decoration: none;
-  white-space: nowrap;
   transform: translateX(-50%);
+
+  @include bp.up(lg) {
+    top: calc(100% + 36px);
+    max-width: none;
+    color: var(--color-surface);
+    line-height: 1.75rem;
+    white-space: nowrap;
+  }
 }
