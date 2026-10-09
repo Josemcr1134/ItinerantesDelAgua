@@ -2,42 +2,48 @@
   @for (item of items(); track item.id; let i = $index) {
     @let expanded = expandedId() === item.id;
     <li class="card">
-      <div class="card__image">
-        <img
-          [src]="item.image.src"
-          [alt]="item.image.alt"
-          [width]="item.imageSize?.width ?? 282"
-          [height]="item.imageSize?.height ?? 282"
-          loading="lazy"
-        />
-      </div>
-      <h3 class="card__title" [id]="titleId(item.id)">{{ item.title }}</h3>
-      <p class="card__description">{{ item.description }}</p>
-      <button
-        #trigger
-        type="button"
-        class="card__trigger"
-        [class.card__trigger--active]="expanded"
-        [attr.aria-expanded]="expanded"
-        [attr.aria-controls]="inline() && !expanded ? null : panelId"
-        [attr.aria-label]="(expanded ? closeLabel() : openLabel()) + ': ' + item.title"
-        (click)="toggle(item.id)"
-        (keydown)="onTriggerKeydown($event, i)"
+      <div
+        class="card__summary"
+        [class.card__summary--backdrop]="!!item.backdrop"
+        [style.--ui-ecg-card-backdrop]="item.backdrop ?? null"
       >
-        <svg
-          class="card__trigger-icon"
-          aria-hidden="true"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
+        <div class="card__image">
+          <img
+            [src]="item.image.src"
+            [alt]="item.image.alt"
+            [width]="item.imageSize?.width ?? 282"
+            [height]="item.imageSize?.height ?? 282"
+            loading="lazy"
+          />
+        </div>
+        <h3 class="card__title" [id]="titleId(item.id)">{{ item.title }}</h3>
+        <p class="card__description">{{ item.description }}</p>
+        <button
+          #trigger
+          type="button"
+          class="card__trigger"
+          [class.card__trigger--active]="expanded"
+          [attr.aria-expanded]="expanded"
+          [attr.aria-controls]="inline() && !expanded ? null : panelId"
+          [attr.aria-label]="(expanded ? closeLabel() : openLabel()) + ': ' + item.title"
+          (click)="toggle(item.id)"
+          (keydown)="onTriggerKeydown($event, i)"
         >
-          <path d="M4.9992 12H19.0008M12 19.0008L19.0008 12L12 4.9992" />
-        </svg>
-      </button>
+          <svg
+            class="card__trigger-icon"
+            aria-hidden="true"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M4.9992 12H19.0008M12 19.0008L19.0008 12L12 4.9992" />
+          </svg>
+        </button>
+      </div>
       <!-- Pantallas estrechas: el panel se abre justo bajo su tarjeta. -->
       @if (inline() && expanded) {
         <ng-container [ngTemplateOutlet]="panel" />

@@ -10,4 +10,9 @@ export interface ExpandableItem {
   readonly title: string;
   /** Admite saltos de línea (`\n`) para respetar los cortes del diseño. */
   readonly description: string;
+  /**
+   * Fondo de la forma orgánica tras la tarjeta en pantallas estrechas (un
+   * valor CSS de `background`, p. ej. un color). Opcional.
+   */
+  readonly backdrop?: string;
 }

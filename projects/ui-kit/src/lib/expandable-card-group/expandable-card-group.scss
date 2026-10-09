@@ -16,6 +16,14 @@
 //   --ui-ecg-panel-min-height    alto mínimo del panel (501px)
 //   --ui-ecg-trigger-gap         texto → botón en pantallas estrechas (24px)
 //   --ui-ecg-inline-offset       botón → panel bajo la tarjeta (-12px: se solapan)
+//   --ui-ecg-backdrop-top        inicio de la forma de fondo bajo la ilustración (40px)
+//   --ui-ecg-backdrop-inset      margen lateral de la forma de fondo (14px)
+//   --ui-ecg-image-scale         escala de la ilustración (1)
+//   --ui-ecg-title-size          tamaño del título (40px)
+//   --ui-ecg-desc-line-height    interlineado de la descripción (28px)
+//   --ui-ecg-desc-gap            separación título → descripción (19.6px)
+//   --ui-ecg-trigger-size        lado del botón (60px)
+//   --ui-ecg-row-gap             separación vertical entre tarjetas en columna (48px)
 // TODO(diseño): tablet y móvil pendientes.
 $panel-bg: var(--ui-ecg-panel-bg, #364f84);
 $text: var(--ui-ecg-text, #fff);
@@ -35,6 +43,16 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-6) var(--space-5);
+
+  // Pantallas estrechas (tarjetas en columna): separación configurable, que
+  // puede ser negativa para solapar las tarjetas.
+  @media (max-width: 63.9988rem) {
+    row-gap: 0;
+
+    > .card + .card {
+      margin-top: var(--ui-ecg-row-gap, var(--space-6));
+    }
+  }
   margin: 0;
   padding: 0;
   list-style: none;
@@ -67,15 +85,50 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   }
 }
 
+// Parte visible de la tarjeta (ilustración, textos y botón). En escritorio no
+// genera caja; en pantallas estrechas sirve de referencia a la forma de fondo
+// para que no se estire hasta el panel abierto bajo la tarjeta.
+.card__summary {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  @include bp.up(xl) {
+    display: contents;
+  }
+}
+
+// Forma orgánica de color tras la tarjeta (pantallas estrechas): empieza bajo
+// la ilustración y termina a la altura del centro del botón.
+// TODO(diseño): sustituir el border-radius por el vector de Figma.
+.card__summary--backdrop::before {
+  content: '';
+  position: absolute;
+  top: var(--ui-ecg-backdrop-top, 40px);
+  bottom: calc(var(--ui-ecg-trigger-size, 60px) / 2);
+  inset-inline: var(--ui-ecg-backdrop-inset, 14px);
+  z-index: -1;
+  border-radius: 110px 120px 100px 110px / 100px 110px 120px 100px;
+  background: var(--ui-ecg-card-backdrop);
+
+  @include bp.up(xl) {
+    display: none;
+  }
+}
+
 // Caja de 282px de alto; ilustraciones más anchas desbordan centradas.
 .card__image {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 282px;
+  height: calc(282px * var(--ui-ecg-image-scale, 1));
 
   img {
+    zoom: var(--ui-ecg-image-scale, 1);
     max-width: 100%;
     height: auto;
     object-fit: contain;
@@ -92,7 +145,7 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   margin-top: var(--ui-ecg-title-gap, 4px);
   color: var(--ui-ecg-title-color, inherit);
   font-family: var(--font-family-display);
-  font-size: 2.5rem;
+  font-size: var(--ui-ecg-title-size, 2.5rem);
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
@@ -105,9 +158,9 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
 
 // Acumin Regular 24/28 (configurable).
 .card__description {
-  margin-top: 19.6px;
+  margin-top: var(--ui-ecg-desc-gap, 19.6px);
   font-size: var(--ui-ecg-desc-size, 1.5rem);
-  line-height: 1.75rem;
+  line-height: var(--ui-ecg-desc-line-height, 1.75rem);
   white-space: pre-line; // respeta los `\n` del diseño y corta si no cabe
   max-width: 100%;
 
@@ -126,8 +179,8 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 60px;
-  height: 60px;
+  width: var(--ui-ecg-trigger-size, 60px);
+  height: var(--ui-ecg-trigger-size, 60px);
   padding: 0;
   border: 0;
   border-radius: 13px;
@@ -143,14 +196,15 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
     transform: translateX(-50%);
   }
 
+  // Resplandor (32×31 bajo un botón de 60px; proporcional en otros tamaños).
   &::before {
     content: '';
     position: absolute;
-    top: 39px;
+    top: calc(var(--ui-ecg-trigger-size, 60px) - 21px);
     left: 14px;
     z-index: -1;
-    width: 32px;
-    height: 31px;
+    width: calc(var(--ui-ecg-trigger-size, 60px) - 28px);
+    height: calc(var(--ui-ecg-trigger-size, 60px) - 29px);
     border-radius: 6px;
     background-color: inherit;
     filter: blur(10.75px);
