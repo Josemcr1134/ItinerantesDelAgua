@@ -1,21 +1,38 @@
 // Valores medidos sobre la variante "Contacto=Variante2" del Figma (612×442),
 // relativos a la onda azul que precede al formulario.
 // TODO(diseño): confirmar tamaños de texto con el panel Dev Mode.
+@use 'breakpoints' as bp;
+
+// Móvil: formulario centrado de 313px con "Volver" bajo "Enviar".
 :host {
   display: block;
-  width: 440px;
+  width: 313px;
   max-width: 100%;
+
+  @include bp.up(lg) {
+    width: 440px;
+  }
 }
 
 .contact-form {
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
+  margin-top: 30.5px;
+
+  @include bp.up(lg) {
+    margin-top: 20px;
+  }
 }
 
 // Acumin Regular 16/20, crema.
 .contact-form__label {
-  margin-left: 2px;
+  text-align: center;
+
+  @include bp.up(lg) {
+    margin-left: 2px;
+    text-align: start;
+  }
+
   font-size: 1rem;
   line-height: 1.25rem;
 
@@ -24,10 +41,13 @@
   }
 }
 
-// Campos blancos de 440px con radio de 10px (2px a la derecha del texto).
+// Campos blancos (313px en móvil, 440px en escritorio) con radio de 10px.
 .contact-form__field {
+  @include bp.up(lg) {
+    margin-left: 2px; // 2px a la derecha del texto
+  }
+
   width: 100%;
-  margin-left: 2px;
   height: 49px;
   padding: 0 21px;
   border: 0;
@@ -73,9 +93,17 @@
 
 .contact-form__actions {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 21px;
+  gap: 11px;
+  margin-top: 23px;
+
+  @include bp.up(lg) {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+    margin-top: 21px;
+  }
 }
 
 // "Enviar": mismo botón que "Hablemos".
@@ -86,8 +114,12 @@
 
   min-width: 232px;
   min-height: 68px;
-  margin-left: 2px;
   padding: 0 1.5rem;
+
+  @include bp.up(lg) {
+    margin-left: 2px;
+  }
+
   border-radius: 100px;
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);

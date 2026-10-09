@@ -8,7 +8,15 @@
     height="68"
     loading="lazy"
   />
-  <p class="footer__tagline">{{ c.tagline }}</p>
+  <p class="footer__tagline">
+    <!-- Escritorio: el lema en una línea. Móvil: una frase por bloque. -->
+    <span class="footer__tagline-full">{{ c.tagline }}</span>
+    <span class="footer__tagline-parts">
+      @for (part of taglineParts(); track $index) {
+        <span class="footer__tagline-part">{{ part }}</span>
+      }
+    </span>
+  </p>
   <ul class="footer__social">
     @for (social of c.socialLinks; track social.href) {
       <li>

@@ -1,8 +1,9 @@
 @use 'breakpoints' as bp;
 
-// Valores tomados del Figma (Landing Desktop, 1440px), relativos al inicio de
-// la onda verde. El fondo (footerBg.svg, 1440×781) continúa en el footer.
-// TODO(diseño): tablet y móvil pendientes.
+// Valores tomados del Figma, relativos al inicio de la onda verde: escritorio
+// (1440px) desde lg y móvil (frame de 428px) por debajo. El fondo
+// (footerBg.svg, 1440×781) continúa en el footer.
+// TODO(diseño): tablet pendiente; entre 768 y 1023px se usa el diseño móvil.
 :host {
   position: relative;
   z-index: 1; // las ilustraciones asoman sobre la sección anterior
@@ -11,10 +12,13 @@
 
 .closing {
   --s: calc(min(100vw, 1440px) / 1440);
+  // 1px de diseño en el frame móvil de 428px (como máximo, su tamaño real).
+  --m: min(calc(100vw / 428), 1px);
 
   position: relative;
-  min-height: 588px;
-  padding: 150px var(--space-3) var(--space-6);
+  // Móvil: contenido centrado; la onda azul ~250px bajo el inicio del verde.
+  padding: 258px var(--space-3) 0;
+  overflow-x: clip; // la ilustración derecha sobresale en móvil
   // Hasta 1440px escala en proporción; más ancho solo se estira en horizontal.
   background: var(--closing-bg) top center / 100% calc(781 * var(--s)) no-repeat;
   color: var(--color-surface);
@@ -28,6 +32,11 @@
         no-repeat;
   }
 
+  @include bp.up(lg) {
+    min-height: 588px;
+    padding: 150px var(--space-3) var(--space-6);
+  }
+
   @include bp.up(xl) {
     // x=182 dentro del marco de 1440px, centrado en pantallas más anchas.
     padding: 150px 0 0 calc(max(0px, (100% - 1440px) / 2) + 182px);
@@ -35,36 +44,49 @@
 }
 
 .closing__illustration {
-  display: none;
   position: absolute;
   height: auto;
   pointer-events: none;
   user-select: none;
+}
+
+// Serpiente: pegada al borde izquierdo, sobre la onda.
+.closing__illustration--left {
+  top: calc(-63 * var(--m));
+  left: calc(-2 * var(--m));
+  width: calc(145 * var(--m));
 
   @include bp.up(lg) {
-    display: block;
+    top: calc(-266 * var(--s));
+    left: 0;
+    width: calc(268 * var(--s));
   }
 }
 
-// Serpiente: pegada al borde izquierdo, 266px sobre la onda.
-.closing__illustration--left {
-  top: calc(-266 * var(--s));
-  left: 0;
-  width: calc(268 * var(--s));
-}
-
-// Mujer y árboles: desde x=663, 275px sobre la onda (recortada a la derecha).
+// Mujer y árboles: recortada a la derecha, sobre la onda.
 .closing__illustration--right {
-  top: calc(-275 * var(--s));
-  right: 0;
-  width: calc(777 * var(--s));
+  top: calc(-111 * var(--m));
+  right: calc(-54 * var(--m));
+  width: calc(338 * var(--m));
+
+  @include bp.up(lg) {
+    top: calc(-275 * var(--s));
+    right: 0;
+    width: calc(777 * var(--s));
+  }
 }
 
 .closing__content {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
+
+  @include bp.up(lg) {
+    align-items: flex-start;
+    text-align: start;
+  }
 }
 
 .closing__divider {
@@ -81,11 +103,7 @@
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  white-space: normal; // los `\n` son cortes del diseño de escritorio
-
-  @include bp.up(xl) {
-    white-space: pre-line;
-  }
+  white-space: pre-line; // "Territorios que cuidan / y aprenden", como en el diseño
 }
 
 // Acumin Regular 20/28, crema.
@@ -108,10 +126,25 @@
 
   min-width: 232px;
   min-height: 68px;
-  margin: 35px 0 0 2px; // en el diseño el botón está 2px más a la derecha que el texto
+  margin-top: 35px;
+
+  @include bp.up(lg) {
+    margin-left: 2px; // en el diseño el botón está 2px más a la derecha que el texto
+  }
   padding: 0 1.5rem;
   border-radius: 100px;
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
+}
+
+// Formulario (sustituye al bloque): centrado en móvil, como el bloque.
+.closing__form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @include bp.up(lg) {
+    align-items: flex-start;
+  }
 }

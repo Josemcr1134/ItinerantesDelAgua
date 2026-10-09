@@ -1,42 +1,93 @@
 @use 'breakpoints' as bp;
 
-// Valores tomados del Figma (Landing Desktop, 1440px): logo en x=189,
-// lema en x=380 y Instagram en x=1217, centrados en una fila de 68px.
+// Valores tomados del Figma.
+// Escritorio (xl, 1440px): logo en x=189, lema en x=380 e Instagram en
+// x=1217, centrados en una fila de 68px.
+// Móvil (frame de 428px): lema arriba con una frase por bloque (18/32) y,
+// debajo, logo e Instagram en una fila de 238px centrada.
 :host {
   display: block;
 }
 
 .footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  padding: 38px var(--space-3) 87px;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  align-items: end;
+  row-gap: 52px;
+  padding: 20px max(var(--space-3), calc(50% - 119px)) 48px;
   background-color: var(--color-primary);
   color: var(--color-surface);
   text-align: center;
 
   @include bp.up(xl) {
+    display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
     gap: 88px;
     // x=189 dentro del marco de 1440px, centrado en pantallas más anchas.
-    padding-left: calc(max(0px, (100% - 1440px) / 2) + 189px);
+    padding: 38px var(--space-3) 87px calc(max(0px, (100% - 1440px) / 2) + 189px);
     text-align: start;
   }
 }
 
 .footer__logo {
-  width: 103px;
-  height: 68px;
+  grid-area: 2 / 1;
+  width: 112px;
+  height: auto;
+
+  @include bp.up(xl) {
+    width: 103px;
+    height: 68px;
+  }
 }
 
-// Acumin Regular 20/28.
+// Escritorio: Acumin Regular 20/28 en una línea con las frases separadas por
+// "·". Móvil: 18/32, una frase por bloque con mayúscula inicial.
 .footer__tagline {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
+  grid-area: 1 / 1 / 2 / -1;
+  font-size: 1.125rem;
+  line-height: 2rem;
+
+  @include bp.up(xl) {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+.footer__tagline-full {
+  display: none;
+
+  @include bp.up(xl) {
+    display: inline;
+  }
+}
+
+.footer__tagline-parts {
+  display: block;
+
+  @include bp.up(xl) {
+    display: none;
+  }
+}
+
+.footer__tagline-part {
+  display: block;
+  max-width: 200px;
+  margin-inline: auto;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+
+  & + & {
+    margin-top: 23.5px;
+  }
 }
 
 .footer__social {
+  grid-area: 2 / 2;
   display: flex;
   gap: var(--space-2);
   margin: 0;
