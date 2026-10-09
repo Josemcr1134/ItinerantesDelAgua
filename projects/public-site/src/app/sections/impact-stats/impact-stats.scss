@@ -1,22 +1,35 @@
 @use 'breakpoints' as bp;
 
-// Valores tomados del Figma (Landing Desktop, 1440px). La franja azul de
-// fondo la pone la página (compartida con "Nuestra trayectoria").
-// TODO(diseño): tablet y móvil pendientes; por debajo de ~1300px las tarjetas
-// pasan a varias filas.
+// Valores tomados del Figma: escritorio (1440px) desde lg y móvil (frame de
+// 428px) por debajo. La franja azul de fondo la pone la página (compartida
+// con "Nuestra trayectoria").
+//   --m  1px de diseño en el frame móvil de 428px
+//   --u  unidad de las tarjetas: en móvil son las de escritorio reducidas
+//        (386px de ancho a 428px); desde lg, 1px
+// TODO(diseño): tablet pendiente; entre 768 y 1023px se usa el diseño móvil.
 :host {
   display: block;
 }
 
 .impact {
+  --m: calc(100vw / 428);
+  --u: calc(100vw * 386 / 414 / 428);
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  // La onda está 335px bajo el inicio del arco en el diseño (deja libre el
-  // "Desliza para explorar" y las ilustraciones del hero).
-  padding: max(160px, calc(335 * min(100vw, 1440px) / 1440)) var(--space-3) 80px;
+  // Móvil: la onda está 154px de diseño bajo el inicio del arco.
+  padding: calc(154 * var(--m)) var(--space-3) 80px;
   color: var(--color-on-impact);
   text-align: center;
+
+  @include bp.up(lg) {
+    --u: 1px;
+
+    // Escritorio: la onda está 335px bajo el inicio del arco (deja libre el
+    // "Desliza para explorar" y las ilustraciones del hero).
+    padding-top: max(160px, calc(335 * min(100vw, 1440px) / 1440));
+  }
 }
 
 .impact__divider {
@@ -26,87 +39,113 @@
   margin: -2px;
 }
 
-// Amatic SC Bold 64px, line-height 0.96, mayúsculas, blanco.
+// Amatic SC Bold, line-height 0.96, mayúsculas, blanco: 48px en móvil (dos
+// líneas) y 64px en escritorio.
 .impact__title {
+  max-width: 300px;
   margin-top: 30px;
   color: #fff;
   font-family: var(--font-family-display);
-  font-size: clamp(2.5rem, 4.444vw, 4rem);
+  font-size: 3rem;
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
+
+  @include bp.up(lg) {
+    max-width: none;
+    font-size: clamp(2.5rem, 4.444vw, 4rem);
+  }
 }
 
 .impact__highlight {
   position: relative;
-  margin-top: 23px;
+  margin-top: 46px;
+
+  @include bp.up(lg) {
+    margin-top: 23px;
+  }
+
   color: #fff;
   text-transform: uppercase;
 }
 
-// Trazo a mano de 463×130; en pantallas estrechas se reduce con el ancho.
+// Trazo a mano de 463×130 (escritorio), reducido a 391px de ancho en móvil.
 .impact__highlight-outline {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(463px, calc(100vw - 2 * var(--space-3)));
+  width: calc(391 * var(--m));
   height: auto;
   max-width: none;
   pointer-events: none;
-  transform: translate(-50%, calc(-50% - 1px));
+  transform: translate(-50%, calc(-50% - 3px));
+
+  @include bp.up(lg) {
+    width: 463px;
+    transform: translate(-50%, calc(-50% - 1px));
+  }
 }
 
-// Tarjetas: 414/408/414 de ancho con separaciones de 30 y 27px.
+// Tarjetas: en escritorio 414/408/414 de ancho con separaciones de 30 y 27px;
+// en móvil, una por fila.
 .impact__stats {
   display: flex;
   width: 100%;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 27px;
-  margin: 45px 0 0;
-  // La fila del diseño (1293px) está 1.5px a la izquierda del centro.
-  padding: 0 3px 0 0;
+  gap: calc(19 * var(--m));
+  margin: 54px 0 0;
+  padding: 0;
   list-style: none;
-}
 
-.impact__card {
-  position: relative;
-  isolation: isolate;
-  width: min(414px, 100%);
-  height: 414px;
-  padding-top: 76px;
-
-  // Forma orgánica de fondo (414×408). En pantallas estrechas ocupa toda la
-  // tarjeta sin rotar; en escritorio se rota o refleja como en el diseño.
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 3px 0;
-    z-index: -1;
-    background: var(--impact-card-shape) center / 100% 100% no-repeat;
+  @include bp.up(lg) {
+    gap: 27px;
+    margin-top: 45px;
   }
 
   @include bp.up(xl) {
+    // La fila del diseño (1293px) está 1.5px a la izquierda del centro.
+    padding-right: 3px;
+  }
+}
+
+.impact__card {
+  --ui-stat-unit: var(--u);
+
+  position: relative;
+  isolation: isolate;
+  width: calc(414 * var(--u));
+  height: calc(414 * var(--u));
+  padding-top: calc(76 * var(--u));
+
+  // Forma orgánica de fondo (414×408), rotada o reflejada según la tarjeta.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: -1;
+    width: calc(414 * var(--u));
+    height: calc(408 * var(--u));
+    background: var(--impact-card-shape) center / 100% 100% no-repeat;
+    transform: translate(-50%, -50%);
+  }
+
+  &:nth-child(2) {
+    width: calc(408 * var(--u));
+
     &::before {
-      inset: auto;
-      top: 50%;
-      left: 50%;
-      width: 414px;
-      height: 408px;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) rotate(-90deg);
     }
+  }
 
+  &:nth-child(3)::before {
+    transform: translate(-50%, -50%) scaleX(-1);
+  }
+
+  @include bp.up(xl) {
     &:nth-child(2) {
-      width: 408px;
       margin-left: 3px;
-
-      &::before {
-        transform: translate(-50%, -50%) rotate(-90deg);
-      }
-    }
-
-    &:nth-child(3)::before {
-      transform: translate(-50%, -50%) scaleX(-1);
     }
   }
 }
