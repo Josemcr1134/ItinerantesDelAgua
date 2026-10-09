@@ -65,6 +65,20 @@
     @include bp.up(xl) {
       --ui-ecg-panel-min-height: 801px;
     }
+
+    // Móvil (frame de 428px): tarjetas más compactas sobre su forma de color.
+    @media (max-width: 63.9988rem) {
+      --ui-ecg-image-scale: 0.826;
+      --ui-ecg-title-size: 2rem;
+      --ui-ecg-title-gap: 26px;
+      --ui-ecg-desc-size: 1rem;
+      --ui-ecg-desc-line-height: 1.5rem;
+      --ui-ecg-desc-gap: 15.6px;
+      --ui-ecg-trigger-gap: 51px;
+      --ui-ecg-trigger-size: 48px;
+      --ui-ecg-backdrop-top: 54px;
+      --ui-ecg-row-gap: -10px;
+    }
   }
 }
 

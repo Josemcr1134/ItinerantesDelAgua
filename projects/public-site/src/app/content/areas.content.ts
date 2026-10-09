@@ -15,6 +15,7 @@ export const AREAS_CONTENT: AreasContent = {
     {
       id: 'escuela',
       image: img('snake.png'),
+      backdrop: '#d8e7fb', // forma de fondo en móvil (azul)
       title: 'Escuela Itinerante del Agua',
       description: 'Aprende soluciones basadas\nen la naturaleza para revitalizar\nel agua.',
       cta: { label: 'Conoce la Escuela', href: '#' }, // TODO: destino
@@ -22,6 +23,7 @@ export const AREAS_CONTENT: AreasContent = {
     {
       id: 'diseno',
       image: img('flowerpotAndFlowers.png'),
+      backdrop: '#e3e5d6', // forma de fondo en móvil (salvia)
       title: 'Diseño y Asesoría',
       description: 'Diseñamos soluciones\nadaptadas a las necesidades\nde cada proyecto.',
       // TODO(contenido): ¿lleva botón bajo el panel? (no está en el Figma)
@@ -29,6 +31,7 @@ export const AREAS_CONTENT: AreasContent = {
     {
       id: 'innovacion',
       image: img('ecoBath.png'),
+      backdrop: '#fbebc9', // forma de fondo en móvil (amarillo)
       imageSize: { width: 404, height: 194 },
       title: 'Innovación y tecnologías\nregenerativas',
       description:
