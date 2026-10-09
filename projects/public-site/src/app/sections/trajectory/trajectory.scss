@@ -13,7 +13,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 var(--space-3) 68px;
+  // Móvil: márgenes laterales de 21px (paneles de 386px a 428px).
+  padding: 0 21px 68px;
+
+  @include bp.up(lg) {
+    padding-inline: var(--space-3);
+  }
+
   color: #fff;
   text-align: center;
 }
@@ -24,22 +30,32 @@
   margin: -2px;
 }
 
-// Amatic SC Bold 64px, blanco.
+// Amatic SC Bold, blanco: 48px en móvil y 64px en escritorio.
 .trajectory__title {
   margin-top: 30px;
   font-family: var(--font-family-display);
-  font-size: clamp(2.5rem, 4.444vw, 4rem);
+  font-size: 3rem;
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
+
+  @include bp.up(lg) {
+    font-size: clamp(2.5rem, 4.444vw, 4rem);
+  }
 }
 
-// Acumin Regular 20/28. En Figma el texto (553px) desborda su caja de 498px.
+// Acumin Regular 20/28. Móvil: 300px de ancho (4 líneas). Escritorio: en
+// Figma el texto (553px) desborda su caja de 498px.
 .trajectory__subtitle {
-  max-width: 560px;
-  margin-top: 30px;
+  max-width: 300px;
+  margin-top: 22px;
   font-size: 1.25rem;
   line-height: 1.75rem;
+
+  @include bp.up(lg) {
+    max-width: 560px;
+    margin-top: 30px;
+  }
 }
 
 .trajectory__group {
@@ -51,9 +67,17 @@
     --ui-ecg-panel-min-height: 501px;
   }
 
+  // Móvil: la pestaña queda 54px bajo el texto y se solapa 18px con el panel.
+  --ui-ecg-trigger-gap: 54px;
+  --ui-ecg-inline-offset: -18px;
+
   width: 100%;
-  margin-top: 41px;
+  margin-top: 17px;
   text-align: start;
+
+  @include bp.up(lg) {
+    margin-top: 41px;
+  }
 }
 
 // "Conoce más": mismo botón que "Quiero implementar".
@@ -98,16 +122,26 @@
   object-fit: cover;
 }
 
-// Historia: título y texto a la izquierda, biofiltro a la derecha.
+// Historia: título y texto a la izquierda, biofiltro a la derecha. En móvil
+// el biofiltro va arriba, casi a todo el ancho del panel.
 .panel-history {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-6) var(--space-4);
+  padding: 6px 3px var(--space-6);
 
   @include bp.up(xl) {
     display: block;
     padding: 60px 0 0 110px;
+  }
+}
+
+.panel-history .panel-title,
+.panel-history__text {
+  padding-inline: var(--space-4);
+
+  @include bp.up(xl) {
+    padding-inline: 0;
   }
 }
 
@@ -125,9 +159,11 @@
 }
 
 .panel-history__image {
+  order: -1;
   width: 100%;
   max-width: 622px;
   height: auto;
+  margin-inline: auto;
 
   @include bp.up(xl) {
     position: absolute;
