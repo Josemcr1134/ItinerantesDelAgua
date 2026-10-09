@@ -30,7 +30,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2);
+  // El menú cerrado (alto 0) ocupa una segunda línea: sin separación vertical
+  // y con las líneas centradas, la barra queda centrada en su alto.
+  align-content: center;
+  column-gap: var(--space-2);
+  row-gap: 0;
   max-width: 81.25rem;
   min-height: var(--navbar-height);
   margin: 0 auto;
@@ -91,14 +95,19 @@
 }
 
 .navbar__brand {
-  display: block;
+  // Fija el alto de la primera fila: la barra no se mueve al abrir el menú.
+  display: flex;
+  align-items: center;
+  min-height: var(--navbar-height);
   flex-shrink: 0;
   margin-inline-end: auto;
   border-radius: var(--radius-sm);
 
   @include bp.up(xl) {
+    display: block;
     grid-area: 1 / 1;
     justify-self: start;
+    min-height: 0;
     margin: 0;
   }
 }
