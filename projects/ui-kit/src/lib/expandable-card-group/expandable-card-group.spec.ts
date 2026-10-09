@@ -106,4 +106,38 @@ describe('ExpandableCardGroup', () => {
     const buttons = (f.nativeElement as HTMLElement).querySelectorAll('.card__trigger');
     expect(buttons[1].getAttribute('aria-expanded')).toBe('true');
   });
+
+  describe('en pantallas estrechas', () => {
+    const originalMatchMedia = window.matchMedia;
+
+    beforeEach(() => {
+      window.matchMedia = ((query: string) => ({
+        matches: true,
+        media: query,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      })) as unknown as typeof window.matchMedia;
+    });
+
+    afterEach(() => {
+      window.matchMedia = originalMatchMedia;
+    });
+
+    it('abre el panel justo bajo la tarjeta activa y sin panel por defecto', async () => {
+      const f = TestBed.createComponent(TestHost);
+      const el = f.nativeElement as HTMLElement;
+      await f.whenStable();
+      expect(el.querySelector('.panel')).toBeNull();
+
+      const buttons = el.querySelectorAll<HTMLButtonElement>('.card__trigger');
+      buttons[1].click();
+      await f.whenStable();
+
+      const panel = el.querySelector('.panel')!;
+      expect(panel.closest('li')).toBe(el.querySelectorAll('li.card')[1]);
+      expect(panel.textContent?.trim()).toBe('Panel b');
+      expect(buttons[1].getAttribute('aria-controls')).toBe(panel.id);
+      expect(buttons[0].getAttribute('aria-controls')).toBeNull();
+    });
+  });
 });

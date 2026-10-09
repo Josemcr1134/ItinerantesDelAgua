@@ -19,7 +19,7 @@
         class="card__trigger"
         [class.card__trigger--active]="expanded"
         [attr.aria-expanded]="expanded"
-        [attr.aria-controls]="panelId"
+        [attr.aria-controls]="inline() && !expanded ? null : panelId"
         [attr.aria-label]="(expanded ? closeLabel() : openLabel()) + ': ' + item.title"
         (click)="toggle(item.id)"
         (keydown)="onTriggerKeydown($event, i)"
@@ -38,18 +38,30 @@
           <path d="M4.9992 12H19.0008M12 19.0008L19.0008 12L12 4.9992" />
         </svg>
       </button>
+      <!-- Pantallas estrechas: el panel se abre justo bajo su tarjeta. -->
+      @if (inline() && expanded) {
+        <ng-container [ngTemplateOutlet]="panel" />
+      }
     </li>
   }
 </ul>
 
-<div
-  class="panel"
-  role="region"
-  [id]="panelId"
-  [attr.aria-labelledby]="expandedId() ? titleId(expandedId()!) : null"
-  [attr.aria-label]="expandedId() ? null : groupLabel()"
->
-  @if (activeTemplate(); as template) {
-    <ng-container [ngTemplateOutlet]="template" />
-  }
-</div>
+<!-- Pantallas anchas: un único panel bajo todas las tarjetas. -->
+@if (!inline()) {
+  <ng-container [ngTemplateOutlet]="panel" />
+}
+
+<ng-template #panel>
+  <div
+    class="panel"
+    role="region"
+    [class.panel--inline]="inline()"
+    [id]="panelId"
+    [attr.aria-labelledby]="expandedId() ? titleId(expandedId()!) : null"
+    [attr.aria-label]="expandedId() ? null : groupLabel()"
+  >
+    @if (activeTemplate(); as template) {
+      <ng-container [ngTemplateOutlet]="template" />
+    }
+  </div>
+</ng-template>

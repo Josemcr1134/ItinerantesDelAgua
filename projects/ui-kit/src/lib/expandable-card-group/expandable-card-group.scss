@@ -14,6 +14,8 @@
 //   --ui-ecg-card-height         alto de la tarjeta hasta el pie del botón (511px)
 //   --ui-ecg-panel-offset        separación botones → panel (-12px: se solapan)
 //   --ui-ecg-panel-min-height    alto mínimo del panel (501px)
+//   --ui-ecg-trigger-gap         texto → botón en pantallas estrechas (24px)
+//   --ui-ecg-inline-offset       botón → panel bajo la tarjeta (-12px: se solapan)
 // TODO(diseño): tablet y móvil pendientes.
 $panel-bg: var(--ui-ecg-panel-bg, #364f84);
 $text: var(--ui-ecg-text, #fff);
@@ -49,14 +51,20 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   display: flex;
   flex-direction: column;
   align-items: center; // los títulos largos desbordan centrados
-  width: 282px;
+  // Pantallas estrechas: una tarjeta por fila (su panel se abre debajo).
+  width: 100%;
+  color: $text;
+  text-align: center;
+
+  @include bp.up(lg) {
+    width: 282px;
+  }
+
   // En escritorio la tarjeta tiene alto fijo con el botón al pie; en
   // pantallas estrechas el botón sigue al texto.
   @include bp.up(xl) {
     height: var(--ui-ecg-card-height, 511px);
   }
-  color: $text;
-  text-align: center;
 }
 
 // Caja de 282px de alto; ilustraciones más anchas desbordan centradas.
@@ -88,9 +96,7 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   font-weight: 700;
   line-height: 0.96;
   text-transform: uppercase;
-  // Los `\n` son cortes del diseño de escritorio; en pantallas estrechas el
-  // texto fluye con normalidad.
-  white-space: normal;
+  white-space: pre-line; // respeta los `\n` del diseño y corta si no cabe
 
   @include bp.up(xl) {
     white-space: pre; // en escritorio, sin cortes automáticos (como en el diseño)
@@ -102,7 +108,7 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   margin-top: 19.6px;
   font-size: var(--ui-ecg-desc-size, 1.5rem);
   line-height: 1.75rem;
-  white-space: normal;
+  white-space: pre-line; // respeta los `\n` del diseño y corta si no cabe
   max-width: 100%;
 
   @include bp.up(xl) {
@@ -114,8 +120,9 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
 // Botón-pestaña de 60×60 con resplandor difuminado debajo.
 .card__trigger {
   position: relative;
+  z-index: 1; // sobre el panel abierto bajo la tarjeta
   isolation: isolate;
-  margin-top: var(--space-4);
+  margin-top: var(--ui-ecg-trigger-gap, var(--space-4));
   flex-shrink: 0;
   display: grid;
   place-items: center;
@@ -190,4 +197,13 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
 
   background-color: $panel-bg;
   color: $text;
+}
+
+// Panel abierto bajo su tarjeta (pantallas estrechas): ocupa todo el ancho y
+// se solapa con el botón como una pestaña.
+.panel--inline {
+  width: 100%;
+  min-height: 0;
+  margin-top: var(--ui-ecg-inline-offset, -12px);
+  text-align: start;
 }
