@@ -15,8 +15,8 @@
 .hero {
   // 1px de diseño a 1440px de ancho, nunca mayor.
   --s: calc(min(100vw, 1440px) / 1440);
-  // 1px de diseño en el frame móvil de 428px.
-  --m: calc(100vw / 428);
+  // 1px de diseño en el frame móvil de 428px (como máximo, su tamaño real).
+  --m: min(calc(100vw / 428), 1px);
 
   position: relative;
   display: flex;

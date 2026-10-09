@@ -12,8 +12,9 @@
 }
 
 .impact {
-  --m: calc(100vw / 428);
-  --u: calc(100vw * 386 / 414 / 428);
+  // Escalan con el ancho hasta el tamaño del frame móvil (428px) como máximo.
+  --m: min(calc(100vw / 428), 1px);
+  --u: min(calc(100vw * 386 / 414 / 428), calc(386px / 414));
 
   display: flex;
   flex-direction: column;
