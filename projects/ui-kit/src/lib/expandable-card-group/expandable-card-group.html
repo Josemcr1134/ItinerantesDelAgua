@@ -38,12 +38,19 @@
           <path d="M4.9992 12H19.0008M12 19.0008L19.0008 12L12 4.9992" />
         </svg>
       </button>
+
+      @if (expanded && activeTemplate(); as template) {
+        <div class="panel panel--inline" role="region" [attr.aria-labelledby]="titleId(item.id)">
+          <ng-container [ngTemplateOutlet]="template" />
+        </div>
+      }
     </li>
   }
 </ul>
 
 <div
-  class="panel"
+  class="panel panel--trailing"
+  [class.panel--replaced]="expandedId() !== null"
   role="region"
   [id]="panelId"
   [attr.aria-labelledby]="expandedId() ? titleId(expandedId()!) : null"

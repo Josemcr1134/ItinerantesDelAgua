@@ -73,8 +73,10 @@
 
 .contact-form__actions {
   display: flex;
+  flex-wrap: wrap; // en pantallas muy estrechas el botón "Volver" baja de línea en vez de desbordar
   align-items: center;
   justify-content: space-between;
+  row-gap: var(--space-3);
   margin-top: 21px;
 }
 

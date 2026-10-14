@@ -191,3 +191,24 @@ $trigger-icon: var(--ui-ecg-trigger-icon, #f8f6f9);
   background-color: $panel-bg;
   color: $text;
 }
+
+// En pantallas estrechas las tarjetas se apilan: cada una muestra su propio
+// panel justo debajo (comportamiento de acordeón). De xl en adelante los
+// botones vuelven a quedar en fila y el panel compartido tras la lista
+// recupera su lugar bajo toda la fila, como en el diseño de escritorio.
+.panel--inline {
+  width: 100%;
+  min-height: 0;
+
+  @include bp.up(xl) {
+    display: none;
+  }
+}
+
+.panel--trailing.panel--replaced {
+  display: none;
+
+  @include bp.up(xl) {
+    display: block;
+  }
+}
