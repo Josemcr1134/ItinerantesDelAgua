@@ -1,0 +1,12 @@
+# Itinerantes del Agua
+
+> Itinerantes del Agua integra educación, acompañamiento técnico y ecotecnologías regenerativas para fortalecer la relación entre comunidades, territorios y agua.
+
+Tecnologías regenerativas, saberes indígenas y bioingeniería para cuidar, tratar, captar, infiltrar y regenerar el agua desde una mirada basada en la naturaleza. Landing de una sola página con las siguientes secciones.
+
+## Secciones
+
+- [Objetivos](https://itinerantesdelagua.com/#objetivos): Principios y enfoque de la organización.
+- [Nuestra trayectoria](https://itinerantesdelagua.com/#trayectoria): Historia, premios y reconocimientos, y equipo.
+- [Itinerantes del Agua](https://itinerantesdelagua.com/#itinerantes): Escuela Itinerante del Agua, Diseño y Asesoría, e Innovación y tecnologías regenerativas.
+- [Contacto](https://itinerantesdelagua.com/#contacto): Formulario de contacto.
