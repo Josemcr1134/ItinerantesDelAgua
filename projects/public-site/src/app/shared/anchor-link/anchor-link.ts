@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Directive, inject } from '@angular/core';
+import { scrollToSection } from './scroll-to-section';
 
 /**
  * Enlace a una ancla de la misma página (`<a pubAnchorLink href="#id">`).
@@ -28,10 +29,7 @@ export class AnchorLink {
     }
 
     event.preventDefault();
-    const view = this.document.defaultView;
-    const reduceMotion = view?.matchMedia('(prefers-reduced-motion: reduce)').matches ?? true;
-    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-    target.focus({ preventScroll: true });
-    view?.history.pushState(null, '', href);
+    scrollToSection(this.document, target);
+    this.document.defaultView?.history.pushState(null, '', href);
   }
 }
