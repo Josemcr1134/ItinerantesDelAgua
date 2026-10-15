@@ -195,6 +195,9 @@
 .area-panel__wave {
   width: 116px;
   height: 16px;
+  // En móvil el texto del panel va centrado; a partir de xl pasa a posición
+  // absoluta (ver `--services`), donde el margen deja de importar.
+  margin-inline: auto;
 }
 
 // TODO(diseño): confirmar estilo (en el Figma es una caja de 419×23).
@@ -215,7 +218,12 @@
 .area-column__wave {
   width: 116px;
   height: 16px;
-  margin: -2px;
+  // En móvil el texto del panel va centrado, así que la onda también.
+  margin: -2px auto;
+
+  @include bp.up(xl) {
+    margin: -2px;
+  }
 }
 
 // Acumin Bold 24/28, azul de acento.
