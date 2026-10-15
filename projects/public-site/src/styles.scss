@@ -12,11 +12,12 @@
 }
 
 // Las secciones son destino de anclas: dejan espacio para el navbar fijo y
-// reciben foco programático sin mostrar contorno al hacer clic.
+// reciben foco programático (al navegar por ancla o al cargar la página con
+// una en la URL) sin mostrar contorno; el propio scroll ya indica la sección.
 section[id] {
   scroll-margin-top: var(--navbar-height);
 
-  &:focus:not(:focus-visible) {
+  &:focus {
     outline: none;
   }
 }
