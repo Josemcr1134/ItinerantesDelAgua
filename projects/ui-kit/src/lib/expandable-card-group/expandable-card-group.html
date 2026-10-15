@@ -48,15 +48,15 @@
   }
 </ul>
 
-<div
-  class="panel panel--trailing"
-  [class.panel--replaced]="expandedId() !== null"
-  role="region"
-  [id]="panelId"
-  [attr.aria-labelledby]="expandedId() ? titleId(expandedId()!) : null"
-  [attr.aria-label]="expandedId() ? null : groupLabel()"
->
-  @if (activeTemplate(); as template) {
+@if (activeTemplate(); as template) {
+  <div
+    class="panel panel--trailing"
+    [class.panel--replaced]="expandedId() !== null"
+    role="region"
+    [id]="panelId"
+    [attr.aria-labelledby]="expandedId() ? titleId(expandedId()!) : null"
+    [attr.aria-label]="expandedId() ? null : groupLabel()"
+  >
     <ng-container [ngTemplateOutlet]="template" />
-  }
-</div>
+  </div>
+}
