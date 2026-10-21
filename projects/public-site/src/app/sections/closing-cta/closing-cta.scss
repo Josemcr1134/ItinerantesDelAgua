@@ -20,17 +20,15 @@
   padding: 258px var(--space-3) 0;
   overflow-x: clip; // la ilustración derecha sobresale en móvil
   // Hasta 1440px escala en proporción; más ancho solo se estira en horizontal.
-  background: var(--closing-bg) top center / 100% calc(781 * var(--s)) no-repeat;
   color: var(--color-surface);
 
-  // TODO(diseño): móvil/tablet pendientes. Por debajo de xl la onda escalada
-  // queda muy corta: se rellena de verde bajo ella.
-  @media (max-width: 79.9988rem) {
-    background:
-      var(--closing-bg) top center / 100% calc(781 * var(--s)) no-repeat,
-      linear-gradient(var(--color-primary), var(--color-primary)) 0 calc(110 * var(--s)) / 100% 100%
-        no-repeat;
-  }
+  // Bajo la onda se rellena de verde: por debajo de xl la onda escalada queda
+  // corta, y en cualquier ancho el formulario de contacto puede ser más alto
+  // que el fondo. TODO(diseño): móvil/tablet pendientes.
+  background:
+    var(--closing-bg) top center / 100% calc(781 * var(--s)) no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 0 calc(110 * var(--s)) / 100% 100%
+      no-repeat;
 
   @include bp.up(lg) {
     min-height: 588px;
@@ -139,10 +137,12 @@
 }
 
 // Formulario (sustituye al bloque): centrado en móvil, como el bloque.
+// Deja aire antes del footer: el formulario es más alto que el bloque.
 .closing__form {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: var(--space-6);
 
   @include bp.up(lg) {
     align-items: flex-start;

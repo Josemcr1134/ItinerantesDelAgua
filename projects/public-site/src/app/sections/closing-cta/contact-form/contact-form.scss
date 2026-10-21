@@ -1,6 +1,7 @@
-// Valores medidos sobre la variante "Contacto=Variante2" del Figma (612×442),
-// relativos a la onda azul que precede al formulario.
-// TODO(diseño): confirmar tamaños de texto con el panel Dev Mode.
+// Valores medidos sobre la variante "Contacto=Variante2" del Figma (612×442).
+// Los campos que no están en el Figma (nombre, organización, teléfono, asunto,
+// datos del proyecto y política) siguen el mismo estilo.
+// TODO(diseño): confirmar con el diseño actualizado del formulario.
 @use 'breakpoints' as bp;
 
 // Móvil: formulario centrado de 313px con "Volver" bajo "Enviar".
@@ -17,36 +18,62 @@
 .contact-form {
   display: flex;
   flex-direction: column;
+  gap: 21px;
   margin-top: 30.5px;
+  // El fondo verde no deja ver el texto de autocompletado claro de Chrome.
+  color-scheme: light;
 
   @include bp.up(lg) {
     margin-top: 20px;
   }
 }
 
+.contact-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.contact-form__fieldset,
+.contact-form__project {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.contact-form__project {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+  padding-left: var(--space-3);
+  border-left: 3px solid color-mix(in srgb, var(--color-surface) 40%, transparent);
+}
+
 // Acumin Regular 16/20, crema.
 .contact-form__label {
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.25rem;
   text-align: center;
 
   @include bp.up(lg) {
     margin-left: 2px;
     text-align: start;
   }
-
-  font-size: 1rem;
-  line-height: 1.25rem;
-
-  & + .contact-form__field {
-    margin-top: 23px;
-  }
 }
 
-// Campos blancos (313px en móvil, 440px en escritorio) con radio de 10px.
-.contact-form__field {
-  @include bp.up(lg) {
-    margin-left: 2px; // 2px a la derecha del texto
-  }
+legend.contact-form__label {
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
 
+.contact-form__optional {
+  opacity: 0.75;
+}
+
+// Campos blancos con radio de 10px.
+.contact-form__field {
   width: 100%;
   height: 49px;
   padding: 0 21px;
@@ -56,6 +83,10 @@
   color: var(--color-primary);
   font: inherit;
   font-size: 0.875rem;
+
+  @include bp.up(lg) {
+    margin-left: 2px; // 2px a la derecha del texto
+  }
 
   &::placeholder {
     color: #a8a8a8;
@@ -73,22 +104,112 @@
 }
 
 .contact-form__field--multiline {
-  height: 78px;
+  height: 120px;
   padding-top: 14px;
   resize: vertical;
 }
 
-// Separación entre el primer campo (o su error) y la segunda etiqueta.
-.contact-form__field + .contact-form__label,
-.contact-form__error + .contact-form__label {
-  margin-top: 21px;
+// Select con flecha propia (verde de marca).
+.contact-form__select {
+  padding-right: 44px;
+  appearance: none;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1.5l6 6 6-6' stroke='%233f5644' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    right 18px center / 14px 9px no-repeat;
+  cursor: pointer;
+
+  // Opción "Selecciona…" en gris, como un placeholder.
+  &:has(option[value='']:checked) {
+    color: #a8a8a8;
+  }
+
+  option {
+    color: var(--color-primary);
+  }
+}
+
+// Indicativo (96px) + número.
+.contact-form__phone {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.contact-form__phone-code {
+  flex: 0 0 96px;
+}
+
+.contact-form__phone-number {
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-form__hint-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.contact-form__counter {
+  margin-left: auto;
+  font-family: var(--font-family-numeric);
+  font-size: 0.8125rem;
+  opacity: 0.8;
+  white-space: nowrap;
 }
 
 .contact-form__error {
-  margin-top: var(--space-2);
   color: var(--color-sun);
   font-size: 0.875rem;
   font-weight: 600;
+  text-align: center;
+
+  @include bp.up(lg) {
+    text-align: start;
+  }
+}
+
+.contact-form__checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  text-align: start;
+
+  input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--color-sun);
+    cursor: pointer;
+
+    &[aria-invalid='true'] {
+      outline: 2px solid var(--color-sun);
+      outline-offset: 2px;
+    }
+  }
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.contact-form__policy {
+  margin-left: 28px;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+// Fuera de la vista y del orden de tabulación (honeypot).
+.contact-form__trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 .contact-form__actions {
@@ -96,13 +217,12 @@
   flex-direction: column;
   align-items: center;
   gap: 11px;
-  margin-top: 23px;
+  margin-top: 2px;
 
   @include bp.up(lg) {
     flex-direction: row;
     justify-content: space-between;
     gap: 0;
-    margin-top: 21px;
   }
 }
 
@@ -115,15 +235,14 @@
   min-width: 232px;
   min-height: 68px;
   padding: 0 1.5rem;
-
-  @include bp.up(lg) {
-    margin-left: 2px;
-  }
-
   border-radius: 100px;
   font-size: 1.25rem;
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
+
+  @include bp.up(lg) {
+    margin-left: 2px;
+  }
 
   &:disabled {
     cursor: progress;
@@ -150,11 +269,15 @@
 }
 
 .contact-form__status {
-  margin-top: var(--space-3);
   font-weight: 600;
+  text-align: center;
 
   &:empty {
     display: none;
+  }
+
+  @include bp.up(lg) {
+    text-align: start;
   }
 }
 

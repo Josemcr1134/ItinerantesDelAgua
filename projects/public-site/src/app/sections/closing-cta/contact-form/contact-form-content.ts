@@ -1,15 +1,57 @@
+import { ContactProjectType, ContactService, ContactSubject } from 'data-access';
+
+/** Etiqueta y texto de ayuda de un campo. */
+export interface FieldText {
+  readonly label: string;
+  readonly placeholder?: string;
+}
+
 export interface ContactFormContent {
-  readonly emailLabel: string;
-  readonly emailPlaceholder: string;
-  readonly messageLabel: string;
-  readonly messagePlaceholder: string;
+  /** Indicación de campo opcional junto a la etiqueta. */
+  readonly optionalLabel: string;
+  readonly name: FieldText;
+  readonly email: FieldText;
+  readonly organization: FieldText;
+  readonly phone: {
+    readonly label: string;
+    readonly countryCodeLabel: string;
+    readonly countryCodePlaceholder: string;
+    readonly numberLabel: string;
+    readonly numberPlaceholder: string;
+  };
+  readonly subject: FieldText & { readonly options: Readonly<Record<ContactSubject, string>> };
+  /** Campos extra cuando el asunto es "Diseño y consultoría". */
+  readonly projectType: FieldText & {
+    readonly options: Readonly<Record<ContactProjectType, string>>;
+  };
+  readonly projectLocation: FieldText;
+  readonly service: FieldText & { readonly options: Readonly<Record<ContactService, string>> };
+  readonly message: FieldText & {
+    /** Contador de caracteres ("120 / 2000"). */
+    readonly counter: (length: number, max: number) => string;
+  };
+  readonly privacy: {
+    readonly label: string;
+    /** URL de la política de datos; `null` mientras no exista. */
+    readonly policyUrl: string | null;
+    readonly policyLinkLabel: string;
+  };
+  /** Campo trampa para bots (oculto): etiqueta para el árbol accesible. */
+  readonly honeypotLabel: string;
   readonly submitLabel: string;
   readonly sendingLabel: string;
   readonly backLabel: string;
   readonly errors: {
-    readonly emailRequired: string;
+    readonly required: string;
+    readonly nameMinLength: (min: number) => string;
     readonly emailInvalid: string;
-    readonly messageRequired: string;
+    readonly countryCodeInvalid: string;
+    readonly phoneNumberInvalid: string;
+    readonly phoneIncomplete: string;
+    readonly messageLength: (min: number, max: number) => string;
+    readonly privacyRequired: string;
+    /** Resumen cuando la API rechaza algún campo. */
+    readonly reviewFields: string;
   };
   readonly successMessage: string;
   readonly failureMessage: string;

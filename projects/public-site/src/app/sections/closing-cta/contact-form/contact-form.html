@@ -1,36 +1,276 @@
 @let c = content();
 <form class="contact-form" novalidate [formGroup]="form" (ngSubmit)="submit()">
-  <label class="contact-form__label" for="contact-email">{{ c.emailLabel }}</label>
-  <input
-    #email
-    id="contact-email"
-    class="contact-form__field"
-    type="email"
-    autocomplete="email"
-    formControlName="email"
-    required
-    [placeholder]="c.emailPlaceholder"
-    [attr.aria-invalid]="showError('email')"
-    [attr.aria-describedby]="showError('email') ? 'contact-email-error' : null"
-  />
-  @if (showError('email')) {
-    <p id="contact-email-error" class="contact-form__error">{{ emailError() }}</p>
+  <!-- Nombre -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-name">{{ c.name.label }}</label>
+    <input
+      id="contact-name"
+      class="contact-form__field"
+      type="text"
+      autocomplete="name"
+      formControlName="name"
+      required
+      [placeholder]="c.name.placeholder ?? ''"
+      [attr.aria-invalid]="showError('name')"
+      [attr.aria-describedby]="describedBy('name')"
+    />
+    @if (showError('name')) {
+      <p id="contact-name-error" class="contact-form__error">{{ errorText('name') }}</p>
+    }
+  </div>
+
+  <!-- Correo -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-email">{{ c.email.label }}</label>
+    <input
+      id="contact-email"
+      class="contact-form__field"
+      type="email"
+      autocomplete="email"
+      inputmode="email"
+      formControlName="email"
+      required
+      [placeholder]="c.email.placeholder ?? ''"
+      [attr.aria-invalid]="showError('email')"
+      [attr.aria-describedby]="describedBy('email')"
+    />
+    @if (showError('email')) {
+      <p id="contact-email-error" class="contact-form__error">{{ errorText('email') }}</p>
+    }
+  </div>
+
+  <!-- Organización (opcional) -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-organization">
+      {{ c.organization.label }} <span class="contact-form__optional">{{ c.optionalLabel }}</span>
+    </label>
+    <input
+      id="contact-organization"
+      class="contact-form__field"
+      type="text"
+      autocomplete="organization"
+      formControlName="organization"
+      [placeholder]="c.organization.placeholder ?? ''"
+    />
+  </div>
+
+  <!-- Teléfono / WhatsApp (opcional): indicativo + número -->
+  <fieldset class="contact-form__group contact-form__fieldset">
+    <legend class="contact-form__label">
+      {{ c.phone.label }} <span class="contact-form__optional">{{ c.optionalLabel }}</span>
+    </legend>
+    <div class="contact-form__phone">
+      <div class="contact-form__phone-code">
+        <label class="visually-hidden" for="contact-phoneCountryCode">{{
+          c.phone.countryCodeLabel
+        }}</label>
+        <input
+          id="contact-phoneCountryCode"
+          class="contact-form__field"
+          type="text"
+          inputmode="tel"
+          autocomplete="tel-country-code"
+          list="contact-country-codes"
+          maxlength="5"
+          formControlName="phoneCountryCode"
+          [placeholder]="c.phone.countryCodePlaceholder"
+          [attr.aria-invalid]="showError('phoneCountryCode') || showPhoneIncomplete()"
+          [attr.aria-describedby]="
+            describedBy('phoneCountryCode', showPhoneIncomplete() ? 'contact-phone-incomplete' : '')
+          "
+        />
+        <datalist id="contact-country-codes">
+          @for (country of countries(); track country.code) {
+            <option [value]="country.phoneCode">{{ country.name }}</option>
+          }
+        </datalist>
+      </div>
+      <div class="contact-form__phone-number">
+        <label class="visually-hidden" for="contact-phoneNumber">{{ c.phone.numberLabel }}</label>
+        <input
+          id="contact-phoneNumber"
+          class="contact-form__field"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel-national"
+          formControlName="phoneNumber"
+          [placeholder]="c.phone.numberPlaceholder"
+          [attr.aria-invalid]="showError('phoneNumber') || showPhoneIncomplete()"
+          [attr.aria-describedby]="
+            describedBy('phoneNumber', showPhoneIncomplete() ? 'contact-phone-incomplete' : '')
+          "
+        />
+      </div>
+    </div>
+    @if (showError('phoneCountryCode')) {
+      <p id="contact-phoneCountryCode-error" class="contact-form__error">
+        {{ errorText('phoneCountryCode') }}
+      </p>
+    }
+    @if (showError('phoneNumber')) {
+      <p id="contact-phoneNumber-error" class="contact-form__error">
+        {{ errorText('phoneNumber') }}
+      </p>
+    }
+    @if (showPhoneIncomplete()) {
+      <p id="contact-phone-incomplete" class="contact-form__error">
+        {{ c.errors.phoneIncomplete }}
+      </p>
+    }
+  </fieldset>
+
+  <!-- Asunto -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-subject">{{ c.subject.label }}</label>
+    <select
+      id="contact-subject"
+      class="contact-form__field contact-form__select"
+      formControlName="subject"
+      required
+      [attr.aria-invalid]="showError('subject')"
+      [attr.aria-describedby]="describedBy('subject')"
+    >
+      <option value="" disabled>{{ c.subject.placeholder }}</option>
+      @for (subject of subjects; track subject) {
+        <option [value]="subject">{{ c.subject.options[subject] }}</option>
+      }
+    </select>
+    @if (showError('subject')) {
+      <p id="contact-subject-error" class="contact-form__error">{{ errorText('subject') }}</p>
+    }
+  </div>
+
+  <!-- Diseño y consultoría: datos del proyecto -->
+  @if (isDesignConsulting()) {
+    <fieldset class="contact-form__project">
+      <legend class="visually-hidden">{{ c.subject.options.DESIGN_CONSULTING }}</legend>
+
+      <div class="contact-form__group">
+        <label class="contact-form__label" for="contact-projectType">{{
+          c.projectType.label
+        }}</label>
+        <select
+          id="contact-projectType"
+          class="contact-form__field contact-form__select"
+          formControlName="projectType"
+          required
+          [attr.aria-invalid]="showError('projectType')"
+          [attr.aria-describedby]="describedBy('projectType')"
+        >
+          <option value="" disabled>{{ c.projectType.placeholder }}</option>
+          @for (type of projectTypes; track type) {
+            <option [value]="type">{{ c.projectType.options[type] }}</option>
+          }
+        </select>
+        @if (showError('projectType')) {
+          <p id="contact-projectType-error" class="contact-form__error">
+            {{ errorText('projectType') }}
+          </p>
+        }
+      </div>
+
+      <div class="contact-form__group">
+        <label class="contact-form__label" for="contact-projectLocation">{{
+          c.projectLocation.label
+        }}</label>
+        <input
+          id="contact-projectLocation"
+          class="contact-form__field"
+          type="text"
+          formControlName="projectLocation"
+          required
+          [placeholder]="c.projectLocation.placeholder ?? ''"
+          [attr.aria-invalid]="showError('projectLocation')"
+          [attr.aria-describedby]="describedBy('projectLocation')"
+        />
+        @if (showError('projectLocation')) {
+          <p id="contact-projectLocation-error" class="contact-form__error">
+            {{ errorText('projectLocation') }}
+          </p>
+        }
+      </div>
+
+      <div class="contact-form__group">
+        <label class="contact-form__label" for="contact-service">{{ c.service.label }}</label>
+        <select
+          id="contact-service"
+          class="contact-form__field contact-form__select"
+          formControlName="service"
+          required
+          [attr.aria-invalid]="showError('service')"
+          [attr.aria-describedby]="describedBy('service')"
+        >
+          <option value="" disabled>{{ c.service.placeholder }}</option>
+          @for (service of services; track service) {
+            <option [value]="service">{{ c.service.options[service] }}</option>
+          }
+        </select>
+        @if (showError('service')) {
+          <p id="contact-service-error" class="contact-form__error">{{ errorText('service') }}</p>
+        }
+      </div>
+    </fieldset>
   }
 
-  <label class="contact-form__label" for="contact-message">{{ c.messageLabel }}</label>
-  <textarea
-    #message
-    id="contact-message"
-    class="contact-form__field contact-form__field--multiline"
-    formControlName="message"
-    required
-    [placeholder]="c.messagePlaceholder"
-    [attr.aria-invalid]="showError('message')"
-    [attr.aria-describedby]="showError('message') ? 'contact-message-error' : null"
-  ></textarea>
-  @if (showError('message')) {
-    <p id="contact-message-error" class="contact-form__error">{{ c.errors.messageRequired }}</p>
-  }
+  <!-- Mensaje -->
+  <div class="contact-form__group">
+    <label class="contact-form__label" for="contact-message">{{ c.message.label }}</label>
+    <textarea
+      id="contact-message"
+      class="contact-form__field contact-form__field--multiline"
+      formControlName="message"
+      required
+      [attr.maxlength]="rules.messageMax"
+      [placeholder]="c.message.placeholder ?? ''"
+      [attr.aria-invalid]="showError('message')"
+      [attr.aria-describedby]="describedBy('message', 'contact-message-counter')"
+    ></textarea>
+    <div class="contact-form__hint-row">
+      @if (showError('message')) {
+        <p id="contact-message-error" class="contact-form__error">{{ errorText('message') }}</p>
+      }
+      <p id="contact-message-counter" class="contact-form__counter">
+        {{ c.message.counter(messageLength(), rules.messageMax) }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Política de datos -->
+  <div class="contact-form__group">
+    <div class="contact-form__checkbox">
+      <input
+        id="contact-privacyAccepted"
+        type="checkbox"
+        formControlName="privacyAccepted"
+        required
+        [attr.aria-invalid]="showError('privacyAccepted')"
+        [attr.aria-describedby]="describedBy('privacyAccepted')"
+      />
+      <label for="contact-privacyAccepted">{{ c.privacy.label }}</label>
+    </div>
+    @if (c.privacy.policyUrl) {
+      <a class="contact-form__policy" [href]="c.privacy.policyUrl" target="_blank" rel="noopener">
+        {{ c.privacy.policyLinkLabel }}
+      </a>
+    }
+    @if (showError('privacyAccepted')) {
+      <p id="contact-privacyAccepted-error" class="contact-form__error">
+        {{ errorText('privacyAccepted') }}
+      </p>
+    }
+  </div>
+
+  <!-- Honeypot: invisible para personas; los bots suelen llenarlo -->
+  <div class="contact-form__trap" aria-hidden="true">
+    <label for="contact-website">{{ c.honeypotLabel }}</label>
+    <input
+      id="contact-website"
+      type="text"
+      tabindex="-1"
+      autocomplete="off"
+      formControlName="website"
+    />
+  </div>
 
   <div class="contact-form__actions">
     <button
@@ -38,9 +278,9 @@
       variant="secondary"
       type="submit"
       class="contact-form__submit"
-      [disabled]="status() === 'sending'"
+      [disabled]="request.loading()"
     >
-      {{ status() === 'sending' ? c.sendingLabel : c.submitLabel }}
+      {{ request.loading() ? c.sendingLabel : c.submitLabel }}
     </button>
     <button type="button" class="contact-form__back" (click)="back.emit()">
       <svg
@@ -61,13 +301,9 @@
   </div>
 
   <p class="contact-form__status" role="status">
-    @if (status() === 'sent') {
+    @if (sent()) {
       {{ c.successMessage }}
     }
   </p>
-  @if (status() === 'error') {
-    <p class="contact-form__status contact-form__status--error" role="alert">
-      {{ c.failureMessage }}
-    </p>
-  }
+  <p class="contact-form__status contact-form__status--error" role="alert">{{ errorMessage() }}</p>
 </form>

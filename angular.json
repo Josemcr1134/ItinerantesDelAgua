@@ -63,7 +63,13 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/public-site/src/environments/environment.ts",
+                  "with": "projects/public-site/src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -78,7 +84,10 @@
               "buildTarget": "public-site:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "projects/public-site/proxy.conf.json"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"

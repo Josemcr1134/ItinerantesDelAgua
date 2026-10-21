@@ -1,11 +1,15 @@
 import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideApi } from 'data-access';
 import { TestBed } from '@angular/core/testing';
 import { CLOSING_CTA_CONTENT } from '../../content/closing-cta.content';
 import { ClosingCta } from './closing-cta';
 
 describe('ClosingCta', () => {
   async function setup() {
-    TestBed.configureTestingModule({ providers: [provideHttpClient()] });
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideApi({ baseUrl: '' })],
+    });
     const fixture = TestBed.createComponent(ClosingCta);
     fixture.componentRef.setInput('content', CLOSING_CTA_CONTENT);
     await fixture.whenStable();
@@ -19,10 +23,10 @@ describe('ClosingCta', () => {
     return ctx;
   }
 
-  it('sustituye el bloque por el formulario y lleva el foco al correo', async () => {
+  it('sustituye el bloque por el formulario y lleva el foco al primer campo', async () => {
     const { host } = await openForm();
     expect(host.querySelector('.closing__cta')).toBeNull();
-    expect(document.activeElement).toBe(host.querySelector('#contact-email'));
+    expect(document.activeElement).toBe(host.querySelector('#contact-name'));
   });
 
   it('vuelve con Volver y devuelve el foco a Hablemos', async () => {
