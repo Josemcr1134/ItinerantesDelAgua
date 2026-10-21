@@ -8,7 +8,8 @@
     "declarationMap": true,
     "types": [],
     "paths": {
-      "data-access": ["../../dist/data-access"]
+      "data-access": ["../../dist/data-access"],
+      "ui-kit": ["../../dist/ui-kit"]
     }
   },
   "include": ["src/**/*.ts"],

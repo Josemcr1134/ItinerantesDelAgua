@@ -1,0 +1,108 @@
+@use 'breakpoints' as bp;
+
+// Móvil: franja verde con el logo y el formulario debajo. Escritorio: panel de
+// marca a la izquierda y formulario centrado a la derecha.
+:host {
+  display: block;
+}
+
+.layout {
+  display: grid;
+  min-height: 100dvh;
+
+  @include bp.up(lg) {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  }
+}
+
+.layout__brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-3);
+  overflow: hidden;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+
+  @include bp.up(lg) {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    padding: var(--space-6);
+  }
+
+  // Onda de agua al pie del panel.
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 18px;
+    background-color: var(--color-surface);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 18' preserveAspectRatio='none'%3E%3Cpath d='M0 9 Q15 0 30 9 T60 9 T90 9 T120 9 V18 H0 Z'/%3E%3C/svg%3E")
+      bottom / 240px 18px repeat-x;
+
+    @include bp.up(lg) {
+      display: none;
+    }
+  }
+}
+
+.layout__logo {
+  width: 120px;
+  height: auto;
+
+  @include bp.up(lg) {
+    position: absolute;
+    top: var(--space-5);
+    left: var(--space-5);
+    width: 160px;
+  }
+}
+
+.layout__illustration {
+  display: none;
+
+  @include bp.up(lg) {
+    display: block;
+    width: min(440px, 80%);
+    height: auto;
+  }
+}
+
+// Amatic SC en crema.
+.layout__platform {
+  font-family: var(--font-family-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: var(--space-2);
+
+  @include bp.up(lg) {
+    font-size: 2.75rem;
+    padding-bottom: 0;
+  }
+}
+
+.layout__main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-5) var(--space-3) var(--space-6);
+
+  @include bp.up(lg) {
+    align-items: center;
+    padding: var(--space-6);
+  }
+}
+
+.layout__content {
+  width: 100%;
+  max-width: 26rem;
+}

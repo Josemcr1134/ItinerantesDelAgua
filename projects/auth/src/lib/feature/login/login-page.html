@@ -1,0 +1,73 @@
+@let t = texts.login;
+<auth-layout>
+  <h1 class="title">{{ t.title }}</h1>
+  <p class="subtitle">{{ t.subtitle }}</p>
+
+  <form class="form" novalidate [formGroup]="form" (ngSubmit)="submit()">
+    @if (expired && !errorMessage()) {
+      <p class="notice notice--info" role="status">{{ t.expired }}</p>
+    }
+    <p class="notice" role="alert">{{ errorMessage() }}</p>
+
+    <div class="field">
+      <label class="field__label" for="login-email">{{ texts.email.label }}</label>
+      <input
+        #email
+        id="login-email"
+        class="field__input"
+        type="email"
+        autocomplete="username"
+        inputmode="email"
+        formControlName="email"
+        required
+        [placeholder]="texts.email.placeholder"
+        [attr.aria-invalid]="showError('email')"
+        [attr.aria-describedby]="showError('email') ? 'login-email-error' : null"
+      />
+      @if (showError('email')) {
+        <p id="login-email-error" class="field__error">
+          {{
+            form.controls.email.hasError('required') ? texts.errors.required : texts.errors.email
+          }}
+        </p>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="login-password">{{ texts.password.label }}</label>
+      <div class="field__control">
+        <input
+          #password
+          id="login-password"
+          class="field__input field__input--with-action"
+          autocomplete="current-password"
+          formControlName="password"
+          required
+          [type]="showPassword() ? 'text' : 'password'"
+          [attr.aria-invalid]="showError('password')"
+          [attr.aria-describedby]="showError('password') ? 'login-password-error' : null"
+        />
+        <auth-password-toggle
+          class="field__action"
+          [(visible)]="showPassword"
+          controls="login-password"
+        />
+      </div>
+      @if (showError('password')) {
+        <p id="login-password-error" class="field__error">{{ texts.errors.required }}</p>
+      }
+    </div>
+
+    <div class="options">
+      <label class="checkbox">
+        <input type="checkbox" formControlName="rememberMe" />
+        {{ t.rememberMe }}
+      </label>
+      <a class="link" [routerLink]="config.forgotPasswordUrl">{{ t.forgot }}</a>
+    </div>
+
+    <button uiButton type="submit" class="submit" [disabled]="request.loading()">
+      {{ request.loading() ? t.submitting : t.submit }}
+    </button>
+  </form>
+</auth-layout>

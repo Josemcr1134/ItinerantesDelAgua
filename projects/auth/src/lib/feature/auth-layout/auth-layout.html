@@ -1,0 +1,27 @@
+<div class="layout">
+  <aside class="layout__brand">
+    <img
+      class="layout__logo"
+      src="assets/brand/logo-white.webp"
+      [alt]="texts.brandAlt"
+      width="206"
+      height="136"
+    />
+    <img
+      class="layout__illustration"
+      src="assets/illustrations/auth-welcome.webp"
+      alt=""
+      width="564"
+      height="564"
+    />
+    @if (platformName) {
+      <p class="layout__platform">{{ platformName }}</p>
+    }
+  </aside>
+
+  <main class="layout__main">
+    <div class="layout__content">
+      <ng-content />
+    </div>
+  </main>
+</div>
