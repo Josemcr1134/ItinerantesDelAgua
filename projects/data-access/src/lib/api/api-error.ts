@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorDetailDto, ErrorResponseDto } from './models.generated';
+import { ErrorCode, ErrorDetailDto, ErrorResponseDto } from './models.generated';
 
 /** Código de error estable de la API (ver docs/frontend/errores.md del backend). */
-export type ApiErrorCode = ErrorResponseDto['code'] | 'NETWORK_ERROR' | 'UNKNOWN_ERROR';
+export type ApiErrorCode = ErrorCode | 'NETWORK_ERROR' | 'UNKNOWN_ERROR';
 
 /** Origen del error: respuesta de la API, sin conexión o inesperado. */
 export type ApiErrorKind = 'http' | 'network' | 'unknown';

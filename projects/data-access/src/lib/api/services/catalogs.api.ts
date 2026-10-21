@@ -1,44 +1,42 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiClient } from '../api-client';
 import { publicRequest } from '../http-context';
-import {
-  CountryListResponseDto,
-  DivisionListResponseDto,
-  MunicipalityListResponseDto,
-  TimezonesResponseDto,
-} from '../models.generated';
+import { Uuid } from '../models.generated';
+import { ApiQuery, ApiResponse } from '../operations.generated';
 
 /** Catálogos públicos: ubicaciones y zonas horarias. */
 @Injectable({ providedIn: 'root' })
 export class CatalogsApi {
   private readonly api = inject(ApiClient);
+  private readonly options = { context: publicRequest() };
 
   countries() {
-    return this.api.get<CountryListResponseDto>('/api/v1/locations/countries', {
-      context: publicRequest(),
-    });
-  }
-
-  /** Estados / departamentos de un país (código ISO). */
-  divisions(countryCode: string) {
-    return this.api.get<DivisionListResponseDto>(
-      `/api/v1/locations/countries/${encodeURIComponent(countryCode)}/divisions`,
-      { context: publicRequest() },
+    return this.api.get<ApiResponse<'Locations_countries'>>(
+      '/api/v1/locations/countries',
+      this.options,
     );
   }
 
-  municipalities(divisionId: string) {
-    return this.api.get<MunicipalityListResponseDto>(
+  /** Estados / departamentos de un país (código ISO-3166 alpha-2). */
+  divisions(countryCode: string) {
+    return this.api.get<ApiResponse<'Locations_divisions'>>(
+      `/api/v1/locations/countries/${encodeURIComponent(countryCode)}/divisions`,
+      this.options,
+    );
+  }
+
+  municipalities(divisionId: Uuid) {
+    return this.api.get<ApiResponse<'Locations_municipalities'>>(
       `/api/v1/locations/divisions/${encodeURIComponent(divisionId)}/municipalities`,
-      { context: publicRequest() },
+      this.options,
     );
   }
 
   /** Zonas horarias; `at` (ISO) calcula los desfases en esa fecha. */
-  timezones(at?: string) {
-    return this.api.get<TimezonesResponseDto>('/api/v1/timezones', {
-      query: { at },
-      context: publicRequest(),
+  timezones(query: ApiQuery<'Locations_timezones'> = {}) {
+    return this.api.get<ApiResponse<'Locations_timezones'>>('/api/v1/timezones', {
+      ...this.options,
+      query: { ...query },
     });
   }
 }

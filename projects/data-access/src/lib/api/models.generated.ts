@@ -1,7 +1,329 @@
 // ⚠️ Archivo generado por tools/generate-api-models.mjs a partir de
-// docs/api/openapi.json (Escuela Itinerante del Agua — API). No editar a mano:
-// regenerar con `node tools/generate-api-models.mjs`.
+// docs/api/openapi.json (Escuela Itinerante del Agua — API 0.1.0).
+// DTO, enums y alias de la API. No editar a mano: regenerar con `npm run api:models`.
 /* eslint-disable */
+
+/** Fecha y hora ISO 8601 (p. ej. `2026-03-01T15:00:00.000Z`). */
+export type IsoDateTime = string;
+
+/** Identificador UUID. */
+export type Uuid = string;
+
+export const ATTENDANCE_SOURCE_VALUES = ['PARTICIPANT', 'MANUAL'] as const;
+export type AttendanceSource = (typeof ATTENDANCE_SOURCE_VALUES)[number];
+
+export const ATTENDANCE_STATUS_VALUES = [
+  'PENDING',
+  'REGISTERED',
+  'NOT_REGISTERED',
+  'NOT_APPLICABLE',
+] as const;
+export type AttendanceStatus = (typeof ATTENDANCE_STATUS_VALUES)[number];
+
+export const ATTENDANCE_WINDOW_STATE_VALUES = [
+  'NOT_OPEN_YET',
+  'OPEN',
+  'CLOSED',
+  'NOT_APPLICABLE',
+] as const;
+export type AttendanceWindowState = (typeof ATTENDANCE_WINDOW_STATE_VALUES)[number];
+
+export const CALENDAR_CATEGORY_VALUES = [
+  'TRAINING',
+  'TERRITORY',
+  'COMMUNITY',
+  'EVENTS',
+  'IMPORTANT_DATES',
+] as const;
+export type CalendarCategory = (typeof CALENDAR_CATEGORY_VALUES)[number];
+
+export const CALENDAR_ITEM_KIND_VALUES = [
+  'SESSION',
+  'ACTIVITY_DUE',
+  'MANUAL',
+  'ENROLLMENT_OPENS',
+  'ENROLLMENT_CLOSES',
+  'OFFER_STARTS',
+  'SCHOLARSHIP_DEADLINE',
+  'FINAL_PROJECT',
+] as const;
+export type CalendarItemKind = (typeof CALENDAR_ITEM_KIND_VALUES)[number];
+
+export const CALENDAR_ITEM_SOURCE_VALUES = ['SESSION', 'EVENT', 'ACTIVITY'] as const;
+export type CalendarItemSource = (typeof CALENDAR_ITEM_SOURCE_VALUES)[number];
+
+export const CALENDAR_LINK_KIND_VALUES = ['CLASSROOM', 'OFFER', 'NONE'] as const;
+export type CalendarLinkKind = (typeof CALENDAR_LINK_KIND_VALUES)[number];
+
+export const CURRENCY_VALUES = ['MXN', 'USD'] as const;
+export type Currency = (typeof CURRENCY_VALUES)[number];
+
+export const CURRENCY_SOURCE_VALUES = ['PROFILE', 'TIMEZONE', 'DEFAULT'] as const;
+export type CurrencySource = (typeof CURRENCY_SOURCE_VALUES)[number];
+
+export const DASHBOARD_BLOCK_VALUES = [
+  'nextActivity',
+  'formations',
+  'upcomingEvents',
+  'recommendedResources',
+  'notifications',
+] as const;
+export type DashboardBlock = (typeof DASHBOARD_BLOCK_VALUES)[number];
+
+export const ENROLLMENT_STATUS_VALUES = [
+  'PENDING_PAYMENT',
+  'ACTIVE',
+  'COMPLETED',
+  'SUSPENDED',
+  'CANCELLED',
+] as const;
+export type EnrollmentStatus = (typeof ENROLLMENT_STATUS_VALUES)[number];
+
+export const ERROR_CODE_VALUES = [
+  'VALIDATION_ERROR',
+  'BAD_REQUEST',
+  'UNAUTHORIZED',
+  'FORBIDDEN',
+  'NOT_FOUND',
+  'CONFLICT',
+  'PAYLOAD_TOO_LARGE',
+  'BUSINESS_RULE_VIOLATION',
+  'RATE_LIMITED',
+  'INTERNAL_ERROR',
+  'SERVICE_UNAVAILABLE',
+  'AUTH_EMAIL_ALREADY_REGISTERED',
+  'AUTH_USERNAME_TAKEN',
+  'AUTH_INVALID_CREDENTIALS',
+  'AUTH_EMAIL_NOT_VERIFIED',
+  'AUTH_ACCOUNT_DISABLED',
+  'AUTH_LOGIN_LOCKED',
+  'AUTH_ACCOUNT_NOT_FOUND',
+  'AUTH_ALREADY_VERIFIED',
+  'AUTH_OTP_INVALID',
+  'AUTH_OTP_EXPIRED',
+  'AUTH_OTP_LOCKED',
+  'AUTH_OTP_COOLDOWN',
+  'AUTH_REFRESH_INVALID',
+  'AUTH_RESET_TOKEN_INVALID',
+  'AUTH_CURRENT_PASSWORD_INVALID',
+  'CONTACT_CAPTCHA_FAILED',
+  'OFFER_NOT_AVAILABLE',
+  'ENROLLMENT_REQUIRED',
+  'ENROLLMENT_SUSPENDED',
+  'ENROLLMENT_ALREADY_EXISTS',
+  'ENROLLMENT_NOT_FREE',
+  'ENROLLMENT_CLOSED',
+  'OFFER_SOLD_OUT',
+  'SESSION_CANCELLED',
+  'ATTENDANCE_NOT_OPEN_YET',
+  'ATTENDANCE_WINDOW_CLOSED',
+  'ATTENDANCE_ALREADY_REGISTERED',
+  'RESOURCE_FILE_UNAVAILABLE',
+  'FINAL_PROJECT_NOT_AVAILABLE',
+  'FINAL_PROJECT_DEADLINE_PASSED',
+  'FINAL_PROJECT_INVALID_FILE',
+  'FINAL_PROJECT_UPLOAD_NOT_FOUND',
+] as const;
+export type ErrorCode = (typeof ERROR_CODE_VALUES)[number];
+
+export const FINAL_PROJECT_CONTENT_TYPE_VALUES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/zip',
+] as const;
+export type FinalProjectContentType = (typeof FINAL_PROJECT_CONTENT_TYPE_VALUES)[number];
+
+export const FORMATION_PHASE_VALUES = ['ACTIVE', 'COMPLETED'] as const;
+export type FormationPhase = (typeof FORMATION_PHASE_VALUES)[number];
+
+export const FORMATION_PHASE_FILTER_VALUES = ['ACTIVE', 'COMPLETED', 'ALL'] as const;
+export type FormationPhaseFilter = (typeof FORMATION_PHASE_FILTER_VALUES)[number];
+
+export const LIBRARY_AUDIENCE_VALUES = ['ALL_REGISTERED', 'OFFER_ENROLLED'] as const;
+export type LibraryAudience = (typeof LIBRARY_AUDIENCE_VALUES)[number];
+
+export const LIBRARY_ITEM_TYPE_VALUES = [
+  'PDF',
+  'ARTICLE',
+  'BOOK',
+  'VIDEO',
+  'AUDIO',
+  'EXTERNAL',
+  'COURSE_MATERIAL',
+] as const;
+export type LibraryItemType = (typeof LIBRARY_ITEM_TYPE_VALUES)[number];
+
+export const MATERIAL_RESOURCE_TYPE_VALUES = ['PRESENTATION', 'PRE_READING', 'ACTIVITY'] as const;
+export type MaterialResourceType = (typeof MATERIAL_RESOURCE_TYPE_VALUES)[number];
+
+export const MODULE_STATUS_VALUES = ['UPCOMING', 'IN_PROGRESS', 'COMPLETED'] as const;
+export type ModuleStatus = (typeof MODULE_STATUS_VALUES)[number];
+
+export const NOTIFICATION_CATEGORY_VALUES = [
+  'TRAINING',
+  'APPLICATIONS',
+  'PAYMENTS',
+  'GENERAL',
+] as const;
+export type NotificationCategory = (typeof NOTIFICATION_CATEGORY_VALUES)[number];
+
+export const NOTIFICATION_PRIORITY_VALUES = ['NORMAL', 'HIGH'] as const;
+export type NotificationPriority = (typeof NOTIFICATION_PRIORITY_VALUES)[number];
+
+export const NOTIFICATION_TYPE_VALUES = [
+  'ENROLLMENT_CONFIRMED',
+  'ATTENDANCE_OPEN',
+  'WHATSAPP_GROUP_AVAILABLE',
+  'MATERIAL_PUBLISHED',
+  'RECORDING_PUBLISHED',
+  'SESSION_RESCHEDULED',
+  'SESSION_CANCELLED',
+  'MOODLE_ENROLLMENT_LINKED',
+  'APPLICATION_SUBMITTED',
+  'APPLICATION_STATUS_CHANGED',
+  'INTERVIEW_SCHEDULED',
+  'INTERVIEW_REMINDER',
+  'SCHOLARSHIP_APPROVED',
+  'APPLICATION_EXPIRED',
+  'PAYMENT_CONFIRMED',
+  'BALANCE_DUE_REMINDER',
+  'INSTALLMENT_UPCOMING',
+  'INSTALLMENT_PAID',
+  'INSTALLMENT_FAILED',
+  'PLAN_DELINQUENT',
+  'TRANSFER_VALIDATED',
+  'TRANSFER_REJECTED',
+  'GENERAL',
+] as const;
+export type NotificationType = (typeof NOTIFICATION_TYPE_VALUES)[number];
+
+export const OFFER_ACTION_REASON_VALUES = [
+  'ENROLLMENT_NOT_OPEN_YET',
+  'ENROLLMENT_CLOSED',
+  'OFFER_FINISHED',
+  'SOLD_OUT',
+  'SCHOLARSHIP_NOT_OPEN_YET',
+  'SCHOLARSHIP_CLOSED',
+  'PRICE_NOT_AVAILABLE',
+] as const;
+export type OfferActionReason = (typeof OFFER_ACTION_REASON_VALUES)[number];
+
+export const OFFER_ACTION_TYPE_VALUES = [
+  'ENROLL_AND_PAY',
+  'PAY_IN_INSTALLMENTS',
+  'ENROLL_FREE',
+  'APPLY_SCHOLARSHIP',
+  'APPLY_OPEN_CALL',
+  'ACTIVATE_MOODLE_ACCESS',
+  'GO_TO_CLASSROOM',
+] as const;
+export type OfferActionType = (typeof OFFER_ACTION_TYPE_VALUES)[number];
+
+export const OFFER_AVAILABILITY_VALUES = [
+  'ENROLLMENT_OPEN',
+  'UPCOMING',
+  'ENROLLMENT_CLOSED',
+  'FINISHED',
+] as const;
+export type OfferAvailability = (typeof OFFER_AVAILABILITY_VALUES)[number];
+
+export const OFFER_MODALITY_VALUES = ['ONLINE_LIVE', 'IN_PERSON'] as const;
+export type OfferModality = (typeof OFFER_MODALITY_VALUES)[number];
+
+export const OFFER_ORIGIN_VALUES = ['NAS', 'MOODLE'] as const;
+export type OfferOrigin = (typeof OFFER_ORIGIN_VALUES)[number];
+
+export const OFFER_TOPIC_VALUES = [
+  'ECOTECH_WATER_DIPLOMA',
+  'ECOPEDAGOGIES_DIPLOMA',
+  'WATER_APPRENTICES_SCHOOL',
+  'WATER_TREATMENT_SYSTEMS_INTRO',
+  'CONSTRUCTED_WETLANDS',
+  'DRY_TOILETS',
+  'WATER_HARVESTING',
+  'TRAVELING_WATER_LABS',
+  'TERRITORIAL_PRACTICES',
+  'FIELD_VISITS',
+] as const;
+export type OfferTopic = (typeof OFFER_TOPIC_VALUES)[number];
+
+export const OFFER_TYPE_VALUES = ['DIPLOMA', 'COURSE', 'WORKSHOP', 'EVENT', 'OPEN_CALL'] as const;
+export type OfferType = (typeof OFFER_TYPE_VALUES)[number];
+
+export const PRICING_KIND_VALUES = ['PAID', 'FREE', 'EXTERNAL_ENROLLMENT'] as const;
+export type PricingKind = (typeof PRICING_KIND_VALUES)[number];
+
+export const RECORDING_STATE_VALUES = [
+  'AVAILABLE',
+  'AFTER_SESSION',
+  'PENDING',
+  'NOT_APPLICABLE',
+] as const;
+export type RecordingState = (typeof RECORDING_STATE_VALUES)[number];
+
+export const RESOURCE_KIND_VALUES = ['FILE', 'EXTERNAL_LINK'] as const;
+export type ResourceKind = (typeof RESOURCE_KIND_VALUES)[number];
+
+export const SCHEDULE_STATUS_VALUES = [
+  'HAS_NEXT_SESSION',
+  'NO_UPCOMING_SESSIONS',
+  'FINISHED',
+] as const;
+export type ScheduleStatus = (typeof SCHEDULE_STATUS_VALUES)[number];
+
+export const SCHOLARSHIP_LEVEL_VALUES = [
+  'AGUA_VIVA',
+  'RIOS_VIVOS',
+  'AGUAS_LIBRES',
+  'CENOTES_VIVOS',
+  'SPECIAL',
+] as const;
+export type ScholarshipLevel = (typeof SCHOLARSHIP_LEVEL_VALUES)[number];
+
+export const SESSION_JOIN_STATE_VALUES = [
+  'NOT_YET',
+  'OPEN',
+  'LINK_PENDING',
+  'ENDED',
+  'CANCELLED',
+  'IN_PERSON',
+] as const;
+export type SessionJoinState = (typeof SESSION_JOIN_STATE_VALUES)[number];
+
+export const SESSION_PLATFORM_VALUES = ['ZOOM', 'GOOGLE_MEET', 'OTHER'] as const;
+export type SessionPlatform = (typeof SESSION_PLATFORM_VALUES)[number];
+
+export const SESSION_SCOPE_VALUES = ['UPCOMING', 'PAST'] as const;
+export type SessionScope = (typeof SESSION_SCOPE_VALUES)[number];
+
+export const SESSION_STATUS_VALUES = ['SCHEDULED', 'CANCELLED'] as const;
+export type SessionStatus = (typeof SESSION_STATUS_VALUES)[number];
+
+export const SUBMISSION_STATE_VALUES = ['DISABLED', 'OPEN', 'CLOSED'] as const;
+export type SubmissionState = (typeof SUBMISSION_STATE_VALUES)[number];
+
+export const TOPIC_AVAILABILITY_VALUES = [
+  'ENROLLMENT_OPEN',
+  'UPCOMING',
+  'ENROLLMENT_CLOSED',
+  'OPEN_CALL',
+  'NO_SCHEDULED_DATES',
+] as const;
+export type TopicAvailability = (typeof TOPIC_AVAILABILITY_VALUES)[number];
+
+export const TOPIC_GROUP_VALUES = [
+  'SPECIALIZED_TRAINING',
+  'ONLINE_COURSES_WORKSHOPS',
+  'HANDS_ON_LEARNING',
+] as const;
+export type TopicGroup = (typeof TOPIC_GROUP_VALUES)[number];
+
+export const TOPIC_LINK_KIND_VALUES = ['OFFER', 'CATALOG', 'NONE'] as const;
+export type TopicLinkKind = (typeof TOPIC_LINK_KIND_VALUES)[number];
+
+export const WINDOW_STATUS_VALUES = ['OPEN', 'UPCOMING', 'CLOSED'] as const;
+export type WindowStatus = (typeof WINDOW_STATUS_VALUES)[number];
 
 export interface HealthResponseDto {
   readonly status: 'ok';
@@ -25,50 +347,7 @@ export interface ErrorResponseDto {
   /** Status HTTP (repetido en el cuerpo). */
   readonly statusCode: number;
   /** Código estable para decidir qué mostrar en el frontend. Catálogo en docs/frontend/errores.md. */
-  readonly code:
-    | 'VALIDATION_ERROR'
-    | 'BAD_REQUEST'
-    | 'UNAUTHORIZED'
-    | 'FORBIDDEN'
-    | 'NOT_FOUND'
-    | 'CONFLICT'
-    | 'PAYLOAD_TOO_LARGE'
-    | 'BUSINESS_RULE_VIOLATION'
-    | 'RATE_LIMITED'
-    | 'INTERNAL_ERROR'
-    | 'SERVICE_UNAVAILABLE'
-    | 'AUTH_EMAIL_ALREADY_REGISTERED'
-    | 'AUTH_USERNAME_TAKEN'
-    | 'AUTH_INVALID_CREDENTIALS'
-    | 'AUTH_EMAIL_NOT_VERIFIED'
-    | 'AUTH_ACCOUNT_DISABLED'
-    | 'AUTH_LOGIN_LOCKED'
-    | 'AUTH_ACCOUNT_NOT_FOUND'
-    | 'AUTH_ALREADY_VERIFIED'
-    | 'AUTH_OTP_INVALID'
-    | 'AUTH_OTP_EXPIRED'
-    | 'AUTH_OTP_LOCKED'
-    | 'AUTH_OTP_COOLDOWN'
-    | 'AUTH_REFRESH_INVALID'
-    | 'AUTH_RESET_TOKEN_INVALID'
-    | 'AUTH_CURRENT_PASSWORD_INVALID'
-    | 'CONTACT_CAPTCHA_FAILED'
-    | 'OFFER_NOT_AVAILABLE'
-    | 'ENROLLMENT_REQUIRED'
-    | 'ENROLLMENT_SUSPENDED'
-    | 'ENROLLMENT_ALREADY_EXISTS'
-    | 'ENROLLMENT_NOT_FREE'
-    | 'ENROLLMENT_CLOSED'
-    | 'OFFER_SOLD_OUT'
-    | 'SESSION_CANCELLED'
-    | 'ATTENDANCE_NOT_OPEN_YET'
-    | 'ATTENDANCE_WINDOW_CLOSED'
-    | 'ATTENDANCE_ALREADY_REGISTERED'
-    | 'RESOURCE_FILE_UNAVAILABLE'
-    | 'FINAL_PROJECT_NOT_AVAILABLE'
-    | 'FINAL_PROJECT_DEADLINE_PASSED'
-    | 'FINAL_PROJECT_INVALID_FILE'
-    | 'FINAL_PROJECT_UPLOAD_NOT_FOUND';
+  readonly code: ErrorCode;
   /** Mensaje en español. */
   readonly message: string;
   /** Errores por campo (validación, duplicados). Ausente si no aplica. */
@@ -108,7 +387,7 @@ export interface CountryDto {
   /** Etiqueta del segundo nivel en la UI. */
   readonly municipalityLabel: string;
   /** Moneda de cobro para residentes del país (MX → MXN; resto → USD). */
-  readonly currency: 'MXN' | 'USD';
+  readonly currency: Currency;
 }
 
 export interface CountryListResponseDto {
@@ -191,16 +470,19 @@ export interface LocationResponseDto {
   readonly municipalityName: string;
 }
 
-export type Role =
-  | 'PARTICIPANT'
-  | 'SUPER_ADMIN'
-  | 'ACADEMIC_COORDINATOR'
-  | 'REVIEW_COMMITTEE'
-  | 'REVIEW_DECIDER'
-  | 'FOLLOW_UP'
-  | 'FINANCE';
+export const ROLE_VALUES = [
+  'PARTICIPANT',
+  'SUPER_ADMIN',
+  'ACADEMIC_COORDINATOR',
+  'REVIEW_COMMITTEE',
+  'REVIEW_DECIDER',
+  'FOLLOW_UP',
+  'FINANCE',
+] as const;
+export type Role = (typeof ROLE_VALUES)[number];
 
-export type UserStatus = 'PENDING_VERIFICATION' | 'ACTIVE' | 'DISABLED';
+export const USER_STATUS_VALUES = ['PENDING_VERIFICATION', 'ACTIVE', 'DISABLED'] as const;
+export type UserStatus = (typeof USER_STATUS_VALUES)[number];
 
 export interface UserProfileDto {
   readonly id: string;
@@ -214,13 +496,13 @@ export interface UserProfileDto {
   /** Zona IANA (HU-11). */
   readonly timezone: string;
   /** Calculado: moneda de los pagos nuevos según el país (MX → MXN; resto → USD). */
-  readonly currency: 'MXN' | 'USD';
+  readonly currency: Currency;
   readonly roles: Role[];
   readonly status: UserStatus;
-  readonly emailVerifiedAt: string | null;
-  readonly lastLoginAt: string | null;
-  readonly createdAt: string;
-  readonly updatedAt: string;
+  readonly emailVerifiedAt: IsoDateTime | null;
+  readonly lastLoginAt: IsoDateTime | null;
+  readonly createdAt: IsoDateTime;
+  readonly updatedAt: IsoDateTime;
 }
 
 export interface PhoneDto {
@@ -279,9 +561,9 @@ export interface OtpDeliveryDto {
   /** Número de dígitos (casillas). */
   readonly codeLength: number;
   /** Vencimiento del código. */
-  readonly expiresAt: string;
+  readonly expiresAt: IsoDateTime;
   /** Desde cuándo se puede pedir otro código ("Reenviar en 00:30"). */
-  readonly resendAvailableAt: string;
+  readonly resendAvailableAt: IsoDateTime;
 }
 
 export interface RegisterResponseDto {
@@ -318,7 +600,8 @@ export interface VerifyEmailResponseDto {
 }
 
 /** `EMAIL_VERIFICATION` (HU-03) o `PASSWORD_RESET` (HU-05). */
-export type OtpPurpose = 'EMAIL_VERIFICATION' | 'PASSWORD_RESET';
+export const OTP_PURPOSE_VALUES = ['EMAIL_VERIFICATION', 'PASSWORD_RESET'] as const;
+export type OtpPurpose = (typeof OTP_PURPOSE_VALUES)[number];
 
 export interface ResendOtpRequestDto {
   /** Se normaliza a minúsculas y sin espacios. */
@@ -339,10 +622,10 @@ export interface LoginResponseDto {
   readonly tokenType: string;
   /** Segundos de vida del accessToken. */
   readonly expiresIn: number;
-  readonly accessTokenExpiresAt: string;
+  readonly accessTokenExpiresAt: IsoDateTime;
   readonly refreshToken: string;
   /** 7 días (30 con "Recordarme"). Cada refresh lo renueva. */
-  readonly refreshTokenExpiresAt: string;
+  readonly refreshTokenExpiresAt: IsoDateTime;
   readonly user: UserProfileDto;
 }
 
@@ -355,10 +638,10 @@ export interface TokenPairDto {
   readonly tokenType: string;
   /** Segundos de vida del accessToken. */
   readonly expiresIn: number;
-  readonly accessTokenExpiresAt: string;
+  readonly accessTokenExpiresAt: IsoDateTime;
   readonly refreshToken: string;
   /** 7 días (30 con "Recordarme"). Cada refresh lo renueva. */
-  readonly refreshTokenExpiresAt: string;
+  readonly refreshTokenExpiresAt: IsoDateTime;
 }
 
 export interface LogoutRequestDto {
@@ -380,7 +663,7 @@ export interface VerifyResetOtpRequestDto {
 export interface ResetTokenResponseDto {
   /** Envíalo en POST /auth/password/reset. Un solo uso. */
   readonly resetToken: string;
-  readonly expiresAt: string;
+  readonly expiresAt: IsoDateTime;
 }
 
 export interface ResetPasswordRequestDto {
@@ -398,24 +681,45 @@ export interface ChangePasswordRequestDto {
   readonly confirmPassword: string;
 }
 
-export type ContactSubject =
-  'SCHOOL' | 'DESIGN_CONSULTING' | 'REGENERATIVE_TECH_HAWA' | 'SCHOLARSHIPS_CALLS' | 'OTHER';
+export const CONTACT_SUBJECT_VALUES = [
+  'SCHOOL',
+  'DESIGN_CONSULTING',
+  'REGENERATIVE_TECH_HAWA',
+  'SCHOLARSHIPS_CALLS',
+  'OTHER',
+] as const;
+export type ContactSubject = (typeof CONTACT_SUBJECT_VALUES)[number];
 
 /** Obligatorio si subject = DESIGN_CONSULTING (se ignora con otro asunto). */
-export type ContactProjectType = 'HOUSEHOLD' | 'COMMERCIAL' | 'COLLECTIVE' | 'PRODUCTIVE' | 'OTHER';
+export const CONTACT_PROJECT_TYPE_VALUES = [
+  'HOUSEHOLD',
+  'COMMERCIAL',
+  'COLLECTIVE',
+  'PRODUCTIVE',
+  'OTHER',
+] as const;
+export type ContactProjectType = (typeof CONTACT_PROJECT_TYPE_VALUES)[number];
 
 /** Servicio de interés (o NOT_SURE). Obligatorio si subject = DESIGN_CONSULTING. */
-export type ContactService =
-  | 'WASTEWATER_TREATMENT_DESIGN'
-  | 'RAINWATER_HARVESTING_DESIGN'
-  | 'INFILTRATION_REHYDRATION_DESIGN'
-  | 'WATER_RESILIENCE_DIAGNOSTICS'
-  | 'TECHNOLOGY_IMPLEMENTATION_ADVICE'
-  | 'NOT_SURE';
+export const CONTACT_SERVICE_VALUES = [
+  'WASTEWATER_TREATMENT_DESIGN',
+  'RAINWATER_HARVESTING_DESIGN',
+  'INFILTRATION_REHYDRATION_DESIGN',
+  'WATER_RESILIENCE_DIAGNOSTICS',
+  'TECHNOLOGY_IMPLEMENTATION_ADVICE',
+  'NOT_SURE',
+] as const;
+export type ContactService = (typeof CONTACT_SERVICE_VALUES)[number];
 
 /** Canal de origen (LANDING desde la landing HU-01). */
-export type ContactOrigin =
-  'CONTACT_PAGE' | 'LANDING' | 'DESIGN_CONSULTING_PAGE' | 'REGENERATIVE_TECH_PAGE' | 'ABOUT_PAGE';
+export const CONTACT_ORIGIN_VALUES = [
+  'CONTACT_PAGE',
+  'LANDING',
+  'DESIGN_CONSULTING_PAGE',
+  'REGENERATIVE_TECH_PAGE',
+  'ABOUT_PAGE',
+] as const;
+export type ContactOrigin = (typeof CONTACT_ORIGIN_VALUES)[number];
 
 export interface CreateContactMessageRequestDto {
   readonly name: string;
@@ -441,12 +745,13 @@ export interface CreateContactMessageRequestDto {
   readonly captchaToken?: string;
 }
 
-export type ContactStatus = 'NEW';
+export const CONTACT_STATUS_VALUES = ['NEW'] as const;
+export type ContactStatus = (typeof CONTACT_STATUS_VALUES)[number];
 
 export interface ContactMessageResponseDto {
   readonly id: string;
   readonly status: ContactStatus;
-  readonly createdAt: string;
+  readonly createdAt: IsoDateTime;
 }
 
 export interface PaginationMetaDto {
@@ -463,11 +768,11 @@ export interface PaginatedResponseDto {
 
 export interface OfferDatesDto {
   /** Apertura de inscripciones (o de postulación en convocatorias). */
-  readonly enrollmentOpensAt: string | null;
+  readonly enrollmentOpensAt: IsoDateTime | null;
   /** Cierre de inscripciones (o de postulación). */
-  readonly enrollmentClosesAt: string | null;
-  readonly startsAt: string | null;
-  readonly endsAt: string | null;
+  readonly enrollmentClosesAt: IsoDateTime | null;
+  readonly startsAt: IsoDateTime | null;
+  readonly endsAt: IsoDateTime | null;
 }
 
 export interface SessionSlotDto {
@@ -496,7 +801,7 @@ export interface OfferVenueSummaryDto {
 export interface MoneyDto {
   /** Centavos enteros. */
   readonly amountCents: number;
-  readonly currency: 'MXN' | 'USD';
+  readonly currency: Currency;
 }
 
 export interface OfferInstallmentsDto {
@@ -506,11 +811,11 @@ export interface OfferInstallmentsDto {
 
 export interface OfferPricingDto {
   /** PAID: con costo; FREE: "Gratuito"; EXTERNAL_ENROLLMENT: origen Moodle ("Inscripción externa", sin precio). */
-  readonly kind: 'PAID' | 'FREE' | 'EXTERNAL_ENROLLMENT';
+  readonly kind: PricingKind;
   /** Moneda del visitante. */
-  readonly currency: 'MXN' | 'USD';
+  readonly currency: Currency;
   /** PROFILE: país del perfil; TIMEZONE: zona del navegador (sin sesión); DEFAULT: sin datos (USD). */
-  readonly currencySource: 'PROFILE' | 'TIMEZONE' | 'DEFAULT';
+  readonly currencySource: CurrencySource;
   /** Precio en `currency` (null si no es PAID o no hay precio en esa moneda). */
   readonly price: MoneyDto | null;
   /** Solo si la oferta permite cuotas. */
@@ -523,32 +828,21 @@ export interface ScholarshipBadgeDto {
 }
 
 export interface OfferSummaryDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** Ruta /escuela/oferta/[slug]. */
   readonly slug: string;
   readonly name: string;
-  readonly type: 'DIPLOMA' | 'COURSE' | 'WORKSHOP' | 'EVENT' | 'OPEN_CALL';
-  readonly modality: 'ONLINE_LIVE' | 'IN_PERSON';
-  readonly origin: 'NAS' | 'MOODLE';
+  readonly type: OfferType;
+  readonly modality: OfferModality;
+  readonly origin: OfferOrigin;
   /** Estado derivado de publicación y fechas. */
-  readonly availability: 'ENROLLMENT_OPEN' | 'UPCOMING' | 'ENROLLMENT_CLOSED' | 'FINISHED';
+  readonly availability: OfferAvailability;
   /** Solo convocatorias: estado de la postulación. */
-  readonly openCallStatus: 'OPEN' | 'UPCOMING' | 'CLOSED' | null;
+  readonly openCallStatus: WindowStatus | null;
   readonly summary: string;
   readonly coverImageUrl: string | null;
   readonly cohortLabel: string | null;
-  readonly publicTopic:
-    | 'ECOTECH_WATER_DIPLOMA'
-    | 'ECOPEDAGOGIES_DIPLOMA'
-    | 'WATER_APPRENTICES_SCHOOL'
-    | 'WATER_TREATMENT_SYSTEMS_INTRO'
-    | 'CONSTRUCTED_WETLANDS'
-    | 'DRY_TOILETS'
-    | 'WATER_HARVESTING'
-    | 'TRAVELING_WATER_LABS'
-    | 'TERRITORIAL_PRACTICES'
-    | 'FIELD_VISITS'
-    | null;
+  readonly publicTopic: OfferTopic | null;
   readonly dates: OfferDatesDto;
   /** null si la oferta no tiene regla de horario. */
   readonly schedule: OfferScheduleDto | null;
@@ -564,7 +858,7 @@ export interface OfferSummaryDto {
 }
 
 export interface TopicLinkDto {
-  readonly kind: 'OFFER' | 'CATALOG' | 'NONE';
+  readonly kind: TopicLinkKind;
   /** kind = OFFER: slug de la ficha. */
   readonly slug: string | null;
   /** kind = CATALOG: query string para /escuela/oferta. */
@@ -572,22 +866,11 @@ export interface TopicLinkDto {
 }
 
 export interface TopicAvailabilityDto {
-  readonly topic:
-    | 'ECOTECH_WATER_DIPLOMA'
-    | 'ECOPEDAGOGIES_DIPLOMA'
-    | 'WATER_APPRENTICES_SCHOOL'
-    | 'WATER_TREATMENT_SYSTEMS_INTRO'
-    | 'CONSTRUCTED_WETLANDS'
-    | 'DRY_TOILETS'
-    | 'WATER_HARVESTING'
-    | 'TRAVELING_WATER_LABS'
-    | 'TERRITORIAL_PRACTICES'
-    | 'FIELD_VISITS';
-  readonly group: 'SPECIALIZED_TRAINING' | 'ONLINE_COURSES_WORKSHOPS' | 'HANDS_ON_LEARNING';
+  readonly topic: OfferTopic;
+  readonly group: TopicGroup;
   /** Texto literal del cliente. */
   readonly label: string;
-  readonly availability:
-    'ENROLLMENT_OPEN' | 'UPCOMING' | 'ENROLLMENT_CLOSED' | 'OPEN_CALL' | 'NO_SCHEDULED_DATES';
+  readonly availability: TopicAvailability;
   /** Ofertas vigentes (publicadas, no finalizadas). */
   readonly offerCount: number;
   readonly link: TopicLinkDto;
@@ -599,13 +882,13 @@ export interface TopicAvailabilityListDto {
 
 export interface OfferDetailDatesDto {
   /** Apertura de inscripciones (o de postulación en convocatorias). */
-  readonly enrollmentOpensAt: string | null;
+  readonly enrollmentOpensAt: IsoDateTime | null;
   /** Cierre de inscripciones (o de postulación). */
-  readonly enrollmentClosesAt: string | null;
-  readonly startsAt: string | null;
-  readonly endsAt: string | null;
+  readonly enrollmentClosesAt: IsoDateTime | null;
+  readonly startsAt: IsoDateTime | null;
+  readonly endsAt: IsoDateTime | null;
   /** Proyecto final (diplomados). */
-  readonly finalProjectDueAt: string | null;
+  readonly finalProjectDueAt: IsoDateTime | null;
 }
 
 export interface OfferVenueDto {
@@ -617,7 +900,7 @@ export interface OfferVenueDto {
 }
 
 export interface TeacherDto {
-  readonly id: string;
+  readonly id: Uuid;
   readonly fullName: string;
   readonly photoUrl: string | null;
   readonly bio: string | null;
@@ -635,11 +918,11 @@ export interface OfferModuleDto {
 export interface AmountRangeDto {
   readonly minAmountCents: number;
   readonly maxAmountCents: number;
-  readonly currency: 'MXN' | 'USD';
+  readonly currency: Currency;
 }
 
 export interface ScholarshipLevelDto {
-  readonly level: 'AGUA_VIVA' | 'RIOS_VIVOS' | 'AGUAS_LIBRES' | 'CENOTES_VIVOS' | 'SPECIAL';
+  readonly level: ScholarshipLevel;
   readonly label: string;
   readonly minPercent: number;
   /** Igual a minPercent salvo en Beca especial (71–80). */
@@ -657,9 +940,9 @@ export interface OfferScholarshipDto {
   readonly maxPercent: number;
   readonly interviewRequiredAbovePercent: number;
   /** Convocatoria de becas. */
-  readonly windowStatus: 'OPEN' | 'UPCOMING' | 'CLOSED';
-  readonly opensAt: string | null;
-  readonly closesAt: string | null;
+  readonly windowStatus: WindowStatus;
+  readonly opensAt: IsoDateTime | null;
+  readonly closesAt: IsoDateTime | null;
   readonly levels: ScholarshipLevelDto[];
 }
 
@@ -690,60 +973,34 @@ export interface OfferViewerDto {
 }
 
 export interface OfferActionDto {
-  readonly type:
-    | 'ENROLL_AND_PAY'
-    | 'PAY_IN_INSTALLMENTS'
-    | 'ENROLL_FREE'
-    | 'APPLY_SCHOLARSHIP'
-    | 'APPLY_OPEN_CALL'
-    | 'ACTIVATE_MOODLE_ACCESS'
-    | 'GO_TO_CLASSROOM';
+  readonly type: OfferActionType;
   readonly enabled: boolean;
   /** Botón principal (máximo uno). */
   readonly primary: boolean;
   /** Sin sesión: llevar a login/registro y regresar a la ficha con la acción. */
   readonly requiresLogin: boolean;
   /** Motivo si `enabled = false`. */
-  readonly reason:
-    | 'ENROLLMENT_NOT_OPEN_YET'
-    | 'ENROLLMENT_CLOSED'
-    | 'OFFER_FINISHED'
-    | 'SOLD_OUT'
-    | 'SCHOLARSHIP_NOT_OPEN_YET'
-    | 'SCHOLARSHIP_CLOSED'
-    | 'PRICE_NOT_AVAILABLE'
-    | null;
+  readonly reason: OfferActionReason | null;
   /** Para *_NOT_OPEN_YET: cuándo se habilita. */
-  readonly availableFrom: string | null;
+  readonly availableFrom: IsoDateTime | null;
 }
 
 export interface OfferDetailDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** Ruta /escuela/oferta/[slug]. */
   readonly slug: string;
   readonly name: string;
-  readonly type: 'DIPLOMA' | 'COURSE' | 'WORKSHOP' | 'EVENT' | 'OPEN_CALL';
-  readonly modality: 'ONLINE_LIVE' | 'IN_PERSON';
-  readonly origin: 'NAS' | 'MOODLE';
+  readonly type: OfferType;
+  readonly modality: OfferModality;
+  readonly origin: OfferOrigin;
   /** Estado derivado de publicación y fechas. */
-  readonly availability: 'ENROLLMENT_OPEN' | 'UPCOMING' | 'ENROLLMENT_CLOSED' | 'FINISHED';
+  readonly availability: OfferAvailability;
   /** Solo convocatorias: estado de la postulación. */
-  readonly openCallStatus: 'OPEN' | 'UPCOMING' | 'CLOSED' | null;
+  readonly openCallStatus: WindowStatus | null;
   readonly summary: string;
   readonly coverImageUrl: string | null;
   readonly cohortLabel: string | null;
-  readonly publicTopic:
-    | 'ECOTECH_WATER_DIPLOMA'
-    | 'ECOPEDAGOGIES_DIPLOMA'
-    | 'WATER_APPRENTICES_SCHOOL'
-    | 'WATER_TREATMENT_SYSTEMS_INTRO'
-    | 'CONSTRUCTED_WETLANDS'
-    | 'DRY_TOILETS'
-    | 'WATER_HARVESTING'
-    | 'TRAVELING_WATER_LABS'
-    | 'TERRITORIAL_PRACTICES'
-    | 'FIELD_VISITS'
-    | null;
+  readonly publicTopic: OfferTopic | null;
   readonly dates: OfferDetailDatesDto;
   /** null si la oferta no tiene regla de horario. */
   readonly schedule: OfferScheduleDto | null;
@@ -763,7 +1020,7 @@ export interface OfferDetailDto {
   readonly carouselImageUrls: string[];
   /** Sesiones programadas (sin canceladas). */
   readonly sessionCount: number;
-  readonly calendarCategory: 'TRAINING' | 'TERRITORY' | 'COMMUNITY' | 'EVENTS' | 'IMPORTANT_DATES';
+  readonly calendarCategory: CalendarCategory;
   readonly teachers: TeacherDto[];
   /** Temario: solo módulos publicados. */
   readonly modules: OfferModuleDto[];
@@ -788,16 +1045,16 @@ export interface PortalVenueDto {
 }
 
 export interface FormationOfferDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** Para "Ver ficha". */
   readonly slug: string;
   readonly name: string;
-  readonly type: 'DIPLOMA' | 'COURSE' | 'WORKSHOP' | 'EVENT' | 'OPEN_CALL';
-  readonly modality: 'ONLINE_LIVE' | 'IN_PERSON';
+  readonly type: OfferType;
+  readonly modality: OfferModality;
   readonly coverImageUrl: string | null;
   readonly cohortLabel: string | null;
-  readonly startsAt: string | null;
-  readonly endsAt: string | null;
+  readonly startsAt: IsoDateTime | null;
+  readonly endsAt: IsoDateTime | null;
   /** Solo presenciales. */
   readonly venue: PortalVenueDto | null;
 }
@@ -812,32 +1069,32 @@ export interface ProgressDto {
 }
 
 export interface NextSessionRefDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** UTC; muestra tu hora + CDMX. */
   readonly startsAt: string;
   readonly endsAt: string;
 }
 
 export interface FormationCardDto {
-  readonly enrollmentId: string;
-  readonly status: 'PENDING_PAYMENT' | 'ACTIVE' | 'COMPLETED' | 'SUSPENDED' | 'CANCELLED';
+  readonly enrollmentId: Uuid;
+  readonly status: EnrollmentStatus;
   /** Pestaña: Activos / Completados (completada si la oferta ya terminó). */
-  readonly phase: 'ACTIVE' | 'COMPLETED';
+  readonly phase: FormationPhase;
   /** `MOODLE` → badge "Vía Moodle". */
-  readonly origin: 'NAS' | 'MOODLE';
+  readonly origin: OfferOrigin;
   /** [Continuar] habilitado (acceso al Aula). `false` si está suspendida. */
   readonly canContinue: boolean;
   readonly offer: FormationOfferDto;
   readonly progress: ProgressDto;
   readonly nextSession: NextSessionRefDto | null;
   /** Sin próxima sesión: `FINISHED` ("Finalizado") o `NO_UPCOMING_SESSIONS`. */
-  readonly scheduleStatus: 'HAS_NEXT_SESSION' | 'NO_UPCOMING_SESSIONS' | 'FINISHED';
+  readonly scheduleStatus: ScheduleStatus;
   readonly enrolledAt: string;
 }
 
 export interface CreateEnrollmentRequestDto {
   /** Id de la oferta (`id` del catálogo/ficha). */
-  readonly offerId: string;
+  readonly offerId: Uuid;
 }
 
 export interface NotificationActionDto {
@@ -847,34 +1104,11 @@ export interface NotificationActionDto {
 }
 
 export interface NotificationDto {
-  readonly id: string;
-  readonly type:
-    | 'ENROLLMENT_CONFIRMED'
-    | 'ATTENDANCE_OPEN'
-    | 'WHATSAPP_GROUP_AVAILABLE'
-    | 'MATERIAL_PUBLISHED'
-    | 'RECORDING_PUBLISHED'
-    | 'SESSION_RESCHEDULED'
-    | 'SESSION_CANCELLED'
-    | 'MOODLE_ENROLLMENT_LINKED'
-    | 'APPLICATION_SUBMITTED'
-    | 'APPLICATION_STATUS_CHANGED'
-    | 'INTERVIEW_SCHEDULED'
-    | 'INTERVIEW_REMINDER'
-    | 'SCHOLARSHIP_APPROVED'
-    | 'APPLICATION_EXPIRED'
-    | 'PAYMENT_CONFIRMED'
-    | 'BALANCE_DUE_REMINDER'
-    | 'INSTALLMENT_UPCOMING'
-    | 'INSTALLMENT_PAID'
-    | 'INSTALLMENT_FAILED'
-    | 'PLAN_DELINQUENT'
-    | 'TRANSFER_VALIDATED'
-    | 'TRANSFER_REJECTED'
-    | 'GENERAL';
+  readonly id: Uuid;
+  readonly type: NotificationType;
   /** Ícono / grupo. */
-  readonly category: 'TRAINING' | 'APPLICATIONS' | 'PAYMENTS' | 'GENERAL';
-  readonly priority: 'NORMAL' | 'HIGH';
+  readonly category: NotificationCategory;
+  readonly priority: NotificationPriority;
   /** Fijada al inicio del panel (prioridad alta sin regularizar: cobro fallido, mora). */
   readonly pinned: boolean;
   readonly title: string;
@@ -885,7 +1119,7 @@ export interface NotificationDto {
     readonly [key: string]: unknown;
   } | null;
   readonly read: boolean;
-  readonly readAt: string | null;
+  readonly readAt: IsoDateTime | null;
   readonly createdAt: string;
 }
 
@@ -902,16 +1136,16 @@ export interface MarkAllReadResponseDto {
 }
 
 export interface PortalOfferRefDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** Para "Ver ficha". */
   readonly slug: string;
   readonly name: string;
-  readonly type: 'DIPLOMA' | 'COURSE' | 'WORKSHOP' | 'EVENT' | 'OPEN_CALL';
-  readonly modality: 'ONLINE_LIVE' | 'IN_PERSON';
+  readonly type: OfferType;
+  readonly modality: OfferModality;
 }
 
 export interface SessionModuleRefDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** "Módulo N". */
   readonly number: number;
   readonly title: string;
@@ -919,58 +1153,58 @@ export interface SessionModuleRefDto {
 
 export interface SessionJoinDto {
   /** `OPEN` → [Entrar a sesión] con `url`; `NOT_YET` → deshabilitado hasta `opensAt` (cuenta regresiva; vuelve a pedir la sesión al llegar); `LINK_PENDING` "Enlace aún no disponible"; `CANCELLED` "Cancelada"; `ENDED`; `IN_PERSON` (sin enlace). */
-  readonly state: 'NOT_YET' | 'OPEN' | 'LINK_PENDING' | 'ENDED' | 'CANCELLED' | 'IN_PERSON';
+  readonly state: SessionJoinState;
   /** Inicio − 10 min (BUSINESS_RULES.SESSION_JOIN_WINDOW_MINUTES_BEFORE). */
-  readonly opensAt: string;
+  readonly opensAt: IsoDateTime;
   /** join_url (Zoom/Meet) SOLO con `state = OPEN`. Nunca el enlace de anfitrión. */
   readonly url: string | null;
 }
 
 export interface SessionRecordingDto {
   /** `AVAILABLE` [Ver grabación]; `AFTER_SESSION` "Disponible después de la sesión"; `PENDING` "Grabación pendiente"; `NOT_APPLICABLE` sin grabación. */
-  readonly state: 'AVAILABLE' | 'AFTER_SESSION' | 'PENDING' | 'NOT_APPLICABLE';
+  readonly state: RecordingState;
   /** Enlace externo. */
   readonly url: string | null;
 }
 
 export interface SessionAttendanceDto {
   /** Pendiente / Registrada / No registrada (`NOT_APPLICABLE` en canceladas). */
-  readonly status: 'PENDING' | 'REGISTERED' | 'NOT_REGISTERED' | 'NOT_APPLICABLE';
+  readonly status: AttendanceStatus;
   /** Ventana de registro: abre al terminar la sesión y dura N h (24 h por defecto). */
-  readonly windowState: 'NOT_OPEN_YET' | 'OPEN' | 'CLOSED' | 'NOT_APPLICABLE';
+  readonly windowState: AttendanceWindowState;
   /** Fin de la sesión. */
-  readonly opensAt: string;
+  readonly opensAt: IsoDateTime;
   /** "Puedes registrar hasta el …" / "Cierra en 21 h 35 min". */
-  readonly closesAt: string;
+  readonly closesAt: IsoDateTime;
   /** Duración de la ventana (sesión ?? oferta). */
   readonly windowHours: number;
   /** Habilita [Registrar asistencia]. */
   readonly canRegister: boolean;
   /** "Asistencia registrada el …". */
-  readonly registeredAt: string | null;
+  readonly registeredAt: IsoDateTime | null;
   /** `MANUAL` = la marcó el equipo (p. ej. pase de lista en sitio). */
-  readonly source: 'PARTICIPANT' | 'MANUAL' | null;
+  readonly source: AttendanceSource | null;
   readonly comment: string | null;
 }
 
 export interface SessionCardDto {
-  readonly id: string;
+  readonly id: Uuid;
   readonly offer: PortalOfferRefDto;
   readonly module: SessionModuleRefDto | null;
   /** Docente(s) del módulo o de la oferta. */
   readonly teacherNames: string[];
-  readonly startsAt: string;
-  readonly endsAt: string;
+  readonly startsAt: IsoDateTime;
+  readonly endsAt: IsoDateTime;
   /** Hora oficial de referencia (CDMX). */
   readonly timezone: string;
-  readonly status: 'SCHEDULED' | 'CANCELLED';
-  readonly category: 'TRAINING' | 'TERRITORY' | 'COMMUNITY' | 'EVENTS' | 'IMPORTANT_DATES';
+  readonly status: SessionStatus;
+  readonly category: CalendarCategory;
   /** Si fue reprogramada: inicio original (HU-29). */
-  readonly originalStartsAt: string | null;
+  readonly originalStartsAt: IsoDateTime | null;
   /** Motivo de reprogramación/cancelación. */
   readonly changeReason: string | null;
   /** Plataforma (ícono), deducida del enlace aunque aún no se entregue. */
-  readonly platform: 'ZOOM' | 'GOOGLE_MEET' | 'OTHER' | null;
+  readonly platform: SessionPlatform | null;
   /** Presencial: lugar. */
   readonly venue: PortalVenueDto | null;
   readonly join: SessionJoinDto;
@@ -993,12 +1227,12 @@ export interface AttendanceResultDto {
 }
 
 export interface ClassroomEnrollmentDto {
-  readonly id: string;
-  readonly status: 'PENDING_PAYMENT' | 'ACTIVE' | 'COMPLETED' | 'SUSPENDED' | 'CANCELLED';
-  readonly phase: 'ACTIVE' | 'COMPLETED';
+  readonly id: Uuid;
+  readonly status: EnrollmentStatus;
+  readonly phase: FormationPhase;
   /** `MOODLE` → "Vía Moodle". */
-  readonly origin: 'NAS' | 'MOODLE';
-  readonly enrolledAt: string;
+  readonly origin: OfferOrigin;
+  readonly enrolledAt: IsoDateTime;
 }
 
 export interface ClassroomTeacherDto {
@@ -1007,16 +1241,16 @@ export interface ClassroomTeacherDto {
 }
 
 export interface ClassroomOfferDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** Para "Ver ficha". */
   readonly slug: string;
   readonly name: string;
-  readonly type: 'DIPLOMA' | 'COURSE' | 'WORKSHOP' | 'EVENT' | 'OPEN_CALL';
-  readonly modality: 'ONLINE_LIVE' | 'IN_PERSON';
+  readonly type: OfferType;
+  readonly modality: OfferModality;
   readonly coverImageUrl: string | null;
   readonly cohortLabel: string | null;
-  readonly startsAt: string | null;
-  readonly endsAt: string | null;
+  readonly startsAt: IsoDateTime | null;
+  readonly endsAt: IsoDateTime | null;
   readonly totalHours: number | null;
   /** Presencial: "Cómo llegar". */
   readonly venue: PortalVenueDto | null;
@@ -1029,14 +1263,14 @@ export interface WhatsappGroupDto {
   /** Solo inscritos y desde la fecha que definió el equipo. */
   readonly url: string | null;
   /** Configurado pero aún no visible: "Disponible a partir del …". */
-  readonly availableFrom: string | null;
+  readonly availableFrom: IsoDateTime | null;
 }
 
 export interface ClassroomWelcomeDto {
   /** `true` antes de la primera sesión → bloque "Antes de empezar" destacado; después, bloque secundario "Grupo de WhatsApp". */
   readonly preStart: boolean;
   readonly message: string | null;
-  readonly firstSessionStartsAt: string | null;
+  readonly firstSessionStartsAt: IsoDateTime | null;
   readonly whatsapp: WhatsappGroupDto;
 }
 
@@ -1049,13 +1283,13 @@ export interface ModuleResourceCountsDto {
 }
 
 export interface ClassroomModuleDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** "Módulo N" (orden del temario). */
   readonly number: number;
   readonly title: string;
   readonly description: string | null;
   /** Próximo / En curso / Completado. */
-  readonly status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
+  readonly status: ModuleStatus;
   readonly teacherNames: string[];
   readonly resourceCounts: ModuleResourceCountsDto;
 }
@@ -1064,15 +1298,15 @@ export interface FinalProjectSubmissionDto {
   readonly fileName: string;
   readonly mimeType: string;
   readonly sizeBytes: number;
-  readonly submittedAt: string;
+  readonly submittedAt: IsoDateTime;
 }
 
 export interface FinalProjectDto {
   /** Fecha de presentación/entrega. */
-  readonly dueAt: string | null;
+  readonly dueAt: IsoDateTime | null;
   readonly guidelines: string | null;
   /** `DISABLED`: solo presentación en vivo (sin carga); `OPEN`: se puede subir/reemplazar; `CLOSED`: pasó la fecha límite (solo lectura). */
-  readonly submissionState: 'DISABLED' | 'OPEN' | 'CLOSED';
+  readonly submissionState: SubmissionState;
   /** PDF, DOCX, PPTX o ZIP. */
   readonly acceptedMimeTypes: string[];
   /** 20 MB. */
@@ -1095,36 +1329,36 @@ export interface ClassroomDto {
 }
 
 export interface MaterialResourceDto {
-  readonly id: string;
-  readonly type: 'PRESENTATION' | 'PRE_READING' | 'ACTIVITY';
+  readonly id: Uuid;
+  readonly type: MaterialResourceType;
   readonly title: string;
   readonly description: string | null;
   /** `FILE` → [Descargar]: pide la URL temporal a `…/resources/{id}/access`. `EXTERNAL_LINK` → [Ver] abre `url` en pestaña nueva. */
-  readonly kind: 'FILE' | 'EXTERNAL_LINK' | null;
+  readonly kind: ResourceKind | null;
   /** Solo enlaces externos. */
   readonly url: string | null;
   readonly fileName: string | null;
   readonly mimeType: string | null;
   readonly sizeBytes: number | null;
   /** Actividades: fecha (aparece en el calendario como "Fecha importante"). */
-  readonly activityDueAt: string | null;
+  readonly activityDueAt: IsoDateTime | null;
 }
 
 export interface MaterialRecordingDto {
-  readonly sessionId: string;
+  readonly sessionId: Uuid;
   /** "Ver grabación" con fecha. */
-  readonly startsAt: string;
-  readonly endsAt: string;
-  readonly state: 'AVAILABLE' | 'AFTER_SESSION' | 'PENDING' | 'NOT_APPLICABLE';
+  readonly startsAt: IsoDateTime;
+  readonly endsAt: IsoDateTime;
+  readonly state: RecordingState;
   readonly url: string | null;
 }
 
 export interface MaterialModuleDto {
-  readonly id: string;
+  readonly id: Uuid;
   readonly number: number;
   readonly title: string;
   readonly description: string | null;
-  readonly status: 'UPCOMING' | 'IN_PROGRESS' | 'COMPLETED';
+  readonly status: ModuleStatus;
   readonly teacherNames: string[];
   /** 1. Presentación del módulo (la más reciente). */
   readonly presentation: MaterialResourceDto | null;
@@ -1141,21 +1375,17 @@ export interface MaterialsDto {
 }
 
 export interface AccessUrlDto {
-  readonly kind: 'FILE' | 'EXTERNAL_LINK';
+  readonly kind: ResourceKind;
   readonly url: string;
   /** Vencimiento de la URL firmada (null para enlaces externos). Al vencer, pide otra. */
-  readonly expiresAt: string | null;
+  readonly expiresAt: IsoDateTime | null;
   readonly fileName: string | null;
 }
 
 export interface FinalProjectUploadRequestDto {
   readonly fileName: string;
   /** Content-Type exacto que enviarás en el PUT. */
-  readonly contentType:
-    | 'application/pdf'
-    | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-    | 'application/zip';
+  readonly contentType: FinalProjectContentType;
   /** Tamaño en bytes (máx. 20 MB). */
   readonly sizeBytes: number;
 }
@@ -1167,7 +1397,7 @@ export interface UploadUrlDto {
   readonly headers: Record<string, unknown>;
   /** Envíala a `PUT …/final-project` para confirmar la entrega. */
   readonly key: string;
-  readonly expiresAt: string;
+  readonly expiresAt: IsoDateTime;
 }
 
 export interface ConfirmFinalProjectRequestDto {
@@ -1178,36 +1408,28 @@ export interface ConfirmFinalProjectRequestDto {
 
 export interface CalendarLinkDto {
   /** `CLASSROOM` → Aula (`offerId`); `OFFER` → ficha `/escuela/oferta/{slug}`. */
-  readonly kind: 'CLASSROOM' | 'OFFER' | 'NONE';
-  readonly offerId: string | null;
+  readonly kind: CalendarLinkKind;
+  readonly offerId: Uuid | null;
   readonly slug: string | null;
 }
 
 export interface CalendarItemDto {
-  readonly id: string;
+  readonly id: Uuid;
   /** `SESSION` = clase generada desde el horario (no editable); `EVENT` = evento manual o fecha importante; `ACTIVITY` = fecha de una actividad de módulo (HU-08, "Fecha importante"). */
-  readonly source: 'SESSION' | 'EVENT' | 'ACTIVITY';
+  readonly source: CalendarItemSource;
   /** Tipo: SESSION, ACTIVITY_DUE, MANUAL (webinar/encuentro) o fecha importante automática (ENROLLMENT_OPENS, ENROLLMENT_CLOSES, OFFER_STARTS, SCHOLARSHIP_DEADLINE, FINAL_PROJECT). */
-  readonly kind:
-    | 'SESSION'
-    | 'ACTIVITY_DUE'
-    | 'MANUAL'
-    | 'ENROLLMENT_OPENS'
-    | 'ENROLLMENT_CLOSES'
-    | 'OFFER_STARTS'
-    | 'SCHOLARSHIP_DEADLINE'
-    | 'FINAL_PROJECT';
+  readonly kind: CalendarItemKind;
   readonly title: string;
   readonly description: string | null;
   /** Color: Formación azul, Territorio verde, Comunidad naranja, Eventos morado, Fechas importantes rojo. */
-  readonly category: 'TRAINING' | 'TERRITORY' | 'COMMUNITY' | 'EVENTS' | 'IMPORTANT_DATES';
+  readonly category: CalendarCategory;
   readonly startsAt: string;
-  readonly endsAt: string | null;
+  readonly endsAt: IsoDateTime | null;
   /** Evento de día completo (fechas importantes). */
   readonly allDay: boolean;
   readonly timezone: string;
   /** `CANCELLED` → "Cancelada", sin enlace. */
-  readonly status: 'SCHEDULED' | 'CANCELLED';
+  readonly status: SessionStatus;
   readonly offer: PortalOfferRefDto | null;
   readonly module: SessionModuleRefDto | null;
   /** Presencial (hora local del lugar). */
@@ -1224,24 +1446,24 @@ export interface CalendarResponseDto {
 }
 
 export interface LibraryOfferRefDto {
-  readonly id: string;
+  readonly id: Uuid;
   readonly slug: string;
   readonly name: string;
 }
 
 export interface LibraryItemDto {
-  readonly id: string;
+  readonly id: Uuid;
   readonly title: string;
   readonly description: string | null;
-  readonly type: 'PDF' | 'ARTICLE' | 'BOOK' | 'VIDEO' | 'AUDIO' | 'EXTERNAL' | 'COURSE_MATERIAL';
+  readonly type: LibraryItemType;
   readonly author: string | null;
   readonly keywords: string[];
   readonly thumbnailUrl: string | null;
   /** `OFFER_ENROLLED` = exclusivo de un curso (solo lo ves si estás inscrito). */
-  readonly audience: 'ALL_REGISTERED' | 'OFFER_ENROLLED';
+  readonly audience: LibraryAudience;
   readonly offer: LibraryOfferRefDto | null;
   /** Ábrelo con `GET /library/{id}/access` (archivo: URL temporal; externo: pestaña nueva). */
-  readonly kind: 'FILE' | 'EXTERNAL_LINK' | null;
+  readonly kind: ResourceKind | null;
   readonly fileName: string | null;
   readonly sizeBytes: number | null;
   /** Material recomendado (Dashboard). */
@@ -1265,7 +1487,5 @@ export interface DashboardDto {
   readonly recommendedResources: LibraryItemDto[] | null;
   readonly notifications: UnreadCountDto | null;
   /** Bloques que no se pudieron cargar: muestra "No se pudo cargar esta información" + reintento (el reintento puede usar el endpoint propio del bloque: /me/enrollments, /me/calendar, /library, /me/notifications/unread-count). */
-  readonly failedBlocks: (
-    'nextActivity' | 'formations' | 'upcomingEvents' | 'recommendedResources' | 'notifications'
-  )[];
+  readonly failedBlocks: DashboardBlock[];
 }

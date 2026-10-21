@@ -1,22 +1,20 @@
 import { inject, Injectable } from '@angular/core';
-import { ApiClient, PageQuery, Paginated } from '../api-client';
-import { AccessUrlDto, LibraryItemDto } from '../models.generated';
-
-export interface LibraryQuery extends PageQuery {
-  readonly type?: readonly LibraryItemDto['type'][];
-  readonly q?: string;
-}
+import { ApiClient } from '../api-client';
+import { Uuid } from '../models.generated';
+import { ApiQuery, ApiResponse } from '../operations.generated';
 
 /** Biblioteca digital. */
 @Injectable({ providedIn: 'root' })
 export class LibraryApi {
   private readonly api = inject(ApiClient);
 
-  list(query: LibraryQuery = {}) {
-    return this.api.get<Paginated<LibraryItemDto>>('/api/v1/library', { query: { ...query } });
+  list(query: ApiQuery<'Library_list'> = {}) {
+    return this.api.get<ApiResponse<'Library_list'>>('/api/v1/library', { query: { ...query } });
   }
 
-  access(id: string) {
-    return this.api.get<AccessUrlDto>(`/api/v1/library/${encodeURIComponent(id)}/access`);
+  access(id: Uuid) {
+    return this.api.get<ApiResponse<'Library_access'>>(
+      `/api/v1/library/${encodeURIComponent(id)}/access`,
+    );
   }
 }

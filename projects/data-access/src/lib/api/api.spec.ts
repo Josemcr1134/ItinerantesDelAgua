@@ -17,7 +17,16 @@ import { silentRequest } from './http-context';
 import { loadingInterceptor } from './loading.interceptor';
 import { LoadingService } from './loading.service';
 import { requestState } from './request-state';
+import { OFFER_TYPE_VALUES, ROLE_VALUES, SESSION_SCOPE_VALUES } from './models.generated';
 import { OffersApi } from './services/offers.api';
+
+describe('tipado generado', () => {
+  it('expone los valores de cada enum para filtros y selects', () => {
+    expect(OFFER_TYPE_VALUES).toEqual(['DIPLOMA', 'COURSE', 'WORKSHOP', 'EVENT', 'OPEN_CALL']);
+    expect(SESSION_SCOPE_VALUES).toEqual(['UPCOMING', 'PAST']);
+    expect(ROLE_VALUES).toContain('SUPER_ADMIN');
+  });
+});
 
 describe('toApiError', () => {
   it('usa el formato de error de la API', () => {

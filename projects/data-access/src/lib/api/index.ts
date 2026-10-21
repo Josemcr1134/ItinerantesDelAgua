@@ -7,6 +7,7 @@ export * from './loading.interceptor';
 export * from './request-state';
 export * from './api-client';
 export * from './models.generated';
+export * from './operations.generated';
 export * from './services/health.api';
 export * from './services/catalogs.api';
 export * from './services/auth.api';
