@@ -28,6 +28,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/public-site/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/ui-kit/assets/fonts",
+                "output": "assets/fonts"
               }
             ],
             "styles": ["projects/public-site/src/styles.scss"],
@@ -97,6 +102,16 @@
               {
                 "glob": "**/*",
                 "input": "projects/portal/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/ui-kit/assets/fonts",
+                "output": "assets/fonts"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/ui-kit/assets/illustrations",
+                "output": "assets/illustrations"
               }
             ],
             "styles": ["projects/portal/src/styles.scss"],
@@ -166,6 +181,16 @@
               {
                 "glob": "**/*",
                 "input": "projects/admin/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/ui-kit/assets/fonts",
+                "output": "assets/fonts"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/ui-kit/assets/illustrations",
+                "output": "assets/illustrations"
               }
             ],
             "styles": ["projects/admin/src/styles.scss"],
