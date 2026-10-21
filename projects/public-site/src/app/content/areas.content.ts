@@ -14,7 +14,7 @@ export const AREAS_CONTENT: AreasContent = {
   items: [
     {
       id: 'escuela',
-      image: img('snake.png'),
+      image: img('snake.webp'),
       backdrop: '#d8e7fb', // forma de fondo en móvil (azul)
       title: 'Escuela Itinerante del Agua',
       description: 'Aprende soluciones basadas\nen la naturaleza para revitalizar\nel agua.',
@@ -22,7 +22,7 @@ export const AREAS_CONTENT: AreasContent = {
     },
     {
       id: 'diseno',
-      image: img('flowerpotAndFlowers.png'),
+      image: img('flowerpotAndFlowers.webp'),
       backdrop: '#e3e5d6', // forma de fondo en móvil (salvia)
       title: 'Diseño y Asesoría',
       description: 'Diseñamos soluciones\nadaptadas a las necesidades\nde cada proyecto.',
@@ -30,7 +30,7 @@ export const AREAS_CONTENT: AreasContent = {
     },
     {
       id: 'innovacion',
-      image: img('ecoBath.png'),
+      image: img('ecoBath.webp'),
       backdrop: '#fbebc9', // forma de fondo en móvil (amarillo)
       imageSize: { width: 404, height: 194 },
       title: 'Innovación y tecnologías\nregenerativas',
@@ -52,7 +52,7 @@ export const AREAS_CONTENT: AreasContent = {
         text: 'Combinamos educación, diseño, innovación tecnológica y acción territorial para desarrollar y compartir soluciones que permitan cuidar, tratar, captar, infiltrar y regenerar el agua desde una mirada basada en la naturaleza.',
       },
     ],
-    image: img('ladyOnTheRock.png'),
+    image: img('ladyOnTheRock.webp'),
     pathsTitle: 'Nuestros caminos',
     paths: [
       {
@@ -87,7 +87,7 @@ export const AREAS_CONTENT: AreasContent = {
     subtitle: 'Diseñar soluciones adaptadas a cada territorio.',
     paragraph:
       'Implementamos soluciones basadas en la naturaleza para la transición climática a nivel domiciliario y comercial. Acompañamos a espacios y proyectos colectivos, organizaciones o proyectos productivos que desean integrar sistemas regenerativos de agua: captación de lluvia, rehidratación del paisaje o tratamiento de aguas residuales. Partimos de las condiciones del territorio para integrar procesos naturales, conocimientos técnicos y tecnologías apropiadas.',
-    image: img('flowerpotAndFlowers.png'),
+    image: img('flowerpotAndFlowers.webp'),
     servicesTitle: '¿Qué hacemos?',
     services: [
       'Diseño de sistemas de tratamiento de aguas residuales',

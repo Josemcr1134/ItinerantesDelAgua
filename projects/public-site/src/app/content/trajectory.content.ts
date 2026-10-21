@@ -13,19 +13,19 @@ export const TRAJECTORY_CONTENT: TrajectoryContent = {
   items: [
     {
       id: 'historia',
-      image: img('sculpture.png'),
+      image: img('sculpture.webp'),
       title: 'Historia',
       description: 'Conoce\nnuestro camino.',
     },
     {
       id: 'premios',
-      image: img('sculptureWheelbarrow.png'),
+      image: img('sculptureWheelbarrow.webp'),
       title: 'Premios y reconocimientos',
       description: 'Conoce\nnuestros logros.',
     },
     {
       id: 'equipo',
-      image: img('ladyAndFlowers.png'),
+      image: img('ladyAndFlowers.webp'),
       title: 'Equipo',
       description: 'Conoce a quiénes\nlo hacen posible',
     },
@@ -40,7 +40,7 @@ export const TRAJECTORY_CONTENT: TrajectoryContent = {
       'Itinerantes del Agua es una organización que combina educación, diseño, innovación tecnológica y acción territorial para cuidar, tratar, captar, infiltrar y regenerar el agua desde una mirada basada en la naturaleza.',
       'Como el escarabajo pelotero, que construye su casa con residuos, nos inspira la capacidad de transformar. Aprendemos del agua, diseñamos con la naturaleza y regeneramos desde el territorio.',
     ],
-    image: img('ecoBath.png'),
+    image: img('ecoBath.webp'),
   },
   awards: {
     title: 'Premios y reconocimientos',

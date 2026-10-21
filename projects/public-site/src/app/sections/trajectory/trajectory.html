@@ -18,16 +18,16 @@
     [closeLabel]="c.closeLabel"
     [activeId]="c.initialItemId ?? null"
   >
-    <ng-template uiCardPanelDefault>
-      @if (c.defaultIllustration; as illustration) {
+    @if (c.defaultIllustration; as illustration) {
+      <ng-template uiCardPanelDefault>
         <img
           class="panel-default__illustration"
           [src]="illustration.src"
           [alt]="illustration.alt"
           loading="lazy"
         />
-      }
-    </ng-template>
+      </ng-template>
+    }
 
     <ng-template uiCardPanel="historia">
       <div class="panel-history">

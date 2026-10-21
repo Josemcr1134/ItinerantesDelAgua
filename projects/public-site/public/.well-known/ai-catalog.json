@@ -1,0 +1,16 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Itinerantes del Agua",
+    "identifier": "itinerantesdelagua.com"
+  },
+  "entries": [
+    {
+      "identifier": "urn:ai:itinerantesdelagua.com:knowledge:llms-txt",
+      "displayName": "Resumen del sitio (llms.txt)",
+      "type": "text/plain",
+      "url": "https://itinerantesdelagua.com/llms.txt",
+      "description": "Resumen en Markdown del propósito de Itinerantes del Agua y enlaces a las secciones principales de la landing, pensado para agentes de IA."
+    }
+  ]
+}

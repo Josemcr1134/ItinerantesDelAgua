@@ -57,17 +57,18 @@
   <ng-container [ngTemplateOutlet]="panel" />
 }
 
+<!-- Sin contenido activo no se pinta el panel (evita una caja vacía). -->
 <ng-template #panel>
-  <div
-    class="panel"
-    role="region"
-    [class.panel--inline]="inline()"
-    [id]="panelId"
-    [attr.aria-labelledby]="expandedId() ? titleId(expandedId()!) : null"
-    [attr.aria-label]="expandedId() ? null : groupLabel()"
-  >
-    @if (activeTemplate(); as template) {
+  @if (activeTemplate(); as template) {
+    <div
+      class="panel"
+      role="region"
+      [class.panel--inline]="inline()"
+      [id]="panelId"
+      [attr.aria-labelledby]="expandedId() ? titleId(expandedId()!) : null"
+      [attr.aria-label]="expandedId() ? null : groupLabel()"
+    >
       <ng-container [ngTemplateOutlet]="template" />
-    }
-  </div>
+    </div>
+  }
 </ng-template>

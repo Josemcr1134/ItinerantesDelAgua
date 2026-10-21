@@ -22,6 +22,12 @@
 
   color: #fff;
   text-align: center;
+
+  // Sin ninguna tarjeta activa no hay panel bajo la fila: el CTA queda muy
+  // pegado a los botones, así que se compensa con más espacio al pie.
+  &:not(:has(.panel)) {
+    margin-bottom: var(--space-7);
+  }
 }
 
 .trajectory__divider {

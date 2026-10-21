@@ -3,7 +3,7 @@ import { SECTION_IDS } from './section-ids';
 
 export const NAVBAR_CONTENT: NavbarContent = {
   logo: {
-    src: 'assets/images/logoGreen.png',
+    src: 'assets/images/logoGreen.webp',
     alt: 'Itinerantes del Agua, ir al inicio',
   },
   homeHref: `#${SECTION_IDS.hero}`,
