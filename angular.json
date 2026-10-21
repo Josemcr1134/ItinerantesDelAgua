@@ -116,6 +116,11 @@
                 "glob": "**/*",
                 "input": "projects/ui-kit/assets/illustrations",
                 "output": "assets/illustrations"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/ui-kit/assets/brand",
+                "output": "assets/brand"
               }
             ],
             "styles": [
@@ -199,6 +204,11 @@
                 "glob": "**/*",
                 "input": "projects/ui-kit/assets/illustrations",
                 "output": "assets/illustrations"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/ui-kit/assets/brand",
+                "output": "assets/brand"
               }
             ],
             "styles": [
@@ -250,7 +260,10 @@
               "buildTarget": "admin:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "projects/admin/proxy.conf.json"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"
