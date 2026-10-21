@@ -11,3 +11,7 @@ export * from './lib/stat-badge/stat-badge';
 export * from './lib/expandable-card-group/expandable-item';
 export * from './lib/expandable-card-group/card-panel';
 export * from './lib/expandable-card-group/expandable-card-group';
+export * from './lib/alert/alert-options';
+export * from './lib/alert/alert-dialog';
+export * from './lib/alert/alert.service';
+export * from './lib/loading-overlay/loading-overlay';

@@ -1,0 +1,53 @@
+// Loader general: velo crema translúcido con la onda azul de la marca.
+:host {
+  display: contents;
+}
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background-color: rgb(251 248 240 / 72%);
+  backdrop-filter: blur(2px);
+  cursor: progress;
+  animation: loader-in 0.2s ease var(--ui-loader-delay, 300ms) both;
+}
+
+.loader__track {
+  stroke: var(--color-columbia-blue);
+}
+
+.loader__flow {
+  stroke: var(--color-accent);
+  stroke-dasharray: 34 66;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: loader-flow 1.2s linear infinite;
+  }
+}
+
+.loader__label {
+  color: var(--color-primary);
+  font-family: var(--font-family-display);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+@keyframes loader-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes loader-flow {
+  to {
+    stroke-dashoffset: -100;
+  }
+}

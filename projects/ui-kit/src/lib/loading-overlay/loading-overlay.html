@@ -1,0 +1,27 @@
+@if (visible()) {
+  <div class="loader" role="status" aria-live="polite">
+    <svg
+      class="loader__wave"
+      aria-hidden="true"
+      width="180"
+      height="32"
+      viewBox="0 0 116 16"
+      fill="none"
+    >
+      <path
+        class="loader__track"
+        d="M2 8C11.33 0 20.67 0 30 8s18.67 8 28 0 18.67-8 28 0 18.67 8 28 0"
+        stroke-width="4"
+        stroke-linecap="round"
+      />
+      <path
+        class="loader__flow"
+        d="M2 8C11.33 0 20.67 0 30 8s18.67 8 28 0 18.67-8 28 0 18.67 8 28 0"
+        stroke-width="4"
+        stroke-linecap="round"
+        pathLength="100"
+      />
+    </svg>
+    <p class="loader__label">{{ label() }}</p>
+  </div>
+}

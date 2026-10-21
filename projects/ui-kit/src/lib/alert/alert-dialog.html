@@ -1,0 +1,48 @@
+@let o = options();
+<dialog
+  #dialog
+  class="alert"
+  [class]="'alert alert--' + variant()"
+  [attr.role]="role()"
+  [attr.aria-labelledby]="id + '-title'"
+  [attr.aria-describedby]="id + '-message'"
+  (cancel)="onCancel()"
+  (close)="onClosed()"
+>
+  <img class="alert__illustration" [src]="illustration()" alt="" width="200" height="200" />
+
+  <h2 class="alert__title" [id]="id + '-title'">{{ o.title }}</h2>
+  <p class="alert__message" [id]="id + '-message'">{{ o.message }}</p>
+
+  @if (o.details?.length) {
+    <ul class="alert__details">
+      @for (detail of o.details; track $index) {
+        <li>{{ detail }}</li>
+      }
+    </ul>
+  }
+
+  @if (o.reference) {
+    <p class="alert__reference">
+      Código de referencia: <code>{{ o.reference }}</code>
+    </p>
+  }
+
+  <div class="alert__actions">
+    @if (o.cancelLabel) {
+      <button type="button" class="alert__cancel" (click)="close(false)">
+        {{ o.cancelLabel }}
+      </button>
+    }
+    <button
+      uiButton
+      variant="secondary"
+      type="button"
+      class="alert__confirm"
+      autofocus
+      (click)="close(true)"
+    >
+      {{ o.confirmLabel ?? 'Entendido' }}
+    </button>
+  </div>
+</dialog>
