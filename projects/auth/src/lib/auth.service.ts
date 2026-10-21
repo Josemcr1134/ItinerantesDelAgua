@@ -30,15 +30,23 @@ export class AuthService {
   private pendingUser: Promise<UserProfileDto | null> | null = null;
 
   constructor() {
+    // Al expirar la sesión (o cerrarla en otra pestaña) se vuelve al login;
+    // si expiró, se conserva la página para regresar después.
     effect(() => {
-      if (this.session.ended() === 'expired') {
-        untracked(() => {
-          const returnUrl = this.router.url;
-          void this.router.navigate([this.config.loginUrl], {
-            queryParams: returnUrl.startsWith(this.config.loginUrl) ? {} : { returnUrl },
-          });
-        });
+      const reason = this.session.ended();
+      if (!reason) {
+        return;
       }
+      untracked(() => {
+        const url = this.router.url;
+        const { loginUrl, forgotPasswordUrl } = this.config;
+        if (url.startsWith(loginUrl) || url.startsWith(forgotPasswordUrl)) {
+          return;
+        }
+        void this.router.navigate([loginUrl], {
+          queryParams: reason === 'expired' ? { returnUrl: url } : {},
+        });
+      });
     });
   }
 

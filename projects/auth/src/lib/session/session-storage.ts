@@ -13,6 +13,11 @@ export interface SessionStorage {
   read(): SessionTokens | null;
   write(tokens: SessionTokens): void;
   clear(): void;
+  /**
+   * Avisa cuando otra pestaña cambia los tokens (renovación, login o cierre).
+   * Devuelve la función para dejar de escuchar.
+   */
+  watch?(listener: (tokens: SessionTokens | null) => void): () => void;
 }
 
 const KEY = 'itinerantes.session';
@@ -47,6 +52,16 @@ export const localSessionStorage: SessionStorage = {
     } catch {
       // Nada que limpiar.
     }
+  },
+  watch(listener) {
+    // El evento `storage` solo llega a las demás pestañas del mismo origen.
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === KEY || event.key === null) {
+        listener(this.read());
+      }
+    };
+    globalThis.addEventListener?.('storage', onStorage);
+    return () => globalThis.removeEventListener?.('storage', onStorage);
   },
 };
 

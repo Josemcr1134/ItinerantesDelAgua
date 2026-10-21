@@ -4,6 +4,7 @@
 
 export * from './lib/session/session-storage';
 export * from './lib/session/session.store';
+export * from './lib/session/token-refresher';
 export * from './lib/auth.interceptor';
 export * from './lib/auth.config';
 export * from './lib/provide-auth';

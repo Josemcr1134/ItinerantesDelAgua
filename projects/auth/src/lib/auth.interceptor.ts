@@ -1,11 +1,9 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthApi, isApiError, PUBLIC_REQUEST } from 'data-access';
-import { catchError, finalize, map, Observable, shareReplay, switchMap, throwError } from 'rxjs';
+import { API_BASE_URL, isApiError, PUBLIC_REQUEST } from 'data-access';
+import { catchError, switchMap, throwError } from 'rxjs';
 import { SessionStore } from './session/session.store';
-
-/** Renovación en curso, compartida entre peticiones simultáneas. */
-let refreshing: Observable<string> | null = null;
+import { isAccessTokenExpiring, TokenRefresher } from './session/token-refresher';
 
 const isUnauthorized = (error: unknown): boolean =>
   (isApiError(error) && error.statusCode === 401) ||
@@ -14,47 +12,52 @@ const isUnauthorized = (error: unknown): boolean =>
 const withToken = (req: HttpRequest<unknown>, token: string) =>
   req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
 
+/** Solo las peticiones a nuestra API llevan el token (nunca a otros dominios). */
+const isApiRequest = (url: string, baseUrl: string): boolean =>
+  baseUrl ? url.startsWith(`${baseUrl}/`) : url.startsWith('/') && !url.startsWith('//');
+
 /**
- * Adjunta el token de acceso a las rutas protegidas. Si la API responde 401,
- * renueva los tokens una sola vez (aunque fallen varias peticiones a la vez) y
- * reintenta; si la renovación falla, cierra la sesión como expirada.
+ * Adjunta el token de acceso a las rutas protegidas de la API y lo mantiene
+ * vigente:
+ *
+ * 1. Si el access token vence en menos de 30 s, lo renueva antes de enviar.
+ * 2. Si aun así la API responde 401, renueva y reintenta una sola vez.
+ *
+ * Las renovaciones se coordinan en `TokenRefresher` (una a la vez, también
+ * entre pestañas). Si la sesión no se puede renovar, se cierra como expirada
+ * y la petición falla con su 401 original.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  if (req.context.get(PUBLIC_REQUEST)) {
+  if (
+    req.context.get(PUBLIC_REQUEST) ||
+    !isApiRequest(req.url, inject(API_BASE_URL, { optional: true }) ?? '')
+  ) {
     return next(req);
   }
   const session = inject(SessionStore);
-  const authApi = inject(AuthApi);
-  const tokens = session.tokens();
+  const refresher = inject(TokenRefresher);
+  const tokens = session.latestTokens();
   if (!tokens) {
     return next(req);
   }
 
-  return next(withToken(req, tokens.accessToken)).pipe(
-    catchError((error: unknown) => {
-      const refreshToken = session.tokens()?.refreshToken;
-      if (!isUnauthorized(error) || !refreshToken) {
-        return throwError(() => error);
-      }
-      refreshing ??= authApi.refresh({ refreshToken }).pipe(
-        map((pair) => {
-          session.setTokens(pair);
-          return pair.accessToken;
-        }),
-        catchError((refreshError: unknown) => {
-          session.end('expired');
-          return throwError(() => refreshError);
-        }),
-        finalize(() => (refreshing = null)),
-        shareReplay({ bufferSize: 1, refCount: false }),
-      );
-      return refreshing.pipe(
-        switchMap((accessToken) => next(withToken(req, accessToken))),
-        // Si la renovación falló, se propaga el 401 original de la petición.
-        catchError((retryError: unknown) =>
-          throwError(() => (session.isAuthenticated() ? retryError : error)),
-        ),
-      );
-    }),
-  );
+  const send = (accessToken: string) =>
+    next(withToken(req, accessToken)).pipe(
+      catchError((error: unknown) => {
+        if (!isUnauthorized(error)) {
+          return throwError(() => error);
+        }
+        return refresher.refresh(accessToken).pipe(
+          switchMap((fresh) => next(withToken(req, fresh))),
+          // Si no se pudo renovar, se propaga el 401 original de la petición.
+          catchError((retryError: unknown) =>
+            throwError(() => (session.isAuthenticated() ? retryError : error)),
+          ),
+        );
+      }),
+    );
+
+  return isAccessTokenExpiring(tokens)
+    ? refresher.refresh(tokens.accessToken).pipe(switchMap(send))
+    : send(tokens.accessToken);
 };

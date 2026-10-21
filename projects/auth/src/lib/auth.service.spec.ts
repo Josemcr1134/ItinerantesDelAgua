@@ -20,9 +20,9 @@ import { SessionStore } from './session/session.store';
 const API = 'https://api.test/api/v1';
 const tokens: SessionTokens = {
   accessToken: 'access-1',
-  accessTokenExpiresAt: '2026-01-01T00:00:00.000Z',
+  accessTokenExpiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
   refreshToken: 'refresh-1',
-  refreshTokenExpiresAt: '2026-01-08T00:00:00.000Z',
+  refreshTokenExpiresAt: new Date(Date.now() + 7 * 86_400_000).toISOString(),
 };
 const user = (roles: Role[]) => ({ id: 'u1', fullName: 'Ana Pérez', roles }) as UserProfileDto;
 const loginResponse = (roles: Role[]) => ({
