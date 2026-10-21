@@ -12,17 +12,8 @@ export const CLOSING_CTA_CONTENT: ClosingCtaContent = {
     // Del Figma: "Correo", "Mensaje", "Enviar" y "Volver".
     // TODO(contenido/diseño): el resto de campos los exige la API de contacto y
     // no están en el Figma; confirmar textos y opciones.
-    optionalLabel: '(opcional)',
     name: { label: 'Nombre', placeholder: 'Escribe tu nombre' },
     email: { label: 'Correo', placeholder: 'Escribe tu correo' },
-    organization: { label: 'Organización', placeholder: 'Nombre de tu organización' },
-    phone: {
-      label: 'Teléfono / WhatsApp',
-      countryCodeLabel: 'Indicativo',
-      countryCodePlaceholder: '+52',
-      numberLabel: 'Número',
-      numberPlaceholder: 'Número sin indicativo',
-    },
     subject: {
       label: 'Asunto',
       placeholder: 'Selecciona un asunto',
@@ -80,9 +71,6 @@ export const CLOSING_CTA_CONTENT: ClosingCtaContent = {
       required: 'Este campo es obligatorio.',
       nameMinLength: (min) => `Escribe al menos ${min} caracteres.`,
       emailInvalid: 'Escribe un correo válido, por ejemplo nombre@dominio.com.',
-      countryCodeInvalid: 'Usa el formato +52.',
-      phoneNumberInvalid: 'Escribe solo números (entre 6 y 15 dígitos).',
-      phoneIncomplete: 'Completa el indicativo y el número, o deja ambos vacíos.',
       messageLength: (min, max) => `Escribe entre ${min} y ${max} caracteres.`,
       privacyRequired: 'Debes aceptar la política de datos para enviar tu mensaje.',
       reviewFields: 'Revisa los campos marcados.',

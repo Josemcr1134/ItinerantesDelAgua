@@ -1,6 +1,6 @@
 // Valores medidos sobre la variante "Contacto=Variante2" del Figma (612×442).
-// Los campos que no están en el Figma (nombre, organización, teléfono, asunto,
-// datos del proyecto y política) siguen el mismo estilo.
+// Los campos que no están en el Figma (nombre, asunto, datos del proyecto y
+// política) siguen el mismo estilo.
 // TODO(diseño): confirmar con el diseño actualizado del formulario.
 @use 'breakpoints' as bp;
 
@@ -35,7 +35,6 @@
   min-width: 0;
 }
 
-.contact-form__fieldset,
 .contact-form__project {
   margin: 0;
   padding: 0;
@@ -61,15 +60,6 @@
     margin-left: 2px;
     text-align: start;
   }
-}
-
-legend.contact-form__label {
-  width: 100%;
-  margin-bottom: var(--space-2);
-}
-
-.contact-form__optional {
-  opacity: 0.75;
 }
 
 // Campos blancos con radio de 10px.
@@ -126,21 +116,6 @@ legend.contact-form__label {
   option {
     color: var(--color-primary);
   }
-}
-
-// Indicativo (96px) + número.
-.contact-form__phone {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.contact-form__phone-code {
-  flex: 0 0 96px;
-}
-
-.contact-form__phone-number {
-  flex: 1;
-  min-width: 0;
 }
 
 .contact-form__hint-row {

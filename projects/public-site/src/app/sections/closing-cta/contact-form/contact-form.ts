@@ -19,7 +19,6 @@ import {
   Validators,
 } from '@angular/forms';
 import {
-  CatalogsApi,
   CONTACT_PROJECT_TYPE_VALUES,
   CONTACT_SERVICE_VALUES,
   CONTACT_SUBJECT_VALUES,
@@ -32,15 +31,11 @@ import {
   requestState,
 } from 'data-access';
 import { Button } from 'ui-kit';
-import { catchError, map, of } from 'rxjs';
+import { map } from 'rxjs';
 import { ContactFormContent } from './contact-form-content';
 
 /** Reglas de la API (CreateContactMessageRequestDto). */
 export const CONTACT_RULES = { nameMin: 3, messageMin: 10, messageMax: 2000 } as const;
-
-const COUNTRY_CODE = /^\+\d{1,4}$/;
-const PHONE_DIGITS = /^\d{6,15}$/;
-const digitsOnly = (value: string) => value.replace(/[\s-]/g, '');
 
 /** Longitud sin espacios al inicio ni al final. */
 function trimmedLength(min: number, max = Infinity): ValidatorFn {
@@ -50,21 +45,10 @@ function trimmedLength(min: number, max = Infinity): ValidatorFn {
   };
 }
 
-/** Indicativo y número van juntos: ambos o ninguno. */
-const phoneComplete: ValidatorFn = (group) => {
-  const code = String(group.get('phoneCountryCode')?.value ?? '').trim();
-  const number = String(group.get('phoneNumber')?.value ?? '').trim();
-  return Boolean(code) !== Boolean(number) ? { phoneIncomplete: true } : null;
-};
-
 /** Campo de la API (`details[].field`) → control del formulario. */
 const API_FIELDS: Readonly<Record<string, ControlName>> = {
   name: 'name',
   email: 'email',
-  organization: 'organization',
-  phone: 'phoneNumber',
-  'phone.number': 'phoneNumber',
-  'phone.countryCode': 'phoneCountryCode',
   subject: 'subject',
   projectType: 'projectType',
   projectLocation: 'projectLocation',
@@ -76,9 +60,6 @@ const API_FIELDS: Readonly<Record<string, ControlName>> = {
 type ControlName =
   | 'name'
   | 'email'
-  | 'organization'
-  | 'phoneCountryCode'
-  | 'phoneNumber'
   | 'subject'
   | 'projectType'
   | 'projectLocation'
@@ -118,31 +99,21 @@ export class ContactForm {
   protected readonly submitted = signal(false);
   protected readonly sent = signal(false);
 
-  protected readonly form = this.fb.group(
-    {
-      name: ['', [Validators.required, trimmedLength(CONTACT_RULES.nameMin)]],
-      email: ['', [Validators.required, Validators.email]],
-      organization: [''],
-      phoneCountryCode: ['', Validators.pattern(COUNTRY_CODE)],
-      phoneNumber: [
-        '',
-        (c: AbstractControl) =>
-          c.value && !PHONE_DIGITS.test(digitsOnly(String(c.value))) ? { phone: true } : null,
-      ],
-      subject: this.fb.control<ContactSubject | ''>('', Validators.required),
-      projectType: this.fb.control<ContactProjectType | ''>(''),
-      projectLocation: [''],
-      service: this.fb.control<ContactService | ''>(''),
-      message: [
-        '',
-        [Validators.required, trimmedLength(CONTACT_RULES.messageMin, CONTACT_RULES.messageMax)],
-      ],
-      privacyAccepted: [false, Validators.requiredTrue],
-      /** Honeypot: oculto; si un bot lo llena, la API descarta el mensaje. */
-      website: [''],
-    },
-    { validators: phoneComplete },
-  );
+  protected readonly form = this.fb.group({
+    name: ['', [Validators.required, trimmedLength(CONTACT_RULES.nameMin)]],
+    email: ['', [Validators.required, Validators.email]],
+    subject: this.fb.control<ContactSubject | ''>('', Validators.required),
+    projectType: this.fb.control<ContactProjectType | ''>(''),
+    projectLocation: [''],
+    service: this.fb.control<ContactService | ''>(''),
+    message: [
+      '',
+      [Validators.required, trimmedLength(CONTACT_RULES.messageMin, CONTACT_RULES.messageMax)],
+    ],
+    privacyAccepted: [false, Validators.requiredTrue],
+    /** Honeypot: oculto; si un bot lo llena, la API descarta el mensaje. */
+    website: [''],
+  });
 
   protected readonly isDesignConsulting = toSignal(
     this.form.controls.subject.valueChanges.pipe(map((s) => s === 'DESIGN_CONSULTING')),
@@ -151,17 +122,6 @@ export class ContactForm {
   protected readonly messageLength = toSignal(
     this.form.controls.message.valueChanges.pipe(map((m) => m.length)),
     { initialValue: 0 },
-  );
-
-  /** Indicativos sugeridos (si el catálogo no responde, se escribe a mano). */
-  protected readonly countries = toSignal(
-    inject(CatalogsApi)
-      .countries()
-      .pipe(
-        map((res) => res.data),
-        catchError(() => of([])),
-      ),
-    { initialValue: [] },
   );
 
   /** Mensaje general: éxito o error de la API (los de campo van en su campo). */
@@ -201,14 +161,6 @@ export class ContactForm {
     return control.invalid && (control.touched || this.submitted());
   }
 
-  protected showPhoneIncomplete(): boolean {
-    return (
-      this.form.hasError('phoneIncomplete') &&
-      (this.submitted() ||
-        (this.form.controls.phoneCountryCode.touched && this.form.controls.phoneNumber.touched))
-    );
-  }
-
   /** Texto del error de un campo (el de la API tiene prioridad). */
   protected errorText(name: ControlName): string {
     const errors = this.form.controls[name].errors ?? {};
@@ -218,8 +170,6 @@ export class ContactForm {
       return name === 'privacyAccepted' ? t.privacyRequired : t.required;
     }
     if (errors['email']) return t.emailInvalid;
-    if (errors['pattern']) return t.countryCodeInvalid;
-    if (errors['phone']) return t.phoneNumberInvalid;
     if (errors['length']) {
       return name === 'name'
         ? t.nameMinLength(CONTACT_RULES.nameMin)
@@ -260,8 +210,6 @@ export class ContactForm {
     if (!v.subject) {
       return null;
     }
-    const organization = v.organization.trim();
-    const number = digitsOnly(v.phoneNumber);
     const design = v.subject === 'DESIGN_CONSULTING';
     if (design && (!v.projectType || !v.service)) {
       return null;
@@ -273,8 +221,6 @@ export class ContactForm {
       message: v.message.trim(),
       privacyAccepted: v.privacyAccepted,
       origin: 'LANDING',
-      ...(organization && { organization }),
-      ...(number && { phone: { countryCode: v.phoneCountryCode.trim(), number } }),
       ...(design &&
         v.projectType &&
         v.service && {

@@ -21,10 +21,6 @@ describe('ContactForm', () => {
     fixture.componentRef.setInput('content', CLOSING_CTA_CONTENT.form);
     await fixture.whenStable();
     const http = TestBed.inject(HttpTestingController);
-    // Catálogo de países para los indicativos.
-    http.expectOne(`${API}/locations/countries`).flush({
-      data: [{ code: 'MX', name: 'México', phoneCode: '+52' }],
-    });
     const host = fixture.nativeElement as HTMLElement;
     const stable = async () => {
       await fixture.whenStable();
@@ -71,22 +67,19 @@ describe('ContactForm', () => {
     for (const field of ['email', 'subject', 'message', 'privacyAccepted']) {
       expect(host.querySelector(`#contact-${field}-error`)).not.toBeNull();
     }
-    expect(host.querySelector('#contact-organization-error')).toBeNull();
     expect(host.querySelector('#contact-privacyAccepted-error')?.textContent).toContain(
       'política de datos',
     );
     expect(document.activeElement).toBe(name);
   });
 
-  it('valida longitud del mensaje, correo y teléfono', async () => {
+  it('valida el correo y la longitud del mensaje', async () => {
     const { host, type, submit } = await setup();
     await type('#contact-email', 'no-es-correo');
     await type('#contact-message', 'Hola');
-    await type('#contact-phoneNumber', '55 1234 5678');
     await submit();
     expect(host.querySelector('#contact-email-error')?.textContent).toContain('correo válido');
     expect(host.querySelector('#contact-message-error')?.textContent).toContain('entre 10');
-    expect(host.querySelector('#contact-phone-incomplete')?.textContent).toContain('indicativo');
   });
 
   it('con "Diseño y consultoría" pide los datos del proyecto', async () => {
@@ -103,9 +96,8 @@ describe('ContactForm', () => {
 
   it('envía a la API con origen LANDING y confirma', async () => {
     const { host, http, type, submit, fillRequired, stable } = await setup();
+    expect(host.querySelector('#contact-organization, [id^="contact-phone"]')).toBeNull();
     await fillRequired();
-    await type('#contact-phoneCountryCode', '+52');
-    await type('#contact-phoneNumber', '55 1234-5678');
     await submit();
 
     const req = http.expectOne(`${API}/contact-messages`);
@@ -117,7 +109,6 @@ describe('ContactForm', () => {
       message: 'Quisiera información sobre el diplomado.',
       privacyAccepted: true,
       origin: 'LANDING',
-      phone: { countryCode: '+52', number: '5512345678' },
     });
     req.flush(
       { id: 'c1', status: 'NEW', createdAt: '2026-11-07T16:00:00.000Z' },

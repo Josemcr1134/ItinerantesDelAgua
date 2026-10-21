@@ -7,18 +7,8 @@ export interface FieldText {
 }
 
 export interface ContactFormContent {
-  /** Indicación de campo opcional junto a la etiqueta. */
-  readonly optionalLabel: string;
   readonly name: FieldText;
   readonly email: FieldText;
-  readonly organization: FieldText;
-  readonly phone: {
-    readonly label: string;
-    readonly countryCodeLabel: string;
-    readonly countryCodePlaceholder: string;
-    readonly numberLabel: string;
-    readonly numberPlaceholder: string;
-  };
   readonly subject: FieldText & { readonly options: Readonly<Record<ContactSubject, string>> };
   /** Campos extra cuando el asunto es "Diseño y consultoría". */
   readonly projectType: FieldText & {
@@ -45,9 +35,6 @@ export interface ContactFormContent {
     readonly required: string;
     readonly nameMinLength: (min: number) => string;
     readonly emailInvalid: string;
-    readonly countryCodeInvalid: string;
-    readonly phoneNumberInvalid: string;
-    readonly phoneIncomplete: string;
     readonly messageLength: (min: number, max: number) => string;
     readonly privacyRequired: string;
     /** Resumen cuando la API rechaza algún campo. */
