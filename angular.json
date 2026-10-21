@@ -35,9 +35,13 @@
                 "output": "assets/fonts"
               }
             ],
-            "styles": ["projects/public-site/src/styles.scss"],
+            "styles": [
+              "projects/public-site/src/styles.scss"
+            ],
             "stylePreprocessorOptions": {
-              "includePaths": ["projects/ui-kit/src/styles"]
+              "includePaths": [
+                "projects/ui-kit/src/styles"
+              ]
             }
           },
           "configurations": {
@@ -114,9 +118,13 @@
                 "output": "assets/illustrations"
               }
             ],
-            "styles": ["projects/portal/src/styles.scss"],
+            "styles": [
+              "projects/portal/src/styles.scss"
+            ],
             "stylePreprocessorOptions": {
-              "includePaths": ["projects/ui-kit/src/styles"]
+              "includePaths": [
+                "projects/ui-kit/src/styles"
+              ]
             }
           },
           "configurations": {
@@ -193,9 +201,13 @@
                 "output": "assets/illustrations"
               }
             ],
-            "styles": ["projects/admin/src/styles.scss"],
+            "styles": [
+              "projects/admin/src/styles.scss"
+            ],
             "stylePreprocessorOptions": {
-              "includePaths": ["projects/ui-kit/src/styles"]
+              "includePaths": [
+                "projects/ui-kit/src/styles"
+              ]
             }
           },
           "configurations": {
@@ -217,7 +229,13 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/admin/src/environments/environment.ts",
+                  "with": "projects/admin/src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

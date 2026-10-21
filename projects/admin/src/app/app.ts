@@ -1,12 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LoadingService } from 'data-access';
+import { LoadingOverlay } from 'ui-kit';
 
+/** Shell del administrador: loader general y contenido de la ruta. */
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, LoadingOverlay],
   selector: 'adm-root',
-  styleUrl: './app.scss',
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly title = signal('admin');
+  protected readonly loading = inject(LoadingService);
 }
