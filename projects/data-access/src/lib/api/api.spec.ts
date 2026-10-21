@@ -40,6 +40,24 @@ describe('toApiError', () => {
     expect(error.fieldErrors()).toEqual({ email: 'Debe ser un correo válido.' });
   });
 
+  it('conserva los datos extra de `meta`', () => {
+    const error = toApiError(
+      new HttpErrorResponse({
+        status: 429,
+        error: {
+          statusCode: 429,
+          code: 'AUTH_LOGIN_LOCKED',
+          message: 'Cuenta bloqueada temporalmente.',
+          meta: { lockedUntil: '2026-01-01T10:15:00Z', attemptsRemaining: 0 },
+          requestId: 'req-2',
+        },
+      }),
+    );
+    expect(error.metaString('lockedUntil')).toBe('2026-01-01T10:15:00Z');
+    expect(error.metaNumber('attemptsRemaining')).toBe(0);
+    expect(error.metaNumber('lockedUntil')).toBeNull();
+  });
+
   it('reconoce la falta de conexión', () => {
     const error = toApiError(new HttpErrorResponse({ status: 0 }));
     expect(error.kind).toBe('network');

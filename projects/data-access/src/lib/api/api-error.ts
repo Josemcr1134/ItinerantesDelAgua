@@ -22,6 +22,8 @@ export class ApiError extends Error {
     message: string,
     readonly details: readonly ErrorDetailDto[] = [],
     readonly requestId: string | null = null,
+    /** Datos extra según el código (`lockedUntil`, `attemptsRemaining`…). */
+    readonly meta: Readonly<Record<string, unknown>> = {},
   ) {
     super(message);
   }
@@ -29,6 +31,18 @@ export class ApiError extends Error {
   /** Errores por campo, indexados por nombre (`email`, `phone.number`…). */
   fieldErrors(): Readonly<Record<string, string>> {
     return Object.fromEntries(this.details.map((d) => [d.field, d.message]));
+  }
+
+  /** Lee un dato de `meta` como texto (p. ej. una fecha ISO). */
+  metaString(key: string): string | null {
+    const value = this.meta[key];
+    return typeof value === 'string' ? value : null;
+  }
+
+  /** Lee un dato de `meta` como número (p. ej. `attemptsRemaining`). */
+  metaNumber(key: string): number | null {
+    const value = this.meta[key];
+    return typeof value === 'number' ? value : null;
   }
 }
 
@@ -63,6 +77,7 @@ export function toApiError(error: unknown): ApiError {
         body.message,
         body.details ?? [],
         body.requestId ?? requestId,
+        body.meta ?? {},
       );
     }
     const code = error.status >= 500 ? 'INTERNAL_ERROR' : 'UNKNOWN_ERROR';
