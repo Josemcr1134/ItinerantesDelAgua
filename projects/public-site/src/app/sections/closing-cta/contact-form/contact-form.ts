@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ContactService } from 'data-access';
+import { ContactFormService } from 'data-access';
 import { Button } from 'ui-kit';
 import { ContactFormContent } from './contact-form-content';
 
@@ -33,7 +33,7 @@ export class ContactForm {
   protected readonly status = signal<SendStatus>('idle');
   protected readonly submitted = signal(false);
 
-  private readonly contact = inject(ContactService);
+  private readonly contact = inject(ContactFormService);
   private readonly emailInput = viewChild.required<ElementRef<HTMLInputElement>>('email');
   private readonly messageInput = viewChild.required<ElementRef<HTMLTextAreaElement>>('message');
 

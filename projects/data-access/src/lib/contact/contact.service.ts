@@ -9,7 +9,7 @@ import { ContactMessage } from './contact-message';
  * TODO(backend): confirmar el contrato del endpoint (cuerpo y respuesta).
  */
 @Injectable({ providedIn: 'root' })
-export class ContactService {
+export class ContactFormService {
   private readonly http = inject(HttpClient);
   private readonly endpoint = inject(CONTACT_ENDPOINT);
 

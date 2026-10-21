@@ -3,9 +3,9 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { CONTACT_ENDPOINT, ContactEndpointMissingError } from './contact-endpoint';
-import { ContactService } from './contact.service';
+import { ContactFormService } from './contact.service';
 
-describe('ContactService', () => {
+describe('ContactFormService', () => {
   function setup(endpoint: string | null) {
     TestBed.configureTestingModule({
       providers: [
@@ -14,7 +14,10 @@ describe('ContactService', () => {
         { provide: CONTACT_ENDPOINT, useValue: endpoint },
       ],
     });
-    return { service: TestBed.inject(ContactService), http: TestBed.inject(HttpTestingController) };
+    return {
+      service: TestBed.inject(ContactFormService),
+      http: TestBed.inject(HttpTestingController),
+    };
   }
 
   it('falla con un error claro mientras el endpoint no esté configurado', async () => {
