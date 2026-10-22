@@ -7,6 +7,11 @@ const routes: Routes = [
     title: 'Postulaciones · Administrador',
     loadComponent: () => import('./list/applications-page'),
   },
+  {
+    path: ':id',
+    title: 'Postulación · Administrador',
+    loadComponent: () => import('./detail/application-detail-page'),
+  },
 ];
 
 export default routes;

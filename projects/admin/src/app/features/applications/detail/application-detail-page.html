@@ -1,0 +1,180 @@
+<nav class="topbar" aria-label="Navegación de postulaciones">
+  <a class="adm-link back" routerLink="/postulaciones" [queryParams]="backQuery()">
+    ← Postulaciones
+  </a>
+  @if (app(); as a) {
+    <div class="adm-actions">
+      <button type="button" class="adm-action" [disabled]="!a.prevId" (click)="go(a.prevId)">
+        Anterior
+      </button>
+      <button type="button" class="adm-action" [disabled]="!a.nextId" (click)="go(a.nextId)">
+        Siguiente
+      </button>
+    </div>
+  }
+</nav>
+
+<adm-request-state
+  [error]="store.error()"
+  [loaded]="app() !== null"
+  loadingText="Cargando postulación…"
+  (retry)="store.load(id())"
+>
+  @if (app(); as a) {
+    <div class="page" [class.page--stale]="stale()" [attr.aria-busy]="store.loading()">
+      <header class="head">
+        <p class="head__eyebrow">
+          <span class="folio">{{ a.folio }}</span> · {{ kindLabels[a.kind] }}
+        </p>
+        <h1 class="head__title">{{ a.applicant.name }}</h1>
+        <p class="head__offer">{{ a.offer.name }}</p>
+        <p class="head__status">
+          <span [class]="'adm-badge adm-badge--' + statusTones[a.status]">{{
+            statusLabels[a.status]
+          }}</span>
+          @if (a.submittedAt) {
+            <span class="muted">Enviada el {{ formatDateTime(a.submittedAt) }}</span>
+          }
+        </p>
+      </header>
+
+      <adm-notice [(message)]="store.notice" />
+
+      <div class="layout">
+        <div class="main">
+          <section class="adm-section" aria-labelledby="app-contact">
+            <h2 id="app-contact" class="adm-section__title">Datos de contacto</h2>
+            <dl class="facts">
+              <div>
+                <dt>Correo</dt>
+                <dd>
+                  <a class="adm-link" [href]="'mailto:' + a.contact.email">{{ a.contact.email }}</a>
+                </dd>
+              </div>
+              <div>
+                <dt>Teléfono</dt>
+                <dd>{{ a.contact.phoneCountryCode }} {{ a.contact.phoneNumber }}</dd>
+              </div>
+              <div>
+                <dt>Ubicación</dt>
+                <dd>{{ location() }}</dd>
+              </div>
+              @if (a.contact.age !== null) {
+                <div>
+                  <dt>Edad</dt>
+                  <dd>{{ a.contact.age }} años</dd>
+                </div>
+              }
+              @if (a.contact.organization) {
+                <div>
+                  <dt>Organización</dt>
+                  <dd>
+                    {{ a.contact.organization }}
+                    @if (a.contact.organizationRole) {
+                      · {{ a.contact.organizationRole }}
+                    }
+                  </dd>
+                </div>
+              }
+              @if (a.contact.partnerCode) {
+                <div>
+                  <dt>Código de aliado</dt>
+                  <dd>{{ a.contact.partnerCode }}</dd>
+                </div>
+              }
+              @if (a.requestedLevel) {
+                <div>
+                  <dt>Nivel solicitado</dt>
+                  <dd>{{ levelLabels[a.requestedLevel] }}</dd>
+                </div>
+              }
+            </dl>
+          </section>
+
+          <section class="adm-section" aria-labelledby="app-answers">
+            <h2 id="app-answers" class="adm-section__title">
+              {{ a.kind === 'SCHOLARSHIP' ? 'Carta de intención' : 'Respuestas' }}
+            </h2>
+            @if (a.kind === 'SCHOLARSHIP') {
+              <p class="text">{{ a.answers.intentLetter || 'Sin carta.' }}</p>
+            } @else {
+              <h3 class="sub">Experiencia</h3>
+              <p class="text">{{ a.answers.experience || '—' }}</p>
+              <h3 class="sub">Motivación</h3>
+              <p class="text">{{ a.answers.motivation || '—' }}</p>
+              @if (a.answers.canTravel !== null) {
+                <h3 class="sub">¿Puede viajar?</h3>
+                <p class="text">{{ a.answers.canTravel ? 'Sí' : 'No' }}</p>
+              }
+            }
+            <p class="muted">
+              {{
+                a.answers.eligibilityConfirmed
+                  ? 'Confirmó que cumple los requisitos.'
+                  : 'No confirmó los requisitos.'
+              }}
+            </p>
+          </section>
+
+          <section class="adm-section" aria-labelledby="app-evidence">
+            <h2 id="app-evidence" class="adm-section__title">Evidencias</h2>
+            @if (a.documents.length || a.answers.evidenceLinks.length) {
+              <ul class="files">
+                @for (doc of a.documents; track doc.id) {
+                  <li>
+                    <a class="adm-link" [href]="doc.url" target="_blank" rel="noopener"
+                      >{{ doc.fileName
+                      }}<span class="visually-hidden"> (se abre en otra pestaña)</span></a
+                    >
+                    <span class="muted"> · {{ formatBytes(doc.sizeBytes) }}</span>
+                  </li>
+                }
+                @for (link of a.answers.evidenceLinks; track link) {
+                  <li>
+                    <a class="adm-link" [href]="link" target="_blank" rel="noopener noreferrer"
+                      >{{ link }}<span class="visually-hidden"> (se abre en otra pestaña)</span></a
+                    >
+                  </li>
+                }
+              </ul>
+              @if (a.documents.length) {
+                <p class="muted">
+                  Los enlaces de los archivos vencen a los pocos minutos; si no abren, recarga la
+                  página.
+                </p>
+              }
+            } @else {
+              <p class="muted">Sin evidencias.</p>
+            }
+          </section>
+
+          <section class="adm-section" aria-labelledby="app-history">
+            <h2 id="app-history" class="adm-section__title">Historial</h2>
+            <ol class="timeline">
+              @for (event of a.history; track $index) {
+                <li class="timeline__item">
+                  <p class="timeline__title">{{ statusLabels[event.toStatus] }}</p>
+                  <p class="muted">{{ formatDateTime(event.at) }} · {{ actorName(event) }}</p>
+                  @if (event.note) {
+                    <p class="timeline__note">
+                      <span class="visually-hidden">Nota interna: </span>{{ event.note }}
+                    </p>
+                  }
+                </li>
+              }
+            </ol>
+          </section>
+        </div>
+
+        <aside class="side" aria-label="Revisión y decisión">
+          <adm-evaluation-panel />
+          <adm-interview-panel />
+          <adm-decision-panel />
+          @if (store.hasFollowUp()) {
+            <adm-follow-up-panel />
+          }
+        </aside>
+      </div>
+    </div>
+  }
+</adm-request-state>

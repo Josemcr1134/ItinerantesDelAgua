@@ -26,6 +26,11 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   ADMIN_UPLOAD_NOT_FOUND: 'No encontramos la imagen',
   ADMIN_UPLOAD_INVALID_FILE: 'Imagen no válida',
   TEACHER_IN_USE: 'El docente está en uso',
+  APPLICATION_INVALID_STATE: 'No es posible en este estado',
+  APPLICATION_INTERVIEW_REQUIRED: 'Falta la entrevista',
+  NOTIFICATION_EMAIL_NOT_FAILED: 'El correo ya se envió',
+  FOLLOW_UP_REMINDER_TOO_SOON: 'Aún no se puede recordar',
+  FOLLOW_UP_PHONE_INVALID: 'Teléfono no válido',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -45,6 +50,11 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'OFFER_INCOMPLETE',
   'ADMIN_UPLOAD_INVALID_FILE',
   'TEACHER_IN_USE',
+  'APPLICATION_INVALID_STATE',
+  'APPLICATION_INTERVIEW_REQUIRED',
+  'NOTIFICATION_EMAIL_NOT_FAILED',
+  'FOLLOW_UP_REMINDER_TOO_SOON',
+  'FOLLOW_UP_PHONE_INVALID',
 ];
 
 export interface PresentErrorOptions {
