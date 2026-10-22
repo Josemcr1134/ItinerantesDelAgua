@@ -1,7 +1,7 @@
 /** Configuración de desarrollo (`ng serve public-site`). */
 export const environment = {
   production: false,
-  // Mismo origen: `ng serve` reenvía /api al backend (proxy.conf.mjs), porque
-  // la API aún no responde a las peticiones CORS desde localhost.
-  apiBaseUrl: '',
+  // Directo a Railway: la API permite CORS desde localhost:4200, 4201 y 4202
+  // (levantar en uno de esos puertos).
+  apiBaseUrl: 'https://itinerantes-backend-production.up.railway.app',
 };
