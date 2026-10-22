@@ -20,6 +20,13 @@
   }
 }
 
+.bar--stacked {
+  @include bp.up(xl) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 .bar__top {
   display: flex;
   align-items: flex-end;
@@ -87,6 +94,19 @@
     flex: 5 1 0;
     align-items: flex-end;
     min-width: 0;
+  }
+}
+
+.bar--stacked .bar__top {
+  @include bp.up(xl) {
+    max-width: 32rem;
+  }
+}
+
+.bar--stacked .bar__filters {
+  @include bp.up(xl) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   }
 }
 

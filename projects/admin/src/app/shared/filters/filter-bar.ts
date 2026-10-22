@@ -3,11 +3,15 @@ import { FilterSelect } from './filter-select';
 
 let nextBarId = 0;
 
+/** Filtros que caben junto a la búsqueda en una sola fila (desde xl). */
+const MAX_FILTERS_IN_ROW = 5;
+
 /**
  * Barra de filtros de una lista. La búsqueda (`[admFilterSearch]`) siempre
  * está a la vista; el resto de filtros se pliega en pantallas pequeñas (hasta
  * xl) tras el botón "Filtros", que muestra cuántos hay aplicados. Desde xl
- * todo se ve en una fila.
+ * todo se ve en una fila (con más de cinco filtros, la búsqueda arriba y los
+ * filtros en rejilla debajo).
  *
  * ```html
  * <adm-filter-bar label="Filtrar ofertas" [activeCount]="list.activeFilterCount()" (clear)="clearFilters()">
@@ -19,7 +23,13 @@ let nextBarId = 0;
 @Component({
   selector: 'adm-filter-bar',
   template: `
-    <form class="bar" role="search" [attr.aria-label]="label()" (submit)="$event.preventDefault()">
+    <form
+      class="bar"
+      [class.bar--stacked]="stacked()"
+      role="search"
+      [attr.aria-label]="label()"
+      (submit)="$event.preventDefault()"
+    >
       <div class="bar__top">
         <div class="bar__search"><ng-content select="[admFilterSearch]" /></div>
         @if (hasFilters()) {
@@ -78,4 +88,6 @@ export class FilterBar {
   private readonly selects = contentChildren(FilterSelect, { descendants: true });
   /** Hay filtros además de la búsqueda (si no, no hace falta plegar nada). */
   protected readonly hasFilters = computed(() => this.selects().length > 0);
+  /** Con muchos filtros, desde xl la búsqueda va en su fila y los filtros debajo. */
+  protected readonly stacked = computed(() => this.selects().length > MAX_FILTERS_IN_ROW);
 }
