@@ -25,3 +25,4 @@ export * from './services/dashboard.api';
 export * from './services/site.api';
 export * from './services/admin-users.api';
 export * from './services/admin-offers.api';
+export * from './services/admin-content.api';

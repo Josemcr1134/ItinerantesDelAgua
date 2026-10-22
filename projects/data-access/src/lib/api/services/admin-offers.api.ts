@@ -131,21 +131,45 @@ export class AdminUploadsApi {
    * devuelve la `key` para guardarla en la oferta o el docente.
    */
   uploadImage(file: File, purpose: ImageUploadPurpose, offerId?: Uuid): Observable<string> {
-    return this.imageUploadUrl({
-      purpose,
-      offerId,
-      fileName: file.name,
-      contentType: file.type as ImageContentType,
-      sizeBytes: file.size,
-    }).pipe(
-      switchMap((target) => {
-        const headers = new HttpHeaders(
-          Object.fromEntries(Object.entries(target.headers).map(([k, v]) => [k, String(v)])),
-        );
-        return this.http
-          .request(target.method || 'PUT', target.uploadUrl, { body: file, headers })
-          .pipe(map(() => target.key));
+    return uploadToSignedUrl(
+      this.http,
+      this.imageUploadUrl({
+        purpose,
+        offerId,
+        fileName: file.name,
+        contentType: file.type as ImageContentType,
+        sizeBytes: file.size,
       }),
+      file,
     );
   }
+}
+
+/** Destino de una subida firmada (lo que devuelven los endpoints `…/upload-url`). */
+export interface SignedUpload {
+  readonly uploadUrl: string;
+  readonly method: string;
+  readonly headers: Record<string, unknown>;
+  readonly key: string;
+}
+
+/**
+ * Sube un archivo a una URL firmada: pide el destino, hace el PUT con los
+ * headers que exige y devuelve la `key` para guardarla en la API.
+ */
+export function uploadToSignedUrl(
+  http: HttpClient,
+  target$: Observable<SignedUpload>,
+  file: File,
+): Observable<string> {
+  return target$.pipe(
+    switchMap((target) => {
+      const headers = new HttpHeaders(
+        Object.fromEntries(Object.entries(target.headers).map(([k, v]) => [k, String(v)])),
+      );
+      return http
+        .request(target.method || 'PUT', target.uploadUrl, { body: file, headers })
+        .pipe(map(() => target.key));
+    }),
+  );
 }
