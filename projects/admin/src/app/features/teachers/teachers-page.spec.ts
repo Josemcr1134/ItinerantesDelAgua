@@ -28,8 +28,13 @@ const teacher = (id: string, fullName: string, offerCount = 0): AdminTeacherDto 
   updatedAt: '2026-10-22T12:00:00.000Z',
 });
 
+const tick = () => new Promise((r) => setTimeout(r));
+
 describe('TeachersPage', () => {
+  let warnings: { title: string; message: string }[];
+
   async function setup(permissions: Permission[]) {
+    warnings = [];
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -38,7 +43,14 @@ describe('TeachersPage', () => {
         provideApi({ baseUrl: 'https://api.test' }),
         {
           provide: AlertService,
-          useValue: { confirm: () => Promise.resolve(true), open: () => Promise.resolve(true) },
+          useValue: {
+            confirm: () => Promise.resolve(true),
+            open: () => Promise.resolve(true),
+            warning: (title: string, message: string) => (
+              warnings.push({ title, message }),
+              Promise.resolve(true)
+            ),
+          },
         },
       ],
     });
@@ -75,25 +87,70 @@ describe('TeachersPage', () => {
     expect(button('Editar')).toBeUndefined();
   });
 
-  it('no deja borrar a quien está asignado y borra a quien no', async () => {
+  /** Responde la revisión de uso (listado buscado por nombre) con estas cifras. */
+  async function answerUsage(http: HttpTestingController, found: AdminTeacherDto): Promise<void> {
+    await tick();
+    const check = http.expectOne((r) => r.url === `${API}/admin/teachers` && r.params.has('q'));
+    expect(check.request.params.get('q')).toBe(found.fullName);
+    check.flush({ data: [found], meta: { page: 1, pageSize: 100, total: 1, totalPages: 1 } });
+    await tick();
+  }
+
+  it('al borrar a quien participa en ofertas, informa en cuántas y no lo borra', async () => {
     const { fixture, http, host, button } = await setup([
       'admin.access',
       'offers.read',
       'offers.write',
     ]);
-    const [assigned, free] = [...host.querySelectorAll('.card')];
-    expect(button('Borrar', assigned)!.disabled).toBe(true);
+    const [assigned] = [...host.querySelectorAll('.card')];
+    expect(button('Borrar', assigned)!.disabled).toBe(false);
+
+    button('Borrar', assigned)!.click();
+    await answerUsage(http, { ...teacher('t1', 'Marta Torres', 3), moduleCount: 1 });
+    await fixture.whenStable();
+
+    expect(warnings).toEqual([
+      {
+        title: 'Marta Torres no se puede borrar',
+        message:
+          'Participa en 3 ofertas y 1 módulo. Para borrarlo, primero quítalo de esos contenidos.',
+      },
+    ]);
+    http.expectNone((r) => r.method === 'DELETE');
+    // La tarjeta muestra las cifras actualizadas.
+    expect(assigned.textContent).toContain('3 ofertas · 1 módulo');
+  });
+
+  it('revisa la cifra actual: si la lista estaba desactualizada, también avisa', async () => {
+    const { http, host, button } = await setup(['admin.access', 'offers.read', 'offers.write']);
+    const [, free] = [...host.querySelectorAll('.card')];
     button('Borrar', free)!.click();
+    await answerUsage(http, teacher('t2', 'Elena Cruz', 1));
+    expect(warnings[0].message).toContain('Participa en 1 oferta.');
+    expect(warnings[0].message).toContain('ese contenido');
+    http.expectNone((r) => r.method === 'DELETE');
+  });
+
+  it('borra a quien no participa en ninguna oferta', async () => {
+    const { fixture, http, host, button } = await setup([
+      'admin.access',
+      'offers.read',
+      'offers.write',
+    ]);
+    const [, free] = [...host.querySelectorAll('.card')];
+    button('Borrar', free)!.click();
+    await answerUsage(http, teacher('t2', 'Elena Cruz'));
     await fixture.whenStable();
     const req = http.expectOne(`${API}/admin/teachers/t2`);
     expect(req.request.method).toBe('DELETE');
     req.flush(null, { status: 204, statusText: 'No Content' });
-    await new Promise((r) => setTimeout(r));
+    await tick();
     await fixture.whenStable();
     http
-      .expectOne((r) => r.url === `${API}/admin/teachers`)
+      .expectOne((r) => r.url === `${API}/admin/teachers` && !r.params.has('q'))
       .flush({ data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } });
     await fixture.whenStable();
+    expect(warnings).toEqual([]);
     expect(host.querySelector('[role="status"]')?.textContent).toContain('Se borró a Elena Cruz');
   });
 

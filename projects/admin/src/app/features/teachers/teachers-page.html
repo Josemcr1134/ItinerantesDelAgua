@@ -83,12 +83,7 @@
               <button
                 type="button"
                 class="adm-action adm-action--danger"
-                [disabled]="busy || inUse(teacher)"
-                [attr.title]="
-                  inUse(teacher)
-                    ? 'Está asignado a ofertas o módulos: quítalo de ellos para poder borrarlo'
-                    : null
-                "
+                [disabled]="busy"
                 (click)="remove(teacher)"
               >
                 Borrar<span class="visually-hidden"> a {{ teacher.fullName }}</span>
