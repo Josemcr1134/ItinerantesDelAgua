@@ -115,27 +115,12 @@
 
     @if (hasRule()) {
       <div class="adm-grid rule">
-        <fieldset class="adm-grid__full weekdays-field">
-          <legend class="adm-field__label">Días</legend>
-          <div class="weekdays">
-            @for (day of weekdays; track day.value) {
-              <label class="weekday">
-                <input
-                  class="visually-hidden"
-                  type="checkbox"
-                  [checked]="days().includes(day.value)"
-                  [disabled]="readonly()"
-                  (change)="toggleDay(day.value, $any($event.target).checked)"
-                />
-                <span aria-hidden="true">{{ day.short }}</span>
-                <span class="visually-hidden">{{ day.label }}</span>
-              </label>
-            }
-          </div>
-          @if (issue('weekdays')) {
-            <p class="adm-field__error">{{ issue('weekdays') }}</p>
-          }
-        </fieldset>
+        <adm-weekday-picker
+          class="adm-grid__full"
+          [(value)]="days"
+          [disabled]="readonly()"
+          [error]="issue('weekdays')"
+        />
         <div class="adm-field">
           <label class="adm-field__label" for="s-start-time">Hora de inicio</label>
           <input
@@ -156,42 +141,13 @@
           <input type="checkbox" formControlName="excludeMexicanHolidays" />
           Omitir los festivos oficiales de México
         </label>
-        <div class="adm-grid__full">
-          <span class="adm-field__label" id="s-excluded-label">Fechas sin sesión (recesos)</span>
-          @if (excludedDates().length) {
-            <ul class="dates" aria-labelledby="s-excluded-label">
-              @for (date of excludedDates(); track date) {
-                <li class="date">
-                  {{ date }}
-                  @if (!readonly()) {
-                    <button
-                      type="button"
-                      (click)="removeExcludedDate(date)"
-                      [attr.aria-label]="'Quitar ' + date"
-                    >
-                      ×
-                    </button>
-                  }
-                </li>
-              }
-            </ul>
-          }
-          @if (!readonly()) {
-            <div class="add-date">
-              <label class="visually-hidden" for="s-excluded-new">Nueva fecha sin sesión</label>
-              <input
-                id="s-excluded-new"
-                class="adm-field__input"
-                type="date"
-                [value]="newExcludedDate()"
-                (input)="newExcludedDate.set($any($event.target).value)"
-              />
-              <button type="button" class="adm-action" (click)="addExcludedDate()">
-                Agregar fecha
-              </button>
-            </div>
-          }
-        </div>
+        <adm-date-list-field
+          class="adm-grid__full"
+          label="Fechas sin sesión (recesos)"
+          addLabel="Nueva fecha sin sesión"
+          [(value)]="excludedDates"
+          [disabled]="readonly()"
+        />
       </div>
     }
   </section>

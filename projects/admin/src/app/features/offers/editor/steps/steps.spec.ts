@@ -90,7 +90,7 @@ describe('pasos del asistente de ofertas', () => {
     await type('s-starts', '2026-11-09T10:00');
     host.querySelector<HTMLInputElement>('input[formcontrolname="hasRule"]')!.click();
     await fixture.whenStable();
-    host.querySelectorAll<HTMLInputElement>('.weekday input')[0].click(); // lunes
+    host.querySelectorAll<HTMLInputElement>('adm-weekday-picker input')[0].click(); // lunes
     await type('s-start-time', '18:00');
     await type('s-end-time', '20:00');
 
