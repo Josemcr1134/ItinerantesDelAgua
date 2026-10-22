@@ -9,6 +9,7 @@ import {
   untracked,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import {
   AdminTeacherDto,
   AdminTeacherRefDto,
@@ -21,6 +22,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 /** Docentes de la oferta en el orden de la ficha: buscar, agregar, mover y quitar. */
 @Component({
   selector: 'adm-teacher-picker',
+  imports: [RouterLink],
   template: `
     <fieldset class="picker">
       <legend class="adm-field__label">Docentes</legend>
@@ -87,7 +89,11 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
             @if (results.loading() && !results.data()) {
               <p class="adm-field__hint">Buscando…</p>
             } @else if (!available().length) {
-              <p class="adm-field__hint">No hay más docentes con «{{ search() }}».</p>
+              <p class="adm-field__hint">
+                No hay más docentes con «{{ search() }}».
+                <a class="adm-link" routerLink="/docentes" target="_blank">Registrar docente</a>
+                (se abre en otra pestaña; luego vuelve a buscarlo aquí).
+              </p>
             } @else {
               <ul class="results">
                 @for (t of available(); track t.id) {

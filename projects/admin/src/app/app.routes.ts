@@ -28,6 +28,12 @@ export const routes: Routes = [
         loadChildren: () => import('./features/offers/offers.routes'),
       },
       {
+        path: 'docentes',
+        title: 'Docentes · Administrador',
+        canActivate: [permissionGuard('offers.read')],
+        loadComponent: () => import('./features/teachers/teachers-page'),
+      },
+      {
         path: 'administradores',
         title: 'Administradores · Administrador',
         canActivate: [permissionGuard('users.manage')],
