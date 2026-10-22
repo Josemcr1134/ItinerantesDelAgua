@@ -1,0 +1,85 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): reemplazar por el diseño del Figma.
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.page-title {
+  color: var(--color-primary);
+  font-family: var(--font-family-display);
+  font-size: 3rem;
+  text-transform: uppercase;
+}
+
+.page-lead {
+  margin-top: var(--space-1);
+  color: var(--color-primary);
+}
+
+.page-add {
+  min-height: 48px;
+}
+
+.results {
+  margin-top: var(--space-4);
+}
+
+.row--disabled .person__name,
+.row--disabled .adm-chips {
+  opacity: 0.6;
+}
+
+.person__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+.person-cell {
+  @include bp.up(lg) {
+    min-width: 15rem;
+  }
+}
+
+.last-login {
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+}
+
+.person__meta {
+  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
+  font-size: 0.875rem;
+  overflow-wrap: break-word;
+}
+
+.you {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-columbia-blue);
+  color: var(--color-deep-blue);
+  font-size: 0.75rem;
+}
+
+.actions-cell {
+  @include bp.up(lg) {
+    width: 1%;
+  }
+}
+
+.dialog-lead {
+  margin-bottom: var(--space-3);
+  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
+}

@@ -1,0 +1,240 @@
+<header class="page-header">
+  <div>
+    <h1 class="page-title">Administradores</h1>
+    <p class="page-lead">
+      Personas del equipo con acceso al panel y lo que cada rol les permite hacer.
+    </p>
+  </div>
+  <button uiButton type="button" class="page-add" (click)="addOpen.set(true)">
+    <svg
+      aria-hidden="true"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.2"
+      stroke-linecap="round"
+    >
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+    Agregar administrador
+  </button>
+</header>
+
+<p class="adm-notice" role="status">{{ notice() }}</p>
+
+<!-- Filtros -->
+<form
+  class="adm-filters"
+  role="search"
+  aria-label="Filtrar administradores"
+  (submit)="$event.preventDefault()"
+>
+  <div class="adm-field adm-field--search">
+    <label class="adm-field__label" for="admins-search">Buscar</label>
+    <input
+      id="admins-search"
+      class="adm-field__input"
+      type="search"
+      placeholder="Nombre, correo o usuario"
+      autocomplete="off"
+      [ngModel]="searchText()"
+      (ngModelChange)="searchText.set($event)"
+      name="search"
+    />
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="admins-role">Rol</label>
+    <select
+      id="admins-role"
+      class="adm-field__input"
+      name="role"
+      [ngModel]="role()"
+      (ngModelChange)="role.set($event)"
+    >
+      <option value="">Todos los roles</option>
+      @for (def of teamRoles(); track def.role) {
+        <option [value]="def.role">{{ def.label }}</option>
+      }
+    </select>
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="admins-status">Estado</label>
+    <select
+      id="admins-status"
+      class="adm-field__input"
+      name="status"
+      [ngModel]="status()"
+      (ngModelChange)="status.set($event)"
+    >
+      <option value="">Todos</option>
+      <option value="ACTIVE">{{ statusLabels.ACTIVE }}</option>
+      <option value="DISABLED">{{ statusLabels.DISABLED }}</option>
+      <option value="PENDING_VERIFICATION">{{ statusLabels.PENDING_VERIFICATION }}</option>
+    </select>
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="admins-sort">Ordenar por</label>
+    <select
+      id="admins-sort"
+      class="adm-field__input"
+      name="sort"
+      [ngModel]="sort()"
+      (ngModelChange)="sort.set($event)"
+    >
+      <option value="NAME_ASC">Nombre (A-Z)</option>
+      <option value="LAST_LOGIN_DESC">Último acceso</option>
+      <option value="CREATED_DESC">Más recientes</option>
+    </select>
+  </div>
+</form>
+
+<!-- Lista -->
+<section class="results" aria-labelledby="admins-results" [attr.aria-busy]="list.loading()">
+  <h2 id="admins-results" class="visually-hidden">Resultados</h2>
+
+  @if (list.error() && !list.data()) {
+    <div class="adm-state adm-state--error" role="alert">
+      <p>{{ list.error()?.message }}</p>
+      <button uiButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+    </div>
+  } @else if (list.loading() && !list.data()) {
+    <p class="adm-state">Cargando el equipo…</p>
+  } @else if (!users().length) {
+    <div class="adm-state">
+      @if (hasFilters()) {
+        <p>No hay administradores con esos filtros.</p>
+        <button type="button" class="adm-link" (click)="clearFilters()">Quitar filtros</button>
+      } @else {
+        <p>Aún no hay administradores. Agrega al primero con «Agregar administrador».</p>
+      }
+    </div>
+  } @else {
+    <table class="adm-table" [class.adm-table--loading]="list.loading()">
+      <thead>
+        <tr>
+          <th scope="col">Persona</th>
+          <th scope="col">Roles</th>
+          <th scope="col">Estado</th>
+          <th scope="col"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users(); track user.id) {
+          @let me = isMe(user);
+          @let busy = busyId() === user.id;
+          <tr [class.row--disabled]="user.status === 'DISABLED'">
+            <td class="person-cell" data-label="Persona">
+              <p class="person__name">
+                {{ user.fullName }}
+                @if (me) {
+                  <span class="you">Tú</span>
+                }
+              </p>
+              <p class="person__meta">{{ user.email }} · {{ '@' + user.username }}</p>
+            </td>
+            <td data-label="Roles">
+              <ul class="adm-chips">
+                @for (role of staffRoles(user); track role) {
+                  <li class="adm-chip" [class.adm-chip--super]="role === 'SUPER_ADMIN'">
+                    {{ access.roleLabel(role) }}
+                  </li>
+                }
+              </ul>
+            </td>
+            <td data-label="Estado">
+              <span [class]="'adm-status adm-status--' + user.status">
+                {{ statusLabels[user.status] }}
+              </span>
+              <p class="last-login">
+                Último acceso: {{ formatDateTime(user.lastLoginAt) ?? 'nunca' }}
+              </p>
+            </td>
+            <td class="actions-cell">
+              <div class="adm-actions">
+                <button type="button" class="adm-action" [disabled]="busy" (click)="openEdit(user)">
+                  Editar roles<span class="visually-hidden"> de {{ user.fullName }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="adm-action"
+                  [disabled]="busy || me"
+                  [attr.title]="me ? 'No puedes cambiar el estado de tu propia cuenta' : null"
+                  (click)="toggleStatus(user)"
+                >
+                  {{ user.status === 'DISABLED' ? 'Habilitar' : 'Deshabilitar'
+                  }}<span class="visually-hidden"> a {{ user.fullName }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="adm-action adm-action--danger"
+                  [disabled]="busy || me"
+                  [attr.title]="me ? 'No puedes quitarte del equipo' : null"
+                  (click)="removeFromTeam(user)"
+                >
+                  Quitar del equipo<span class="visually-hidden">: {{ user.fullName }}</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (meta(); as m) {
+      <nav class="adm-pagination" aria-label="Paginación">
+        <p class="adm-pagination__info">
+          {{ m.total }} {{ m.total === 1 ? 'persona' : 'personas' }} · Página {{ m.page }} de
+          {{ m.totalPages || 1 }}
+        </p>
+        <div class="adm-pagination__buttons">
+          <button
+            type="button"
+            class="adm-action"
+            [disabled]="m.page <= 1 || list.loading()"
+            (click)="page.set(m.page - 1)"
+          >
+            Anterior
+          </button>
+          <button
+            type="button"
+            class="adm-action"
+            [disabled]="m.page >= m.totalPages || list.loading()"
+            (click)="page.set(m.page + 1)"
+          >
+            Siguiente
+          </button>
+        </div>
+      </nav>
+    }
+  }
+</section>
+
+<!-- Editar roles -->
+<ui-dialog
+  [(open)]="editOpen"
+  [title]="'Roles de ' + (editing()?.fullName ?? '')"
+  [busy]="saving()"
+>
+  @if (editing(); as user) {
+    <p class="dialog-lead">{{ user.email }}</p>
+    <adm-role-picker
+      [roles]="teamRoles()"
+      [(value)]="editRoles"
+      [locked]="lockedRoles(user)"
+      [disabled]="saving()"
+      hint="Los cambios aplican de inmediato. Sin ningún rol, la persona sale del equipo."
+    />
+  }
+  <div uiDialogActions>
+    <button type="button" class="adm-link" [disabled]="saving()" (click)="editOpen.set(false)">
+      Cancelar
+    </button>
+    <button uiButton type="button" [disabled]="saving()" (click)="saveRoles()">
+      {{ saving() ? 'Guardando…' : 'Guardar roles' }}
+    </button>
+  </div>
+</ui-dialog>
+
+<adm-add-administrator-dialog [(open)]="addOpen" [roles]="teamRoles()" (added)="onAdded($event)" />

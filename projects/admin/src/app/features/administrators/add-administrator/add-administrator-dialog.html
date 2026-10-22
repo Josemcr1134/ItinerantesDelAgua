@@ -1,0 +1,97 @@
+<ui-dialog [(open)]="open" title="Agregar administrador" size="wide" [busy]="saving()">
+  @if (selected(); as user) {
+    <!-- Paso 2: roles -->
+    <button type="button" class="back" [disabled]="saving()" (click)="back()">
+      <svg
+        aria-hidden="true"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      Elegir otra cuenta
+    </button>
+    <div class="account account--selected">
+      <p class="account__name">{{ user.fullName }}</p>
+      <p class="account__meta">{{ user.email }} · {{ '@' + user.username }}</p>
+    </div>
+    <adm-role-picker
+      [roles]="roles()"
+      [(value)]="chosenRoles"
+      [disabled]="saving()"
+      legend="¿Qué roles tendrá?"
+      hint="Elige al menos un rol. Podrás cambiarlos después."
+    />
+    @if (submitted() && !chosenRoles().length) {
+      <p class="error" role="alert">Elige al menos un rol.</p>
+    }
+  } @else {
+    <!-- Paso 1: buscar la cuenta -->
+    <p class="lead">
+      La persona debe tener una cuenta registrada en el portal. Búscala por nombre, correo o
+      usuario.
+    </p>
+    <label class="field__label" for="add-admin-search">Buscar cuenta</label>
+    <input
+      id="add-admin-search"
+      class="field__input"
+      type="search"
+      autocomplete="off"
+      placeholder="Ej. laura@escuelaitinerante.org"
+      aria-describedby="add-admin-search-hint"
+      [ngModel]="searchText()"
+      (ngModelChange)="searchText.set($event)"
+    />
+    <p id="add-admin-search-hint" class="hint">Escribe al menos {{ minSearch }} caracteres.</p>
+
+    <div class="results" aria-live="polite" [attr.aria-busy]="results.loading()">
+      @if (!canSearch()) {
+        <!-- Sin búsqueda todavía -->
+      } @else if (results.error()) {
+        <p class="state state--error">{{ results.error()?.message }}</p>
+      } @else if (results.loading() && !results.data()) {
+        <p class="state">Buscando…</p>
+      } @else if (!accounts().length) {
+        <p class="state">
+          No encontramos cuentas con «{{ searchText() }}». Pídele a la persona que se registre en el
+          portal.
+        </p>
+      } @else {
+        <ul class="accounts">
+          @for (user of accounts(); track user.id) {
+            <li>
+              <button type="button" class="account" (click)="choose(user)">
+                <span class="account__text">
+                  <span class="account__name">{{ user.fullName }}</span>
+                  <span class="account__meta">{{ user.email }} · {{ '@' + user.username }}</span>
+                </span>
+                @if (isStaff(user)) {
+                  <span class="tag tag--staff">Ya es del equipo</span>
+                } @else if (user.status !== 'ACTIVE') {
+                  <span class="tag">{{ statusLabels[user.status] }}</span>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+
+  <div uiDialogActions>
+    <button type="button" class="link" [disabled]="saving()" (click)="open.set(false)">
+      Cancelar
+    </button>
+    @if (selected()) {
+      <button uiButton type="button" [disabled]="saving()" (click)="save()">
+        {{ saving() ? 'Guardando…' : 'Agregar al equipo' }}
+      </button>
+    }
+  </div>
+</ui-dialog>
