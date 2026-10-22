@@ -39,8 +39,12 @@ describe('listController', () => {
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
     const host = fixture.componentInstance;
+    /** Deja pasar la espera de la búsqueda y ejecuta los efectos pendientes. */
     const settle = async () => {
       await new Promise((r) => setTimeout(r, 5));
+      TestBed.tick();
+      await new Promise((r) => setTimeout(r));
+      TestBed.tick();
       await fixture.whenStable();
     };
     return { host, settle };

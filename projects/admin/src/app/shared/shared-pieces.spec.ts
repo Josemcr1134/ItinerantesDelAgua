@@ -8,7 +8,13 @@ import { rowActions } from './list/row-actions';
 import { Person } from './person/person';
 import { RequestState } from './request-state/request-state';
 
-const settle = () => new Promise((r) => setTimeout(r, 5));
+/** Deja pasar la espera de la búsqueda y ejecuta los efectos pendientes. */
+const settle = async () => {
+  await new Promise((r) => setTimeout(r, 5));
+  TestBed.tick();
+  await new Promise((r) => setTimeout(r));
+  TestBed.tick();
+};
 
 @Component({ template: '' })
 class SearchHost {
@@ -64,6 +70,7 @@ describe('piezas compartidas del panel', () => {
 
   it('remoteSearch: busca desde el mínimo de caracteres y se reinicia', async () => {
     const fixture = TestBed.createComponent(SearchHost);
+    await fixture.whenStable();
     const { search, queries, response } = fixture.componentInstance;
     search.searchText.set('la');
     await settle();
