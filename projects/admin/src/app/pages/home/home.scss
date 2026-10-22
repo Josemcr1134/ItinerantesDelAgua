@@ -1,0 +1,61 @@
+// TODO(diseño): reemplazar por el diseño del Figma.
+:host {
+  display: block;
+  max-width: 56rem;
+  color: var(--color-primary);
+}
+
+.title {
+  font-family: var(--font-family-display);
+  font-size: 3rem;
+  text-transform: uppercase;
+}
+
+.lead {
+  margin-top: var(--space-2);
+}
+
+.card {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border-radius: 24px;
+  background-color: var(--color-surface);
+}
+
+.card__title {
+  font-family: var(--font-family-body);
+  font-size: 1.125rem;
+}
+
+.card__title--spaced {
+  margin-top: var(--space-4);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.abilities {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding-left: 1.25rem;
+
+  @media (min-width: 48rem) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

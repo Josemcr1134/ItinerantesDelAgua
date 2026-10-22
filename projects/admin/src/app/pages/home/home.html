@@ -1,0 +1,20 @@
+<h1 class="title">Hola, {{ firstName() }}</h1>
+<p class="lead">Este es tu panel del ecosistema Itinerantes del Agua.</p>
+
+<section class="card" aria-labelledby="home-roles">
+  <h2 id="home-roles" class="card__title">Tus roles</h2>
+  <ul class="chips">
+    @for (role of access.roles(); track role) {
+      <li class="chip">{{ access.roleLabel(role) }}</li>
+    }
+  </ul>
+
+  <h2 class="card__title card__title--spaced">Lo que puedes hacer</h2>
+  <ul class="abilities">
+    @for (ability of abilities(); track ability) {
+      <li>{{ ability }}</li>
+    } @empty {
+      <li>Por ahora solo puedes entrar al panel.</li>
+    }
+  </ul>
+</section>

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard, authRoutes } from 'auth';
 import { environment } from '../environments/environment';
+import { adminAccessGuard } from './core/access/access.guards';
 
 /** Rutas solo de desarrollo: catálogo visual de componentes. */
 const devRoutes: Routes = environment.production
@@ -12,7 +13,8 @@ export const routes: Routes = [
   ...devRoutes,
   {
     path: '',
-    canActivate: [authGuard],
+    // Primero la sesión; después el acceso al panel (`GET /admin/me`).
+    canActivate: [authGuard, adminAccessGuard],
     loadComponent: () => import('./layout/admin-shell/admin-shell'),
     children: [
       {
@@ -20,7 +22,6 @@ export const routes: Routes = [
         title: 'Inicio · Administrador',
         loadComponent: () => import('./pages/home/home'),
       },
-      // TODO: módulos del administrador (lazy) cuando se definan.
     ],
   },
   { path: '**', redirectTo: '' },

@@ -17,6 +17,8 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   RATE_LIMITED: 'Demasiados intentos',
   SERVICE_UNAVAILABLE: 'Servicio no disponible',
   INTERNAL_ERROR: 'Algo salió mal',
+  ADMIN_SELF_ACTION: 'No puedes hacerlo sobre tu cuenta',
+  ADMIN_LAST_SUPER_ADMIN: 'Se necesita un superadministrador',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -28,6 +30,8 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'BUSINESS_RULE_VIOLATION',
   'RATE_LIMITED',
   'PAYLOAD_TOO_LARGE',
+  'ADMIN_SELF_ACTION',
+  'ADMIN_LAST_SUPER_ADMIN',
 ];
 
 export interface PresentErrorOptions {

@@ -1,34 +1,125 @@
+<!-- Barra superior (móvil) -->
 <header class="topbar">
-  <a class="topbar__brand" routerLink="/">
+  <a class="brand" routerLink="/">
     <img src="assets/brand/logo-green.webp" alt="Itinerantes del Agua" width="103" height="68" />
-    <span class="topbar__platform">Administrador</span>
+    <span class="brand__platform">Administrador</span>
   </a>
-
-  @if (user(); as u) {
-    <div class="topbar__user">
-      <p class="topbar__name">{{ u.fullName }}</p>
-      <p class="topbar__roles">{{ roles() }}</p>
-    </div>
-  }
-
-  <button type="button" class="topbar__logout" (click)="logout()">
+  <button
+    #menuToggle
+    type="button"
+    class="topbar__toggle"
+    aria-controls="admin-sidebar"
+    [attr.aria-expanded]="menuOpen()"
+    [attr.aria-label]="menuOpen() ? 'Cerrar menú' : 'Abrir menú'"
+    (click)="toggleMenu()"
+  >
     <svg
       aria-hidden="true"
-      width="20"
-      height="20"
+      width="26"
+      height="26"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       stroke-width="2"
       stroke-linecap="round"
-      stroke-linejoin="round"
     >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+      @if (menuOpen()) {
+        <path d="M6 6l12 12M18 6L6 18" />
+      } @else {
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      }
     </svg>
-    Cerrar sesión
   </button>
 </header>
+
+@if (menuOpen()) {
+  <div class="backdrop" aria-hidden="true" (click)="closeMenu()"></div>
+}
+
+<aside id="admin-sidebar" class="sidebar" [class.sidebar--open]="menuOpen()">
+  <a class="brand sidebar__brand" routerLink="/">
+    <img src="assets/brand/logo-green.webp" alt="Itinerantes del Agua" width="103" height="68" />
+    <span class="brand__platform">Administrador</span>
+  </a>
+
+  <nav class="nav" aria-label="Secciones del panel">
+    <ul class="nav__list">
+      @for (item of navItems(); track item.path) {
+        <li>
+          <a
+            #navLink
+            class="nav__link"
+            [routerLink]="item.path"
+            routerLinkActive="nav__link--active"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: !!item.exact }"
+          >
+            <ng-container
+              [ngTemplateOutlet]="icon"
+              [ngTemplateOutletContext]="{ $implicit: item.icon }"
+            />
+            {{ item.label }}
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="sidebar__footer">
+    @if (access.me(); as me) {
+      <div class="person">
+        <span class="person__avatar" aria-hidden="true">{{ me.user.fullName.charAt(0) }}</span>
+        <div class="person__text">
+          <p class="person__name">{{ me.user.fullName }}</p>
+          <p class="person__roles">{{ roles() }}</p>
+        </div>
+      </div>
+    }
+    <button type="button" class="logout" (click)="logout()">
+      <svg
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+      </svg>
+      Cerrar sesión
+    </button>
+  </div>
+</aside>
 
 <main class="content">
   <router-outlet />
 </main>
+
+<ng-template #icon let-name>
+  <svg
+    class="nav__icon"
+    aria-hidden="true"
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    @switch (name) {
+      @case ('home') {
+        <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />
+      }
+      @case ('users') {
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      }
+    }
+  </svg>
+</ng-template>

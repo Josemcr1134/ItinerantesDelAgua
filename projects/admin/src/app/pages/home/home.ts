@@ -1,27 +1,22 @@
 import { Component, computed, inject } from '@angular/core';
-import { SessionStore } from 'auth';
+import { AdminAccess } from '../../core/access/admin-access';
+import { PERMISSION_LABELS } from '../../core/access/permission-labels';
 
-/** Inicio del administrador (provisional hasta definir los módulos). */
+/** Inicio del panel: saludo, roles y lo que la persona puede hacer (provisional). */
 @Component({
   selector: 'adm-home',
-  template: `
-    <h1 class="title">Hola, {{ firstName() }}</h1>
-    <p class="text">Aquí aparecerán los módulos del administrador.</p>
-  `,
-  styles: `
-    .title {
-      color: var(--color-primary);
-      font-family: var(--font-family-display);
-      font-size: 3rem;
-      text-transform: uppercase;
-    }
-    .text {
-      margin-top: var(--space-2);
-      color: var(--color-primary);
-    }
-  `,
+  templateUrl: './home.html',
+  styleUrl: './home.scss',
 })
 export default class Home {
-  private readonly user = inject(SessionStore).user;
-  protected readonly firstName = computed(() => this.user()?.fullName.split(' ')[0] ?? '');
+  protected readonly access = inject(AdminAccess);
+
+  protected readonly firstName = computed(
+    () => this.access.me()?.user.fullName.split(' ')[0] ?? '',
+  );
+  protected readonly abilities = computed(() =>
+    [...this.access.permissions()]
+      .filter((permission) => permission !== 'admin.access')
+      .map((permission) => PERMISSION_LABELS[permission]),
+  );
 }
