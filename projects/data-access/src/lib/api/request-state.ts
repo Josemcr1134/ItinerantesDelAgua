@@ -16,6 +16,8 @@ export interface RequestState<T> {
    * promesa con el resultado o `null` si falló, para encadenar acciones.
    */
   run(request: Observable<T>): Promise<T | null>;
+  /** Reemplaza los datos sin pedirlos (p. ej. tras editar un elemento de la lista). */
+  set(value: T | null): void;
   /** Vuelve al estado inicial. */
   reset(): void;
 }
@@ -60,6 +62,9 @@ export function requestState<T>(): RequestState<T> {
           },
         });
       });
+    },
+    set(value) {
+      data.set(value);
     },
     reset() {
       subscription?.unsubscribe();
