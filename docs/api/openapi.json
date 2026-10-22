@@ -25598,7 +25598,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "https://1fc6-152-203-83-54.ngrok-free.app"
+      "url": "https://itinerantes-backend-production.up.railway.app"
     }
   ],
   "components": {
