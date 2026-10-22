@@ -49,6 +49,8 @@ export interface ListController<T> {
   readonly error: Signal<ApiError | null>;
   /** Hay búsqueda o algún filtro aplicado. */
   readonly hasFilters: Signal<boolean>;
+  /** Cuántos filtros hay aplicados (sin contar la búsqueda ni `notFilters`). */
+  readonly activeFilterCount: Signal<number>;
   reload(): void;
   clearSearch(): void;
   /** Reemplaza un elemento sin volver a pedir la lista (p. ej. tras editarlo). */
@@ -95,6 +97,10 @@ export function listController<T, F extends object = Record<never, never>>(
     pageSize,
   }));
 
+  const activeFilterCount = computed(
+    () => Object.keys(filters()).filter((key) => !notFilters.has(key)).length,
+  );
+
   const request = requestState<Paginated<T>>();
   effect(() => {
     const current = query();
@@ -110,9 +116,8 @@ export function listController<T, F extends object = Record<never, never>>(
     loaded: computed(() => request.data() !== null),
     loading: computed(() => request.loading()),
     error: computed(() => request.error()),
-    hasFilters: computed(
-      () => !!search().trim() || Object.keys(filters()).some((key) => !notFilters.has(key)),
-    ),
+    hasFilters: computed(() => !!search().trim() || activeFilterCount() > 0),
+    activeFilterCount,
     reload: () => void request.run(options.fetch(query())),
     clearSearch: () => searchText.set(''),
     replace(match, item) {

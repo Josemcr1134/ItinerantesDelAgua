@@ -16,25 +16,6 @@
   }
 }
 
-// --- Filtros ---
-.adm-filters {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-  padding: var(--space-3);
-  border-radius: 20px;
-  background-color: var(--color-surface);
-
-  @include bp.up(md) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  @include bp.up(xl) {
-    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
-  }
-}
-
 .adm-field {
   display: flex;
   flex-direction: column;
@@ -513,13 +494,18 @@ a.adm-action {
   text-decoration: none;
 }
 
-// Barra de filtros: la búsqueda arriba a lo ancho y el resto en rejilla.
-.adm-filters__search {
-  @include bp.up(md) {
-    grid-column: 1 / -1;
-  }
+// Campos de adm-filter-bar. Son contenido proyectado (vienen de cada página),
+// por eso sus reglas viven aquí: desde xl cada filtro se reparte la fila y los
+// selectores encogen con ella (si no, la opción más larga fija su ancho).
+adm-filter-bar .adm-field {
+  min-width: 0;
 
   @include bp.up(xl) {
-    grid-column: auto;
+    flex: 1 1 0;
   }
+}
+
+adm-filter-bar select.adm-field__input {
+  width: 100%;
+  min-width: 0;
 }

@@ -6,17 +6,6 @@
   color: var(--color-raisin-black);
 }
 
-// Seis filtros: búsqueda a lo ancho y el resto en rejilla.
-.filters {
-  @include bp.up(md) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  @include bp.up(xl) {
-    grid-template-columns: minmax(0, 2fr) repeat(5, minmax(0, 1fr));
-  }
-}
-
 .offer {
   display: flex;
   align-items: center;

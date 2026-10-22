@@ -12,6 +12,7 @@ import { PageHeader } from '../../shared/page-header/page-header';
 import { Person } from '../../shared/person/person';
 import { TeacherFormDialog } from './teacher-form-dialog';
 import { Notice } from '../../shared/notice/notice';
+import { FilterBar } from '../../shared/filters/filter-bar';
 
 /**
  * Docentes (HU-27): catálogo que se asigna a las ofertas. Ver requiere
@@ -21,6 +22,7 @@ import { Notice } from '../../shared/notice/notice';
 @Component({
   selector: 'adm-teachers-page',
   imports: [
+    FilterBar,
     Notice,
     Button,
     Person,

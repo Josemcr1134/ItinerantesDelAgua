@@ -24,6 +24,7 @@ import { AddAdministratorDialog } from './add-administrator/add-administrator-di
 import { EditRolesDialog } from './edit-roles-dialog';
 import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-roles';
 import { Notice } from '../../shared/notice/notice';
+import { FilterBar } from '../../shared/filters/filter-bar';
 
 /**
  * Administradores (solo con `users.manage`): el equipo con sus roles y
@@ -34,6 +35,7 @@ import { Notice } from '../../shared/notice/notice';
 @Component({
   selector: 'adm-administrators-page',
   imports: [
+    FilterBar,
     Notice,
     Button,
     AddAdministratorDialog,

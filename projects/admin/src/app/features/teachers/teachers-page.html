@@ -23,18 +23,18 @@
 
 <adm-notice [(message)]="notice" />
 
-<form
-  class="adm-filters filters"
-  role="search"
-  aria-label="Buscar docentes"
-  (submit)="$event.preventDefault()"
+<adm-filter-bar
+  label="Buscar docentes"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="list.clearSearch()"
 >
   <adm-search-field
+    admFilterSearch
     inputId="teachers-search"
     placeholder="Nombre del docente"
     [(value)]="list.searchText"
   />
-</form>
+</adm-filter-bar>
 
 <adm-list-states
   [list]="list"

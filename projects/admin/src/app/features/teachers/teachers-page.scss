@@ -6,12 +6,6 @@
   color: var(--color-raisin-black);
 }
 
-.filters {
-  @include bp.up(md) {
-    grid-template-columns: minmax(0, 24rem);
-  }
-}
-
 // Tarjetas: una columna en móvil, varias en pantallas anchas.
 .cards {
   display: grid;

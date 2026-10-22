@@ -1,0 +1,106 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+  margin-top: var(--space-4);
+}
+
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: 20px;
+  background-color: var(--color-surface);
+
+  // Desde xl: búsqueda y filtros en una sola fila.
+  @include bp.up(xl) {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.bar__top {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+
+  @include bp.up(xl) {
+    flex: 1.5 1 0;
+    min-width: 12rem;
+  }
+}
+
+.bar__search {
+  flex: 1;
+  min-width: 0;
+}
+
+// "Filtros" solo en pantallas pequeñas.
+.bar__toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+
+  &[aria-expanded='true'] {
+    border-color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 8%, #fff);
+  }
+
+  @include bp.up(xl) {
+    display: none;
+  }
+}
+
+.bar__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-family-numeric);
+  font-size: 0.75rem;
+}
+
+// Plegados hasta xl; desplegados, en rejilla.
+.bar__filters {
+  display: none;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+
+  @include bp.up(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  // Desde xl: una sola fila; cada filtro se reparte el espacio disponible.
+  @include bp.up(xl) {
+    display: flex;
+    flex: 5 1 0;
+    align-items: flex-end;
+    min-width: 0;
+  }
+}
+
+.bar__filters--open {
+  display: grid;
+}
+
+.bar__clear {
+  justify-self: start;
+  align-self: end;
+  min-height: 44px;
+
+  @include bp.up(xl) {
+    flex: none;
+    white-space: nowrap;
+  }
+}

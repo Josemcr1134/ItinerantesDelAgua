@@ -1,6 +1,6 @@
 import { Component, input, model } from '@angular/core';
 
-/** Campo de búsqueda de una barra de filtros (`adm-filters`). */
+/** Campo de búsqueda de una barra de filtros (`adm-filter-bar`). */
 @Component({
   selector: 'adm-search-field',
   host: { class: 'adm-field' },

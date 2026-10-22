@@ -23,14 +23,13 @@
 
 <adm-notice [(message)]="notice" />
 
-<form
-  class="adm-filters filters"
-  role="search"
-  aria-label="Filtrar ofertas"
-  (submit)="$event.preventDefault()"
+<adm-filter-bar
+  label="Filtrar ofertas"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
 >
   <adm-search-field
-    class="adm-filters__search"
+    admFilterSearch
     inputId="offers-search"
     placeholder="Nombre de la oferta"
     [(value)]="list.searchText"
@@ -69,7 +68,7 @@
     [options]="options.sort"
     [(value)]="sort"
   />
-</form>
+</adm-filter-bar>
 
 <adm-list-states
   [list]="list"

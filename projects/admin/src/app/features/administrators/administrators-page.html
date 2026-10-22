@@ -22,14 +22,13 @@
 <adm-notice [(message)]="notice" />
 
 <!-- Filtros -->
-<form
-  class="adm-filters filters"
-  role="search"
-  aria-label="Filtrar administradores"
-  (submit)="$event.preventDefault()"
+<adm-filter-bar
+  label="Filtrar administradores"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
 >
   <adm-search-field
-    class="adm-filters__search"
+    admFilterSearch
     inputId="admins-search"
     placeholder="Nombre, correo o usuario"
     [(value)]="list.searchText"
@@ -54,7 +53,7 @@
     [options]="options.sort"
     [(value)]="sort"
   />
-</form>
+</adm-filter-bar>
 
 <!-- Lista -->
 <adm-list-states
