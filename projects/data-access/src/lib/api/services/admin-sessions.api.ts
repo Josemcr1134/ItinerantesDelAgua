@@ -1,7 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiClient } from '../api-client';
-import { Uuid } from '../models.generated';
+import { ScheduleRuleBodyDto, Uuid } from '../models.generated';
 import { ApiBody, ApiResponse } from '../operations.generated';
+
+/**
+ * Cuerpo de la vista previa y de "Crear sesiones". El spec declara los días
+ * de la regla como texto, pero son días ISO numéricos (1 = lunes … 7).
+ */
+export type GenerateSessionsBody = Omit<ApiBody<'AdminSessions_generate'>, 'rule'> & {
+  readonly rule?: Omit<ScheduleRuleBodyDto, 'weekdays'> & { readonly weekdays: readonly number[] };
+};
 
 /** Sesiones (videoconferencias) de una oferta (HU-29). Ver: `offers.read`; cambiar: `offers.write`. */
 @Injectable({ providedIn: 'root' })
@@ -27,7 +35,7 @@ export class AdminSessionsApi {
   }
 
   /** Calcula las sesiones de la regla sin guardar nada. */
-  preview(offerId: Uuid, body: ApiBody<'AdminSessions_preview'>) {
+  preview(offerId: Uuid, body: GenerateSessionsBody) {
     return this.api.post<ApiResponse<'AdminSessions_preview'>>(
       this.offer(offerId, '/preview'),
       body,
@@ -35,7 +43,7 @@ export class AdminSessionsApi {
   }
 
   /** Crea todas las sesiones de la vista previa (nunca parcial). */
-  generate(offerId: Uuid, body: ApiBody<'AdminSessions_generate'>) {
+  generate(offerId: Uuid, body: GenerateSessionsBody) {
     return this.api.post<ApiResponse<'AdminSessions_generate'>>(
       this.offer(offerId, '/generate'),
       body,
