@@ -413,7 +413,8 @@ textarea.adm-field__input {
   background-color: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
 }
 
-// Estado de una oferta (Borrador, Publicado…).
+// Insignias de estado: por estado de una oferta (Borrador, Publicado…) o por
+// tono (`--success`, `--pending`, `--info`, `--danger`; sin tono, neutra).
 .adm-badge {
   display: inline-block;
   padding: 3px 10px;
@@ -425,22 +426,26 @@ textarea.adm-field__input {
   white-space: nowrap;
 }
 
-.adm-badge--PUBLISHED {
+.adm-badge--PUBLISHED,
+.adm-badge--success {
   background-color: color-mix(in srgb, #2f7a3e 16%, transparent);
   color: #23602f;
 }
 
-.adm-badge--ENROLLMENT_CLOSED {
+.adm-badge--ENROLLMENT_CLOSED,
+.adm-badge--pending {
   background-color: color-mix(in srgb, var(--color-sun) 28%, transparent);
   color: #6b4d00;
 }
 
-.adm-badge--FINISHED {
+.adm-badge--FINISHED,
+.adm-badge--info {
   background-color: color-mix(in srgb, var(--color-deep-blue) 15%, transparent);
   color: var(--color-deep-blue);
 }
 
-.adm-badge--ARCHIVED {
+.adm-badge--ARCHIVED,
+.adm-badge--danger {
   background-color: color-mix(in srgb, var(--color-danger) 14%, transparent);
   color: #8a3420;
 }

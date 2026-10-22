@@ -34,6 +34,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/teachers/teachers-page'),
       },
       {
+        path: 'postulaciones',
+        canActivate: [permissionGuard('applications.read')],
+        loadChildren: () => import('./features/applications/applications.routes'),
+      },
+      {
         path: 'administradores',
         title: 'Administradores · Administrador',
         canActivate: [permissionGuard('users.manage')],

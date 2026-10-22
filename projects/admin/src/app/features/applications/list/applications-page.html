@@ -1,0 +1,199 @@
+<adm-page-header title="Postulaciones" lead="Becas y convocatorias enviadas por participantes.">
+  <button
+    uiButton
+    variant="secondary"
+    type="button"
+    class="adm-page-action"
+    [disabled]="exporting()"
+    (click)="exportCsv()"
+  >
+    <svg
+      aria-hidden="true"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14" />
+    </svg>
+    {{ exporting() ? 'Exportando…' : 'Exportar a Excel' }}
+  </button>
+</adm-page-header>
+
+<nav class="tabs" aria-label="Tipo de postulación">
+  @for (tab of kinds; track tab.kind) {
+    <a
+      class="tabs__tab"
+      [class.tabs__tab--active]="kind() === tab.kind"
+      [attr.aria-current]="kind() === tab.kind ? 'page' : null"
+      routerLink="."
+      [queryParams]="{ tipo: tab.param }"
+      >{{ tab.label }}</a
+    >
+  }
+</nav>
+
+<adm-filter-bar
+  label="Filtrar postulaciones"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="applications-search"
+    placeholder="Nombre, correo o folio"
+    [(value)]="list.searchText"
+  />
+  @if (options().offers.length) {
+    <adm-filter-select
+      inputId="applications-offer"
+      label="Oferta"
+      allLabel="Todas"
+      [options]="options().offers"
+      [(value)]="offerId"
+    />
+  }
+  <adm-filter-select
+    inputId="applications-status"
+    label="Estado"
+    allLabel="Todos"
+    [options]="options().status"
+    [(value)]="status"
+  />
+  @if (kind() === 'SCHOLARSHIP') {
+    <adm-filter-select
+      inputId="applications-level"
+      label="Nivel solicitado"
+      allLabel="Todos"
+      [options]="options().level"
+      [(value)]="level"
+    />
+  }
+  @if (options().countries.length) {
+    <adm-filter-select
+      inputId="applications-country"
+      label="País"
+      allLabel="Todos"
+      [options]="options().countries"
+      [(value)]="countryCode"
+    />
+  }
+  <adm-filter-select
+    inputId="applications-interview"
+    label="Entrevista"
+    allLabel="Todas"
+    [options]="options().interview"
+    [(value)]="interview"
+  />
+  @if (canEvaluate()) {
+    <adm-filter-select
+      inputId="applications-mine"
+      label="Mi evaluación"
+      allLabel="Todas"
+      [options]="options().mine"
+      [(value)]="withoutMine"
+    />
+  }
+  <adm-filter-select
+    inputId="applications-sort"
+    label="Ordenar por"
+    [options]="options().sort"
+    [(value)]="sort"
+  />
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Postulaciones"
+  headingId="applications-results"
+  loadingText="Cargando postulaciones…"
+  emptyText="Aún no hay postulaciones enviadas."
+  filteredText="No hay postulaciones con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2 applications">
+    <thead>
+      <tr>
+        <th scope="col">Postulante</th>
+        <th scope="col">Oferta</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Evaluación</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of list.items(); track item.id) {
+        <tr>
+          <td data-label="Persona">
+            <adm-person
+              [name]="item.applicant.name"
+              [detail]="item.applicant.email"
+              [avatarSize]="40"
+            />
+            <p class="meta">
+              <span class="folio">{{ item.folio }}</span> ·
+              {{ countryName(item.applicant.countryCode) }}
+            </p>
+          </td>
+          <td data-label="Oferta">
+            <span class="offer">{{ item.offer.name }}</span>
+            @if (levelText(item); as level) {
+              <p class="meta">Nivel: {{ level }}</p>
+            }
+            @if (item.submittedAt) {
+              <p class="meta">Enviada el {{ formatDate(item.submittedAt) }}</p>
+            }
+          </td>
+          <td data-label="Estado">
+            <span [class]="'adm-badge adm-badge--' + statusTones[item.status]">{{
+              statusLabels[item.status]
+            }}</span>
+            @if (item.interview?.status === 'SCHEDULED') {
+              <p class="meta">Entrevista: {{ formatDateTime(item.interview!.startsAt) }}</p>
+            }
+            @if (item.responseDueAt) {
+              <p class="meta">Plazo: {{ formatDate(item.responseDueAt) }}</p>
+            }
+          </td>
+          <td data-label="Evaluación">
+            <ul class="adm-chips">
+              <li class="adm-chip">
+                {{ item.evaluationCount }}
+                {{ item.evaluationCount === 1 ? 'evaluación' : 'evaluaciones' }}
+              </li>
+              @if (item.requiresInterview) {
+                <li class="adm-chip">Requiere entrevista</li>
+              }
+              @if (canEvaluate()) {
+                @if (item.myEvaluation) {
+                  <li class="adm-chip">Yo: {{ recommendationLabels[item.myEvaluation] }}</li>
+                } @else {
+                  <li class="adm-chip adm-chip--super">Sin mi evaluación</li>
+                }
+              }
+            </ul>
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              <a class="adm-action" [routerLink]="[item.id]" [queryParams]="{ tipo: tipo() }">
+                Revisar<span class="visually-hidden">
+                  la postulación de {{ item.applicant.name }}</span
+                >
+              </a>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['postulación', 'postulaciones']"
+  />
+</adm-list-states>

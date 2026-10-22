@@ -1,0 +1,53 @@
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.tabs__tab {
+  margin-bottom: -1px;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 3px solid transparent;
+  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.tabs__tab--active {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.meta {
+  margin: 2px 0 0;
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+}
+
+.folio {
+  font-family: var(--font-family-numeric);
+  font-weight: 700;
+}
+
+.offer {
+  font-weight: 600;
+}
+
+// Estados largos ("Aprobada – pendiente de pago"): pueden bajar de línea.
+.applications .adm-badge {
+  white-space: normal;
+}
+
+.tabs {
+  margin-top: var(--space-4);
+}
