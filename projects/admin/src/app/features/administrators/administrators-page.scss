@@ -6,17 +6,9 @@
   color: var(--color-raisin-black);
 }
 
-.row--disabled .person__name,
+.row--disabled adm-person,
 .row--disabled .adm-chips {
   opacity: 0.6;
-}
-
-.person__name {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-  font-weight: 700;
 }
 
 .person-cell {
@@ -31,21 +23,10 @@
   font-size: 0.8125rem;
 }
 
-.person__meta {
-  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
-  font-size: 0.875rem;
-  overflow-wrap: break-word;
-}
-
 .you {
   padding: 1px 8px;
   border-radius: var(--radius-pill);
   background-color: var(--color-columbia-blue);
   color: var(--color-deep-blue);
   font-size: 0.75rem;
-}
-
-.dialog-lead {
-  margin-bottom: var(--space-3);
-  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
 }

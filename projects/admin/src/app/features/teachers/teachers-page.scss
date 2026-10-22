@@ -32,24 +32,8 @@
 }
 
 .card__head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.card__title {
-  min-width: 0;
-}
-
-.card__name {
   font-family: var(--font-family-body);
   font-size: 1.125rem;
-  font-weight: 700;
-}
-
-.card__usage {
-  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
-  font-size: 0.875rem;
 }
 
 // Semblanza recortada a 4 líneas.

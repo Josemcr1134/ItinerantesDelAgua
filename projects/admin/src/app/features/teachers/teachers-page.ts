@@ -1,15 +1,15 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { AdminTeacherDto, AdminTeachersApi } from 'data-access';
-import { AlertService, Button } from 'ui-kit';
+import { Button } from 'ui-kit';
 import { firstValueFrom } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
-import { Avatar } from '../../shared/avatar/avatar';
 import { SearchField } from '../../shared/filters/search-field';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
 import { Pagination } from '../../shared/list/pagination';
 import { rowActions } from '../../shared/list/row-actions';
 import { PageHeader } from '../../shared/page-header/page-header';
+import { Person } from '../../shared/person/person';
 import { TeacherFormDialog } from './teacher-form-dialog';
 
 /**
@@ -19,13 +19,12 @@ import { TeacherFormDialog } from './teacher-form-dialog';
  */
 @Component({
   selector: 'adm-teachers-page',
-  imports: [Button, Avatar, SearchField, ListStates, Pagination, PageHeader, TeacherFormDialog],
+  imports: [Button, Person, SearchField, ListStates, Pagination, PageHeader, TeacherFormDialog],
   templateUrl: './teachers-page.html',
   styleUrl: './teachers-page.scss',
 })
 export default class TeachersPage {
   private readonly api = inject(AdminTeachersApi);
-  private readonly alerts = inject(AlertService);
   private readonly access = inject(AdminAccess);
   protected readonly canWrite = computed(() => this.access.permissions().has('offers.write'));
 
@@ -65,16 +64,19 @@ export default class TeachersPage {
   }
 
   protected async remove(teacher: AdminTeacherDto): Promise<void> {
-    const confirmed = await this.alerts.confirm(
-      `¿Borrar a ${teacher.fullName}?`,
-      'Se elimina del catálogo de docentes. Esta acción no se puede deshacer.',
-      { confirmLabel: 'Borrar', variant: 'error' },
+    const done = await this.rows.confirmRun(
+      teacher.id,
+      {
+        title: `¿Borrar a ${teacher.fullName}?`,
+        message: 'Se elimina del catálogo de docentes. Esta acción no se puede deshacer.',
+        confirmLabel: 'Borrar',
+        variant: 'error',
+      },
+      async () => {
+        await firstValueFrom(this.api.remove(teacher.id), { defaultValue: undefined });
+        return true;
+      },
     );
-    if (!confirmed) return;
-    const done = await this.rows.run(teacher.id, async () => {
-      await firstValueFrom(this.api.remove(teacher.id), { defaultValue: undefined });
-      return true;
-    });
     if (done) {
       this.notice.set(`Se borró a ${teacher.fullName}.`);
       this.list.reload();

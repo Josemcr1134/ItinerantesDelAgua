@@ -1,29 +1,14 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  model,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Component, computed, inject, input, model } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import {
-  AdminTeacherDto,
-  AdminTeacherRefDto,
-  AdminTeachersApi,
-  Paginated,
-  requestState,
-} from 'data-access';
-import { debounced } from '../../../../core/signals/debounced';
-import { Avatar } from '../../../../shared/avatar/avatar';
+import { AdminTeacherDto, AdminTeacherRefDto, AdminTeachersApi } from 'data-access';
+import { remoteSearch } from '../../../../shared/list/remote-search';
+import { Person } from '../../../../shared/person/person';
 import { moveItem } from '../../../../shared/list/reorder';
 
 /** Docentes de la oferta en el orden de la ficha: buscar, agregar, mover y quitar. */
 @Component({
   selector: 'adm-teacher-picker',
-  imports: [RouterLink, Avatar],
+  imports: [RouterLink, Person],
   template: `
     <fieldset class="picker">
       <legend class="adm-field__label">Docentes</legend>
@@ -31,8 +16,12 @@ import { moveItem } from '../../../../shared/list/reorder';
         <ol class="selected">
           @for (t of teachers(); track t.id; let i = $index, first = $first, last = $last) {
             <li class="teacher">
-              <adm-avatar [name]="t.fullName" [photoUrl]="t.photoUrl" [size]="36" />
-              <span class="teacher__name">{{ t.fullName }}</span>
+              <adm-person
+                class="teacher__person"
+                [name]="t.fullName"
+                [photoUrl]="t.photoUrl"
+                [avatarSize]="36"
+              />
               @if (!disabled()) {
                 <button
                   type="button"
@@ -76,16 +65,16 @@ import { moveItem } from '../../../../shared/list/reorder';
           type="search"
           autocomplete="off"
           placeholder="Buscar docente por nombre"
-          [value]="searchText()"
-          (input)="searchText.set($any($event.target).value)"
+          [value]="search.searchText()"
+          (input)="search.searchText.set($any($event.target).value)"
         />
         <div aria-live="polite">
-          @if (search().trim().length >= 2) {
-            @if (results.loading() && !results.data()) {
+          @if (search.active()) {
+            @if (!search.loaded()) {
               <p class="adm-field__hint">Buscando…</p>
             } @else if (!available().length) {
               <p class="adm-field__hint">
-                No hay más docentes con «{{ search() }}».
+                No hay más docentes con «{{ search.query() }}».
                 <a class="adm-link" routerLink="/docentes" target="_blank">Registrar docente</a>
                 (se abre en otra pestaña; luego vuelve a buscarlo aquí).
               </p>
@@ -139,7 +128,7 @@ import { moveItem } from '../../../../shared/list/reorder';
       border-radius: 14px;
       background: #fff;
     }
-    .teacher__name {
+    .teacher__person {
       flex: 1;
       font-weight: 600;
     }
@@ -151,31 +140,22 @@ export class TeacherPicker {
   readonly issue = input<string | null>(null);
 
   private readonly api = inject(AdminTeachersApi);
-  protected readonly searchText = signal('');
-  protected readonly search = debounced(this.searchText);
-  protected readonly results = requestState<Paginated<AdminTeacherDto>>();
+  protected readonly search = remoteSearch({
+    fetch: (q) => this.api.list({ q, pageSize: 8 }),
+    minLength: 2,
+  });
   /** Resultados que aún no están en la oferta. */
   protected readonly available = computed(() => {
     const chosen = new Set(this.teachers().map((t) => t.id));
-    return (this.results.data()?.data ?? []).filter((t) => !chosen.has(t.id));
+    return this.search.results().filter((t) => !chosen.has(t.id));
   });
-
-  constructor() {
-    effect(() => {
-      const q = this.search().trim();
-      untracked(() => {
-        if (q.length >= 2) void this.results.run(this.api.list({ q, pageSize: 8 }));
-        else this.results.reset();
-      });
-    });
-  }
 
   protected add(teacher: AdminTeacherDto): void {
     this.teachers.update((list) => [
       ...list,
       { id: teacher.id, fullName: teacher.fullName, photoUrl: teacher.photoUrl },
     ]);
-    this.searchText.set('');
+    this.search.reset();
   }
 
   protected remove(id: string): void {

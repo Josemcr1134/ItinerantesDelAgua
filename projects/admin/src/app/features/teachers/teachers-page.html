@@ -49,13 +49,14 @@
     @for (teacher of list.items(); track teacher.id) {
       @let busy = rows.isBusy(teacher.id);
       <li class="card">
-        <div class="card__head">
-          <adm-avatar [name]="teacher.fullName" [photoUrl]="teacher.photoUrl" [size]="64" />
-          <div class="card__title">
-            <h3 class="card__name">{{ teacher.fullName }}</h3>
-            <p class="card__usage">{{ usage(teacher) }}</p>
-          </div>
-        </div>
+        <h3 class="card__head">
+          <adm-person
+            [name]="teacher.fullName"
+            [detail]="usage(teacher)"
+            [photoUrl]="teacher.photoUrl"
+            [avatarSize]="64"
+          />
+        </h3>
         @if (teacher.bio) {
           <p class="card__bio">{{ teacher.bio }}</p>
         } @else {

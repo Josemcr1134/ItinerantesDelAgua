@@ -67,13 +67,7 @@
 
   <div class="sidebar__footer">
     @if (access.me(); as me) {
-      <div class="person">
-        <adm-avatar [name]="me.user.fullName" />
-        <div class="person__text">
-          <p class="person__name">{{ me.user.fullName }}</p>
-          <p class="person__roles">{{ roles() }}</p>
-        </div>
-      </div>
+      <adm-person class="person" [name]="me.user.fullName" [detail]="roles()" />
     }
     <button type="button" class="logout" (click)="logout()">
       <svg

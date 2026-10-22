@@ -15,207 +15,208 @@
   Oferta formativa
 </a>
 
-@if (request.error() && !offer()) {
-  <div class="adm-state adm-state--error" role="alert">
-    <p>{{ request.error()?.message }}</p>
-    <button uiButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
-  </div>
-} @else if (!offer()) {
-  <p class="adm-state">Cargando la oferta…</p>
-} @else {
-  @let o = offer()!;
-  <header class="header">
-    <div class="header__text">
-      <p class="header__meta">
-        <span [class]="'adm-badge adm-badge--' + o.adminStatus">{{
-          statusLabels[o.adminStatus]
-        }}</span>
-        {{ typeLabels[o.type] }} · {{ modalityLabels[o.modality] }}
+<adm-request-state
+  [error]="request.error()"
+  [loaded]="!!offer()"
+  loadingText="Cargando la oferta…"
+  (retry)="reload()"
+>
+  @if (offer(); as o) {
+    <header class="header">
+      <div class="header__text">
+        <p class="header__meta">
+          <span [class]="'adm-badge adm-badge--' + o.adminStatus">{{
+            statusLabels[o.adminStatus]
+          }}</span>
+          {{ typeLabels[o.type] }} · {{ modalityLabels[o.modality] }}
+        </p>
+        <h1 class="header__title">{{ o.name }}</h1>
+      </div>
+      <div class="header__actions">
+        @if (canPublish()) {
+          @if (o.publicationStatus === 'DRAFT') {
+            <button
+              uiButton
+              type="button"
+              [disabled]="busy() || !o.wizard.canPublish"
+              (click)="publish()"
+              [attr.aria-describedby]="o.wizard.canPublish ? null : 'publish-blockers'"
+            >
+              Publicar
+            </button>
+          }
+          <adm-row-menu label="Más acciones de la oferta">
+            @if (o.publicationStatus !== 'DRAFT') {
+              <button class="adm-menuitem" role="menuitem" type="button" (click)="unpublish()">
+                Volver a borrador
+              </button>
+            }
+            @if (o.publicationStatus !== 'ARCHIVED') {
+              <button class="adm-menuitem" role="menuitem" type="button" (click)="archive()">
+                Archivar
+              </button>
+            }
+            <button class="adm-menuitem" role="menuitem" type="button" (click)="duplicate()">
+              Duplicar (nueva cohorte)
+            </button>
+            @if (o.publicationStatus === 'DRAFT' && !o.hasEnrollments) {
+              <button
+                class="adm-menuitem adm-menuitem--danger"
+                role="menuitem"
+                type="button"
+                (click)="remove()"
+              >
+                Borrar borrador
+              </button>
+            }
+          </adm-row-menu>
+        }
+      </div>
+    </header>
+
+    @if (!canWrite()) {
+      <p class="adm-callout adm-callout--info">
+        Solo lectura: tu rol puede ver las ofertas pero no editarlas.
       </p>
-      <h1 class="header__title">{{ o.name }}</h1>
-    </div>
-    <div class="header__actions">
-      @if (canPublish()) {
-        @if (o.publicationStatus === 'DRAFT') {
-          <button
-            uiButton
-            type="button"
-            [disabled]="busy() || !o.wizard.canPublish"
-            (click)="publish()"
-            [attr.aria-describedby]="o.wizard.canPublish ? null : 'publish-blockers'"
-          >
-            Publicar
-          </button>
-        }
-        <adm-row-menu label="Más acciones de la oferta">
-          @if (o.publicationStatus !== 'DRAFT') {
-            <button class="adm-menuitem" role="menuitem" type="button" (click)="unpublish()">
-              Volver a borrador
-            </button>
+    }
+
+    @if (
+      o.publicationStatus === 'DRAFT' && !o.wizard.canPublish && o.wizard.publishBlockers.length
+    ) {
+      <div id="publish-blockers" class="adm-callout blockers">
+        <strong>Para publicar falta:</strong>
+        <ul>
+          @for (b of o.wizard.publishBlockers; track b.field + b.code) {
+            <li>{{ b.message }}</li>
           }
-          @if (o.publicationStatus !== 'ARCHIVED') {
-            <button class="adm-menuitem" role="menuitem" type="button" (click)="archive()">
-              Archivar
-            </button>
-          }
-          <button class="adm-menuitem" role="menuitem" type="button" (click)="duplicate()">
-            Duplicar (nueva cohorte)
-          </button>
-          @if (o.publicationStatus === 'DRAFT' && !o.hasEnrollments) {
-            <button
-              class="adm-menuitem adm-menuitem--danger"
-              role="menuitem"
-              type="button"
-              (click)="remove()"
-            >
-              Borrar borrador
-            </button>
-          }
-        </adm-row-menu>
-      }
-    </div>
-  </header>
+        </ul>
+      </div>
+    }
 
-  @if (!canWrite()) {
-    <p class="adm-callout adm-callout--info">
-      Solo lectura: tu rol puede ver las ofertas pero no editarlas.
-    </p>
-  }
+    <p class="adm-notice" role="status">{{ notice() }}</p>
 
-  @if (o.publicationStatus === 'DRAFT' && !o.wizard.canPublish && o.wizard.publishBlockers.length) {
-    <div id="publish-blockers" class="adm-callout blockers">
-      <strong>Para publicar falta:</strong>
-      <ul>
-        @for (b of o.wizard.publishBlockers; track b.field + b.code) {
-          <li>{{ b.message }}</li>
-        }
-      </ul>
-    </div>
-  }
-
-  <p class="adm-notice" role="status">{{ notice() }}</p>
-
-  <div class="wizard">
-    <nav class="stepper" aria-label="Pasos de la oferta">
-      <ol class="stepper__list">
-        @for (step of steps(); track step.key; let i = $index) {
-          <li>
-            <button
-              type="button"
-              class="stepper__item"
-              [class.stepper__item--current]="i === stepIndex()"
-              [class.stepper__item--done]="step.complete"
-              [class.stepper__item--issues]="!step.complete && step.issues.length"
-              [attr.aria-current]="i === stepIndex() ? 'step' : null"
-              [disabled]="busy()"
-              (click)="goTo(i)"
-            >
-              <span class="stepper__number" aria-hidden="true">
-                @if (step.complete) {
-                  ✓
-                } @else {
-                  {{ step.step }}
-                }
-              </span>
-              <span class="stepper__text">
-                <span class="stepper__label">{{ step.label }}</span>
-                <span class="stepper__status">
+    <div class="wizard">
+      <nav class="stepper" aria-label="Pasos de la oferta">
+        <ol class="stepper__list">
+          @for (step of steps(); track step.key; let i = $index) {
+            <li>
+              <button
+                type="button"
+                class="stepper__item"
+                [class.stepper__item--current]="i === stepIndex()"
+                [class.stepper__item--done]="step.complete"
+                [class.stepper__item--issues]="!step.complete && step.issues.length"
+                [attr.aria-current]="i === stepIndex() ? 'step' : null"
+                [disabled]="busy()"
+                (click)="goTo(i)"
+              >
+                <span class="stepper__number" aria-hidden="true">
                   @if (step.complete) {
-                    Completo
-                  } @else if (step.issues.length) {
-                    {{ step.issues.length }}
-                    {{ step.issues.length === 1 ? 'pendiente' : 'pendientes' }}
+                    ✓
                   } @else {
-                    Sin revisar
-                  }
-                  @if (!step.requiredToPublish) {
-                    · opcional
+                    {{ step.step }}
                   }
                 </span>
-              </span>
+                <span class="stepper__text">
+                  <span class="stepper__label">{{ step.label }}</span>
+                  <span class="stepper__status">
+                    @if (step.complete) {
+                      Completo
+                    } @else if (step.issues.length) {
+                      {{ step.issues.length }}
+                      {{ step.issues.length === 1 ? 'pendiente' : 'pendientes' }}
+                    } @else {
+                      Sin revisar
+                    }
+                    @if (!step.requiredToPublish) {
+                      · opcional
+                    }
+                  </span>
+                </span>
+              </button>
+            </li>
+          }
+        </ol>
+      </nav>
+
+      <div class="step">
+        @if (current(); as step) {
+          <h2 id="offer-step-title" class="step__title" tabindex="-1">
+            <span class="visually-hidden">Paso {{ step.step }} de {{ steps().length }}: </span
+            >{{ step.label }}
+          </h2>
+          @if (step.issues.length && canWrite()) {
+            <div id="offer-step-issues" class="adm-callout step__issues">
+              <strong>Pendiente en este paso:</strong>
+              <ul>
+                @for (issue of step.issues; track issue.field + issue.code) {
+                  <li>{{ issue.message }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          @switch (step.key) {
+            @case ('GENERAL') {
+              <adm-general-step [offer]="o" [readonly]="!canWrite()" />
+            }
+            @case ('CONTENT') {
+              <adm-content-step [offer]="o" [readonly]="!canWrite()" />
+            }
+            @case ('SCHEDULE') {
+              <adm-schedule-step [offer]="o" [readonly]="!canWrite()" />
+            }
+            @case ('ORIGIN_PRICING') {
+              <adm-pricing-step [offer]="o" [readonly]="!canWrite()" />
+            }
+            @case ('RESOURCES') {
+              <adm-resources-step [offer]="o" [readonly]="!canWrite()" />
+            }
+            @case ('ATTENDANCE') {
+              <adm-attendance-step [offer]="o" [readonly]="!canWrite()" />
+            }
+            @case ('WHATSAPP') {
+              <adm-whatsapp-step [offer]="o" [readonly]="!canWrite()" />
+            }
+          }
+
+          <footer class="step__footer">
+            <button
+              type="button"
+              class="adm-action"
+              [disabled]="busy() || stepIndex() === 0"
+              (click)="goTo(stepIndex() - 1)"
+            >
+              ← Anterior
             </button>
-          </li>
-        }
-      </ol>
-    </nav>
-
-    <div class="step">
-      @if (current(); as step) {
-        <h2 id="offer-step-title" class="step__title" tabindex="-1">
-          <span class="visually-hidden">Paso {{ step.step }} de {{ steps().length }}: </span
-          >{{ step.label }}
-        </h2>
-        @if (step.issues.length && canWrite()) {
-          <div id="offer-step-issues" class="adm-callout step__issues">
-            <strong>Pendiente en este paso:</strong>
-            <ul>
-              @for (issue of step.issues; track issue.field + issue.code) {
-                <li>{{ issue.message }}</li>
+            <div class="step__footer-main">
+              @if (canWrite() && dirty()) {
+                <span class="step__dirty">Cambios sin guardar</span>
+                <button
+                  uiButton
+                  variant="secondary"
+                  type="button"
+                  [disabled]="busy()"
+                  (click)="save()"
+                >
+                  {{ busy() ? 'Guardando…' : 'Guardar' }}
+                </button>
               }
-            </ul>
-          </div>
+              @if (!isLast()) {
+                <button
+                  uiButton
+                  type="button"
+                  [disabled]="busy() || blockedNext()"
+                  [attr.aria-describedby]="blockedNext() ? 'offer-step-issues' : null"
+                  (click)="saveAndNext()"
+                >
+                  {{ canWrite() && dirty() ? 'Guardar y continuar →' : 'Siguiente →' }}
+                </button>
+              }
+            </div>
+          </footer>
         }
-
-        @switch (step.key) {
-          @case ('GENERAL') {
-            <adm-general-step [offer]="o" [readonly]="!canWrite()" />
-          }
-          @case ('CONTENT') {
-            <adm-content-step [offer]="o" [readonly]="!canWrite()" />
-          }
-          @case ('SCHEDULE') {
-            <adm-schedule-step [offer]="o" [readonly]="!canWrite()" />
-          }
-          @case ('ORIGIN_PRICING') {
-            <adm-pricing-step [offer]="o" [readonly]="!canWrite()" />
-          }
-          @case ('RESOURCES') {
-            <adm-resources-step [offer]="o" [readonly]="!canWrite()" />
-          }
-          @case ('ATTENDANCE') {
-            <adm-attendance-step [offer]="o" [readonly]="!canWrite()" />
-          }
-          @case ('WHATSAPP') {
-            <adm-whatsapp-step [offer]="o" [readonly]="!canWrite()" />
-          }
-        }
-
-        <footer class="step__footer">
-          <button
-            type="button"
-            class="adm-action"
-            [disabled]="busy() || stepIndex() === 0"
-            (click)="goTo(stepIndex() - 1)"
-          >
-            ← Anterior
-          </button>
-          <div class="step__footer-main">
-            @if (canWrite() && dirty()) {
-              <span class="step__dirty">Cambios sin guardar</span>
-              <button
-                uiButton
-                variant="secondary"
-                type="button"
-                [disabled]="busy()"
-                (click)="save()"
-              >
-                {{ busy() ? 'Guardando…' : 'Guardar' }}
-              </button>
-            }
-            @if (!isLast()) {
-              <button
-                uiButton
-                type="button"
-                [disabled]="busy() || blockedNext()"
-                [attr.aria-describedby]="blockedNext() ? 'offer-step-issues' : null"
-                (click)="saveAndNext()"
-              >
-                {{ canWrite() && dirty() ? 'Guardar y continuar →' : 'Siguiente →' }}
-              </button>
-            }
-          </div>
-        </footer>
-      }
+      </div>
     </div>
-  </div>
-}
+  }
+</adm-request-state>

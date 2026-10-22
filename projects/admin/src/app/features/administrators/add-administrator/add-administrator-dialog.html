@@ -17,10 +17,11 @@
       </svg>
       Elegir otra cuenta
     </button>
-    <div class="account account--selected">
-      <p class="account__name">{{ user.fullName }}</p>
-      <p class="account__meta">{{ user.email }} · {{ '@' + user.username }}</p>
-    </div>
+    <adm-person
+      class="account account--selected"
+      [name]="user.fullName"
+      [detail]="user.email + ' · @' + user.username"
+    />
     <adm-role-picker
       [roles]="roles()"
       [(value)]="chosenRoles"
@@ -45,32 +46,31 @@
       autocomplete="off"
       placeholder="Ej. laura@escuelaitinerante.org"
       aria-describedby="add-admin-search-hint"
-      [ngModel]="searchText()"
-      (ngModelChange)="searchText.set($event)"
+      [value]="accounts.searchText()"
+      (input)="accounts.searchText.set($any($event.target).value)"
     />
-    <p id="add-admin-search-hint" class="hint">Escribe al menos {{ minSearch }} caracteres.</p>
+    <p id="add-admin-search-hint" class="hint">
+      Escribe al menos {{ accounts.minLength }} caracteres.
+    </p>
 
-    <div class="results" aria-live="polite" [attr.aria-busy]="results.loading()">
-      @if (!canSearch()) {
+    <div class="results" aria-live="polite" [attr.aria-busy]="accounts.loading()">
+      @if (!accounts.active()) {
         <!-- Sin búsqueda todavía -->
-      } @else if (results.error()) {
-        <p class="state state--error">{{ results.error()?.message }}</p>
-      } @else if (results.loading() && !results.data()) {
+      } @else if (accounts.error()) {
+        <p class="state state--error">{{ accounts.error()?.message }}</p>
+      } @else if (!accounts.loaded()) {
         <p class="state">Buscando…</p>
-      } @else if (!accounts().length) {
+      } @else if (!accounts.results().length) {
         <p class="state">
-          No encontramos cuentas con «{{ searchText() }}». Pídele a la persona que se registre en el
-          portal.
+          No encontramos cuentas con «{{ accounts.query() }}». Pídele a la persona que se registre
+          en el portal.
         </p>
       } @else {
         <ul class="accounts">
-          @for (user of accounts(); track user.id) {
+          @for (user of accounts.results(); track user.id) {
             <li>
               <button type="button" class="account" (click)="choose(user)">
-                <span class="account__text">
-                  <span class="account__name">{{ user.fullName }}</span>
-                  <span class="account__meta">{{ user.email }} · {{ '@' + user.username }}</span>
-                </span>
+                <adm-person [name]="user.fullName" [detail]="user.email + ' · @' + user.username" />
                 @if (isStaff(user)) {
                   <span class="tag tag--staff">Ya es del equipo</span>
                 } @else if (user.status !== 'ACTIVE') {

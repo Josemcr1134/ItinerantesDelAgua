@@ -8,19 +8,20 @@ import {
   USER_STATUS_VALUES,
   UserStatus,
 } from 'data-access';
-import { AlertService, Button, Dialog, DialogActions } from 'ui-kit';
-import { firstValueFrom, Observable } from 'rxjs';
+import { Button } from 'ui-kit';
+import { firstValueFrom } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
 import { FilterSelect, optionsFrom } from '../../shared/filters/filter-select';
 import { SearchField } from '../../shared/filters/search-field';
-import { FormActions } from '../../shared/form-actions/form-actions';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
 import { Pagination } from '../../shared/list/pagination';
 import { rowActions } from '../../shared/list/row-actions';
 import { PageHeader } from '../../shared/page-header/page-header';
+import { Person } from '../../shared/person/person';
+import { RowMenu } from '../../shared/row-menu/row-menu';
 import { AddAdministratorDialog } from './add-administrator/add-administrator-dialog';
-import { RolePicker } from './role-picker/role-picker';
+import { EditRolesDialog } from './edit-roles-dialog';
 import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-roles';
 
 /**
@@ -33,12 +34,11 @@ import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-r
   selector: 'adm-administrators-page',
   imports: [
     Button,
-    Dialog,
-    DialogActions,
-    FormActions,
-    RolePicker,
     AddAdministratorDialog,
+    EditRolesDialog,
     PageHeader,
+    Person,
+    RowMenu,
     SearchField,
     FilterSelect,
     ListStates,
@@ -49,7 +49,6 @@ import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-r
 })
 export default class AdministratorsPage {
   private readonly api = inject(AdminUsersApi);
-  private readonly alerts = inject(AlertService);
   private readonly router = inject(Router);
   protected readonly access = inject(AdminAccess);
 
@@ -89,8 +88,6 @@ export default class AdministratorsPage {
   // --- Editar roles ---
   protected readonly editing = signal<AdminUserDto | null>(null);
   protected readonly editOpen = signal(false);
-  protected readonly editRoles = signal<readonly Role[]>([]);
-  protected readonly saving = signal(false);
   protected readonly addOpen = signal(false);
 
   protected isMe(user: AdminUserDto): boolean {
@@ -110,7 +107,6 @@ export default class AdministratorsPage {
   // --- Editar roles ---
   protected openEdit(user: AdminUserDto): void {
     this.editing.set(user);
-    this.editRoles.set(staffRolesOf(user.roles));
     this.editOpen.set(true);
   }
 
@@ -119,23 +115,7 @@ export default class AdministratorsPage {
     return user && this.isMe(user) && user.roles.includes('SUPER_ADMIN') ? ['SUPER_ADMIN'] : [];
   }
 
-  protected async saveRoles(): Promise<void> {
-    const user = this.editing();
-    if (!user) return;
-    const roles = this.editRoles();
-    if (!roles.length) {
-      // Quitar todos los roles es "quitar del equipo": se confirma aparte.
-      this.editOpen.set(false);
-      await this.removeFromTeam(user);
-      return;
-    }
-    this.saving.set(true);
-    const updated = await this.rows.run(user.id, () =>
-      firstValueFrom(this.api.updateRoles(user.id, { roles: [...roles] })),
-    );
-    this.saving.set(false);
-    if (!updated) return;
-    this.editOpen.set(false);
+  protected async onRolesSaved(updated: AdminUserDto): Promise<void> {
     this.list.replace((u) => u.id === updated.id, updated);
     this.notice.set(`Se actualizaron los roles de ${updated.fullName}.`);
     if (this.isMe(updated)) await this.afterSelfChange();
@@ -143,13 +123,18 @@ export default class AdministratorsPage {
 
   // --- Quitar del equipo ---
   protected async removeFromTeam(user: AdminUserDto): Promise<void> {
-    const confirmed = await this.alerts.confirm(
-      `¿Quitar a ${user.fullName} del equipo?`,
-      'Perderá el acceso al panel de inmediato. Su cuenta de participante se conserva y puedes volver a asignarle roles cuando quieras.',
-      { confirmLabel: 'Quitar del equipo', variant: 'error' },
+    const done = await this.rows.confirmRun(
+      user.id,
+      {
+        title: `¿Quitar a ${user.fullName} del equipo?`,
+        message:
+          'Perderá el acceso al panel de inmediato. Su cuenta de participante se conserva y puedes volver a asignarle roles cuando quieras.',
+        confirmLabel: 'Quitar del equipo',
+        variant: 'error',
+      },
+      () => firstValueFrom(this.api.updateRoles(user.id, { roles: [] })),
     );
-    if (!confirmed) return;
-    if (await this.runOn(user, this.api.updateRoles(user.id, { roles: [] }))) {
+    if (done) {
       this.notice.set(`${user.fullName} ya no forma parte del equipo.`);
       this.list.reload();
     }
@@ -158,22 +143,23 @@ export default class AdministratorsPage {
   // --- Deshabilitar / habilitar ---
   protected async toggleStatus(user: AdminUserDto): Promise<void> {
     const disabling = user.status !== 'DISABLED';
-    const confirmed = await this.alerts.confirm(
+    const updated = await this.rows.confirmRun(
+      user.id,
       disabling
-        ? `¿Deshabilitar la cuenta de ${user.fullName}?`
-        : `¿Habilitar la cuenta de ${user.fullName}?`,
-      disabling
-        ? 'No podrá iniciar sesión y se cerrarán todas sus sesiones. Puedes volver a habilitarla después.'
-        : 'Podrá volver a iniciar sesión con sus roles actuales.',
-      {
-        confirmLabel: disabling ? 'Deshabilitar' : 'Habilitar',
-        variant: disabling ? 'error' : 'info',
-      },
-    );
-    if (!confirmed) return;
-    const updated = await this.runOn(
-      user,
-      disabling ? this.api.disable(user.id) : this.api.enable(user.id),
+        ? {
+            title: `¿Deshabilitar la cuenta de ${user.fullName}?`,
+            message:
+              'No podrá iniciar sesión y se cerrarán todas sus sesiones. Puedes volver a habilitarla después.',
+            confirmLabel: 'Deshabilitar',
+            variant: 'error',
+          }
+        : {
+            title: `¿Habilitar la cuenta de ${user.fullName}?`,
+            message: 'Podrá volver a iniciar sesión con sus roles actuales.',
+            confirmLabel: 'Habilitar',
+            variant: 'info',
+          },
+      () => firstValueFrom(disabling ? this.api.disable(user.id) : this.api.enable(user.id)),
     );
     if (updated) {
       this.list.replace((u) => u.id === updated.id, updated);
@@ -189,13 +175,6 @@ export default class AdministratorsPage {
   protected onAdded(user: AdminUserDto): void {
     this.notice.set(`${user.fullName} ahora forma parte del equipo.`);
     this.list.reload();
-  }
-
-  private runOn(
-    user: AdminUserDto,
-    request: Observable<AdminUserDto>,
-  ): Promise<AdminUserDto | null> {
-    return this.rows.run(user.id, () => firstValueFrom(request));
   }
 
   /** Si cambié mis propios roles, recargo mi acceso (puedo perder esta sección). */

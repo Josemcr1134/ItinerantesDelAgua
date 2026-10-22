@@ -1,28 +1,11 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  model,
-  output,
-  signal,
-  untracked,
-} from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import {
-  AdminUserDto,
-  AdminUsersApi,
-  Paginated,
-  requestState,
-  Role,
-  RoleDefinitionDto,
-} from 'data-access';
+import { Component, effect, inject, input, model, output, signal, untracked } from '@angular/core';
+import { AdminUserDto, AdminUsersApi, Role, RoleDefinitionDto } from 'data-access';
 import { Dialog, DialogActions } from 'ui-kit';
 import { firstValueFrom } from 'rxjs';
 import { ErrorPresenter } from '../../../core/error-presenter';
-import { debounced } from '../../../core/signals/debounced';
 import { FormActions } from '../../../shared/form-actions/form-actions';
+import { remoteSearch } from '../../../shared/list/remote-search';
+import { Person } from '../../../shared/person/person';
 import { RolePicker } from '../role-picker/role-picker';
 import { staffRolesOf, STATUS_LABELS } from '../team-roles';
 
@@ -35,7 +18,7 @@ const MIN_SEARCH = 3;
  */
 @Component({
   selector: 'adm-add-administrator-dialog',
-  imports: [FormsModule, Dialog, DialogActions, FormActions, RolePicker],
+  imports: [Dialog, DialogActions, FormActions, Person, RolePicker],
   templateUrl: './add-administrator-dialog.html',
   styleUrl: './add-administrator-dialog.scss',
 })
@@ -47,30 +30,18 @@ export class AddAdministratorDialog {
   private readonly api = inject(AdminUsersApi);
   private readonly errors = inject(ErrorPresenter);
 
-  protected readonly minSearch = MIN_SEARCH;
   protected readonly statusLabels = STATUS_LABELS;
-  protected readonly searchText = signal('');
-  private readonly search = debounced(this.searchText);
-  protected readonly results = requestState<Paginated<AdminUserDto>>();
+  /** Cuentas registradas (cualquier persona, no solo el equipo). */
+  protected readonly accounts = remoteSearch({
+    fetch: (q) => this.api.list({ q, pageSize: 8, sort: 'NAME_ASC' }),
+    minLength: MIN_SEARCH,
+  });
   protected readonly selected = signal<AdminUserDto | null>(null);
   protected readonly chosenRoles = signal<readonly Role[]>([]);
   protected readonly saving = signal(false);
   protected readonly submitted = signal(false);
 
-  protected readonly canSearch = computed(() => this.search().trim().length >= MIN_SEARCH);
-  protected readonly accounts = computed(() => this.results.data()?.data ?? []);
-
   constructor() {
-    effect(() => {
-      const q = this.search().trim();
-      untracked(() => {
-        if (q.length >= MIN_SEARCH) {
-          void this.results.run(this.api.list({ q, pageSize: 8, sort: 'NAME_ASC' }));
-        } else {
-          this.results.reset();
-        }
-      });
-    });
     // Al abrir, empieza de cero.
     effect(() => {
       if (this.open()) {
@@ -112,8 +83,7 @@ export class AddAdministratorDialog {
   }
 
   private restart(): void {
-    this.searchText.set('');
-    this.results.reset();
+    this.accounts.reset();
     this.selected.set(null);
     this.chosenRoles.set([]);
     this.submitted.set(false);

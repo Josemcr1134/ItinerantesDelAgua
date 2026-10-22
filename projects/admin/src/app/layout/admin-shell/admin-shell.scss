@@ -156,6 +156,11 @@ $sidebar-width: 272px;
   flex: none;
 }
 
+.person {
+  padding: 0 var(--space-2);
+  color: var(--color-primary);
+}
+
 .sidebar__footer {
   display: flex;
   flex-direction: column;
@@ -163,31 +168,6 @@ $sidebar-width: 272px;
   margin-top: auto;
   padding-top: var(--space-4);
   border-top: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
-}
-
-.person {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--space-2);
-}
-
-.person__text {
-  min-width: 0;
-}
-
-.person__name {
-  overflow: hidden;
-  color: var(--color-primary);
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.person__roles {
-  color: color-mix(in srgb, var(--color-primary) 80%, transparent);
-  font-size: 0.8125rem;
-  line-height: 1.35;
 }
 
 .logout {

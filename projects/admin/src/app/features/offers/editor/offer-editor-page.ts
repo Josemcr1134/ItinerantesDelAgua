@@ -12,6 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AdminOfferDetailDto, AdminOffersApi, requestState, WizardStepDto } from 'data-access';
 import { AlertService, Button } from 'ui-kit';
 import { AdminAccess } from '../../../core/access/admin-access';
+import { RequestState } from '../../../shared/request-state/request-state';
 import { RowMenu } from '../../../shared/row-menu/row-menu';
 import { OFFER_MODALITY_LABELS, OFFER_STATUS_LABELS, OFFER_TYPE_LABELS } from '../offer-labels';
 import { OfferActions } from '../shared/offer-actions';
@@ -36,6 +37,7 @@ import { WhatsappStep } from './steps/whatsapp-step';
     RouterLink,
     Button,
     RowMenu,
+    RequestState,
     GeneralStep,
     ContentStep,
     ScheduleStep,

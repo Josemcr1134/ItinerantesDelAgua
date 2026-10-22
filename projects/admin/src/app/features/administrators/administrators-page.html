@@ -81,13 +81,11 @@
         @let busy = rows.isBusy(user.id);
         <tr [class.row--disabled]="user.status === 'DISABLED'">
           <td class="person-cell" data-label="Persona">
-            <p class="person__name">
-              {{ user.fullName }}
+            <adm-person [name]="user.fullName" [detail]="user.email + ' · @' + user.username">
               @if (me) {
                 <span class="you">Tú</span>
               }
-            </p>
-            <p class="person__meta">{{ user.email }} · {{ '@' + user.username }}</p>
+            </adm-person>
           </td>
           <td data-label="Roles">
             <ul class="adm-chips">
@@ -111,25 +109,28 @@
               <button type="button" class="adm-action" [disabled]="busy" (click)="openEdit(user)">
                 Editar roles<span class="visually-hidden"> de {{ user.fullName }}</span>
               </button>
-              <button
-                type="button"
-                class="adm-action"
-                [disabled]="busy || me"
-                [attr.title]="me ? 'No puedes cambiar el estado de tu propia cuenta' : null"
-                (click)="toggleStatus(user)"
-              >
-                {{ user.status === 'DISABLED' ? 'Habilitar' : 'Deshabilitar'
-                }}<span class="visually-hidden"> a {{ user.fullName }}</span>
-              </button>
-              <button
-                type="button"
-                class="adm-action adm-action--danger"
-                [disabled]="busy || me"
-                [attr.title]="me ? 'No puedes quitarte del equipo' : null"
-                (click)="removeFromTeam(user)"
-              >
-                Quitar del equipo<span class="visually-hidden">: {{ user.fullName }}</span>
-              </button>
+              @if (!me) {
+                <adm-row-menu [label]="'Más acciones de ' + user.fullName">
+                  <button
+                    class="adm-menuitem"
+                    role="menuitem"
+                    type="button"
+                    [disabled]="busy"
+                    (click)="toggleStatus(user)"
+                  >
+                    {{ user.status === 'DISABLED' ? 'Habilitar cuenta' : 'Deshabilitar cuenta' }}
+                  </button>
+                  <button
+                    class="adm-menuitem adm-menuitem--danger"
+                    role="menuitem"
+                    type="button"
+                    [disabled]="busy"
+                    (click)="removeFromTeam(user)"
+                  >
+                    Quitar del equipo
+                  </button>
+                </adm-row-menu>
+              }
             </div>
           </td>
         </tr>
@@ -145,29 +146,13 @@
 </adm-list-states>
 
 <!-- Editar roles -->
-<ui-dialog
+<adm-edit-roles-dialog
   [(open)]="editOpen"
-  [title]="'Roles de ' + (editing()?.fullName ?? '')"
-  [busy]="saving()"
->
-  @if (editing(); as user) {
-    <p class="dialog-lead">{{ user.email }}</p>
-    <adm-role-picker
-      [roles]="teamRoles()"
-      [(value)]="editRoles"
-      [locked]="lockedRoles(user)"
-      [disabled]="saving()"
-      hint="Los cambios aplican de inmediato. Sin ningún rol, la persona sale del equipo."
-    />
-  }
-  <div uiDialogActions>
-    <adm-form-actions
-      submitLabel="Guardar roles"
-      [busy]="saving()"
-      (cancel)="editOpen.set(false)"
-      (submitted)="saveRoles()"
-    />
-  </div>
-</ui-dialog>
+  [user]="editing()"
+  [roles]="teamRoles()"
+  [locked]="lockedRoles(editing())"
+  (saved)="onRolesSaved($event)"
+  (removeRequested)="removeFromTeam($event)"
+/>
 
 <adm-add-administrator-dialog [(open)]="addOpen" [roles]="teamRoles()" (added)="onAdded($event)" />

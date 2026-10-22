@@ -85,22 +85,6 @@
   border-color: var(--color-primary);
 }
 
-.account__text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.account__name {
-  font-weight: 700;
-}
-
-.account__meta {
-  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
-  font-size: 0.875rem;
-  overflow-wrap: anywhere;
-}
-
 .tag {
   flex: none;
   padding: 3px 10px;

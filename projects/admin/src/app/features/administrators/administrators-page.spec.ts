@@ -72,24 +72,28 @@ describe('AdministratorsPage', () => {
     });
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
-    const rowButtons = (row: number) => [
-      ...host.querySelectorAll('tbody tr')[row].querySelectorAll<HTMLButtonElement>('button'),
-    ];
-    return { fixture, http, host, rowButtons };
+    /** Opción del menú "Más acciones" de una fila (`undefined` si no hay menú). */
+    const menuItem = (row: number, text: string) =>
+      [
+        ...host
+          .querySelectorAll('tbody tr')
+          [row].querySelectorAll<HTMLButtonElement>('.adm-menuitem'),
+      ].find((b) => b.textContent?.includes(text));
+    return { fixture, http, host, menuItem };
   }
 
-  it('lista al equipo y no deja deshabilitarme ni quitarme del equipo', async () => {
-    const { host, rowButtons } = await setup();
+  it('lista al equipo y no ofrece deshabilitarme ni quitarme del equipo', async () => {
+    const { host, menuItem } = await setup();
     expect(host.querySelectorAll('tbody tr').length).toBe(2);
-    const [, disableMe, removeMe] = rowButtons(0);
-    expect(disableMe.disabled).toBe(true);
-    expect(removeMe.disabled).toBe(true);
-    expect(rowButtons(1).every((b) => !b.disabled)).toBe(true);
+    // Mi fila no tiene menú de acciones; la de Laura sí, con sus dos opciones.
+    expect(host.querySelectorAll('tbody tr')[0].querySelector('adm-row-menu')).toBeNull();
+    expect(menuItem(1, 'Deshabilitar cuenta')?.disabled).toBe(false);
+    expect(menuItem(1, 'Quitar del equipo')?.disabled).toBe(false);
   });
 
   it('quitar del equipo deja la cuenta sin roles del equipo y recarga la lista', async () => {
-    const { fixture, http, host, rowButtons } = await setup();
-    rowButtons(1)[2].click();
+    const { fixture, http, host, menuItem } = await setup();
+    menuItem(1, 'Quitar del equipo')!.click();
     await fixture.whenStable();
     const req = http.expectOne(`${API}/admin/users/u2/roles`);
     expect(req.request.method).toBe('PUT');
@@ -110,9 +114,9 @@ describe('AdministratorsPage', () => {
   });
 
   it('si cancelo la confirmación no llama a la API', async () => {
-    const { fixture, http, rowButtons } = await setup();
+    const { fixture, http, menuItem } = await setup();
     confirmAnswer = false;
-    rowButtons(1)[1].click();
+    menuItem(1, 'Deshabilitar cuenta')!.click();
     await fixture.whenStable();
     http.expectNone(`${API}/admin/users/u2/disable`);
   });
