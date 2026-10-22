@@ -17,6 +17,11 @@ const routes: Routes = [
     loadComponent: () => import('./content/content-page'),
   },
   {
+    path: ':id/sesiones',
+    title: 'Sesiones · Administrador',
+    loadComponent: () => import('./sessions/sessions-page'),
+  },
+  {
     path: ':id',
     title: 'Editar oferta · Administrador',
     loadComponent: () => import('./editor/offer-editor-page'),

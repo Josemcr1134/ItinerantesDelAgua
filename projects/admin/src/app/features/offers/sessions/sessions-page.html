@@ -1,0 +1,264 @@
+<a class="back" [routerLink]="['/ofertas', id()]">
+  <svg
+    aria-hidden="true"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+  {{ store.offer()?.name ?? 'Volver a la oferta' }}
+</a>
+
+<adm-page-header
+  title="Sesiones"
+  lead="Videoconferencias de las clases, con sus enlaces, grabaciones y asistencia. Horas del centro de México."
+>
+  @if (canWrite() && store.loaded()) {
+    <div class="header-actions">
+      <button
+        uiButton
+        variant="secondary"
+        type="button"
+        class="adm-page-action"
+        (click)="openForm(null)"
+      >
+        Agregar sesión
+      </button>
+      <button uiButton type="button" class="adm-page-action" (click)="generating.set(true)">
+        <svg
+          aria-hidden="true"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M16 3v4M8 3v4M3 11h18M12 14v4M10 16h4" />
+        </svg>
+        Generar sesiones
+      </button>
+    </div>
+  }
+</adm-page-header>
+
+<adm-notice [(message)]="store.notice" />
+
+<adm-request-state
+  [error]="store.error()"
+  [loaded]="store.loaded()"
+  loadingText="Cargando sesiones…"
+  (retry)="store.reload()"
+>
+  @let summary = store.summary();
+  <div class="toolbar">
+    <ul class="adm-chips" aria-label="Resumen">
+      <li class="adm-chip">
+        {{ summary.count }} {{ summary.count === 1 ? 'sesión' : 'sesiones' }} ·
+        {{ summary.hours }} h
+      </li>
+      @if (summary.missingLink) {
+        <li class="adm-chip adm-chip--super">{{ summary.missingLink }} sin enlace</li>
+      }
+      @if (summary.recordingPending) {
+        <li class="adm-chip adm-chip--super">
+          {{ summary.recordingPending }}
+          {{ summary.recordingPending === 1 ? 'grabación pendiente' : 'grabaciones pendientes' }}
+        </li>
+      }
+    </ul>
+    @if (summary.cancelled) {
+      <label class="adm-check">
+        <input
+          type="checkbox"
+          [checked]="showCancelled()"
+          (change)="showCancelled.set($any($event.target).checked)"
+        />
+        Mostrar canceladas ({{ summary.cancelled }})
+      </label>
+    }
+  </div>
+
+  @if (visible().length) {
+    <table class="adm-table adm-table--cards-2 sessions">
+      <caption class="visually-hidden">
+        Sesiones de la oferta
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Sesión</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Enlaces</th>
+          <th scope="col">Asistencia</th>
+          <th scope="col"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (session of visible(); track session.id) {
+          @let busy = isBusy(session);
+          @let cancelled = session.status === 'CANCELLED';
+          <tr [class.sessions__row--cancelled]="cancelled">
+            <td>
+              <p class="when">
+                @if (number(session); as n) {
+                  <span class="when__number">Sesión {{ n }}</span>
+                }
+                <span class="when__day">{{ formatDay(session.startsAt) }}</span>
+                <span class="when__time">{{ formatTime(session.startsAt, session.endsAt) }}</span>
+              </p>
+              <p class="meta">
+                {{
+                  session.module
+                    ? 'Módulo ' + session.module.number + ': ' + session.module.title
+                    : 'Sin módulo'
+                }}
+                · {{ categoryLabels[session.category] }}
+              </p>
+            </td>
+            <td data-label="Estado">
+              <span [class]="'adm-badge adm-badge--' + stateTones[session.state]">{{
+                stateLabels[session.state]
+              }}</span>
+              @if (session.flags.edited && session.originalStartsAt) {
+                <p class="meta">
+                  Reprogramada. Fecha original: {{ formatDay(session.originalStartsAt) }}
+                </p>
+              }
+              @if (session.changeReason) {
+                <p class="meta">Motivo: {{ session.changeReason }}</p>
+              }
+              @if (!cancelled && session.attendanceWindowHours !== null) {
+                <p class="meta">Ventana de asistencia: {{ session.attendanceWindowHours }} h</p>
+              }
+            </td>
+            <td data-label="Enlaces">
+              @if (cancelled) {
+                <span class="meta">—</span>
+              } @else if (store.online()) {
+                <ul class="links">
+                  <li>
+                    @if (session.joinUrl) {
+                      <a class="adm-link" [href]="session.joinUrl" target="_blank" rel="noopener"
+                        >Participantes<span class="visually-hidden">
+                          (se abre en otra pestaña)</span
+                        ></a
+                      >
+                    } @else {
+                      <span class="flag">Sin enlace</span>
+                    }
+                  </li>
+                  @if (session.hostUrl) {
+                    <li>
+                      <a class="adm-link" [href]="session.hostUrl" target="_blank" rel="noopener"
+                        >Anfitrión<span class="visually-hidden"> (se abre en otra pestaña)</span></a
+                      >
+                    </li>
+                  }
+                  <li>
+                    @if (session.recordingUrl) {
+                      <a
+                        class="adm-link"
+                        [href]="session.recordingUrl"
+                        target="_blank"
+                        rel="noopener"
+                        >Grabación<span class="visually-hidden"> (se abre en otra pestaña)</span></a
+                      >
+                    } @else if (session.flags.recordingPending) {
+                      <span class="flag">Grabación pendiente</span>
+                    }
+                  </li>
+                </ul>
+              } @else {
+                <span class="meta">Presencial</span>
+              }
+            </td>
+            <td data-label="Asistencia">
+              @if (cancelled) {
+                <span class="meta">No cuenta</span>
+              } @else {
+                <span class="count">{{ session.attendance.registered }}</span>
+                <span class="meta"> / {{ session.attendance.enrolled }} inscritos</span>
+              }
+            </td>
+            <td class="adm-table__actions">
+              @if (canWrite() && !cancelled) {
+                <div class="adm-actions">
+                  <button
+                    type="button"
+                    class="adm-action"
+                    [disabled]="busy"
+                    (click)="openForm(session)"
+                  >
+                    Editar<span class="visually-hidden">
+                      la {{ formatSlot(session.startsAt, session.endsAt) }}</span
+                    >
+                  </button>
+                  <adm-row-menu
+                    [label]="'Más acciones de la ' + formatSlot(session.startsAt, session.endsAt)"
+                  >
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="openChange(session, 'reschedule')"
+                    >
+                      Reprogramar
+                    </button>
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="openChange(session, 'cancel')"
+                    >
+                      Cancelar sesión
+                    </button>
+                    <button
+                      class="adm-menuitem adm-menuitem--danger"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="remove(session)"
+                    >
+                      Borrar
+                    </button>
+                  </adm-row-menu>
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <div class="adm-state empty">
+      <p>Aún no hay sesiones.</p>
+      @if (canWrite()) {
+        <p class="meta">
+          @if (store.offer()?.schedule?.scheduleRule) {
+            Genéralas con la regla de horario de la oferta («Generar sesiones») o agrega una suelta.
+          } @else {
+            Agrega una suelta, o define la regla de horario en el paso «Horarios» de la oferta para
+            generarlas.
+          }
+        </p>
+      }
+    </div>
+  }
+</adm-request-state>
+
+@if (canWrite()) {
+  <adm-generate-sessions-dialog [(open)]="generating" />
+  <adm-session-form-dialog [(open)]="formOpen" [session]="editing()" />
+  <adm-session-change-dialog [(open)]="changeOpen" [session]="changing()" [mode]="changeMode()" />
+}

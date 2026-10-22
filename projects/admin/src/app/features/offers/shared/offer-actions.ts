@@ -28,7 +28,7 @@ export class OfferActions {
     if (updated?.sessionPreview.available) {
       void this.alerts.info(
         'Oferta publicada',
-        'Ya tiene fechas y regla de horario: el siguiente paso es generar sus sesiones (módulo de sesiones).',
+        'Ya tiene fechas y regla de horario: el siguiente paso es generar sus sesiones (en «Sesiones» del menú de la oferta).',
       );
     }
     return updated;

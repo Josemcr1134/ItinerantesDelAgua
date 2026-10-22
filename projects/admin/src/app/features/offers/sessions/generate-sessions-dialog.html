@@ -1,0 +1,232 @@
+<ui-dialog [(open)]="open" title="Generar sesiones" size="wide" [busy]="busy()">
+  @if (!preview()) {
+    <form id="generate-form" class="form" (ngSubmit)="showPreview()">
+      <section class="step" aria-labelledby="gen-rule">
+        <h3 id="gen-rule" class="step__title">1. Regla</h3>
+        <p class="adm-field__hint">Hora del centro de México.</p>
+        <adm-weekday-picker
+          [(value)]="weekdays"
+          [error]="submitted() ? (errors().weekdays ?? null) : null"
+        />
+        <div class="row">
+          <div class="adm-field">
+            <label class="adm-field__label" for="gen-start">Inicio</label>
+            <input
+              id="gen-start"
+              class="adm-field__input"
+              type="time"
+              name="start"
+              [(ngModel)]="startTime"
+            />
+          </div>
+          <div class="adm-field">
+            <label class="adm-field__label" for="gen-end">Fin</label>
+            <input
+              id="gen-end"
+              class="adm-field__input"
+              type="time"
+              name="end"
+              [(ngModel)]="endTime"
+            />
+          </div>
+        </div>
+        @if (submitted() && errors().time) {
+          <p class="adm-field__error">{{ errors().time }}</p>
+        }
+      </section>
+
+      <section class="step" aria-labelledby="gen-exceptions">
+        <h3 id="gen-exceptions" class="step__title">2. Excepciones y rango</h3>
+        <div class="row">
+          <div class="adm-field">
+            <label class="adm-field__label" for="gen-from">Primer día</label>
+            <input
+              id="gen-from"
+              class="adm-field__input"
+              type="date"
+              name="from"
+              [(ngModel)]="startDate"
+            />
+          </div>
+          <div class="adm-field">
+            <label class="adm-field__label" for="gen-to">Último día</label>
+            <input
+              id="gen-to"
+              class="adm-field__input"
+              type="date"
+              name="to"
+              [(ngModel)]="endDate"
+            />
+          </div>
+        </div>
+        <p class="adm-field__hint">Dentro del periodo de la oferta.</p>
+        @if (submitted() && errors().range) {
+          <p class="adm-field__error">{{ errors().range }}</p>
+        }
+        <label class="adm-check">
+          <input type="checkbox" name="holidays" [(ngModel)]="excludeHolidays" />
+          Omitir los festivos oficiales de México
+        </label>
+        <adm-date-list-field
+          label="Fechas sin sesión (recesos)"
+          addLabel="Nueva fecha sin sesión"
+          [(value)]="excludedDates"
+        />
+      </section>
+
+      <section class="step" aria-labelledby="gen-extra">
+        <h3 id="gen-extra" class="step__title">3. Enlaces, módulos y fechas importantes</h3>
+        @if (store.online()) {
+          <div class="row">
+            <div class="adm-field">
+              <label class="adm-field__label" for="gen-join"
+                >Enlace recurrente para participantes
+                <span class="adm-field__hint">(opcional)</span></label
+              >
+              <input
+                id="gen-join"
+                class="adm-field__input"
+                type="url"
+                name="join"
+                placeholder="https://zoom.us/j/…"
+                [(ngModel)]="joinUrl"
+              />
+              @if (submitted() && errors().join) {
+                <p class="adm-field__error">{{ errors().join }}</p>
+              }
+            </div>
+            <div class="adm-field">
+              <label class="adm-field__label" for="gen-host"
+                >Enlace recurrente de anfitrión
+                <span class="adm-field__hint">(opcional)</span></label
+              >
+              <input
+                id="gen-host"
+                class="adm-field__input"
+                type="url"
+                name="host"
+                [(ngModel)]="hostUrl"
+              />
+              @if (submitted() && errors().host) {
+                <p class="adm-field__error">{{ errors().host }}</p>
+              }
+            </div>
+          </div>
+        }
+        @if (store.modules().length) {
+          <label class="adm-check">
+            <input type="checkbox" name="modules" [(ngModel)]="assignModules" />
+            Repartir las sesiones entre los módulos, en orden
+          </label>
+        }
+        @if (availableDates().length) {
+          <fieldset class="adm-field">
+            <legend class="adm-field__label">Crear o actualizar en el calendario</legend>
+            <div class="checks">
+              @for (kind of availableDates(); track kind) {
+                <label class="adm-check">
+                  <input
+                    type="checkbox"
+                    [checked]="isImportant(kind)"
+                    (change)="toggleImportant(kind, $any($event.target).checked)"
+                  />
+                  {{ importantLabels[kind] }}
+                </label>
+              }
+            </div>
+          </fieldset>
+        }
+      </section>
+    </form>
+  } @else {
+    @let p = preview()!;
+    <div class="form">
+      <p class="preview-summary" role="status">{{ p.summary.label }}</p>
+      <ul class="adm-chips">
+        <li class="adm-chip">
+          {{ p.summary.sessionCount }} {{ p.summary.sessionCount === 1 ? 'nueva' : 'nuevas' }}
+        </li>
+        @if (p.summary.excludedCount) {
+          <li class="adm-chip">
+            {{ p.summary.excludedCount }}
+            {{ p.summary.excludedCount === 1 ? 'excluida' : 'excluidas' }}
+          </li>
+        }
+        @if (p.summary.conflictCount) {
+          <li class="adm-chip adm-chip--super">{{ p.summary.conflictCount }} en conflicto</li>
+        }
+        <li class="adm-chip">{{ p.summary.totalHours }} h en total</li>
+      </ul>
+      @if (p.blockedReason) {
+        <p class="adm-callout" role="alert">{{ p.blockedReason }}</p>
+      }
+      @if (p.warnings.includes('DIPLOMA_HOURS_MISMATCH')) {
+        <p class="adm-callout adm-callout--info">
+          Un diplomado dura 60 horas; con estas sesiones la oferta tendría
+          {{ p.summary.totalHours }} h. Puedes crearlas igual.
+        </p>
+      }
+
+      <ol class="preview-list">
+        @for (item of p.items; track item.startsAt) {
+          <li class="preview-item" [class]="'preview-item--' + item.status">
+            <span class="preview-item__day">{{ formatDay(item.startsAt) }}</span>
+            <span class="preview-item__time">{{ formatTime(item.startsAt, item.endsAt) }}</span>
+            <span class="preview-item__meta">
+              @switch (item.status) {
+                @case ('EXCLUDED') {
+                  Excluida ·
+                  {{ item.exclusionReason ? exclusionLabels[item.exclusionReason] : 'Receso' }}
+                }
+                @case ('CONFLICT') {
+                  Conflicto con otra sesión
+                }
+                @default {
+                  {{ item.module ? 'Módulo ' + item.module.number + ': ' + item.module.title : '' }}
+                }
+              }
+            </span>
+          </li>
+        }
+      </ol>
+
+      @if (p.importantDates.length) {
+        <h3 class="step__title">Fechas importantes</h3>
+        <ul class="plain">
+          @for (d of p.importantDates; track d.kind) {
+            <li>
+              {{ d.title }} · {{ formatDay(d.startsAt) }}
+              <span class="muted">({{ d.exists ? 'se actualiza' : 'nueva' }})</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+  <div uiDialogActions>
+    @if (!preview()) {
+      <button uiButton variant="secondary" type="button" (click)="open.set(false)">Cancelar</button>
+      <button uiButton type="submit" form="generate-form" [disabled]="busy()">
+        {{ busy() ? 'Calculando…' : 'Ver vista previa' }}
+      </button>
+    } @else {
+      <button
+        uiButton
+        variant="secondary"
+        type="button"
+        [disabled]="busy()"
+        (click)="preview.set(null)"
+      >
+        Volver
+      </button>
+      <button
+        uiButton
+        type="button"
+        [disabled]="!preview()?.canConfirm || busy()"
+        (click)="confirm()"
+      >
+        {{ busy() ? 'Creando…' : createLabel() }}
+      </button>
+    }
+  </div>
+</ui-dialog>

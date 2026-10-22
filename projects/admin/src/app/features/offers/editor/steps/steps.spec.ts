@@ -2,6 +2,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { AdminOfferDetailDto, apiErrorInterceptor, provideApi } from 'data-access';
 import { AlertService } from 'ui-kit';
 import { offerFixture } from '../../testing/offer-fixture';
@@ -15,6 +16,7 @@ const API = 'https://api.test/api/v1/admin/offers/o1/steps';
 async function mount<T extends OfferStep>(component: Type<T>, offer: AdminOfferDetailDto) {
   TestBed.configureTestingModule({
     providers: [
+      provideRouter([]),
       provideHttpClient(withInterceptors([apiErrorInterceptor])),
       provideHttpClientTesting(),
       provideApi({ baseUrl: 'https://api.test' }),

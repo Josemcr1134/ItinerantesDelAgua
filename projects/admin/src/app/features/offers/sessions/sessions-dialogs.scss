@@ -1,0 +1,127 @@
+// Estilos compartidos de los diálogos de sesiones.
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--space-3);
+}
+
+.slot {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+.narrow {
+  max-width: 14rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  & + & {
+    padding-top: var(--space-4);
+    border-top: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  }
+}
+
+.step__title {
+  margin: 0;
+  color: var(--color-primary);
+  font-family: var(--font-family-body);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.preview-summary {
+  margin: 0;
+  font-weight: 700;
+}
+
+.preview-list {
+  display: grid;
+  max-height: 22rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+  border-radius: 14px;
+  list-style: none;
+}
+
+.preview-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px var(--space-3);
+  padding: var(--space-2) var(--space-3);
+
+  & + & {
+    border-top: 1px solid color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+}
+
+.preview-item__day {
+  font-weight: 600;
+}
+
+.preview-item__time {
+  font-family: var(--font-family-numeric);
+}
+
+.preview-item__meta {
+  grid-column: 1 / -1;
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.preview-item--EXCLUDED {
+  opacity: 0.6;
+
+  .preview-item__day {
+    text-decoration: line-through;
+  }
+}
+
+.preview-item--CONFLICT {
+  background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
+
+  .preview-item__meta {
+    color: var(--color-danger);
+    font-weight: 600;
+  }
+}
+
+.plain {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.muted {
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.875rem;
+}

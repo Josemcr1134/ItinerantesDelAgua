@@ -150,5 +150,8 @@
         />
       </div>
     }
+    <a class="adm-action manage" [routerLink]="['/ofertas', offer().id, 'sesiones']">
+      {{ readonly() ? 'Ver las sesiones' : 'Gestionar las sesiones' }} →
+    </a>
   </section>
 </form>

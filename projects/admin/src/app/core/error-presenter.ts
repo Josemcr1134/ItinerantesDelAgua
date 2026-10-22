@@ -31,6 +31,10 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   NOTIFICATION_EMAIL_NOT_FAILED: 'El correo ya se envió',
   FOLLOW_UP_REMINDER_TOO_SOON: 'Aún no se puede recordar',
   FOLLOW_UP_PHONE_INVALID: 'Teléfono no válido',
+  SESSION_CONFLICT: 'Se cruza con otra sesión',
+  SESSION_CANCELLED: 'La sesión está cancelada',
+  SESSION_HAS_ATTENDANCE: 'La sesión tiene asistencias',
+  SESSION_GENERATION_BLOCKED: 'No se pueden crear las sesiones',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -55,6 +59,10 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'NOTIFICATION_EMAIL_NOT_FAILED',
   'FOLLOW_UP_REMINDER_TOO_SOON',
   'FOLLOW_UP_PHONE_INVALID',
+  'SESSION_CONFLICT',
+  'SESSION_CANCELLED',
+  'SESSION_HAS_ATTENDANCE',
+  'SESSION_GENERATION_BLOCKED',
 ];
 
 export interface PresentErrorOptions {

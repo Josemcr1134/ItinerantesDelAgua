@@ -1,5 +1,6 @@
 import { Component, computed, effect, forwardRef, inject, signal, untracked } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   AdminOfferDetailDto,
   CALENDAR_CATEGORY_VALUES,
@@ -16,12 +17,18 @@ import { OfferStep } from './offer-step';
 /** Paso 3 — Horarios (fechas en hora CDMX y regla que genera las sesiones). */
 @Component({
   selector: 'adm-schedule-step',
-  imports: [ReactiveFormsModule, WeekdayPicker, DateListField],
+  imports: [ReactiveFormsModule, RouterLink, WeekdayPicker, DateListField],
   providers: [{ provide: OfferStep, useExisting: forwardRef(() => ScheduleStep) }],
   templateUrl: './schedule-step.html',
   styles: `
     .rule {
       margin-top: var(--space-3);
+    }
+    .manage {
+      display: inline-flex;
+      align-items: center;
+      margin-top: var(--space-4);
+      text-decoration: none;
     }
   `,
 })

@@ -1,0 +1,165 @@
+<ui-dialog [(open)]="open" [title]="session() ? 'Editar sesión' : 'Agregar sesión'" [busy]="busy()">
+  <form id="session-form" class="form" novalidate [formGroup]="form" (ngSubmit)="save()">
+    @if (session()) {
+      <p class="slot">{{ slot() }}</p>
+    } @else {
+      <p class="adm-field__hint">
+        Sesión suelta, fuera de la regla de horario. Hora del centro de México.
+      </p>
+      <div class="row">
+        <div class="adm-field">
+          <label class="adm-field__label" for="session-date">Fecha</label>
+          <input
+            id="session-date"
+            class="adm-field__input"
+            type="date"
+            formControlName="date"
+            required
+          />
+        </div>
+        <div class="adm-field">
+          <label class="adm-field__label" for="session-start">Inicio</label>
+          <input
+            id="session-start"
+            class="adm-field__input"
+            type="time"
+            formControlName="startTime"
+            required
+          />
+        </div>
+        <div class="adm-field">
+          <label class="adm-field__label" for="session-end">Fin</label>
+          <input
+            id="session-end"
+            class="adm-field__input"
+            type="time"
+            formControlName="endTime"
+            required
+          />
+        </div>
+      </div>
+      @if (slotError()) {
+        <p class="adm-field__error" role="alert">{{ slotError() }}</p>
+      }
+    }
+
+    <div class="row">
+      <div class="adm-field">
+        <label class="adm-field__label" for="session-module">Módulo</label>
+        <select id="session-module" class="adm-field__input" formControlName="moduleId">
+          <option value="">Sin módulo</option>
+          @for (m of store.modules(); track m.id) {
+            <option [value]="m.id">{{ m.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="session-category">Categoría del calendario</label>
+        <select id="session-category" class="adm-field__input" formControlName="category">
+          @for (c of categories; track c) {
+            <option [value]="c">{{ categoryLabels[c] }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (store.online()) {
+      <div class="adm-field">
+        <label class="adm-field__label" for="session-join"
+          >Enlace para participantes <span class="adm-field__hint">(opcional)</span></label
+        >
+        <input
+          id="session-join"
+          class="adm-field__input"
+          type="url"
+          formControlName="joinUrl"
+          placeholder="https://zoom.us/j/… o https://meet.google.com/…"
+          [attr.aria-invalid]="showError('joinUrl')"
+          [attr.aria-describedby]="showError('joinUrl') ? 'session-join-error' : null"
+        />
+        @if (showError('joinUrl')) {
+          <p id="session-join-error" class="adm-field__error">
+            Usa un enlace https de zoom.us o meet.google.com.
+          </p>
+        }
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="session-host"
+          >Enlace de anfitrión
+          <span class="adm-field__hint">(opcional, solo el equipo)</span></label
+        >
+        <input
+          id="session-host"
+          class="adm-field__input"
+          type="url"
+          formControlName="hostUrl"
+          [attr.aria-invalid]="showError('hostUrl')"
+          [attr.aria-describedby]="showError('hostUrl') ? 'session-host-error' : null"
+        />
+        @if (showError('hostUrl')) {
+          <p id="session-host-error" class="adm-field__error">
+            Usa un enlace https de zoom.us o meet.google.com.
+          </p>
+        }
+      </div>
+
+      @if (session()) {
+        <div class="adm-field">
+          <label class="adm-field__label" for="session-recording"
+            >Grabación <span class="adm-field__hint">(opcional)</span></label
+          >
+          <input
+            id="session-recording"
+            class="adm-field__input"
+            type="url"
+            formControlName="recordingUrl"
+            placeholder="https://…"
+            aria-describedby="session-recording-hint"
+            [attr.aria-invalid]="showError('recordingUrl')"
+          />
+          <p id="session-recording-hint" class="adm-field__hint">
+            Zoom Cloud, YouTube no listado, Vimeo o Drive. Al guardarla se publica en el aula.
+          </p>
+          @if (showError('recordingUrl')) {
+            <p class="adm-field__error">Usa un enlace que empiece con https://</p>
+          }
+        </div>
+        @if (publishesRecording()) {
+          <label class="adm-check">
+            <input type="checkbox" formControlName="notifyRecording" />
+            Avisar a las personas inscritas que ya está la grabación
+          </label>
+        }
+      }
+    }
+
+    @if (session()) {
+      <div class="adm-field narrow">
+        <label class="adm-field__label" for="session-window">Ventana de asistencia (horas)</label>
+        <input
+          id="session-window"
+          class="adm-field__input"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="72"
+          formControlName="windowHours"
+          aria-describedby="session-window-hint"
+          [attr.aria-invalid]="showError('windowHours')"
+        />
+        <p id="session-window-hint" class="adm-field__hint">
+          Vacío: la de la oferta{{ offerWindow() ? ' (' + offerWindow() + ' h)' : '' }}. Entre 1 y
+          72.
+        </p>
+      </div>
+    }
+  </form>
+  <div uiDialogActions>
+    <adm-form-actions
+      form="session-form"
+      [submitLabel]="session() ? 'Guardar cambios' : 'Agregar sesión'"
+      [busy]="busy()"
+      (cancel)="open.set(false)"
+    />
+  </div>
+</ui-dialog>
