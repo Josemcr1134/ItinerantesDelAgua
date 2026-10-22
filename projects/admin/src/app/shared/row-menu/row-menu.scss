@@ -1,0 +1,22 @@
+:host {
+  display: inline-flex;
+}
+
+.trigger {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  padding: 0;
+}
+
+.menu {
+  position: fixed;
+  inset: auto;
+  min-width: 13rem;
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 15%, transparent);
+  border-radius: 14px;
+  background-color: #fff;
+  box-shadow: 0 16px 40px -16px rgb(27 30 48 / 40%);
+}
