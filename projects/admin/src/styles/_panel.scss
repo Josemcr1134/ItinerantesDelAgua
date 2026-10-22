@@ -22,6 +22,14 @@
   gap: var(--space-1);
 }
 
+// Un grupo de campos (fieldset) con aspecto de campo, sin el borde del navegador.
+fieldset.adm-field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
 .adm-field__label {
   color: var(--color-primary);
   font-size: 0.875rem;

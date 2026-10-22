@@ -1,0 +1,271 @@
+@let m = module();
+@let s = state();
+<article
+  class="card"
+  [class.card--hidden]="m.visibility === 'HIDDEN'"
+  [attr.aria-labelledby]="bodyId() + '-title'"
+>
+  <header class="card__header">
+    <button
+      type="button"
+      class="card__toggle"
+      [attr.aria-expanded]="expanded()"
+      [attr.aria-controls]="bodyId()"
+      (click)="expanded.set(!expanded())"
+    >
+      <svg
+        class="card__chevron"
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+      <span class="card__heading">
+        <span class="card__number">Módulo {{ m.number }}</span>
+        <span class="card__title" [id]="bodyId() + '-title'">{{ m.title }}</span>
+      </span>
+    </button>
+    <div class="card__meta">
+      <span [class]="'pub pub--' + s.tone">{{ s.label }}</span>
+      <span class="card__summary">
+        {{ counts().resources }} {{ counts().resources === 1 ? 'recurso' : 'recursos' }}
+        @if (counts().pending) {
+          ·
+          <strong class="card__pending"
+            >{{ counts().pending }}
+            {{ counts().pending === 1 ? 'grabación pendiente' : 'grabaciones pendientes' }}</strong
+          >
+        }
+      </span>
+      @if (canWrite()) {
+        <div class="adm-actions card__actions">
+          <button
+            type="button"
+            class="adm-action"
+            [disabled]="busy() || first()"
+            (click)="store.moveModule(m, -1)"
+            [attr.aria-label]="'Subir el módulo ' + m.number"
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            class="adm-action"
+            [disabled]="busy() || last()"
+            (click)="store.moveModule(m, 1)"
+            [attr.aria-label]="'Bajar el módulo ' + m.number"
+          >
+            ↓
+          </button>
+          <button type="button" class="adm-action" [disabled]="busy()" (click)="editModule.emit(m)">
+            Editar<span class="visually-hidden"> el módulo {{ m.number }}</span>
+          </button>
+          <adm-row-menu [label]="'Más acciones del módulo ' + m.number">
+            <button
+              class="adm-menuitem"
+              role="menuitem"
+              type="button"
+              [disabled]="busy()"
+              (click)="toggleModule()"
+            >
+              {{ m.visibility === 'HIDDEN' ? 'Publicar módulo' : 'Ocultar módulo' }}
+            </button>
+            <button
+              class="adm-menuitem adm-menuitem--danger"
+              role="menuitem"
+              type="button"
+              [disabled]="busy()"
+              (click)="removeModule()"
+            >
+              Borrar módulo
+            </button>
+          </adm-row-menu>
+        </div>
+      }
+    </div>
+  </header>
+
+  @if (expanded()) {
+    <div class="card__body" [id]="bodyId()">
+      @if (m.description || m.teacher) {
+        <p class="card__description">
+          {{ m.description }}
+          @if (m.teacher) {
+            <span class="card__teacher">Docente: {{ m.teacher.fullName }}</span>
+          }
+        </p>
+      }
+
+      @for (type of sections; track type) {
+        @let items = sectionResources(m, type);
+        <section class="section" [attr.aria-label]="sectionLabels[type]">
+          <div class="section__head">
+            <h4 class="section__title">{{ sectionLabels[type] }}</h4>
+            @if (canWrite() && !(type === 'PRESENTATION' && items.length)) {
+              <button
+                type="button"
+                class="adm-link"
+                (click)="editResource.emit({ module: m, type, resource: null })"
+              >
+                + Agregar {{ nouns[type] }}
+              </button>
+            }
+          </div>
+          @if (items.length) {
+            <ul class="resources">
+              @for (r of items; track r.id; let first = $first, last = $last) {
+                @let rs = publicationState(r);
+                <li class="resource" [class.resource--hidden]="r.visibility === 'HIDDEN'">
+                  <div class="resource__main">
+                    <p class="resource__title">{{ r.title }}</p>
+                    <p class="resource__detail">
+                      @switch (r.source) {
+                        @case ('FILE') {
+                          @if (r.file) {
+                            <a
+                              class="adm-link"
+                              [href]="r.file.downloadUrl"
+                              target="_blank"
+                              rel="noopener"
+                              >{{ r.file.fileName ?? 'Archivo' }}</a
+                            >
+                            @if (formatBytes(r.file.sizeBytes); as size) {
+                              · {{ size }}
+                            }
+                          }
+                        }
+                        @case ('URL') {
+                          <a class="adm-link" [href]="r.url" target="_blank" rel="noopener"
+                            >Enlace externo</a
+                          >
+                        }
+                        @case ('LIBRARY') {
+                          Biblioteca: {{ r.library?.title }}
+                        }
+                        @default {
+                          Solo instrucciones
+                        }
+                      }
+                      @if (r.activityDueAt) {
+                        · Entrega: {{ formatDateTime(r.activityDueAt) }}
+                      }
+                    </p>
+                  </div>
+                  <span [class]="'pub pub--' + rs.tone">{{ rs.label }}</span>
+                  @if (canWrite()) {
+                    <div class="adm-actions">
+                      @if (type !== 'PRESENTATION') {
+                        <button
+                          type="button"
+                          class="adm-action"
+                          [disabled]="isBusy(r) || first"
+                          (click)="store.moveResource(m, r, -1)"
+                          [attr.aria-label]="'Subir ' + r.title"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          class="adm-action"
+                          [disabled]="isBusy(r) || last"
+                          (click)="store.moveResource(m, r, 1)"
+                          [attr.aria-label]="'Bajar ' + r.title"
+                        >
+                          ↓
+                        </button>
+                      }
+                      <button
+                        type="button"
+                        class="adm-action"
+                        [disabled]="isBusy(r)"
+                        (click)="editResource.emit({ module: m, type, resource: r })"
+                      >
+                        Editar<span class="visually-hidden"> {{ r.title }}</span>
+                      </button>
+                      <adm-row-menu [label]="'Más acciones de ' + r.title">
+                        @if (type === 'PRESENTATION') {
+                          <button
+                            class="adm-menuitem"
+                            role="menuitem"
+                            type="button"
+                            (click)="editResource.emit({ module: m, type, resource: null })"
+                          >
+                            Reemplazar presentación
+                          </button>
+                        }
+                        <button
+                          class="adm-menuitem"
+                          role="menuitem"
+                          type="button"
+                          [disabled]="isBusy(r)"
+                          (click)="toggleResource(r)"
+                        >
+                          {{ r.visibility === 'HIDDEN' ? 'Publicar' : 'Ocultar' }}
+                        </button>
+                        <button
+                          class="adm-menuitem adm-menuitem--danger"
+                          role="menuitem"
+                          type="button"
+                          [disabled]="isBusy(r)"
+                          (click)="removeResource(r)"
+                        >
+                          Borrar
+                        </button>
+                      </adm-row-menu>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="section__empty">
+              Sin
+              {{ type === 'PRESENTATION' ? 'presentación' : sectionLabels[type].toLowerCase() }}.
+            </p>
+          }
+        </section>
+      }
+
+      <section class="section" aria-label="Grabaciones">
+        <div class="section__head">
+          <h4 class="section__title">Grabaciones</h4>
+        </div>
+        @if (m.sections.recordings.length) {
+          <ul class="resources">
+            @for (row of m.sections.recordings; track row.sessionId) {
+              <li class="resource" [class.resource--pending]="row.pending">
+                <div class="resource__main">
+                  <p class="resource__title">Sesión del {{ recordingDate(row) }}</p>
+                  <p class="resource__detail">
+                    @if (row.status === 'CANCELLED') {
+                      Sesión cancelada
+                    } @else if (row.recordingUrl) {
+                      <a class="adm-link" [href]="row.recordingUrl" target="_blank" rel="noopener"
+                        >Ver grabación</a
+                      >
+                    } @else {
+                      Sin enlace todavía
+                    }
+                  </p>
+                </div>
+                <span class="pub" [class.pub--pending]="row.pending">{{
+                  recordingLabels[row.state]
+                }}</span>
+              </li>
+            }
+          </ul>
+          <p class="section__note">Los enlaces de las grabaciones se editan en cada sesión.</p>
+        } @else {
+          <p class="section__empty">Este módulo aún no tiene sesiones.</p>
+        }
+      </section>
+    </div>
+  }
+</article>

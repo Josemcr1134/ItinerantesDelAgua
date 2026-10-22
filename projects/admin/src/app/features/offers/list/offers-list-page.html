@@ -150,75 +150,79 @@
                 {{ canWrite() ? 'Editar' : 'Ver'
                 }}<span class="visually-hidden"> {{ offer.name }}</span>
               </a>
-              @if (canPublish() || previewUrl(offer)) {
-                <adm-row-menu [label]="'Más acciones de ' + offer.name">
-                  @if (previewUrl(offer); as url) {
-                    <a
-                      class="adm-menuitem"
-                      role="menuitem"
-                      [href]="url"
-                      target="_blank"
-                      rel="noopener"
-                      >Vista previa</a
-                    >
-                  }
-                  @if (canPublish()) {
-                    @if (canPublishNow(offer)) {
-                      <button
-                        class="adm-menuitem"
-                        role="menuitem"
-                        type="button"
-                        [disabled]="busy"
-                        (click)="publish(offer)"
-                      >
-                        Publicar
-                      </button>
-                    }
-                    @if (canUnpublish(offer)) {
-                      <button
-                        class="adm-menuitem"
-                        role="menuitem"
-                        type="button"
-                        [disabled]="busy"
-                        (click)="unpublish(offer)"
-                      >
-                        Volver a borrador
-                      </button>
-                    }
-                    @if (canArchive(offer)) {
-                      <button
-                        class="adm-menuitem"
-                        role="menuitem"
-                        type="button"
-                        [disabled]="busy"
-                        (click)="archive(offer)"
-                      >
-                        Archivar
-                      </button>
-                    }
+              <adm-row-menu [label]="'Más acciones de ' + offer.name">
+                <a
+                  class="adm-menuitem"
+                  role="menuitem"
+                  [routerLink]="['/ofertas', offer.id, 'contenido']"
+                  >Contenido del aula</a
+                >
+                @if (previewUrl(offer); as url) {
+                  <a
+                    class="adm-menuitem"
+                    role="menuitem"
+                    [href]="url"
+                    target="_blank"
+                    rel="noopener"
+                    >Vista previa</a
+                  >
+                }
+                @if (canPublish()) {
+                  @if (canPublishNow(offer)) {
                     <button
                       class="adm-menuitem"
                       role="menuitem"
                       type="button"
                       [disabled]="busy"
-                      (click)="duplicate(offer)"
+                      (click)="publish(offer)"
                     >
-                      Duplicar (nueva cohorte)
+                      Publicar
                     </button>
-                    @if (canRemove(offer)) {
-                      <button
-                        class="adm-menuitem adm-menuitem--danger"
-                        role="menuitem"
-                        type="button"
-                        [disabled]="busy"
-                        (click)="remove(offer)"
-                      >
-                        Borrar borrador
-                      </button>
-                    }
                   }
-                </adm-row-menu>
-              }
+                  @if (canUnpublish(offer)) {
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="unpublish(offer)"
+                    >
+                      Volver a borrador
+                    </button>
+                  }
+                  @if (canArchive(offer)) {
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="archive(offer)"
+                    >
+                      Archivar
+                    </button>
+                  }
+                  <button
+                    class="adm-menuitem"
+                    role="menuitem"
+                    type="button"
+                    [disabled]="busy"
+                    (click)="duplicate(offer)"
+                  >
+                    Duplicar (nueva cohorte)
+                  </button>
+                  @if (canRemove(offer)) {
+                    <button
+                      class="adm-menuitem adm-menuitem--danger"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="remove(offer)"
+                    >
+                      Borrar borrador
+                    </button>
+                  }
+                }
+              </adm-row-menu>
             </div>
           </td>
         </tr>

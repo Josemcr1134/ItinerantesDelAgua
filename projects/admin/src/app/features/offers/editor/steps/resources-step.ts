@@ -1,10 +1,12 @@
 import { Component, forwardRef, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AdminOfferDetailDto } from 'data-access';
 import { OfferStep } from './offer-step';
 
 /** Paso 5 — Recursos: resumen (se gestionan en "Contenido del aula"). */
 @Component({
   selector: 'adm-resources-step',
+  imports: [RouterLink],
   providers: [{ provide: OfferStep, useExisting: forwardRef(() => ResourcesStep) }],
   template: `
     <section class="adm-section" aria-labelledby="resources-title">
@@ -26,9 +28,9 @@ import { OfferStep } from './offer-step';
           <dd>{{ offer().resources.resourceCount }}</dd>
         </div>
       </dl>
-      <p class="adm-callout adm-callout--info">
-        El módulo «Contenido del aula» todavía no está disponible en el panel.
-      </p>
+      <a class="adm-action manage" [routerLink]="['/ofertas', offer().id, 'contenido']">
+        {{ readonly() ? 'Ver el contenido del aula' : 'Gestionar el contenido del aula' }} →
+      </a>
     </section>
   `,
   styles: `
@@ -48,6 +50,12 @@ import { OfferStep } from './offer-step';
       color: var(--color-primary);
       font-size: 0.8125rem;
       font-weight: 600;
+    }
+    .manage {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      text-decoration: none;
     }
     dd {
       margin: 0;

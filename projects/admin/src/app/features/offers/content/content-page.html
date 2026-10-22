@@ -1,0 +1,119 @@
+<a class="back" [routerLink]="['/ofertas', id()]">
+  <svg
+    aria-hidden="true"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+  {{ store.content()?.offerName ?? 'Volver a la oferta' }}
+</a>
+
+<adm-page-header
+  title="Contenido del aula"
+  lead="Módulos y materiales que ven las personas inscritas en su aula."
+>
+  @if (canWrite() && store.loaded()) {
+    <button uiButton type="button" class="adm-page-action" (click)="openModule(null)">
+      <svg
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Agregar módulo
+    </button>
+  }
+</adm-page-header>
+
+<adm-notice [(message)]="store.notice" />
+
+<adm-request-state
+  class="content"
+  [error]="store.error()"
+  [loaded]="store.loaded()"
+  loadingText="Cargando el contenido…"
+  (retry)="store.reload()"
+>
+  @if (store.content(); as content) {
+    <div class="toolbar">
+      <p class="toolbar__info">
+        {{ content.modules.length }} {{ content.modules.length === 1 ? 'módulo' : 'módulos' }} ·
+        {{ content.activeEnrollees }}
+        {{ content.activeEnrollees === 1 ? 'inscrito activo' : 'inscritos activos' }}
+      </p>
+      @if (content.modules.length > 1) {
+        <button type="button" class="adm-link" (click)="toggleAll()">
+          {{ allExpanded() ? 'Contraer todo' : 'Expandir todo' }}
+        </button>
+      }
+    </div>
+
+    @if (content.modules.length) {
+      <ol class="modules">
+        @for (module of content.modules; track module.id; let first = $first, last = $last) {
+          <li>
+            <adm-module-card
+              [module]="module"
+              [first]="first"
+              [last]="last"
+              [canWrite]="canWrite()"
+              [expanded]="isExpanded(module)"
+              (expandedChange)="setExpanded(module, $event)"
+              (editModule)="openModule($event)"
+              (editResource)="openResource($event)"
+            />
+          </li>
+        }
+      </ol>
+    } @else {
+      <div class="adm-state">
+        <p>Esta oferta aún no tiene módulos.</p>
+        @if (canWrite()) {
+          <button uiButton variant="secondary" type="button" (click)="openModule(null)">
+            Agregar el primer módulo
+          </button>
+        }
+      </div>
+    }
+
+    @if (content.unassignedRecordings.length) {
+      <section class="unassigned" aria-labelledby="unassigned-title">
+        <h2 id="unassigned-title" class="unassigned__title">Sesiones sin módulo</h2>
+        <p class="unassigned__lead">
+          Asígnales un módulo desde cada sesión para que su grabación aparezca en el aula.
+        </p>
+        <ul class="unassigned__list">
+          @for (row of content.unassignedRecordings; track row.sessionId) {
+            <li [class.is-pending]="row.pending">
+              <span>{{ formatDateTime(row.startsAt) }}</span>
+              <span class="unassigned__state">{{ recordingLabels[row.state] }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</adm-request-state>
+
+@if (canWrite()) {
+  <adm-module-form-dialog [(open)]="moduleOpen" [module]="editingModule()" />
+  <adm-resource-form-dialog
+    [(open)]="resourceOpen"
+    [module]="resourceModule()"
+    [type]="resourceType()"
+    [resource]="editingResource()"
+  />
+}

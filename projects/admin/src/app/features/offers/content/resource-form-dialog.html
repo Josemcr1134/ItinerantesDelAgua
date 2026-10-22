@@ -1,0 +1,226 @@
+<ui-dialog
+  [(open)]="open"
+  [title]="(resource() ? 'Editar ' : 'Agregar ') + noun()"
+  size="wide"
+  [busy]="saving() || uploading()"
+>
+  <form id="resource-form" class="form" novalidate [formGroup]="form" (ngSubmit)="save()">
+    @if (type() === 'PRESENTATION' && !resource() && module()?.sections?.presentation) {
+      <p class="adm-callout adm-callout--info">
+        Este módulo ya tiene presentación: la nueva la reemplazará.
+      </p>
+    }
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="resource-title">Título</label>
+      <input
+        id="resource-title"
+        class="adm-field__input"
+        formControlName="title"
+        [attr.maxlength]="titleMax"
+        [attr.aria-invalid]="showError('title')"
+        [attr.aria-describedby]="showError('title') ? 'resource-title-error' : null"
+      />
+      @if (showError('title')) {
+        <p id="resource-title-error" class="adm-field__error">
+          Escribe el título (hasta {{ titleMax }} caracteres).
+        </p>
+      }
+    </div>
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="resource-description">
+        {{ type() === 'ACTIVITY' ? 'Instrucciones' : 'Descripción' }}
+        <span class="adm-field__hint">(opcional)</span>
+      </label>
+      <textarea
+        id="resource-description"
+        class="adm-field__input"
+        rows="3"
+        formControlName="description"
+      ></textarea>
+    </div>
+
+    <fieldset class="adm-field">
+      <legend class="adm-field__label">Contenido</legend>
+      <div class="sources">
+        <label class="adm-check"
+          ><input
+            type="radio"
+            name="resource-source"
+            [checked]="source() === 'FILE'"
+            (change)="source.set('FILE')"
+          />
+          Archivo</label
+        >
+        <label class="adm-check"
+          ><input
+            type="radio"
+            name="resource-source"
+            [checked]="source() === 'URL'"
+            (change)="source.set('URL')"
+          />
+          Enlace</label
+        >
+        @if (type() === 'PRE_READING') {
+          <label class="adm-check"
+            ><input
+              type="radio"
+              name="resource-source"
+              [checked]="source() === 'LIBRARY'"
+              (change)="source.set('LIBRARY')"
+            />
+            Recurso de la Biblioteca</label
+          >
+        }
+        @if (type() === 'ACTIVITY') {
+          <label class="adm-check"
+            ><input
+              type="radio"
+              name="resource-source"
+              [checked]="source() === 'NONE'"
+              (change)="source.set('NONE')"
+            />
+            Solo instrucciones</label
+          >
+        }
+      </div>
+    </fieldset>
+
+    @switch (source()) {
+      @case ('FILE') {
+        <div class="adm-field">
+          @if (file(); as f) {
+            <div class="file">
+              <span class="file__name">{{ f.name }}</span>
+              @if (formatBytes(f.size); as size) {
+                <span class="adm-field__hint">{{ size }}</span>
+              }
+              @if (!f.changed && resource()?.file?.downloadUrl; as url) {
+                <a class="adm-link" [href]="url" target="_blank" rel="noopener">Descargar</a>
+              }
+            </div>
+          }
+          <label class="adm-action pick" [class.is-busy]="uploading()">
+            <input
+              class="visually-hidden"
+              type="file"
+              [accept]="accept()"
+              [disabled]="uploading()"
+              aria-describedby="resource-file-hint"
+              (change)="pickFile($event)"
+            />
+            {{ uploading() ? 'Subiendo…' : file() ? 'Reemplazar archivo' : 'Subir archivo' }}
+          </label>
+          <p id="resource-file-hint" class="adm-field__hint">{{ acceptHint() }}, hasta 50 MB.</p>
+          @if (fileError()) {
+            <p class="adm-field__error" role="alert">{{ fileError() }}</p>
+          } @else if (submitted() && sourceError()) {
+            <p class="adm-field__error" role="alert">{{ sourceError() }}</p>
+          }
+        </div>
+      }
+      @case ('URL') {
+        <div class="adm-field">
+          <label class="adm-field__label" for="resource-url">Enlace</label>
+          <input
+            id="resource-url"
+            class="adm-field__input"
+            type="url"
+            formControlName="url"
+            placeholder="https://…"
+            [attr.aria-invalid]="showError('url')"
+            [attr.aria-describedby]="showError('url') ? 'resource-url-error' : null"
+          />
+          @if (showError('url')) {
+            <p id="resource-url-error" class="adm-field__error">
+              Usa un enlace que empiece con https://
+            </p>
+          }
+        </div>
+      }
+      @case ('LIBRARY') {
+        <div class="adm-field">
+          @if (libraryItem(); as item) {
+            <div class="chosen">
+              {{ item.title }}
+              <button type="button" class="adm-link" (click)="libraryItem.set(null)">
+                Cambiar
+              </button>
+            </div>
+          } @else {
+            <label class="adm-field__label" for="resource-library">Buscar en la Biblioteca</label>
+            <input
+              id="resource-library"
+              class="adm-field__input"
+              type="search"
+              autocomplete="off"
+              [value]="libraryResults.searchText()"
+              (input)="libraryResults.searchText.set($any($event.target).value)"
+            />
+            <div aria-live="polite">
+              @if (libraryResults.active()) {
+                @if (!libraryResults.loaded()) {
+                  <p class="adm-field__hint">Buscando…</p>
+                } @else if (!libraryResults.results().length) {
+                  <p class="adm-field__hint">No hay recursos con «{{ libraryResults.query() }}».</p>
+                } @else {
+                  <ul class="results">
+                    @for (item of libraryResults.results(); track item.id) {
+                      <li>
+                        <button type="button" class="adm-menuitem" (click)="chooseLibrary(item)">
+                          {{ item.title }}
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+              }
+            </div>
+            @if (submitted() && sourceError()) {
+              <p class="adm-field__error" role="alert">{{ sourceError() }}</p>
+            }
+          }
+        </div>
+      }
+    }
+
+    @if (type() === 'ACTIVITY') {
+      <div class="adm-field">
+        <label class="adm-field__label" for="resource-due"
+          >Fecha de entrega <span class="adm-field__hint">(hora CDMX)</span></label
+        >
+        <input
+          id="resource-due"
+          class="adm-field__input"
+          type="datetime-local"
+          formControlName="dueAt"
+          aria-describedby="resource-due-hint"
+        />
+        <p id="resource-due-hint" class="adm-field__hint">
+          @if (period()) {
+            Dentro del periodo de la oferta: {{ period() }}.
+          } @else {
+            Debe quedar dentro del periodo de la oferta.
+          }
+        </p>
+      </div>
+    }
+
+    <adm-publication-fields
+      [(value)]="publication"
+      [enrollees]="store.content()?.activeEnrollees ?? 0"
+    />
+    @if (submitted() && pubError()) {
+      <p class="adm-field__error" role="alert">{{ pubError() }}</p>
+    }
+  </form>
+  <div uiDialogActions>
+    <adm-form-actions
+      form="resource-form"
+      [submitLabel]="resource() ? 'Guardar' : 'Agregar ' + noun()"
+      [busy]="saving() || uploading()"
+      (cancel)="open.set(false)"
+    />
+  </div>
+</ui-dialog>

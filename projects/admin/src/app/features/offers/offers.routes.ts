@@ -12,6 +12,11 @@ const routes: Routes = [
     loadComponent: () => import('./list/offers-list-page'),
   },
   {
+    path: ':id/contenido',
+    title: 'Contenido del aula · Administrador',
+    loadComponent: () => import('./content/content-page'),
+  },
+  {
     path: ':id',
     title: 'Editar oferta · Administrador',
     loadComponent: () => import('./editor/offer-editor-page'),
