@@ -8,15 +8,16 @@ import {
   OfferModality,
   OfferType,
 } from 'data-access';
-import { Button, Dialog, DialogActions } from 'ui-kit';
+import { Dialog, DialogActions } from 'ui-kit';
 import { firstValueFrom } from 'rxjs';
 import { ErrorPresenter } from '../../../core/error-presenter';
+import { FormActions } from '../../../shared/form-actions/form-actions';
 import { OFFER_MODALITY_LABELS, OFFER_TYPE_LABELS } from '../offer-labels';
 
 /** "+ Nueva oferta": tipo, modalidad y nombre; crea el borrador y abre el asistente. */
 @Component({
   selector: 'adm-new-offer-dialog',
-  imports: [ReactiveFormsModule, Button, Dialog, DialogActions],
+  imports: [ReactiveFormsModule, Dialog, DialogActions, FormActions],
   template: `
     <ui-dialog [(open)]="open" title="Nueva oferta" [busy]="saving()" (closed)="form.reset()">
       <form id="new-offer-form" class="form" novalidate [formGroup]="form" (ngSubmit)="create()">
@@ -67,12 +68,13 @@ import { OFFER_MODALITY_LABELS, OFFER_TYPE_LABELS } from '../offer-labels';
         </div>
       </form>
       <div uiDialogActions>
-        <button type="button" class="adm-link" [disabled]="saving()" (click)="open.set(false)">
-          Cancelar
-        </button>
-        <button uiButton type="submit" form="new-offer-form" [disabled]="saving()">
-          {{ saving() ? 'Creando…' : 'Crear borrador' }}
-        </button>
+        <adm-form-actions
+          form="new-offer-form"
+          submitLabel="Crear borrador"
+          busyLabel="Creando…"
+          [busy]="saving()"
+          (cancel)="open.set(false)"
+        />
       </div>
     </ui-dialog>
   `,

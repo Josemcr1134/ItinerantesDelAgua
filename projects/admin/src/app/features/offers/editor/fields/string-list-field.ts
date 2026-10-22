@@ -1,4 +1,5 @@
 import { Component, input, model, signal } from '@angular/core';
+import { moveItem, removeAt } from '../../../../shared/list/reorder';
 
 let nextListId = 0;
 
@@ -120,14 +121,10 @@ export class StringListField {
   }
 
   protected move(index: number, delta: number): void {
-    this.items.update((list) => {
-      const next = [...list];
-      [next[index], next[index + delta]] = [next[index + delta], next[index]];
-      return next;
-    });
+    this.items.update((list) => moveItem(list, index, delta));
   }
 
   protected remove(index: number): void {
-    this.items.update((list) => list.filter((_, i) => i !== index));
+    this.items.update((list) => removeAt(list, index));
   }
 }

@@ -35,16 +35,6 @@
   }
 }
 
-.adm-field--search {
-  @include bp.up(md) {
-    grid-column: 1 / -1;
-  }
-
-  @include bp.up(xl) {
-    grid-column: auto;
-  }
-}
-
 .adm-field {
   display: flex;
   flex-direction: column;
@@ -480,4 +470,34 @@ textarea.adm-field__input {
 .adm-callout + .adm-section,
 .adm-section + .adm-callout {
   margin-top: var(--space-4);
+}
+
+// Botón principal de la cabecera ("Nueva oferta", "Registrar docente"…).
+.adm-page-action {
+  min-height: 48px;
+}
+
+// Barra de filtros: la búsqueda arriba a lo ancho y el resto en rejilla.
+.adm-filters__search {
+  @include bp.up(md) {
+    grid-column: 1 / -1;
+  }
+
+  @include bp.up(xl) {
+    grid-column: auto;
+  }
+}
+
+// Celda de acciones: tan angosta como sus botones en escritorio.
+.adm-table__actions {
+  @include bp.up(lg) {
+    width: 1%;
+  }
+}
+
+// Enlaces con aspecto de acción (p. ej. "Editar").
+a.adm-action {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
 }

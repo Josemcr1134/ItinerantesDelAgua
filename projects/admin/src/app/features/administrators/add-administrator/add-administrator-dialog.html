@@ -85,13 +85,12 @@
   }
 
   <div uiDialogActions>
-    <button type="button" class="link" [disabled]="saving()" (click)="open.set(false)">
-      Cancelar
-    </button>
-    @if (selected()) {
-      <button uiButton type="button" [disabled]="saving()" (click)="save()">
-        {{ saving() ? 'Guardando…' : 'Agregar al equipo' }}
-      </button>
-    }
+    <adm-form-actions
+      submitLabel="Agregar al equipo"
+      [busy]="saving()"
+      [showSubmit]="!!selected()"
+      (cancel)="open.set(false)"
+      (submitted)="save()"
+    />
   </div>
 </ui-dialog>

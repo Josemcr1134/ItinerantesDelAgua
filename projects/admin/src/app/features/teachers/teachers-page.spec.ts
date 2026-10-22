@@ -88,6 +88,7 @@ describe('TeachersPage', () => {
     const req = http.expectOne(`${API}/admin/teachers/t2`);
     expect(req.request.method).toBe('DELETE');
     req.flush(null, { status: 204, statusText: 'No Content' });
+    await new Promise((r) => setTimeout(r));
     await fixture.whenStable();
     http
       .expectOne((r) => r.url === `${API}/admin/teachers`)

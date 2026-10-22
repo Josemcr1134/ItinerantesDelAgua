@@ -68,7 +68,7 @@
   <div class="sidebar__footer">
     @if (access.me(); as me) {
       <div class="person">
-        <span class="person__avatar" aria-hidden="true">{{ me.user.fullName.charAt(0) }}</span>
+        <adm-avatar [name]="me.user.fullName" />
         <div class="person__text">
           <p class="person__name">{{ me.user.fullName }}</p>
           <p class="person__roles">{{ roles() }}</p>

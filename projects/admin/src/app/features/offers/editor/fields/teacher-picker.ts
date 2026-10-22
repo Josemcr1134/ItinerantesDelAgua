@@ -8,7 +8,6 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import {
   AdminTeacherDto,
@@ -17,12 +16,14 @@ import {
   Paginated,
   requestState,
 } from 'data-access';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounced } from '../../../../core/signals/debounced';
+import { Avatar } from '../../../../shared/avatar/avatar';
+import { moveItem } from '../../../../shared/list/reorder';
 
 /** Docentes de la oferta en el orden de la ficha: buscar, agregar, mover y quitar. */
 @Component({
   selector: 'adm-teacher-picker',
-  imports: [RouterLink],
+  imports: [RouterLink, Avatar],
   template: `
     <fieldset class="picker">
       <legend class="adm-field__label">Docentes</legend>
@@ -30,13 +31,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
         <ol class="selected">
           @for (t of teachers(); track t.id; let i = $index, first = $first, last = $last) {
             <li class="teacher">
-              @if (t.photoUrl) {
-                <img class="teacher__photo" [src]="t.photoUrl" alt="" />
-              } @else {
-                <span class="teacher__photo teacher__photo--empty" aria-hidden="true">{{
-                  t.fullName.charAt(0)
-                }}</span>
-              }
+              <adm-avatar [name]="t.fullName" [photoUrl]="t.photoUrl" [size]="36" />
               <span class="teacher__name">{{ t.fullName }}</span>
               @if (!disabled()) {
                 <button
@@ -144,20 +139,6 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
       border-radius: 14px;
       background: #fff;
     }
-    .teacher__photo {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-      flex: none;
-    }
-    .teacher__photo--empty {
-      display: grid;
-      place-items: center;
-      background: var(--color-columbia-blue);
-      color: var(--color-deep-blue);
-      font-weight: 700;
-    }
     .teacher__name {
       flex: 1;
       font-weight: 600;
@@ -171,10 +152,7 @@ export class TeacherPicker {
 
   private readonly api = inject(AdminTeachersApi);
   protected readonly searchText = signal('');
-  protected readonly search = toSignal(
-    toObservable(this.searchText).pipe(debounceTime(300), distinctUntilChanged()),
-    { initialValue: '' },
-  );
+  protected readonly search = debounced(this.searchText);
   protected readonly results = requestState<Paginated<AdminTeacherDto>>();
   /** Resultados que aún no están en la oferta. */
   protected readonly available = computed(() => {
@@ -205,10 +183,6 @@ export class TeacherPicker {
   }
 
   protected move(index: number, delta: number): void {
-    this.teachers.update((list) => {
-      const next = [...list];
-      [next[index], next[index + delta]] = [next[index + delta], next[index]];
-      return next;
-    });
+    this.teachers.update((list) => moveItem(list, index, delta));
   }
 }

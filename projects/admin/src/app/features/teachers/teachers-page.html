@@ -1,10 +1,9 @@
-<header class="page-header">
-  <div>
-    <h1 class="page-title">Docentes</h1>
-    <p class="page-lead">Personas que imparten la oferta formativa; se asignan en cada oferta.</p>
-  </div>
+<adm-page-header
+  title="Docentes"
+  lead="Personas que imparten la oferta formativa; se asignan en cada oferta."
+>
   @if (canWrite()) {
-    <button uiButton type="button" class="page-add" (click)="openCreate()">
+    <button uiButton type="button" class="adm-page-action" (click)="openForm(null)">
       <svg
         aria-hidden="true"
         width="20"
@@ -20,7 +19,7 @@
       Registrar docente
     </button>
   }
-</header>
+</adm-page-header>
 
 <p class="adm-notice" role="status">{{ notice() }}</p>
 
@@ -30,136 +29,82 @@
   aria-label="Buscar docentes"
   (submit)="$event.preventDefault()"
 >
-  <div class="adm-field">
-    <label class="adm-field__label" for="teachers-search">Buscar</label>
-    <input
-      id="teachers-search"
-      class="adm-field__input"
-      type="search"
-      name="search"
-      placeholder="Nombre del docente"
-      autocomplete="off"
-      [ngModel]="searchText()"
-      (ngModelChange)="searchText.set($event)"
-    />
-  </div>
+  <adm-search-field
+    inputId="teachers-search"
+    placeholder="Nombre del docente"
+    [(value)]="list.searchText"
+  />
 </form>
 
-<section class="results" aria-labelledby="teachers-results" [attr.aria-busy]="list.loading()">
-  <h2 id="teachers-results" class="visually-hidden">Docentes</h2>
-
-  @if (list.error() && !list.data()) {
-    <div class="adm-state adm-state--error" role="alert">
-      <p>{{ list.error()?.message }}</p>
-      <button uiButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
-    </div>
-  } @else if (list.loading() && !list.data()) {
-    <p class="adm-state">Cargando docentes…</p>
-  } @else if (!teachers().length) {
-    <div class="adm-state">
-      @if (searchText()) {
-        <p>No hay docentes con «{{ searchText() }}».</p>
-        <button type="button" class="adm-link" (click)="searchText.set('')">Quitar búsqueda</button>
-      } @else {
-        <p>Aún no hay docentes registrados.</p>
-      }
-    </div>
-  } @else {
-    <ul class="cards" [class.cards--loading]="list.loading()">
-      @for (teacher of teachers(); track teacher.id) {
-        @let busy = busyId() === teacher.id;
-        <li class="card">
-          <div class="card__head">
-            @if (teacher.photoUrl) {
-              <img
-                class="card__photo"
-                [src]="teacher.photoUrl"
-                alt=""
-                width="64"
-                height="64"
-                loading="lazy"
-              />
-            } @else {
-              <span class="card__photo card__photo--empty" aria-hidden="true">{{
-                teacher.fullName.charAt(0)
-              }}</span>
-            }
-            <div class="card__title">
-              <h3 class="card__name">{{ teacher.fullName }}</h3>
-              <p class="card__usage">{{ usage(teacher) }}</p>
-            </div>
+<adm-list-states
+  [list]="list"
+  heading="Docentes"
+  headingId="teachers-results"
+  loadingText="Cargando docentes…"
+  emptyText="Aún no hay docentes registrados."
+  filteredText="No hay docentes con esa búsqueda."
+  (clearFilters)="list.clearSearch()"
+>
+  <ul class="cards">
+    @for (teacher of list.items(); track teacher.id) {
+      @let busy = rows.isBusy(teacher.id);
+      <li class="card">
+        <div class="card__head">
+          <adm-avatar [name]="teacher.fullName" [photoUrl]="teacher.photoUrl" [size]="64" />
+          <div class="card__title">
+            <h3 class="card__name">{{ teacher.fullName }}</h3>
+            <p class="card__usage">{{ usage(teacher) }}</p>
           </div>
-          @if (teacher.bio) {
-            <p class="card__bio">{{ teacher.bio }}</p>
-          } @else {
-            <p class="card__bio card__bio--empty">Sin semblanza.</p>
-          }
-          <div class="card__footer">
-            @if (teacher.cvUrl) {
-              <a class="adm-link" [href]="teacher.cvUrl" target="_blank" rel="noopener">
-                Ver CV<span class="visually-hidden">
-                  de {{ teacher.fullName }} (se abre en otra pestaña)</span
-                >
-              </a>
-            }
-            @if (canWrite()) {
-              <div class="adm-actions card__actions">
-                <button
-                  type="button"
-                  class="adm-action"
-                  [disabled]="busy"
-                  (click)="openEdit(teacher)"
-                >
-                  Editar<span class="visually-hidden"> a {{ teacher.fullName }}</span>
-                </button>
-                <button
-                  type="button"
-                  class="adm-action adm-action--danger"
-                  [disabled]="busy || inUse(teacher)"
-                  [attr.title]="
-                    inUse(teacher)
-                      ? 'Está asignado a ofertas o módulos: quítalo de ellos para poder borrarlo'
-                      : null
-                  "
-                  (click)="remove(teacher)"
-                >
-                  Borrar<span class="visually-hidden"> a {{ teacher.fullName }}</span>
-                </button>
-              </div>
-            }
-          </div>
-        </li>
-      }
-    </ul>
-
-    @if (meta(); as m) {
-      <nav class="adm-pagination" aria-label="Paginación">
-        <p class="adm-pagination__info">
-          {{ m.total }} {{ m.total === 1 ? 'docente' : 'docentes' }} · Página {{ m.page }} de
-          {{ m.totalPages || 1 }}
-        </p>
-        <div class="adm-pagination__buttons">
-          <button
-            type="button"
-            class="adm-action"
-            [disabled]="m.page <= 1 || list.loading()"
-            (click)="page.set(m.page - 1)"
-          >
-            Anterior
-          </button>
-          <button
-            type="button"
-            class="adm-action"
-            [disabled]="m.page >= m.totalPages || list.loading()"
-            (click)="page.set(m.page + 1)"
-          >
-            Siguiente
-          </button>
         </div>
-      </nav>
+        @if (teacher.bio) {
+          <p class="card__bio">{{ teacher.bio }}</p>
+        } @else {
+          <p class="card__bio card__bio--empty">Sin semblanza.</p>
+        }
+        <div class="card__footer">
+          @if (teacher.cvUrl) {
+            <a class="adm-link" [href]="teacher.cvUrl" target="_blank" rel="noopener">
+              Ver CV<span class="visually-hidden">
+                de {{ teacher.fullName }} (se abre en otra pestaña)</span
+              >
+            </a>
+          }
+          @if (canWrite()) {
+            <div class="adm-actions card__actions">
+              <button
+                type="button"
+                class="adm-action"
+                [disabled]="busy"
+                (click)="openForm(teacher)"
+              >
+                Editar<span class="visually-hidden"> a {{ teacher.fullName }}</span>
+              </button>
+              <button
+                type="button"
+                class="adm-action adm-action--danger"
+                [disabled]="busy || inUse(teacher)"
+                [attr.title]="
+                  inUse(teacher)
+                    ? 'Está asignado a ofertas o módulos: quítalo de ellos para poder borrarlo'
+                    : null
+                "
+                (click)="remove(teacher)"
+              >
+                Borrar<span class="visually-hidden"> a {{ teacher.fullName }}</span>
+              </button>
+            </div>
+          }
+        </div>
+      </li>
     }
-  }
-</section>
+  </ul>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['docente', 'docentes']"
+  />
+</adm-list-states>
 
 @if (canWrite()) {
   <adm-teacher-form-dialog [(open)]="formOpen" [teacher]="editing()" (saved)="onSaved($event)" />

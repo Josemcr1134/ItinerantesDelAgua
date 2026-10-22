@@ -172,18 +172,6 @@ $sidebar-width: 272px;
   padding: 0 var(--space-2);
 }
 
-.person__avatar {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--color-columbia-blue);
-  color: var(--color-deep-blue);
-  font-weight: 700;
-}
-
 .person__text {
   min-width: 0;
 }

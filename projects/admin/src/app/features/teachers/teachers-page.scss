@@ -6,38 +6,10 @@
   color: var(--color-raisin-black);
 }
 
-.page-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.page-title {
-  color: var(--color-primary);
-  font-family: var(--font-family-display);
-  font-size: 3rem;
-  text-transform: uppercase;
-}
-
-.page-lead {
-  margin-top: var(--space-1);
-  color: var(--color-primary);
-}
-
-.page-add {
-  min-height: 48px;
-}
-
 .filters {
   @include bp.up(md) {
     grid-template-columns: minmax(0, 24rem);
   }
-}
-
-.results {
-  margin-top: var(--space-4);
 }
 
 // Tarjetas: una columna en móvil, varias en pantallas anchas.
@@ -48,10 +20,6 @@
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.cards--loading {
-  opacity: 0.6;
 }
 
 .card {
@@ -67,23 +35,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-}
-
-.card__photo {
-  flex: none;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.card__photo--empty {
-  display: grid;
-  place-items: center;
-  background-color: var(--color-columbia-blue);
-  color: var(--color-deep-blue);
-  font-size: 1.5rem;
-  font-weight: 700;
 }
 
 .card__title {

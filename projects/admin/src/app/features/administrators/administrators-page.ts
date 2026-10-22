@@ -1,25 +1,27 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   AdminUserDto,
   AdminUserSort,
   AdminUsersApi,
-  Paginated,
-  requestState,
   Role,
+  USER_STATUS_VALUES,
   UserStatus,
 } from 'data-access';
 import { AlertService, Button, Dialog, DialogActions } from 'ui-kit';
-import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
-import { ErrorPresenter } from '../../core/error-presenter';
+import { FilterSelect, optionsFrom } from '../../shared/filters/filter-select';
+import { SearchField } from '../../shared/filters/search-field';
+import { FormActions } from '../../shared/form-actions/form-actions';
+import { listController } from '../../shared/list/list-controller';
+import { ListStates } from '../../shared/list/list-states';
+import { Pagination } from '../../shared/list/pagination';
+import { rowActions } from '../../shared/list/row-actions';
+import { PageHeader } from '../../shared/page-header/page-header';
 import { AddAdministratorDialog } from './add-administrator/add-administrator-dialog';
 import { RolePicker } from './role-picker/role-picker';
 import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-roles';
-
-const PAGE_SIZE = 20;
 
 /**
  * Administradores (solo con `users.manage`): el equipo con sus roles y
@@ -29,14 +31,25 @@ const PAGE_SIZE = 20;
  */
 @Component({
   selector: 'adm-administrators-page',
-  imports: [FormsModule, Button, Dialog, DialogActions, RolePicker, AddAdministratorDialog],
+  imports: [
+    Button,
+    Dialog,
+    DialogActions,
+    FormActions,
+    RolePicker,
+    AddAdministratorDialog,
+    PageHeader,
+    SearchField,
+    FilterSelect,
+    ListStates,
+    Pagination,
+  ],
   templateUrl: './administrators-page.html',
   styleUrl: './administrators-page.scss',
 })
 export default class AdministratorsPage {
   private readonly api = inject(AdminUsersApi);
   private readonly alerts = inject(AlertService);
-  private readonly errors = inject(ErrorPresenter);
   private readonly router = inject(Router);
   protected readonly access = inject(AdminAccess);
 
@@ -45,34 +58,33 @@ export default class AdministratorsPage {
   protected readonly teamRoles = computed(() => teamRoles(this.access.catalog()));
 
   // --- Filtros ---
-  protected readonly searchText = signal('');
-  private readonly search = toSignal(
-    toObservable(this.searchText).pipe(debounceTime(300), distinctUntilChanged()),
-    { initialValue: '' },
-  );
   protected readonly role = signal<Role | ''>('');
   protected readonly status = signal<UserStatus | ''>('');
   protected readonly sort = signal<AdminUserSort>('NAME_ASC');
-  protected readonly page = signal(1);
+  protected readonly options = {
+    role: computed(() => this.teamRoles().map((def) => ({ value: def.role, label: def.label }))),
+    status: optionsFrom(USER_STATUS_VALUES, STATUS_LABELS),
+    sort: [
+      { value: 'NAME_ASC', label: 'Nombre (A-Z)' },
+      { value: 'LAST_LOGIN_DESC', label: 'Último acceso' },
+      { value: 'CREATED_DESC', label: 'Más recientes' },
+    ] as const,
+  };
 
-  private readonly query = computed(() => ({
-    staffOnly: true,
-    q: this.search().trim() || undefined,
-    role: this.role() || undefined,
-    status: this.status() || undefined,
-    sort: this.sort(),
-    page: this.page(),
-    pageSize: PAGE_SIZE,
-  }));
-
-  protected readonly list = requestState<Paginated<AdminUserDto>>();
-  protected readonly users = computed(() => this.list.data()?.data ?? []);
-  protected readonly meta = computed(() => this.list.data()?.meta ?? null);
-  protected readonly hasFilters = computed(() => !!(this.search() || this.role() || this.status()));
+  protected readonly list = listController({
+    fetch: (query) => this.api.list(query),
+    filters: () => ({
+      staffOnly: true,
+      role: this.role(),
+      status: this.status(),
+      sort: this.sort(),
+    }),
+    notFilters: ['staffOnly', 'sort'],
+  });
+  protected readonly rows = rowActions();
 
   /** Aviso del resultado de la última acción (se anuncia a lectores de pantalla). */
   protected readonly notice = signal('');
-  protected readonly busyId = signal<string | null>(null);
 
   // --- Editar roles ---
   protected readonly editing = signal<AdminUserDto | null>(null);
@@ -80,21 +92,6 @@ export default class AdministratorsPage {
   protected readonly editRoles = signal<readonly Role[]>([]);
   protected readonly saving = signal(false);
   protected readonly addOpen = signal(false);
-
-  constructor() {
-    // Volver a la primera página al cambiar un filtro.
-    effect(() => {
-      this.search();
-      this.role();
-      this.status();
-      this.sort();
-      untracked(() => this.page.set(1));
-    });
-    effect(() => {
-      const query = this.query();
-      untracked(() => void this.list.run(this.api.list(query)));
-    });
-  }
 
   protected isMe(user: AdminUserDto): boolean {
     return this.access.me()?.user.id === user.id;
@@ -104,12 +101,8 @@ export default class AdministratorsPage {
     return staffRolesOf(user.roles);
   }
 
-  protected reload(): void {
-    void this.list.run(this.api.list(this.query()));
-  }
-
   protected clearFilters(): void {
-    this.searchText.set('');
+    this.list.clearSearch();
     this.role.set('');
     this.status.set('');
   }
@@ -137,17 +130,15 @@ export default class AdministratorsPage {
       return;
     }
     this.saving.set(true);
-    try {
-      const updated = await firstValueFrom(this.api.updateRoles(user.id, { roles: [...roles] }));
-      this.editOpen.set(false);
-      this.replace(updated);
-      this.notice.set(`Se actualizaron los roles de ${updated.fullName}.`);
-      if (this.isMe(updated)) await this.afterSelfChange();
-    } catch (error) {
-      void this.errors.present(error);
-    } finally {
-      this.saving.set(false);
-    }
+    const updated = await this.rows.run(user.id, () =>
+      firstValueFrom(this.api.updateRoles(user.id, { roles: [...roles] })),
+    );
+    this.saving.set(false);
+    if (!updated) return;
+    this.editOpen.set(false);
+    this.list.replace((u) => u.id === updated.id, updated);
+    this.notice.set(`Se actualizaron los roles de ${updated.fullName}.`);
+    if (this.isMe(updated)) await this.afterSelfChange();
   }
 
   // --- Quitar del equipo ---
@@ -158,10 +149,10 @@ export default class AdministratorsPage {
       { confirmLabel: 'Quitar del equipo', variant: 'error' },
     );
     if (!confirmed) return;
-    await this.runAction(user, this.api.updateRoles(user.id, { roles: [] }), () => {
+    if (await this.runOn(user, this.api.updateRoles(user.id, { roles: [] }))) {
       this.notice.set(`${user.fullName} ya no forma parte del equipo.`);
-      this.reload();
-    });
+      this.list.reload();
+    }
   }
 
   // --- Deshabilitar / habilitar ---
@@ -180,46 +171,31 @@ export default class AdministratorsPage {
       },
     );
     if (!confirmed) return;
-    const request = disabling ? this.api.disable(user.id) : this.api.enable(user.id);
-    await this.runAction(user, request, (updated) => {
-      this.replace(updated);
+    const updated = await this.runOn(
+      user,
+      disabling ? this.api.disable(user.id) : this.api.enable(user.id),
+    );
+    if (updated) {
+      this.list.replace((u) => u.id === updated.id, updated);
       this.notice.set(
         disabling
           ? `Se deshabilitó la cuenta de ${updated.fullName}.`
           : `Se habilitó la cuenta de ${updated.fullName}.`,
       );
-    });
+    }
   }
 
   // --- Agregar ---
   protected onAdded(user: AdminUserDto): void {
     this.notice.set(`${user.fullName} ahora forma parte del equipo.`);
-    this.reload();
+    this.list.reload();
   }
 
-  private async runAction(
+  private runOn(
     user: AdminUserDto,
-    request: ReturnType<AdminUsersApi['updateRoles']>,
-    done: (updated: AdminUserDto) => void,
-  ): Promise<void> {
-    this.busyId.set(user.id);
-    try {
-      done(await firstValueFrom(request));
-    } catch (error) {
-      void this.errors.present(error);
-    } finally {
-      this.busyId.set(null);
-    }
-  }
-
-  /** Reemplaza una cuenta en la lista sin volver a pedirla. */
-  private replace(updated: AdminUserDto): void {
-    const current = this.list.data();
-    if (!current) return;
-    this.list.set({
-      ...current,
-      data: current.data.map((user) => (user.id === updated.id ? updated : user)),
-    });
+    request: Observable<AdminUserDto>,
+  ): Promise<AdminUserDto | null> {
+    return this.rows.run(user.id, () => firstValueFrom(request));
   }
 
   /** Si cambié mis propios roles, recargo mi acceso (puedo perder esta sección). */

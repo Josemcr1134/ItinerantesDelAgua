@@ -1,6 +1,7 @@
 import { Component, inject, input, model, signal } from '@angular/core';
 import { AdminImageDto, ImageUploadPurpose } from 'data-access';
 import { ImageUpload } from '../../../../shared/image-field/image-upload';
+import { moveItem, removeAt } from '../../../../shared/list/reorder';
 
 /** Varias imágenes en orden (carrusel): agregar, mover y quitar. */
 @Component({
@@ -138,15 +139,11 @@ export class ImageListField {
   protected readonly error = signal<string | null>(null);
 
   protected move(index: number, delta: number): void {
-    this.images.update((list) => {
-      const next = [...list];
-      [next[index], next[index + delta]] = [next[index + delta], next[index]];
-      return next;
-    });
+    this.images.update((list) => moveItem(list, index, delta));
   }
 
   protected remove(index: number): void {
-    this.images.update((list) => list.filter((_, i) => i !== index));
+    this.images.update((list) => removeAt(list, index));
   }
 
   protected async pick(event: Event): Promise<void> {

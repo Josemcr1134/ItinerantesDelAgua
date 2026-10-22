@@ -11,9 +11,10 @@ import {
 } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminImageDto, AdminTeacherDto, AdminTeachersApi } from 'data-access';
-import { Button, Dialog, DialogActions } from 'ui-kit';
+import { Dialog, DialogActions } from 'ui-kit';
 import { firstValueFrom } from 'rxjs';
 import { ErrorPresenter } from '../../core/error-presenter';
+import { FormActions } from '../../shared/form-actions/form-actions';
 import { ImageField } from '../../shared/image-field/image-field';
 
 /** Reglas de la API (CreateTeacherRequestDto). */
@@ -23,7 +24,7 @@ const HTTPS_URL = /^https:\/\/\S+$/;
 /** Registrar o editar un docente (nombre, semblanza, CV y foto). */
 @Component({
   selector: 'adm-teacher-form-dialog',
-  imports: [ReactiveFormsModule, Button, Dialog, DialogActions, ImageField],
+  imports: [ReactiveFormsModule, Dialog, DialogActions, FormActions, ImageField],
   template: `
     <ui-dialog
       [(open)]="open"
@@ -90,12 +91,12 @@ const HTTPS_URL = /^https:\/\/\S+$/;
         </div>
       </form>
       <div uiDialogActions>
-        <button type="button" class="adm-link" [disabled]="saving()" (click)="open.set(false)">
-          Cancelar
-        </button>
-        <button uiButton type="submit" form="teacher-form" [disabled]="saving()">
-          {{ saving() ? 'Guardando…' : teacher() ? 'Guardar cambios' : 'Registrar docente' }}
-        </button>
+        <adm-form-actions
+          form="teacher-form"
+          [submitLabel]="teacher() ? 'Guardar cambios' : 'Registrar docente'"
+          [busy]="saving()"
+          (cancel)="open.set(false)"
+        />
       </div>
     </ui-dialog>
   `,

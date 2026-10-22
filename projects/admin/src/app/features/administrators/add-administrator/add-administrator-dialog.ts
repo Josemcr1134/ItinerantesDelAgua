@@ -9,7 +9,6 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import {
   AdminUserDto,
@@ -19,9 +18,11 @@ import {
   Role,
   RoleDefinitionDto,
 } from 'data-access';
-import { Button, Dialog, DialogActions } from 'ui-kit';
-import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
+import { Dialog, DialogActions } from 'ui-kit';
+import { firstValueFrom } from 'rxjs';
 import { ErrorPresenter } from '../../../core/error-presenter';
+import { debounced } from '../../../core/signals/debounced';
+import { FormActions } from '../../../shared/form-actions/form-actions';
 import { RolePicker } from '../role-picker/role-picker';
 import { staffRolesOf, STATUS_LABELS } from '../team-roles';
 
@@ -34,7 +35,7 @@ const MIN_SEARCH = 3;
  */
 @Component({
   selector: 'adm-add-administrator-dialog',
-  imports: [FormsModule, Button, Dialog, DialogActions, RolePicker],
+  imports: [FormsModule, Dialog, DialogActions, FormActions, RolePicker],
   templateUrl: './add-administrator-dialog.html',
   styleUrl: './add-administrator-dialog.scss',
 })
@@ -49,10 +50,7 @@ export class AddAdministratorDialog {
   protected readonly minSearch = MIN_SEARCH;
   protected readonly statusLabels = STATUS_LABELS;
   protected readonly searchText = signal('');
-  private readonly search = toSignal(
-    toObservable(this.searchText).pipe(debounceTime(300), distinctUntilChanged()),
-    { initialValue: '' },
-  );
+  private readonly search = debounced(this.searchText);
   protected readonly results = requestState<Paginated<AdminUserDto>>();
   protected readonly selected = signal<AdminUserDto | null>(null);
   protected readonly chosenRoles = signal<readonly Role[]>([]);

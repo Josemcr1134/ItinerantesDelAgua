@@ -1,14 +1,16 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
-import { AdminTeacherDto, AdminTeachersApi, Paginated, requestState } from 'data-access';
+import { Component, computed, inject, signal } from '@angular/core';
+import { AdminTeacherDto, AdminTeachersApi } from 'data-access';
 import { AlertService, Button } from 'ui-kit';
-import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
-import { ErrorPresenter } from '../../core/error-presenter';
+import { Avatar } from '../../shared/avatar/avatar';
+import { SearchField } from '../../shared/filters/search-field';
+import { listController } from '../../shared/list/list-controller';
+import { ListStates } from '../../shared/list/list-states';
+import { Pagination } from '../../shared/list/pagination';
+import { rowActions } from '../../shared/list/row-actions';
+import { PageHeader } from '../../shared/page-header/page-header';
 import { TeacherFormDialog } from './teacher-form-dialog';
-
-const PAGE_SIZE = 20;
 
 /**
  * Docentes (HU-27): catálogo que se asigna a las ofertas. Ver requiere
@@ -17,52 +19,21 @@ const PAGE_SIZE = 20;
  */
 @Component({
   selector: 'adm-teachers-page',
-  imports: [FormsModule, Button, TeacherFormDialog],
+  imports: [Button, Avatar, SearchField, ListStates, Pagination, PageHeader, TeacherFormDialog],
   templateUrl: './teachers-page.html',
   styleUrl: './teachers-page.scss',
 })
 export default class TeachersPage {
   private readonly api = inject(AdminTeachersApi);
   private readonly alerts = inject(AlertService);
-  private readonly errors = inject(ErrorPresenter);
   private readonly access = inject(AdminAccess);
   protected readonly canWrite = computed(() => this.access.permissions().has('offers.write'));
 
-  protected readonly searchText = signal('');
-  private readonly search = toSignal(
-    toObservable(this.searchText).pipe(debounceTime(300), distinctUntilChanged()),
-    { initialValue: '' },
-  );
-  protected readonly page = signal(1);
-  private readonly query = computed(() => ({
-    q: this.search().trim() || undefined,
-    page: this.page(),
-    pageSize: PAGE_SIZE,
-  }));
-
-  protected readonly list = requestState<Paginated<AdminTeacherDto>>();
-  protected readonly teachers = computed(() => this.list.data()?.data ?? []);
-  protected readonly meta = computed(() => this.list.data()?.meta ?? null);
+  protected readonly list = listController({ fetch: (query) => this.api.list(query) });
+  protected readonly rows = rowActions();
   protected readonly notice = signal('');
-  protected readonly busyId = signal<string | null>(null);
-
   protected readonly formOpen = signal(false);
   protected readonly editing = signal<AdminTeacherDto | null>(null);
-
-  constructor() {
-    effect(() => {
-      this.search();
-      untracked(() => this.page.set(1));
-    });
-    effect(() => {
-      const query = this.query();
-      untracked(() => void this.list.run(this.api.list(query)));
-    });
-  }
-
-  protected reload(): void {
-    void this.list.run(this.api.list(this.query()));
-  }
 
   /** En uso: está en alguna oferta o módulo (la API no deja borrarlo). */
   protected inUse(teacher: AdminTeacherDto): boolean {
@@ -78,29 +49,18 @@ export default class TeachersPage {
     return parts.length ? parts.join(' · ') : 'Sin asignar';
   }
 
-  protected openCreate(): void {
-    this.editing.set(null);
-    this.formOpen.set(true);
-  }
-
-  protected openEdit(teacher: AdminTeacherDto): void {
+  protected openForm(teacher: AdminTeacherDto | null): void {
     this.editing.set(teacher);
     this.formOpen.set(true);
   }
 
   protected onSaved(teacher: AdminTeacherDto): void {
     if (this.editing()) {
-      const current = this.list.data();
-      if (current) {
-        this.list.set({
-          ...current,
-          data: current.data.map((t) => (t.id === teacher.id ? teacher : t)),
-        });
-      }
+      this.list.replace((t) => t.id === teacher.id, teacher);
       this.notice.set(`Se guardaron los cambios de ${teacher.fullName}.`);
     } else {
       this.notice.set(`Se registró a ${teacher.fullName}.`);
-      this.reload();
+      this.list.reload();
     }
   }
 
@@ -111,15 +71,13 @@ export default class TeachersPage {
       { confirmLabel: 'Borrar', variant: 'error' },
     );
     if (!confirmed) return;
-    this.busyId.set(teacher.id);
-    try {
+    const done = await this.rows.run(teacher.id, async () => {
       await firstValueFrom(this.api.remove(teacher.id), { defaultValue: undefined });
+      return true;
+    });
+    if (done) {
       this.notice.set(`Se borró a ${teacher.fullName}.`);
-      this.reload();
-    } catch (error) {
-      void this.errors.present(error);
-    } finally {
-      this.busyId.set(null);
+      this.list.reload();
     }
   }
 }

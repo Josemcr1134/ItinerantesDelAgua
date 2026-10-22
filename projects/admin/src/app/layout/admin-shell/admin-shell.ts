@@ -14,6 +14,7 @@ import { AuthService } from 'auth';
 import { AlertService } from 'ui-kit';
 import { filter } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
+import { Avatar } from '../../shared/avatar/avatar';
 import { NAV_ITEMS } from '../../core/navigation';
 
 /**
@@ -23,7 +24,7 @@ import { NAV_ITEMS } from '../../core/navigation';
  */
 @Component({
   selector: 'adm-admin-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Avatar],
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.scss',
   host: { '(document:keydown.escape)': 'closeMenu()' },

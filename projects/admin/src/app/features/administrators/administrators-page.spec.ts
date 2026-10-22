@@ -95,6 +95,7 @@ describe('AdministratorsPage', () => {
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual({ roles: [] });
     req.flush(user('u2', 'Laura', []));
+    await new Promise((r) => setTimeout(r));
     await fixture.whenStable();
     http
       .expectOne((r) => r.url === `${API}/admin/users`)

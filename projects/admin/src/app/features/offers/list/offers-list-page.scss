@@ -6,30 +6,6 @@
   color: var(--color-raisin-black);
 }
 
-.page-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.page-title {
-  color: var(--color-primary);
-  font-family: var(--font-family-display);
-  font-size: 3rem;
-  text-transform: uppercase;
-}
-
-.page-lead {
-  margin-top: var(--space-1);
-  color: var(--color-primary);
-}
-
-.page-add {
-  min-height: 48px;
-}
-
 // Seis filtros: búsqueda a lo ancho y el resto en rejilla.
 .filters {
   @include bp.up(md) {
@@ -39,20 +15,6 @@
   @include bp.up(xl) {
     grid-template-columns: minmax(0, 2fr) repeat(5, minmax(0, 1fr));
   }
-}
-
-.filters__search {
-  @include bp.up(md) {
-    grid-column: 1 / -1;
-  }
-
-  @include bp.up(xl) {
-    grid-column: auto;
-  }
-}
-
-.results {
-  margin-top: var(--space-4);
 }
 
 .offer {
@@ -105,16 +67,4 @@
 .count {
   font-family: var(--font-family-numeric);
   font-weight: 700;
-}
-
-.actions-cell {
-  @include bp.up(lg) {
-    width: 1%;
-  }
-}
-
-.adm-action {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
 }

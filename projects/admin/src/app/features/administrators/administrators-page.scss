@@ -6,34 +6,6 @@
   color: var(--color-raisin-black);
 }
 
-.page-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.page-title {
-  color: var(--color-primary);
-  font-family: var(--font-family-display);
-  font-size: 3rem;
-  text-transform: uppercase;
-}
-
-.page-lead {
-  margin-top: var(--space-1);
-  color: var(--color-primary);
-}
-
-.page-add {
-  min-height: 48px;
-}
-
-.results {
-  margin-top: var(--space-4);
-}
-
 .row--disabled .person__name,
 .row--disabled .adm-chips {
   opacity: 0.6;
@@ -71,12 +43,6 @@
   background-color: var(--color-columbia-blue);
   color: var(--color-deep-blue);
   font-size: 0.75rem;
-}
-
-.actions-cell {
-  @include bp.up(lg) {
-    width: 1%;
-  }
 }
 
 .dialog-lead {
