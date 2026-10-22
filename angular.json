@@ -86,7 +86,7 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "proxyConfig": "projects/public-site/proxy.conf.json"
+            "proxyConfig": "proxy.conf.mjs"
           }
         },
         "test": {
@@ -271,7 +271,7 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "proxyConfig": "projects/admin/proxy.conf.json"
+            "proxyConfig": "proxy.conf.mjs"
           }
         },
         "test": {
