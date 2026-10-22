@@ -76,15 +76,33 @@ export class AdminOffersApi {
   }
 }
 
-/** Docentes (selector del paso 1). */
+/** Docentes: catálogo para las ofertas (leer: `offers.read`; editar: `offers.write`). */
 @Injectable({ providedIn: 'root' })
 export class AdminTeachersApi {
   private readonly api = inject(ApiClient);
 
+  private path(id: Uuid): string {
+    return `/api/v1/admin/teachers/${encodeURIComponent(id)}`;
+  }
+
+  /** Orden alfabético; `q` busca en el nombre. */
   list(query: ApiQuery<'AdminTeachers_list'> = {}) {
     return this.api.get<ApiResponse<'AdminTeachers_list'>>('/api/v1/admin/teachers', {
       query: { ...query },
     });
+  }
+
+  create(body: ApiBody<'AdminTeachers_create'>) {
+    return this.api.post<ApiResponse<'AdminTeachers_create'>>('/api/v1/admin/teachers', body);
+  }
+
+  update(id: Uuid, body: ApiBody<'AdminTeachers_update'>) {
+    return this.api.patch<ApiResponse<'AdminTeachers_update'>>(this.path(id), body);
+  }
+
+  /** Solo si no está en ninguna oferta ni módulo (409 `TEACHER_IN_USE`). */
+  remove(id: Uuid) {
+    return this.api.delete<ApiResponse<'AdminTeachers_remove'>>(this.path(id));
   }
 }
 
