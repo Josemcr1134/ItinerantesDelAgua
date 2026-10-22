@@ -1,0 +1,198 @@
+<form [formGroup]="form" (submit)="$event.preventDefault()">
+  <p class="adm-callout adm-callout--info">
+    Las fechas y horas se escriben en hora de la Ciudad de México ({{ timezone() }}).
+  </p>
+
+  <section class="adm-section" aria-labelledby="schedule-dates">
+    <h2 id="schedule-dates" class="adm-section__title">Fechas</h2>
+    <div class="adm-grid">
+      <div class="adm-field">
+        <label class="adm-field__label" for="s-opens">{{
+          isOpenCall() ? 'Abre la postulación' : 'Abren las inscripciones'
+        }}</label>
+        <input
+          id="s-opens"
+          class="adm-field__input"
+          type="datetime-local"
+          formControlName="enrollmentOpensAt"
+          [attr.aria-invalid]="!!issue('enrollmentOpensAt')"
+        />
+        @if (issue('enrollmentOpensAt')) {
+          <p class="adm-field__error">{{ issue('enrollmentOpensAt') }}</p>
+        }
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="s-closes">{{
+          isOpenCall() ? 'Cierra la postulación' : 'Cierran las inscripciones'
+        }}</label>
+        <input
+          id="s-closes"
+          class="adm-field__input"
+          type="datetime-local"
+          formControlName="enrollmentClosesAt"
+          [attr.aria-invalid]="!!issue('enrollmentClosesAt')"
+        />
+        @if (issue('enrollmentClosesAt')) {
+          <p class="adm-field__error">{{ issue('enrollmentClosesAt') }}</p>
+        }
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="s-starts">Inicio</label>
+        <input
+          id="s-starts"
+          class="adm-field__input"
+          type="datetime-local"
+          formControlName="startsAt"
+          [attr.aria-invalid]="!!issue('startsAt')"
+        />
+        @if (issue('startsAt')) {
+          <p class="adm-field__error">{{ issue('startsAt') }}</p>
+        }
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="s-ends">Fin</label>
+        <input
+          id="s-ends"
+          class="adm-field__input"
+          type="datetime-local"
+          formControlName="endsAt"
+          [attr.aria-invalid]="!!issue('endsAt')"
+        />
+        @if (issue('endsAt')) {
+          <p class="adm-field__error">{{ issue('endsAt') }}</p>
+        }
+      </div>
+      @if (offer().type === 'DIPLOMA') {
+        <div class="adm-field">
+          <label class="adm-field__label" for="s-final">Entrega del proyecto final</label>
+          <input
+            id="s-final"
+            class="adm-field__input"
+            type="datetime-local"
+            formControlName="finalProjectDueAt"
+            [attr.aria-invalid]="!!issue('finalProjectDueAt')"
+          />
+          @if (issue('finalProjectDueAt')) {
+            <p class="adm-field__error">{{ issue('finalProjectDueAt') }}</p>
+          }
+        </div>
+      }
+      <div class="adm-field">
+        <label class="adm-field__label" for="s-hours">Duración total (horas)</label>
+        <input
+          id="s-hours"
+          class="adm-field__input"
+          type="number"
+          min="1"
+          step="0.5"
+          formControlName="totalHours"
+          aria-describedby="s-hours-hint"
+          [attr.aria-invalid]="!!issue('totalHours')"
+        />
+        <p id="s-hours-hint" class="adm-field__hint">Curso: hasta 9 h. Diplomado: 60 h.</p>
+        @if (issue('totalHours')) {
+          <p class="adm-field__error">{{ issue('totalHours') }}</p>
+        }
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="s-category">Color en el calendario</label>
+        <select id="s-category" class="adm-field__input" formControlName="calendarCategory">
+          @for (c of categories; track c) {
+            <option [value]="c">{{ categoryLabels[c] }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="adm-section" aria-labelledby="schedule-rule">
+    <h2 id="schedule-rule" class="adm-section__title">Regla de horario</h2>
+    <p class="adm-section__lead">Con ella se generan las sesiones de la oferta.</p>
+    <label class="adm-check">
+      <input type="checkbox" formControlName="hasRule" />
+      La oferta tiene sesiones en días fijos de la semana
+    </label>
+
+    @if (hasRule()) {
+      <div class="adm-grid rule">
+        <fieldset class="adm-grid__full weekdays-field">
+          <legend class="adm-field__label">Días</legend>
+          <div class="weekdays">
+            @for (day of weekdays; track day.value) {
+              <label class="weekday">
+                <input
+                  class="visually-hidden"
+                  type="checkbox"
+                  [checked]="days().includes(day.value)"
+                  [disabled]="readonly()"
+                  (change)="toggleDay(day.value, $any($event.target).checked)"
+                />
+                <span aria-hidden="true">{{ day.short }}</span>
+                <span class="visually-hidden">{{ day.label }}</span>
+              </label>
+            }
+          </div>
+          @if (issue('weekdays')) {
+            <p class="adm-field__error">{{ issue('weekdays') }}</p>
+          }
+        </fieldset>
+        <div class="adm-field">
+          <label class="adm-field__label" for="s-start-time">Hora de inicio</label>
+          <input
+            id="s-start-time"
+            class="adm-field__input"
+            type="time"
+            formControlName="startTime"
+          />
+        </div>
+        <div class="adm-field">
+          <label class="adm-field__label" for="s-end-time">Hora de fin</label>
+          <input id="s-end-time" class="adm-field__input" type="time" formControlName="endTime" />
+          @if (issue('endTime') ?? issue('scheduleRule')) {
+            <p class="adm-field__error">{{ issue('endTime') ?? issue('scheduleRule') }}</p>
+          }
+        </div>
+        <label class="adm-check adm-grid__full">
+          <input type="checkbox" formControlName="excludeMexicanHolidays" />
+          Omitir los festivos oficiales de México
+        </label>
+        <div class="adm-grid__full">
+          <span class="adm-field__label" id="s-excluded-label">Fechas sin sesión (recesos)</span>
+          @if (excludedDates().length) {
+            <ul class="dates" aria-labelledby="s-excluded-label">
+              @for (date of excludedDates(); track date) {
+                <li class="date">
+                  {{ date }}
+                  @if (!readonly()) {
+                    <button
+                      type="button"
+                      (click)="removeExcludedDate(date)"
+                      [attr.aria-label]="'Quitar ' + date"
+                    >
+                      ×
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          }
+          @if (!readonly()) {
+            <div class="add-date">
+              <label class="visually-hidden" for="s-excluded-new">Nueva fecha sin sesión</label>
+              <input
+                id="s-excluded-new"
+                class="adm-field__input"
+                type="date"
+                [value]="newExcludedDate()"
+                (input)="newExcludedDate.set($any($event.target).value)"
+              />
+              <button type="button" class="adm-action" (click)="addExcludedDate()">
+                Agregar fecha
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </section>
+</form>

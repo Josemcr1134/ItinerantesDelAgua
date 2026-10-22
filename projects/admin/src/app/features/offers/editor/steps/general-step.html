@@ -1,0 +1,170 @@
+<form [formGroup]="form" (submit)="$event.preventDefault()">
+  <section class="adm-section" aria-labelledby="general-basics">
+    <h2 id="general-basics" class="adm-section__title">Datos de la oferta</h2>
+    @if (offer().hasEnrollments) {
+      <p class="adm-callout adm-callout--info">
+        Ya tiene inscritos o postulaciones: el tipo y la modalidad no se pueden cambiar.
+      </p>
+    }
+    <div class="adm-grid">
+      <div class="adm-field adm-grid__full">
+        <label class="adm-field__label" for="g-name">Nombre</label>
+        <input
+          id="g-name"
+          class="adm-field__input"
+          formControlName="name"
+          [attr.aria-invalid]="!!issue('name')"
+          [attr.aria-describedby]="issue('name') ? 'g-name-issue' : null"
+        />
+        @if (issue('name')) {
+          <p id="g-name-issue" class="adm-field__error">{{ issue('name') }}</p>
+        }
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="g-type">Tipo</label>
+        <select id="g-type" class="adm-field__input" formControlName="type">
+          @for (t of types; track t) {
+            <option [value]="t">{{ typeLabels[t] }}</option>
+          }
+        </select>
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="g-modality">Modalidad</label>
+        <select id="g-modality" class="adm-field__input" formControlName="modality">
+          @for (m of modalities; track m) {
+            <option [value]="m">{{ modalityLabels[m] }}</option>
+          }
+        </select>
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="g-cohort"
+          >Cohorte <span class="adm-field__hint">(opcional)</span></label
+        >
+        <input
+          id="g-cohort"
+          class="adm-field__input"
+          formControlName="cohortLabel"
+          placeholder="Ej. Generación 2027"
+        />
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="g-capacity"
+          >Cupo <span class="adm-field__hint">(vacío = sin límite)</span></label
+        >
+        <input
+          id="g-capacity"
+          class="adm-field__input"
+          type="number"
+          min="1"
+          step="1"
+          formControlName="capacity"
+        />
+        @if (issue('capacity')) {
+          <p class="adm-field__error">{{ issue('capacity') }}</p>
+        }
+      </div>
+      <div class="adm-field adm-grid__full">
+        <label class="adm-field__label" for="g-topic">Temática pública</label>
+        <select
+          id="g-topic"
+          class="adm-field__input"
+          formControlName="publicTopic"
+          aria-describedby="g-topic-hint"
+        >
+          <option value="">Sin temática</option>
+          @for (t of topics; track t) {
+            <option [value]="t">{{ topicLabels[t] }}</option>
+          }
+        </select>
+        <p id="g-topic-hint" class="adm-field__hint">
+          Agrupa la oferta en «Nuestros caminos» del sitio.
+        </p>
+      </div>
+      <div class="adm-field adm-grid__full">
+        <label class="adm-field__label" for="g-summary">Resumen</label>
+        <textarea
+          id="g-summary"
+          class="adm-field__input"
+          rows="3"
+          formControlName="summary"
+          [attr.aria-invalid]="!!issue('summary')"
+          [attr.aria-describedby]="issue('summary') ? 'g-summary-issue' : null"
+        ></textarea>
+        @if (issue('summary')) {
+          <p id="g-summary-issue" class="adm-field__error">{{ issue('summary') }}</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="adm-section" aria-labelledby="general-images">
+    <h2 id="general-images" class="adm-section__title">Imágenes</h2>
+    <div class="adm-grid">
+      <adm-image-field
+        label="Portada"
+        purpose="OFFER_COVER"
+        [offerId]="offer().id"
+        [disabled]="readonly()"
+        [issue]="issue('coverImageKey') ?? issue('coverImage')"
+        [(image)]="cover"
+      />
+      <adm-image-list-field
+        label="Carrusel"
+        purpose="OFFER_CAROUSEL"
+        [offerId]="offer().id"
+        [disabled]="readonly()"
+        [(images)]="carousel"
+      />
+    </div>
+  </section>
+
+  <section class="adm-section" aria-labelledby="general-teachers">
+    <h2 id="general-teachers" class="adm-section__title">Docentes</h2>
+    <adm-teacher-picker
+      [(teachers)]="teachers"
+      [disabled]="readonly()"
+      [issue]="issue('teacherIds') ?? issue('teachers')"
+    />
+  </section>
+
+  @if (modality() === 'IN_PERSON') {
+    <section class="adm-section" aria-labelledby="general-venue">
+      <h2 id="general-venue" class="adm-section__title">Sede</h2>
+      <p class="adm-section__lead">Obligatoria en las ofertas presenciales.</p>
+      <div class="adm-grid">
+        <div class="adm-field">
+          <label class="adm-field__label" for="g-venue-name">Nombre del lugar</label>
+          <input
+            id="g-venue-name"
+            class="adm-field__input"
+            formControlName="venueName"
+            [attr.aria-invalid]="!!issue('venueName')"
+          />
+          @if (issue('venueName')) {
+            <p class="adm-field__error">{{ issue('venueName') }}</p>
+          }
+        </div>
+        <div class="adm-field">
+          <label class="adm-field__label" for="g-venue-city">Ciudad</label>
+          <input id="g-venue-city" class="adm-field__input" formControlName="venueCity" />
+        </div>
+        <div class="adm-field adm-grid__full">
+          <label class="adm-field__label" for="g-venue-address">Dirección</label>
+          <input id="g-venue-address" class="adm-field__input" formControlName="venueAddress" />
+        </div>
+        <div class="adm-field adm-grid__full">
+          <label class="adm-field__label" for="g-venue-maps"
+            >Enlace de Google Maps <span class="adm-field__hint">(opcional)</span></label
+          >
+          <input
+            id="g-venue-maps"
+            class="adm-field__input"
+            type="url"
+            formControlName="venueMapsUrl"
+            placeholder="https://maps.google.com/…"
+          />
+        </div>
+      </div>
+    </section>
+  }
+</form>

@@ -1,0 +1,207 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): reemplazar por el diseño del Figma.
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 var(--space-4);
+}
+
+.header__text {
+  min-width: 0;
+}
+
+.header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
+  font-size: 0.875rem;
+}
+
+.header__title {
+  margin-top: var(--space-1);
+  color: var(--color-primary);
+  font-family: var(--font-family-display);
+  font-size: clamp(2.25rem, 4vw, 3rem);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.blockers {
+  margin-bottom: var(--space-3);
+}
+
+// Pasos a la izquierda (escritorio) o arriba con scroll (móvil).
+.wizard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+
+  @include bp.up(xl) {
+    grid-template-columns: 16rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.stepper {
+  min-width: 0;
+
+  @include bp.up(xl) {
+    position: sticky;
+    top: var(--space-4);
+  }
+}
+
+.stepper__list {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  overflow-x: auto;
+  list-style: none;
+
+  @include bp.up(xl) {
+    flex-direction: column;
+    overflow: visible;
+  }
+}
+
+.stepper__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-width: 12rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background-color: var(--color-surface);
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+
+.stepper__item--current {
+  border-color: var(--color-primary);
+}
+
+.stepper__number {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  font-family: var(--font-family-numeric);
+  font-weight: 700;
+}
+
+.stepper__item--done .stepper__number {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.stepper__item--issues .stepper__number {
+  background-color: color-mix(in srgb, var(--color-sun) 35%, transparent);
+  color: #6b4d00;
+}
+
+.stepper__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stepper__label {
+  font-weight: 700;
+}
+
+.stepper__status {
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.75rem;
+}
+
+.step {
+  min-width: 0;
+}
+
+.step__title {
+  margin-bottom: var(--space-3);
+  color: var(--color-primary);
+  font-family: var(--font-family-body);
+  font-size: 1.5rem;
+  font-weight: 700;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.step__issues {
+  margin-bottom: var(--space-4);
+}
+
+.step__footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  background-color: #f6f2e7;
+}
+
+.step__footer-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.step__dirty {
+  color: #6b4d00;
+  font-size: 0.875rem;
+  font-weight: 600;
+}

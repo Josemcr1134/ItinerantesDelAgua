@@ -23,6 +23,11 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/home/home'),
       },
       {
+        path: 'ofertas',
+        canActivate: [permissionGuard('offers.read')],
+        loadChildren: () => import('./features/offers/offers.routes'),
+      },
+      {
         path: 'administradores',
         title: 'Administradores · Administrador',
         canActivate: [permissionGuard('users.manage')],

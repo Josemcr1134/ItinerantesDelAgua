@@ -1,0 +1,172 @@
+<form [formGroup]="form" (submit)="$event.preventDefault()">
+  <section class="adm-section" aria-labelledby="pricing-origin">
+    <h2 id="pricing-origin" class="adm-section__title">Origen</h2>
+    <p class="adm-section__lead">
+      Dónde se imparte: en la plataforma propia (inscripción y pagos aquí) o en Moodle.
+    </p>
+    @if (offer().hasEnrollments) {
+      <p class="adm-callout adm-callout--info">
+        Ya tiene inscritos: el origen no se puede cambiar.
+      </p>
+    }
+    <fieldset class="choices">
+      <legend class="visually-hidden">Origen</legend>
+      @for (o of origins; track o) {
+        <label class="choice">
+          <input type="radio" formControlName="origin" [value]="o" />
+          {{ originLabels[o] }}
+        </label>
+      }
+    </fieldset>
+    @if (origin() === 'MOODLE') {
+      <div class="adm-field rule">
+        <label class="adm-field__label" for="p-moodle">Enlace del curso en Moodle</label>
+        <input
+          id="p-moodle"
+          class="adm-field__input"
+          type="url"
+          formControlName="moodleCourseUrl"
+          placeholder="https://…"
+          [attr.aria-invalid]="!!issue('moodleCourseUrl')"
+        />
+        @if (issue('moodleCourseUrl')) {
+          <p class="adm-field__error">{{ issue('moodleCourseUrl') }}</p>
+        }
+        <p class="adm-field__hint">
+          La lista de correos y los códigos de acceso se cargan en la sección de Moodle de la
+          oferta.
+        </p>
+      </div>
+    }
+  </section>
+
+  @if (origin() === 'NAS') {
+    <section class="adm-section" aria-labelledby="pricing-price">
+      <h2 id="pricing-price" class="adm-section__title">Precio</h2>
+      <label class="adm-check">
+        <input type="checkbox" formControlName="isFree" />
+        Gratuita
+      </label>
+      @if (!isFree()) {
+        <div class="adm-grid rule">
+          <div class="adm-field">
+            <label class="adm-field__label" for="p-mxn">Precio en pesos (MXN)</label>
+            <div class="money">
+              <span class="money__prefix" aria-hidden="true">$</span>
+              <input
+                id="p-mxn"
+                class="adm-field__input"
+                type="number"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                formControlName="priceMxn"
+                [attr.aria-invalid]="!!issue('priceMxnCents')"
+              />
+            </div>
+            @if (issue('priceMxnCents')) {
+              <p class="adm-field__error">{{ issue('priceMxnCents') }}</p>
+            }
+          </div>
+          <div class="adm-field">
+            <label class="adm-field__label" for="p-usd">Precio en dólares (USD)</label>
+            <div class="money">
+              <span class="money__prefix" aria-hidden="true">$</span>
+              <input
+                id="p-usd"
+                class="adm-field__input"
+                type="number"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                formControlName="priceUsd"
+                [attr.aria-invalid]="!!issue('priceUsdCents')"
+              />
+            </div>
+            @if (issue('priceUsdCents')) {
+              <p class="adm-field__error">{{ issue('priceUsdCents') }}</p>
+            }
+          </div>
+          <label class="adm-check adm-grid__full">
+            <input type="checkbox" formControlName="installmentsEnabled" />
+            Permitir pago en cuotas
+          </label>
+          @if (installments()) {
+            <div class="adm-field">
+              <label class="adm-field__label" for="p-installments">Número máximo de cuotas</label>
+              <select
+                id="p-installments"
+                class="adm-field__input"
+                formControlName="installmentsMax"
+              >
+                <option [ngValue]="null" disabled>Elige</option>
+                @for (n of [2, 3, 4]; track n) {
+                  <option [ngValue]="n">{{ n }} cuotas</option>
+                }
+              </select>
+              @if (issue('installmentsMax')) {
+                <p class="adm-field__error">{{ issue('installmentsMax') }}</p>
+              }
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    @if (scholarshipAvailable()) {
+      <section class="adm-section" aria-labelledby="pricing-scholarship">
+        <h2 id="pricing-scholarship" class="adm-section__title">Beca</h2>
+        <label class="adm-check">
+          <input type="checkbox" formControlName="scholarshipEnabled" />
+          Ofrecer beca en este diplomado
+        </label>
+        @if (scholarship()) {
+          <div class="adm-grid rule">
+            <fieldset class="adm-grid__full levels-field">
+              <legend class="adm-field__label">Niveles de beca</legend>
+              <div class="levels">
+                @for (level of levels; track level) {
+                  <label class="adm-check">
+                    <input
+                      type="checkbox"
+                      [checked]="scholarshipLevels().includes(level)"
+                      [disabled]="readonly()"
+                      (change)="toggleLevel(level, $any($event.target).checked)"
+                    />
+                    {{ levelLabels[level] }}
+                  </label>
+                }
+              </div>
+              @if (issue('scholarshipLevels')) {
+                <p class="adm-field__error">{{ issue('scholarshipLevels') }}</p>
+              }
+            </fieldset>
+            <div class="adm-field">
+              <label class="adm-field__label" for="p-sch-opens">Abre la postulación a beca</label>
+              <input
+                id="p-sch-opens"
+                class="adm-field__input"
+                type="datetime-local"
+                formControlName="scholarshipOpensAt"
+              />
+            </div>
+            <div class="adm-field">
+              <label class="adm-field__label" for="p-sch-closes"
+                >Cierra la postulación a beca</label
+              >
+              <input
+                id="p-sch-closes"
+                class="adm-field__input"
+                type="datetime-local"
+                formControlName="scholarshipClosesAt"
+              />
+            </div>
+            <p class="adm-field__hint adm-grid__full">
+              Sin fechas, la beca sigue la ventana de inscripción. Horas en CDMX.
+            </p>
+          </div>
+        }
+      </section>
+    }
+  }
+</form>

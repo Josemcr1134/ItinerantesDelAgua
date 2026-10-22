@@ -1,0 +1,323 @@
+<header class="page-header">
+  <div>
+    <h1 class="page-title">Oferta formativa</h1>
+    <p class="page-lead">Diplomados, cursos, talleres, eventos y convocatorias.</p>
+  </div>
+  @if (canWrite()) {
+    <button uiButton type="button" class="page-add" (click)="creating.set(true)">
+      <svg
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Nueva oferta
+    </button>
+  }
+</header>
+
+<p class="adm-notice" role="status">{{ notice() }}</p>
+
+<form
+  class="adm-filters filters"
+  role="search"
+  aria-label="Filtrar ofertas"
+  (submit)="$event.preventDefault()"
+>
+  <div class="adm-field filters__search">
+    <label class="adm-field__label" for="offers-search">Buscar</label>
+    <input
+      id="offers-search"
+      class="adm-field__input"
+      type="search"
+      name="search"
+      placeholder="Nombre de la oferta"
+      autocomplete="off"
+      [ngModel]="searchText()"
+      (ngModelChange)="searchText.set($event)"
+    />
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="offers-status">Estado</label>
+    <select
+      id="offers-status"
+      class="adm-field__input"
+      name="status"
+      [ngModel]="status()"
+      (ngModelChange)="status.set($event)"
+    >
+      <option value="">Todos</option>
+      @for (value of statuses; track value) {
+        <option [value]="value">{{ statusLabels[value] }}</option>
+      }
+    </select>
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="offers-type">Tipo</label>
+    <select
+      id="offers-type"
+      class="adm-field__input"
+      name="type"
+      [ngModel]="type()"
+      (ngModelChange)="type.set($event)"
+    >
+      <option value="">Todos</option>
+      @for (value of types; track value) {
+        <option [value]="value">{{ typeLabels[value] }}</option>
+      }
+    </select>
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="offers-modality">Modalidad</label>
+    <select
+      id="offers-modality"
+      class="adm-field__input"
+      name="modality"
+      [ngModel]="modality()"
+      (ngModelChange)="modality.set($event)"
+    >
+      <option value="">Todas</option>
+      @for (value of modalities; track value) {
+        <option [value]="value">{{ modalityLabels[value] }}</option>
+      }
+    </select>
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="offers-origin">Origen</label>
+    <select
+      id="offers-origin"
+      class="adm-field__input"
+      name="origin"
+      [ngModel]="origin()"
+      (ngModelChange)="origin.set($event)"
+    >
+      <option value="">Todos</option>
+      @for (value of origins; track value) {
+        <option [value]="value">{{ originLabels[value] }}</option>
+      }
+    </select>
+  </div>
+  <div class="adm-field">
+    <label class="adm-field__label" for="offers-sort">Ordenar por</label>
+    <select
+      id="offers-sort"
+      class="adm-field__input"
+      name="sort"
+      [ngModel]="sort()"
+      (ngModelChange)="sort.set($event)"
+    >
+      <option value="UPDATED_DESC">Recientes</option>
+      <option value="STARTS_AT_ASC">Fecha de inicio</option>
+      <option value="NAME_ASC">Nombre (A-Z)</option>
+    </select>
+  </div>
+</form>
+
+<section class="results" aria-labelledby="offers-results" [attr.aria-busy]="list.loading()">
+  <h2 id="offers-results" class="visually-hidden">Ofertas</h2>
+
+  @if (list.error() && !list.data()) {
+    <div class="adm-state adm-state--error" role="alert">
+      <p>{{ list.error()?.message }}</p>
+      <button uiButton variant="secondary" type="button" (click)="reload()">Reintentar</button>
+    </div>
+  } @else if (list.loading() && !list.data()) {
+    <p class="adm-state">Cargando ofertas…</p>
+  } @else if (!offers().length) {
+    <div class="adm-state">
+      @if (hasFilters()) {
+        <p>No hay ofertas con esos filtros.</p>
+        <button type="button" class="adm-link" (click)="clearFilters()">Quitar filtros</button>
+      } @else {
+        <p>
+          Aún no hay ofertas.
+          @if (canWrite()) {
+            Crea la primera con «Nueva oferta».
+          }
+        </p>
+      }
+    </div>
+  } @else {
+    <table class="adm-table" [class.adm-table--loading]="list.loading()">
+      <thead>
+        <tr>
+          <th scope="col">Oferta</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Fechas</th>
+          <th scope="col">Inscripciones</th>
+          <th scope="col"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (offer of offers(); track offer.id) {
+          @let busy = busyId() === offer.id;
+          <tr>
+            <td data-label="Oferta">
+              <div class="offer">
+                @if (offer.coverImageUrl) {
+                  <img
+                    class="offer__cover"
+                    [src]="offer.coverImageUrl"
+                    alt=""
+                    width="72"
+                    height="54"
+                    loading="lazy"
+                  />
+                } @else {
+                  <span class="offer__cover offer__cover--empty" aria-hidden="true"></span>
+                }
+                <div class="offer__text">
+                  <a class="offer__name" [routerLink]="['/ofertas', offer.id]">{{ offer.name }}</a>
+                  <p class="offer__meta">
+                    {{ typeLabels[offer.type] }} · {{ modalityLabels[offer.modality] }}
+                    @if (offer.origin === 'MOODLE') {
+                      · Moodle
+                    }
+                    @if (offer.cohortLabel) {
+                      · {{ offer.cohortLabel }}
+                    }
+                  </p>
+                </div>
+              </div>
+            </td>
+            <td data-label="Estado">
+              <span [class]="'adm-badge adm-badge--' + offer.adminStatus">{{
+                statusLabels[offer.adminStatus]
+              }}</span>
+            </td>
+            <td data-label="Fechas" class="dates">
+              @if (offer.startsAt) {
+                {{ formatDate(offer.startsAt) }}
+                @if (offer.endsAt) {
+                  – {{ formatDate(offer.endsAt) }}
+                }
+              } @else {
+                <span class="muted">Sin fechas</span>
+              }
+            </td>
+            <td data-label="Inscripciones">
+              <span class="count">{{ offer.counts.enrollments }}</span>
+              @if (offer.counts.applications) {
+                <span class="muted"> · {{ offer.counts.applications }} postulaciones</span>
+              }
+            </td>
+            <td class="actions-cell">
+              <div class="adm-actions">
+                <a class="adm-action" [routerLink]="['/ofertas', offer.id]">
+                  {{ canWrite() ? 'Editar' : 'Ver'
+                  }}<span class="visually-hidden"> {{ offer.name }}</span>
+                </a>
+                @if (canPublish() || previewUrl(offer)) {
+                  <adm-row-menu [label]="'Más acciones de ' + offer.name">
+                    @if (previewUrl(offer); as url) {
+                      <a
+                        class="adm-menuitem"
+                        role="menuitem"
+                        [href]="url"
+                        target="_blank"
+                        rel="noopener"
+                        >Vista previa</a
+                      >
+                    }
+                    @if (canPublish()) {
+                      @if (canPublishNow(offer)) {
+                        <button
+                          class="adm-menuitem"
+                          role="menuitem"
+                          type="button"
+                          [disabled]="busy"
+                          (click)="publish(offer)"
+                        >
+                          Publicar
+                        </button>
+                      }
+                      @if (canUnpublish(offer)) {
+                        <button
+                          class="adm-menuitem"
+                          role="menuitem"
+                          type="button"
+                          [disabled]="busy"
+                          (click)="unpublish(offer)"
+                        >
+                          Volver a borrador
+                        </button>
+                      }
+                      @if (canArchive(offer)) {
+                        <button
+                          class="adm-menuitem"
+                          role="menuitem"
+                          type="button"
+                          [disabled]="busy"
+                          (click)="archive(offer)"
+                        >
+                          Archivar
+                        </button>
+                      }
+                      <button
+                        class="adm-menuitem"
+                        role="menuitem"
+                        type="button"
+                        [disabled]="busy"
+                        (click)="duplicate(offer)"
+                      >
+                        Duplicar (nueva cohorte)
+                      </button>
+                      @if (canRemove(offer)) {
+                        <button
+                          class="adm-menuitem adm-menuitem--danger"
+                          role="menuitem"
+                          type="button"
+                          [disabled]="busy"
+                          (click)="remove(offer)"
+                        >
+                          Borrar borrador
+                        </button>
+                      }
+                    }
+                  </adm-row-menu>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (meta(); as m) {
+      <nav class="adm-pagination" aria-label="Paginación">
+        <p class="adm-pagination__info">
+          {{ m.total }} {{ m.total === 1 ? 'oferta' : 'ofertas' }} · Página {{ m.page }} de
+          {{ m.totalPages || 1 }}
+        </p>
+        <div class="adm-pagination__buttons">
+          <button
+            type="button"
+            class="adm-action"
+            [disabled]="m.page <= 1 || list.loading()"
+            (click)="page.set(m.page - 1)"
+          >
+            Anterior
+          </button>
+          <button
+            type="button"
+            class="adm-action"
+            [disabled]="m.page >= m.totalPages || list.loading()"
+            (click)="page.set(m.page + 1)"
+          >
+            Siguiente
+          </button>
+        </div>
+      </nav>
+    }
+  }
+</section>
+
+@if (canWrite()) {
+  <adm-new-offer-dialog [(open)]="creating" />
+}

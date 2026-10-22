@@ -1,0 +1,120 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): reemplazar por el diseño del Figma.
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.page-title {
+  color: var(--color-primary);
+  font-family: var(--font-family-display);
+  font-size: 3rem;
+  text-transform: uppercase;
+}
+
+.page-lead {
+  margin-top: var(--space-1);
+  color: var(--color-primary);
+}
+
+.page-add {
+  min-height: 48px;
+}
+
+// Seis filtros: búsqueda a lo ancho y el resto en rejilla.
+.filters {
+  @include bp.up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include bp.up(xl) {
+    grid-template-columns: minmax(0, 2fr) repeat(5, minmax(0, 1fr));
+  }
+}
+
+.filters__search {
+  @include bp.up(md) {
+    grid-column: 1 / -1;
+  }
+
+  @include bp.up(xl) {
+    grid-column: auto;
+  }
+}
+
+.results {
+  margin-top: var(--space-4);
+}
+
+.offer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.offer__cover {
+  flex: none;
+  width: 72px;
+  height: 54px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.offer__cover--empty {
+  background: linear-gradient(
+    135deg,
+    var(--color-columbia-blue),
+    color-mix(in srgb, var(--color-primary) 25%, #fff)
+  );
+}
+
+.offer__text {
+  min-width: 0;
+}
+
+.offer__name {
+  color: var(--color-raisin-black);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+}
+
+.offer__meta,
+.muted {
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.875rem;
+}
+
+.dates {
+  white-space: nowrap;
+}
+
+.count {
+  font-family: var(--font-family-numeric);
+  font-weight: 700;
+}
+
+.actions-cell {
+  @include bp.up(lg) {
+    width: 1%;
+  }
+}
+
+.adm-action {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}

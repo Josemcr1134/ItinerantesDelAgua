@@ -1,6 +1,6 @@
 import { Permission } from 'data-access';
 
-export type NavIcon = 'home' | 'users';
+export type NavIcon = 'home' | 'offers' | 'users';
 
 export interface NavItem {
   readonly label: string;
@@ -15,5 +15,6 @@ export interface NavItem {
 /** Menú lateral del panel; cada módulo nuevo se agrega aquí con su permiso. */
 export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Inicio', path: '/', icon: 'home', exact: true },
+  { label: 'Oferta formativa', path: '/ofertas', icon: 'offers', permission: 'offers.read' },
   { label: 'Administradores', path: '/administradores', icon: 'users', permission: 'users.manage' },
 ];

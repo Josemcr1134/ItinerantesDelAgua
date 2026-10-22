@@ -19,6 +19,13 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   INTERNAL_ERROR: 'Algo salió mal',
   ADMIN_SELF_ACTION: 'No puedes hacerlo sobre tu cuenta',
   ADMIN_LAST_SUPER_ADMIN: 'Se necesita un superadministrador',
+  OFFER_NAME_TAKEN: 'Ese nombre ya existe',
+  OFFER_HAS_ENROLLMENTS: 'La oferta ya tiene inscritos',
+  OFFER_INVALID_STATE: 'No es posible en este estado',
+  OFFER_INCOMPLETE: 'Faltan datos para publicar',
+  ADMIN_UPLOAD_NOT_FOUND: 'No encontramos la imagen',
+  ADMIN_UPLOAD_INVALID_FILE: 'Imagen no válida',
+  TEACHER_IN_USE: 'El docente está en uso',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -32,6 +39,12 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'PAYLOAD_TOO_LARGE',
   'ADMIN_SELF_ACTION',
   'ADMIN_LAST_SUPER_ADMIN',
+  'OFFER_NAME_TAKEN',
+  'OFFER_HAS_ENROLLMENTS',
+  'OFFER_INVALID_STATE',
+  'OFFER_INCOMPLETE',
+  'ADMIN_UPLOAD_INVALID_FILE',
+  'TEACHER_IN_USE',
 ];
 
 export interface PresentErrorOptions {

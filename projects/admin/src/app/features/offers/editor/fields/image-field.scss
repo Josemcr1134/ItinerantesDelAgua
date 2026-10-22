@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+
+.image-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.image-field__box {
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  max-width: 28rem;
+  border-radius: 16px;
+  background-color: #fff;
+}
+
+.image-field__box--empty {
+  display: grid;
+  place-items: center;
+  border: 2px dashed #d9d2c1;
+}
+
+.image-field__preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-field__placeholder {
+  color: color-mix(in srgb, var(--color-raisin-black) 55%, transparent);
+  font-size: 0.875rem;
+}
+
+.image-field__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.image-field__pick {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+.is-busy {
+  cursor: progress;
+  opacity: 0.6;
+}
