@@ -15,23 +15,21 @@
   />
   <h2 id="impact-title" class="impact__title">{{ c.heading }}</h2>
 
-  <div class="impact__highlight">
-    <img
-      class="impact__highlight-outline"
-      [src]="c.highlightOutline.src"
-      [alt]="c.highlightOutline.alt"
-      width="463"
-      height="130"
-    />
-    <ui-stat-badge
-      [value]="c.highlight.value"
-      [unit]="c.highlight.unit"
-      [label]="c.highlight.label"
-    />
-  </div>
+  @if (c.highlight; as highlight) {
+    <div class="impact__highlight">
+      <img
+        class="impact__highlight-outline"
+        [src]="c.highlightOutline.src"
+        [alt]="c.highlightOutline.alt"
+        width="463"
+        height="130"
+      />
+      <ui-stat-badge [value]="highlight.value" [unit]="highlight.unit" [label]="highlight.label" />
+    </div>
+  }
 
   <ul class="impact__stats">
-    @for (stat of c.stats; track stat.label) {
+    @for (stat of c.stats; track stat.key ?? stat.label) {
       <li class="impact__card">
         <ui-stat-circle
           [value]="stat.value"
