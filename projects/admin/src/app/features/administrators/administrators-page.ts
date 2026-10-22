@@ -23,6 +23,7 @@ import { RowMenu } from '../../shared/row-menu/row-menu';
 import { AddAdministratorDialog } from './add-administrator/add-administrator-dialog';
 import { EditRolesDialog } from './edit-roles-dialog';
 import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-roles';
+import { Notice } from '../../shared/notice/notice';
 
 /**
  * Administradores (solo con `users.manage`): el equipo con sus roles y
@@ -33,6 +34,7 @@ import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-r
 @Component({
   selector: 'adm-administrators-page',
   imports: [
+    Notice,
     Button,
     AddAdministratorDialog,
     EditRolesDialog,

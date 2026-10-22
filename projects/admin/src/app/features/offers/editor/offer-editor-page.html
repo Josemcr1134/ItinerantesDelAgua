@@ -93,7 +93,7 @@
       </div>
     }
 
-    <p class="adm-notice" role="status">{{ notice() }}</p>
+    <adm-notice [(message)]="notice" />
 
     <div class="wizard">
       <nav class="stepper" aria-label="Pasos de la oferta">

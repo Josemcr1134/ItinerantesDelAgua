@@ -21,7 +21,7 @@
   }
 </adm-page-header>
 
-<p class="adm-notice" role="status">{{ notice() }}</p>
+<adm-notice [(message)]="notice" />
 
 <form
   class="adm-filters filters"

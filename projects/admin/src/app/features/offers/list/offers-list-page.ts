@@ -33,6 +33,7 @@ import {
 import { NewOfferDialog } from '../shared/new-offer-dialog';
 import { OfferActions } from '../shared/offer-actions';
 import { formatOfferDate } from '../shared/zoned-time';
+import { Notice } from '../../../shared/notice/notice';
 
 /**
  * Oferta formativa (HU-27): listado con filtros, estado y conteos. Las
@@ -42,6 +43,7 @@ import { formatOfferDate } from '../shared/zoned-time';
 @Component({
   selector: 'adm-offers-list-page',
   imports: [
+    Notice,
     RouterLink,
     Button,
     RowMenu,

@@ -24,6 +24,7 @@ import { PricingStep } from './steps/pricing-step';
 import { ResourcesStep } from './steps/resources-step';
 import { ScheduleStep } from './steps/schedule-step';
 import { WhatsappStep } from './steps/whatsapp-step';
+import { Notice } from '../../../shared/notice/notice';
 
 /**
  * Asistente de una oferta (HU-27): 7 pasos con su estado según la API
@@ -34,6 +35,7 @@ import { WhatsappStep } from './steps/whatsapp-step';
 @Component({
   selector: 'adm-offer-editor-page',
   imports: [
+    Notice,
     RouterLink,
     Button,
     RowMenu,
