@@ -1,0 +1,75 @@
+<adm-page-header title="Página web" lead="Contenido de la landing que edita el equipo." />
+
+<adm-notice [(message)]="notice" />
+
+<section class="adm-section" aria-labelledby="site-metrics-title">
+  <h2 id="site-metrics-title" class="adm-section__title">Cifras de impacto</h2>
+  <p class="adm-section__lead">
+    Los números destacados de la landing, en el orden en que se muestran. Las ocultas no se ven en
+    el sitio.
+  </p>
+
+  <adm-request-state
+    [error]="metrics.error()"
+    [loaded]="metrics.data() !== null"
+    loadingText="Cargando cifras…"
+    (retry)="load()"
+  >
+    @if (items().length) {
+      <table class="adm-table adm-table--cards-2 metrics">
+        <caption class="visually-hidden">
+          Cifras de impacto de la landing
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Orden</th>
+            <th scope="col">Cifra</th>
+            <th scope="col">Texto</th>
+            <th scope="col">Estado</th>
+            <th scope="col"><span class="visually-hidden">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (metric of items(); track metric.key) {
+            @let busy = rows.isBusy(metric.key);
+            <tr [class.metrics__row--hidden]="!metric.visible">
+              <td data-label="Orden" class="metrics__order">{{ metric.sortOrder }}</td>
+              <td data-label="Cifra" class="metrics__value">{{ metric.display }}</td>
+              <td data-label="Texto">{{ metric.label }}</td>
+              <td data-label="Estado">
+                <span class="adm-badge" [class.adm-badge--PUBLISHED]="metric.visible">
+                  {{ metric.visible ? 'Visible' : 'Oculta' }}
+                </span>
+              </td>
+              <td class="adm-table__actions">
+                <div class="adm-actions">
+                  <button
+                    type="button"
+                    class="adm-action"
+                    [disabled]="busy"
+                    (click)="openForm(metric)"
+                  >
+                    Editar<span class="visually-hidden"> «{{ metric.label }}»</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="adm-action"
+                    [disabled]="busy"
+                    (click)="toggle(metric)"
+                  >
+                    {{ metric.visible ? 'Ocultar' : 'Mostrar'
+                    }}<span class="visually-hidden"> «{{ metric.label }}»</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="adm-state">Aún no hay cifras.</p>
+    }
+  </adm-request-state>
+</section>
+
+<adm-metric-form-dialog [(open)]="formOpen" [metric]="editing()" (saved)="onSaved($event)" />

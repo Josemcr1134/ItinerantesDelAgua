@@ -39,6 +39,12 @@ export const routes: Routes = [
         canActivate: [permissionGuard('users.manage')],
         loadComponent: () => import('./features/administrators/administrators-page'),
       },
+      {
+        path: 'pagina-web',
+        title: 'Página web · Administrador',
+        canActivate: [permissionGuard('site.write')],
+        loadComponent: () => import('./features/site/site-page'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

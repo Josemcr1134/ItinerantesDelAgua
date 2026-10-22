@@ -1,6 +1,6 @@
 import { Permission } from 'data-access';
 
-export type NavIcon = 'home' | 'offers' | 'teachers' | 'users';
+export type NavIcon = 'home' | 'offers' | 'teachers' | 'users' | 'site';
 
 export interface NavItem {
   readonly label: string;
@@ -18,4 +18,5 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Oferta formativa', path: '/ofertas', icon: 'offers', permission: 'offers.read' },
   { label: 'Docentes', path: '/docentes', icon: 'teachers', permission: 'offers.read' },
   { label: 'Administradores', path: '/administradores', icon: 'users', permission: 'users.manage' },
+  { label: 'Página web', path: '/pagina-web', icon: 'site', permission: 'site.write' },
 ];

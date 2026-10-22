@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+// Dentro de la sección la tabla va sobre el mismo fondo: se distingue por el borde.
+.metrics {
+  border: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+
+  @media (max-width: 79.9988rem) {
+    border: 0;
+
+    tr {
+      border: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+    }
+  }
+}
+
+.metrics__order {
+  width: 4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.metrics__value {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.metrics__row--hidden .metrics__value {
+  opacity: 0.55;
+}
