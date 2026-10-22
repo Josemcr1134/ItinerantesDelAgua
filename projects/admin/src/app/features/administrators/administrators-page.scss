@@ -12,7 +12,7 @@
 }
 
 .person-cell {
-  @include bp.up(lg) {
+  @include bp.up(xl) {
     min-width: 15rem;
   }
 }

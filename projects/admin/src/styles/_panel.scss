@@ -109,8 +109,9 @@
     border-bottom: 0;
   }
 
-  // Móvil: cada fila es una tarjeta con la etiqueta de cada dato.
-  @media (max-width: 63.9988rem) {
+  // Hasta xl cada fila es una tarjeta con la etiqueta de cada dato: con el
+  // menú lateral fijo, entre lg y xl la tabla no cabe.
+  @media (max-width: 79.9988rem) {
     background: none;
 
     thead {
@@ -148,6 +149,27 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+    }
+  }
+}
+
+// Tarjetas en dos columnas en md y lg (mientras la tabla se muestra como
+// tarjetas); las acciones quedan al pie de cada tarjeta.
+.adm-table--cards-2 {
+  @media (min-width: 48rem) and (max-width: 79.9988rem) {
+    tbody {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    tr {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .adm-table__actions {
+      margin-top: auto;
+      padding-top: var(--space-2);
     }
   }
 }
@@ -215,7 +237,7 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 
-  @include bp.up(lg) {
+  @include bp.up(xl) {
     flex-wrap: nowrap;
     justify-content: flex-end;
   }
@@ -477,20 +499,9 @@ textarea.adm-field__input {
   min-height: 48px;
 }
 
-// Barra de filtros: la búsqueda arriba a lo ancho y el resto en rejilla.
-.adm-filters__search {
-  @include bp.up(md) {
-    grid-column: 1 / -1;
-  }
-
-  @include bp.up(xl) {
-    grid-column: auto;
-  }
-}
-
-// Celda de acciones: tan angosta como sus botones en escritorio.
+// Celda de acciones: tan angosta como sus botones cuando es tabla (xl).
 .adm-table__actions {
-  @include bp.up(lg) {
+  @include bp.up(xl) {
     width: 1%;
   }
 }
@@ -500,4 +511,15 @@ a.adm-action {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
+}
+
+// Barra de filtros: la búsqueda arriba a lo ancho y el resto en rejilla.
+.adm-filters__search {
+  @include bp.up(md) {
+    grid-column: 1 / -1;
+  }
+
+  @include bp.up(xl) {
+    grid-column: auto;
+  }
 }
