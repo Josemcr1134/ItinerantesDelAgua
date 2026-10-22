@@ -91,6 +91,17 @@ $wave-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
   --ui-button-on-color: var(--color-dark-bg);
 }
 
+// Deshabilitado: atenuado y sin la animación del agua.
+:host(:disabled),
+:host([aria-disabled='true']) {
+  cursor: not-allowed;
+  opacity: 0.45;
+
+  &::before {
+    translate: 0 100% !important;
+  }
+}
+
 @keyframes ui-button-wave {
   to {
     transform: translateX(-50%);
