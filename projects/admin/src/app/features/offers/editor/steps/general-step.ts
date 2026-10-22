@@ -13,7 +13,7 @@ import {
   UpdateGeneralStepDto,
 } from 'data-access';
 import { OFFER_MODALITY_LABELS, OFFER_TOPIC_LABELS, OFFER_TYPE_LABELS } from '../../offer-labels';
-import { ImageField } from '../fields/image-field';
+import { ImageField } from '../../../../shared/image-field/image-field';
 import { ImageListField } from '../fields/image-list-field';
 import { TeacherPicker } from '../fields/teacher-picker';
 import { formDirty } from './form-dirty';

@@ -16,6 +16,12 @@
   background-color: #fff;
 }
 
+.image-field__box--round {
+  width: 8rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
 .image-field__box--empty {
   display: grid;
   place-items: center;

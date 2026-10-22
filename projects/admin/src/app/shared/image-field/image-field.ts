@@ -4,15 +4,24 @@ import { ImageUpload } from './image-upload';
 
 let nextImageFieldId = 0;
 
-/** Imagen única (portada): vista previa, subir, cambiar y quitar. */
+/** Imagen única (portada de oferta, foto de docente): vista previa, subir, cambiar y quitar. */
 @Component({
   selector: 'adm-image-field',
   template: `
     <div class="image-field">
       <span class="adm-field__label" [id]="id + '-label'">{{ label() }}</span>
-      <div class="image-field__box" [class.image-field__box--empty]="!image()">
+      <div
+        class="image-field__box"
+        [class.image-field__box--empty]="!image()"
+        [class.image-field__box--round]="shape() === 'round'"
+      >
         @if (image(); as img) {
-          <img class="image-field__preview" [src]="img.url" alt="" />
+          <img
+            class="image-field__preview"
+            [class.image-field__preview--round]="shape() === 'round'"
+            [src]="img.url"
+            alt=""
+          />
         } @else {
           <span class="image-field__placeholder">Sin imagen</span>
         }
@@ -52,8 +61,11 @@ export class ImageField {
   readonly image = model<AdminImageDto | null>(null);
   readonly label = input.required<string>();
   readonly purpose = input.required<ImageUploadPurpose>();
-  readonly offerId = input.required<string>();
+  /** Obligatorio para las imágenes de una oferta. */
+  readonly offerId = input<string>();
   readonly disabled = input(false);
+  /** `round` para fotos de perfil. */
+  readonly shape = input<'wide' | 'round'>('wide');
   readonly hint = input('JPG, PNG o WebP de hasta 5 MB.');
   /** Problema reportado por la API para este campo. */
   readonly issue = input<string | null>(null);

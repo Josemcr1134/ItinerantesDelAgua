@@ -1,6 +1,6 @@
 import { Component, inject, input, model, signal } from '@angular/core';
 import { AdminImageDto, ImageUploadPurpose } from 'data-access';
-import { ImageUpload } from './image-upload';
+import { ImageUpload } from '../../../../shared/image-field/image-upload';
 
 /** Varias imágenes en orden (carrusel): agregar, mover y quitar. */
 @Component({
