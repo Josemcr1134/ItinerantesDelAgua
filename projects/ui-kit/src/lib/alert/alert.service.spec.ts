@@ -28,6 +28,21 @@ describe('AlertService', () => {
     expect(dialog()).toBeNull();
   });
 
+  it('oculta la ilustración si no carga, sin afectar el resto', async () => {
+    const result = alerts.success('Listo', 'Se guardó.');
+    await TestBed.inject(ApplicationRef).whenStable();
+    const image = dialog()?.querySelector('img');
+    expect(image?.getAttribute('src')).toBe('assets/illustrations/alert-success.webp');
+
+    image!.dispatchEvent(new Event('error'));
+    await TestBed.inject(ApplicationRef).whenStable();
+    expect(dialog()?.querySelector('img')).toBeNull();
+    expect(dialog()?.textContent).toContain('Se guardó.');
+
+    button('Entendido').click();
+    await expect(result).resolves.toBe(true);
+  });
+
   it('confirm resuelve false al cancelar', async () => {
     const result = alerts.confirm('¿Eliminar?', 'No se puede deshacer.');
     await TestBed.inject(ApplicationRef).whenStable();

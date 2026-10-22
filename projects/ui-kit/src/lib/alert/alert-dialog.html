@@ -9,7 +9,16 @@
   (cancel)="onCancel()"
   (close)="onClosed()"
 >
-  <img class="alert__illustration" [src]="illustration()" alt="" width="200" height="200" />
+  @if (!illustrationFailed()) {
+    <img
+      class="alert__illustration"
+      [src]="illustration()"
+      alt=""
+      width="200"
+      height="200"
+      (error)="illustrationFailed.set(true)"
+    />
+  }
 
   <h2 class="alert__title" [id]="id + '-title'">{{ o.title }}</h2>
   <p class="alert__message" [id]="id + '-message'">{{ o.message }}</p>

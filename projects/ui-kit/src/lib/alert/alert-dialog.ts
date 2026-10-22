@@ -7,6 +7,7 @@ import {
   inject,
   input,
   output,
+  signal,
   viewChild,
 } from '@angular/core';
 import { Button } from '../button/button';
@@ -43,6 +44,8 @@ export class AlertDialog {
   protected readonly illustration = computed(
     () => this.options().illustration ?? this.illustrations[this.variant()],
   );
+  /** Si la ilustración no carga, se oculta en vez de mostrar una imagen rota. */
+  protected readonly illustrationFailed = signal(false);
   /** Errores, avisos y confirmaciones interrumpen: rol `alertdialog`. */
   protected readonly role = computed(() =>
     this.options().cancelLabel || ['error', 'warning', 'network'].includes(this.variant())
