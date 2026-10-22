@@ -1,0 +1,111 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: contents;
+}
+
+.dialog {
+  width: min(560px, calc(100vw - 2 * var(--space-3)));
+  max-height: calc(100dvh - 2 * var(--space-3));
+  padding: 0;
+  border: 0;
+  border-radius: 28px;
+  background-color: var(--color-surface);
+  box-shadow: 0 24px 64px -24px rgb(27 30 48 / 45%);
+  color: var(--color-raisin-black);
+  font-family: var(--font-family-body);
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+
+    @media (prefers-reduced-motion: no-preference) {
+      animation: dialog-in 0.22s ease-out;
+    }
+  }
+
+  &::backdrop {
+    background-color: rgb(27 30 48 / 55%);
+    backdrop-filter: blur(3px);
+  }
+}
+
+.dialog--wide {
+  width: min(760px, calc(100vw - 2 * var(--space-3)));
+}
+
+.dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+
+  @include bp.up(md) {
+    padding: var(--space-5) var(--space-5) var(--space-2);
+  }
+}
+
+// Amatic SC Bold, verde de marca.
+.dialog__title {
+  color: var(--color-primary);
+  font-family: var(--font-family-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.dialog__close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -6px -8px 0 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: progress;
+  }
+}
+
+.dialog__body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  overflow-y: auto;
+
+  @include bp.up(md) {
+    padding: var(--space-2) var(--space-5) var(--space-4);
+  }
+}
+
+.dialog__actions {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+
+  &:empty {
+    display: none;
+  }
+
+  @include bp.up(md) {
+    padding: var(--space-3) var(--space-5) var(--space-5);
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}

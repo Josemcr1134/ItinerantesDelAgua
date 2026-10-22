@@ -15,3 +15,4 @@ export * from './lib/alert/alert-options';
 export * from './lib/alert/alert-dialog';
 export * from './lib/alert/alert.service';
 export * from './lib/loading-overlay/loading-overlay';
+export * from './lib/dialog/dialog';
