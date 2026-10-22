@@ -219,11 +219,4 @@
       {{ c.backLabel }}
     </button>
   </div>
-
-  <p class="contact-form__status" role="status">
-    @if (sent()) {
-      {{ c.successMessage }}
-    }
-  </p>
-  <p class="contact-form__status contact-form__status--error" role="alert">{{ errorMessage() }}</p>
 </form>

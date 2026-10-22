@@ -1,7 +1,6 @@
 import {
   afterNextRender,
   Component,
-  computed,
   DestroyRef,
   ElementRef,
   inject,
@@ -19,6 +18,7 @@ import {
   Validators,
 } from '@angular/forms';
 import {
+  ApiError,
   CONTACT_PROJECT_TYPE_VALUES,
   CONTACT_SERVICE_VALUES,
   CONTACT_SUBJECT_VALUES,
@@ -30,7 +30,7 @@ import {
   CreateContactMessageRequestDto,
   requestState,
 } from 'data-access';
-import { Button } from 'ui-kit';
+import { AlertService, Button } from 'ui-kit';
 import { map } from 'rxjs';
 import { ContactFormContent } from './contact-form-content';
 
@@ -87,6 +87,7 @@ export class ContactForm {
   readonly back = output<void>();
 
   private readonly contactApi = inject(ContactApi);
+  private readonly alerts = inject(AlertService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(NonNullableFormBuilder);
@@ -97,7 +98,6 @@ export class ContactForm {
   protected readonly services = CONTACT_SERVICE_VALUES;
   protected readonly request = requestState<ContactMessageResponseDto>();
   protected readonly submitted = signal(false);
-  protected readonly sent = signal(false);
 
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, trimmedLength(CONTACT_RULES.nameMin)]],
@@ -123,17 +123,6 @@ export class ContactForm {
     this.form.controls.message.valueChanges.pipe(map((m) => m.length)),
     { initialValue: 0 },
   );
-
-  /** Mensaje general: éxito o error de la API (los de campo van en su campo). */
-  protected readonly errorMessage = computed(() => {
-    const error = this.request.error();
-    if (!error) {
-      return null;
-    }
-    return error.code === 'VALIDATION_ERROR' && error.details.length
-      ? this.content().errors.reviewFields
-      : error.message || this.content().failureMessage;
-  });
 
   constructor() {
     // Los campos del proyecto solo son obligatorios con "Diseño y consultoría".
@@ -187,7 +176,6 @@ export class ContactForm {
 
   protected async submit(): Promise<void> {
     this.submitted.set(true);
-    this.sent.set(false);
     this.request.reset();
     const body = this.payload();
     if (this.form.invalid || !body) {
@@ -196,13 +184,45 @@ export class ContactForm {
       return;
     }
     const result = await this.request.run(this.contactApi.send(body));
+    const error = this.request.error();
     if (result) {
-      this.sent.set(true);
       this.submitted.set(false);
       this.form.reset();
-      return;
+      const { alerts } = this.content();
+      await this.alerts.success(alerts.successTitle, this.content().successMessage, {
+        confirmLabel: alerts.confirmLabel,
+      });
+      // Enviado: vuelve al bloque "Hablemos".
+      this.back.emit();
+    } else if (error) {
+      const hasFieldErrors = this.applyServerErrors(error);
+      await this.presentError(error, hasFieldErrors);
+      if (hasFieldErrors) this.focusFirstInvalid();
     }
-    this.applyServerErrors();
+  }
+
+  /** Informa el error con el sistema de alertas, según su tipo. */
+  private presentError(error: ApiError, hasFieldErrors: boolean): Promise<boolean> {
+    const { alerts, errors, failureMessage } = this.content();
+    const confirmLabel = alerts.confirmLabel;
+    if (error.kind === 'network') {
+      return this.alerts.open({
+        variant: 'network',
+        title: alerts.networkTitle,
+        message: error.message,
+        confirmLabel,
+      });
+    }
+    if (hasFieldErrors) {
+      return this.alerts.warning(alerts.reviewTitle, errors.reviewFields, { confirmLabel });
+    }
+    if (error.code === 'RATE_LIMITED') {
+      return this.alerts.warning(alerts.rateLimitedTitle, error.message, { confirmLabel });
+    }
+    return this.alerts.error(alerts.errorTitle, error.message || failureMessage, {
+      confirmLabel,
+      reference: error.requestId,
+    });
   }
 
   private payload(): CreateContactMessageRequestDto | null {
@@ -232,20 +252,19 @@ export class ContactForm {
     };
   }
 
-  /** Lleva los errores por campo de la API a cada control. */
-  private applyServerErrors(): void {
-    const details = this.request.error()?.details ?? [];
-    for (const detail of details) {
+  /** Lleva los errores por campo de la API a cada control; `true` si hubo alguno. */
+  private applyServerErrors(error: ApiError): boolean {
+    let applied = false;
+    for (const detail of error.details) {
       const name = API_FIELDS[detail.field];
       if (name) {
         const control = this.form.controls[name];
         control.setErrors({ ...control.errors, server: detail.message });
         control.markAsTouched();
+        applied = true;
       }
     }
-    if (details.length) {
-      this.focusFirstInvalid();
-    }
+    return applied;
   }
 
   private focusFirstInvalid(): void {

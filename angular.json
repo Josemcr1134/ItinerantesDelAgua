@@ -33,6 +33,11 @@
                 "glob": "**/*",
                 "input": "projects/ui-kit/assets/fonts",
                 "output": "assets/fonts"
+              },
+              {
+                "glob": "alert-*.webp",
+                "input": "projects/ui-kit/assets/illustrations",
+                "output": "assets/illustrations"
               }
             ],
             "styles": [

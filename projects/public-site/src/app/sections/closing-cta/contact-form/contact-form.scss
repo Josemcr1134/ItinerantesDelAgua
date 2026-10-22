@@ -243,20 +243,3 @@
     text-decoration: underline;
   }
 }
-
-.contact-form__status {
-  font-weight: 600;
-  text-align: center;
-
-  &:empty {
-    display: none;
-  }
-
-  @include bp.up(lg) {
-    text-align: start;
-  }
-}
-
-.contact-form__status--error {
-  color: var(--color-sun);
-}

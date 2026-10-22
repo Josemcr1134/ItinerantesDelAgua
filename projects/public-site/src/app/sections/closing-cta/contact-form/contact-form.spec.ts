@@ -2,23 +2,45 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { apiErrorInterceptor, provideApi } from 'data-access';
+import { AlertOptions, AlertService } from 'ui-kit';
 import { CLOSING_CTA_CONTENT } from '../../../content/closing-cta.content';
 import { ContactForm } from './contact-form';
 
 const API = 'https://api.test/api/v1';
 const tick = () => new Promise((resolve) => setTimeout(resolve));
 
+/** Alertas abiertas (tipo + opciones), en orden. */
+type OpenedAlert = AlertOptions & { readonly kind: string };
+
 describe('ContactForm', () => {
   async function setup() {
+    const alerts: OpenedAlert[] = [];
+    const record =
+      (kind: string) =>
+      (title: string, message: string, extra: Partial<AlertOptions> = {}) => (
+        alerts.push({ ...extra, kind, title, message }),
+        Promise.resolve(true)
+      );
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptors([apiErrorInterceptor])),
         provideHttpClientTesting(),
         provideApi({ baseUrl: 'https://api.test' }),
+        {
+          provide: AlertService,
+          useValue: {
+            open: (o: AlertOptions) => (alerts.push({ ...o, kind: 'open' }), Promise.resolve(true)),
+            success: record('success'),
+            warning: record('warning'),
+            error: record('error'),
+          },
+        },
       ],
     });
     const fixture = TestBed.createComponent(ContactForm);
     fixture.componentRef.setInput('content', CLOSING_CTA_CONTENT.form);
+    let backed = false;
+    fixture.componentInstance.back.subscribe(() => (backed = true));
     await fixture.whenStable();
     const http = TestBed.inject(HttpTestingController);
     const host = fixture.nativeElement as HTMLElement;
@@ -54,7 +76,19 @@ describe('ContactForm', () => {
       await type('#contact-message', 'Quisiera información sobre el diplomado.');
       await check('#contact-privacyAccepted');
     };
-    return { fixture, host, http, type, choose, check, submit, fillRequired, stable };
+    return {
+      fixture,
+      host,
+      http,
+      type,
+      choose,
+      check,
+      submit,
+      fillRequired,
+      stable,
+      alerts,
+      backed: () => backed,
+    };
   }
 
   it('marca los obligatorios, asocia cada error y enfoca el primero', async () => {
@@ -94,8 +128,8 @@ describe('ContactForm', () => {
     expect(host.querySelector('#contact-projectType')).toBeNull();
   });
 
-  it('envía a la API con origen LANDING y confirma', async () => {
-    const { host, http, type, submit, fillRequired, stable } = await setup();
+  it('envía a la API con origen LANDING, confirma con una alerta y vuelve', async () => {
+    const { host, http, submit, fillRequired, stable, alerts, backed } = await setup();
     expect(host.querySelector('#contact-organization, [id^="contact-phone"]')).toBeNull();
     await fillRequired();
     await submit();
@@ -116,8 +150,15 @@ describe('ContactForm', () => {
     );
     await stable();
 
-    expect(host.querySelector('[role="status"]')?.textContent).toContain('Gracias');
+    expect(alerts).toEqual([
+      expect.objectContaining({
+        kind: 'success',
+        title: '¡Mensaje enviado!',
+        message: CLOSING_CTA_CONTENT.form.successMessage,
+      }),
+    ]);
     expect(host.querySelector<HTMLInputElement>('#contact-name')!.value).toBe('');
+    expect(backed()).toBe(true);
   });
 
   it('incluye los datos del proyecto con "Diseño y consultoría"', async () => {
@@ -138,8 +179,8 @@ describe('ContactForm', () => {
     });
   });
 
-  it('muestra en su campo los errores de validación de la API', async () => {
-    const { host, http, submit, fillRequired, stable } = await setup();
+  it('validación de la API: alerta para revisar y error en su campo', async () => {
+    const { host, http, submit, fillRequired, stable, alerts, backed } = await setup();
     await fillRequired();
     await submit();
     http.expectOne(`${API}/contact-messages`).flush(
@@ -157,12 +198,15 @@ describe('ContactForm', () => {
     expect(host.querySelector('#contact-email-error')?.textContent).toContain(
       'Debe ser un correo válido.',
     );
-    expect(host.querySelector('[role="alert"]')?.textContent).toContain('Revisa los campos');
+    expect(alerts).toEqual([
+      expect.objectContaining({ kind: 'warning', title: 'Revisa tus datos' }),
+    ]);
     expect(document.activeElement).toBe(host.querySelector('#contact-email'));
+    expect(backed()).toBe(false);
   });
 
-  it('anuncia el límite de envíos con el mensaje de la API', async () => {
-    const { host, http, submit, fillRequired, stable } = await setup();
+  it('límite de envíos: alerta con el mensaje de la API', async () => {
+    const { http, submit, fillRequired, stable, alerts } = await setup();
     await fillRequired();
     await submit();
     http.expectOne(`${API}/contact-messages`).flush(
@@ -175,6 +219,42 @@ describe('ContactForm', () => {
       { status: 429, statusText: 'Too Many Requests' },
     );
     await stable();
-    expect(host.querySelector('[role="alert"]')?.textContent).toContain('Demasiadas solicitudes');
+    expect(alerts).toEqual([
+      expect.objectContaining({
+        kind: 'warning',
+        title: 'Demasiados envíos',
+        message: 'Demasiadas solicitudes. Intenta de nuevo en unos momentos.',
+      }),
+    ]);
+  });
+
+  it('sin conexión: alerta con la ilustración de red', async () => {
+    const { http, submit, fillRequired, stable, alerts } = await setup();
+    await fillRequired();
+    await submit();
+    http.expectOne(`${API}/contact-messages`).error(new ProgressEvent('error'));
+    await stable();
+    expect(alerts).toEqual([
+      expect.objectContaining({ kind: 'open', variant: 'network', title: 'Sin conexión' }),
+    ]);
+  });
+
+  it('error del servidor: alerta de error con el código de referencia', async () => {
+    const { http, submit, fillRequired, stable, alerts } = await setup();
+    await fillRequired();
+    await submit();
+    http.expectOne(`${API}/contact-messages`).flush(
+      {
+        statusCode: 500,
+        code: 'INTERNAL_ERROR',
+        message: 'Ocurrió un error inesperado.',
+        requestId: 'req-500',
+      },
+      { status: 500, statusText: 'Server Error' },
+    );
+    await stable();
+    expect(alerts).toEqual([
+      expect.objectContaining({ kind: 'error', title: 'No se pudo enviar', reference: 'req-500' }),
+    ]);
   });
 });

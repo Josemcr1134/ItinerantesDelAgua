@@ -37,9 +37,20 @@ export interface ContactFormContent {
     readonly emailInvalid: string;
     readonly messageLength: (min: number, max: number) => string;
     readonly privacyRequired: string;
-    /** Resumen cuando la API rechaza algún campo. */
+    /** Mensaje de la alerta cuando la API rechaza algún campo. */
     readonly reviewFields: string;
   };
+  /** Mensaje de la alerta de éxito. */
   readonly successMessage: string;
+  /** Mensaje si la API no explica el error. */
   readonly failureMessage: string;
+  /** Títulos de las alertas que informan el resultado del envío. */
+  readonly alerts: {
+    readonly successTitle: string;
+    readonly reviewTitle: string;
+    readonly rateLimitedTitle: string;
+    readonly networkTitle: string;
+    readonly errorTitle: string;
+    readonly confirmLabel: string;
+  };
 }
