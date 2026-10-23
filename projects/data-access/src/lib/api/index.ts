@@ -29,3 +29,4 @@ export * from './services/admin-content.api';
 export * from './services/admin-site.api';
 export * from './services/admin-applications.api';
 export * from './services/admin-sessions.api';
+export * from './services/admin-attendance.api';
