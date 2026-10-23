@@ -17,6 +17,7 @@ import {
   SECTION_LABELS,
 } from './content-labels';
 import { ContentStore, sectionResources } from './content-store';
+import { formatDateTime } from '../../../shared/format/format';
 
 /** Pedido de abrir el formulario de un recurso. */
 export interface ResourceRequest {
@@ -24,12 +25,6 @@ export interface ResourceRequest {
   readonly type: MaterialResourceType;
   readonly resource: AdminResourceDto | null;
 }
-
-const dateTime = new Intl.DateTimeFormat('es-MX', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Mexico_City',
-});
 
 /**
  * Un módulo del aula con sus cuatro secciones. Las acciones rápidas
@@ -61,7 +56,7 @@ export class ModuleCard {
   protected readonly publicationState = publicationState;
   protected readonly formatBytes = formatBytes;
   protected readonly formatDate = formatOfferDate;
-  protected readonly formatDateTime = (iso: string) => dateTime.format(new Date(iso));
+  protected readonly formatDateTime = (iso: string) => formatDateTime(iso) ?? '';
   protected readonly sectionResources = sectionResources;
 
   protected readonly state = computed(() => publicationState(this.module()));

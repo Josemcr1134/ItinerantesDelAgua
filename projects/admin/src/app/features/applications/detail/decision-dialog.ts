@@ -19,7 +19,8 @@ import { firstValueFrom } from 'rxjs';
 import { Button, Dialog, DialogActions } from 'ui-kit';
 import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
 import { formatOfferDate } from '../../offers/shared/zoned-time';
-import { APPLICATION_STATUS_LABELS, formatMoney } from '../application-labels';
+import { APPLICATION_STATUS_LABELS } from '../application-labels';
+import { formatMoney } from '../../../shared/format/format';
 import { ApplicationStore } from './application-store';
 
 const TEXT_MAX = 1000;

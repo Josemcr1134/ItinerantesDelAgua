@@ -11,12 +11,7 @@ import { ContentStore } from './content-store';
 import { ModuleCard, ResourceRequest } from './module-card';
 import { ModuleFormDialog } from './module-form-dialog';
 import { ResourceFormDialog } from './resource-form-dialog';
-
-const dateTime = new Intl.DateTimeFormat('es-MX', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Mexico_City',
-});
+import { formatDateTime } from '../../../shared/format/format';
 
 /**
  * Contenido del aula de una oferta (HU-28): módulos con sus secciones
@@ -47,7 +42,7 @@ export default class ContentPage {
   private readonly access = inject(AdminAccess);
   protected readonly canWrite = computed(() => this.access.permissions().has('offers.write'));
   protected readonly recordingLabels = RECORDING_STATE_LABELS;
-  protected readonly formatDateTime = (iso: string) => dateTime.format(new Date(iso));
+  protected readonly formatDateTime = (iso: string) => formatDateTime(iso) ?? '';
 
   /** Módulos desplegados (por id). */
   protected readonly expanded = signal<ReadonlySet<string>>(new Set());

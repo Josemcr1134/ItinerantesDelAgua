@@ -4,7 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import { Button } from 'ui-kit';
 import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
 import { formatOfferDate } from '../../offers/shared/zoned-time';
-import { EMAIL_STATUS_LABELS, formatDateTime, formatMoney } from '../application-labels';
+import { EMAIL_STATUS_LABELS } from '../application-labels';
+import { formatDateTime, formatMoney } from '../../../shared/format/format';
 import { ApplicationStore } from './application-store';
 import { DecisionDialog } from './decision-dialog';
 

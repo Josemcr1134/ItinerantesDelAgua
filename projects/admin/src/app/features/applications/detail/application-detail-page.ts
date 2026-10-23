@@ -9,8 +9,8 @@ import {
   APPLICATION_KIND_LABELS,
   APPLICATION_STATUS_LABELS,
   APPLICATION_STATUS_TONES,
-  formatDateTime,
 } from '../application-labels';
+import { formatDateTime } from '../../../shared/format/format';
 import { ApplicationStore } from './application-store';
 import { DecisionPanel } from './decision-panel';
 import { EvaluationPanel } from './evaluation-panel';

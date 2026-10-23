@@ -27,7 +27,7 @@ import { FilterSelect, optionsFrom } from '../../../shared/filters/filter-select
 import { SearchField } from '../../../shared/filters/search-field';
 import { Person } from '../../../shared/person/person';
 import { RequestState } from '../../../shared/request-state/request-state';
-import { formatDateTime } from '../../applications/application-labels';
+import { formatDateTime } from '../../../shared/format/format';
 import {
   SESSION_STATE_LABELS,
   SESSION_STATE_TONES,

@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { AdminApplicationsApi, InterviewOutcome } from 'data-access';
 import { AlertService, Button, Dialog, DialogActions } from 'ui-kit';
 import { FormActions } from '../../../shared/form-actions/form-actions';
-import { formatDateTime, INTERVIEW_STATUS_LABELS } from '../application-labels';
+import { INTERVIEW_STATUS_LABELS } from '../application-labels';
+import { formatDateTime } from '../../../shared/format/format';
 import { ApplicationStore } from './application-store';
 import { InterviewDialog } from './interview-dialog';
 

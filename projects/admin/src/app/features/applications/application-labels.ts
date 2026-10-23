@@ -5,7 +5,6 @@ import {
   EvaluationRecommendation,
   FollowUpOutcome,
   InterviewStatus,
-  MoneyAmountDto,
 } from 'data-access';
 
 /**
@@ -84,30 +83,3 @@ export const FOLLOW_UP_STATUSES: readonly ApplicationStatus[] = [
   'ENROLLED',
   'EXPIRED',
 ];
-
-const moneyFormats = new Map<string, Intl.NumberFormat>();
-
-/** "$5,100.00 MXN". */
-export function formatMoney(amount: MoneyAmountDto | null): string | null {
-  if (!amount) return null;
-  let format = moneyFormats.get(amount.currency);
-  if (!format) {
-    format = new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: amount.currency,
-      currencyDisplay: 'narrowSymbol',
-    });
-    moneyFormats.set(amount.currency, format);
-  }
-  return `${format.format(amount.amountCents / 100)} ${amount.currency}`;
-}
-
-const dateTime = new Intl.DateTimeFormat('es-MX', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
-  timeZone: 'America/Mexico_City',
-});
-
-/** Fecha y hora en CDMX ("22 oct 2026, 10:30"). */
-export const formatDateTime = (iso: string | null): string | null =>
-  iso ? dateTime.format(new Date(iso)) : null;

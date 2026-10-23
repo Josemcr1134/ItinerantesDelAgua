@@ -8,7 +8,8 @@ import {
 } from 'data-access';
 import { Button } from 'ui-kit';
 import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
-import { formatDateTime, RECOMMENDATION_LABELS, RECOMMENDATION_TONES } from '../application-labels';
+import { RECOMMENDATION_LABELS, RECOMMENDATION_TONES } from '../application-labels';
+import { formatDateTime } from '../../../shared/format/format';
 import { ApplicationStore } from './application-store';
 
 const COMMENT_MAX = 2000;

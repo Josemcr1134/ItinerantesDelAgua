@@ -12,7 +12,8 @@ import { Dialog, DialogActions } from 'ui-kit';
 import { FormActions } from '../../../shared/form-actions/form-actions';
 import { RequestState } from '../../../shared/request-state/request-state';
 import { isoToZonedInput, zonedInputToIso } from '../../offers/shared/zoned-time';
-import { FOLLOW_UP_OUTCOME_LABELS, formatDateTime, formatMoney } from '../application-labels';
+import { FOLLOW_UP_OUTCOME_LABELS } from '../application-labels';
+import { formatDateTime, formatMoney } from '../../../shared/format/format';
 import { ApplicationStore } from './application-store';
 
 const TEXT_MAX = 1000;

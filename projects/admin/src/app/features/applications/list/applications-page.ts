@@ -33,9 +33,9 @@ import {
   APPLICATION_KIND_LABELS,
   APPLICATION_STATUS_LABELS,
   APPLICATION_STATUS_TONES,
-  formatDateTime,
   RECOMMENDATION_LABELS,
 } from '../application-labels';
+import { formatDateTime } from '../../../shared/format/format';
 
 /** Pestaña en la URL (`?tipo=`), para volver del detalle a la misma. */
 const KIND_PARAMS: Readonly<Record<ApplicationKind, string>> = {
