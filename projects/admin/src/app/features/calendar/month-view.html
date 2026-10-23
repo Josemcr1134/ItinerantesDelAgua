@@ -1,0 +1,98 @@
+<div class="grid" role="grid" aria-label="Calendario del mes">
+  <div class="grid__head" role="row">
+    @for (w of weekdays; track w) {
+      <span class="grid__weekday" role="columnheader">{{ w }}</span>
+    }
+  </div>
+  <div class="grid__body">
+    @for (d of days(); track d.key) {
+      @let list = itemsOf(d.key);
+      <div
+        class="cell"
+        role="gridcell"
+        [class.cell--out]="!d.inMonth"
+        [class.cell--weekend]="d.weekend"
+        [class.cell--today]="d.key === today"
+        [attr.aria-label]="formatDay(d.key)"
+      >
+        <button type="button" class="cell__day" (click)="selectDay.emit(d.key)">
+          {{ d.day }}<span class="visually-hidden"> — crear evento este día</span>
+        </button>
+        <ul class="cell__items">
+          @for (item of list; track item.source + item.id; let i = $index) {
+            @if (i < maxPerDay) {
+              <li>
+                <button
+                  type="button"
+                  [class]="'chip ' + categoryClass[item.category]"
+                  [class.chip--cancelled]="item.status === 'CANCELLED'"
+                  [title]="describe(item)"
+                  (click)="selectItem.emit(item)"
+                >
+                  <span class="visually-hidden">{{ describe(item) }}</span>
+                  <span aria-hidden="true">
+                    @if (!item.allDay) {
+                      <span class="chip__time">{{ formatTime(item.startsAt) }}</span>
+                    }
+                    {{ item.title }}
+                    @if (item.edited || item.missingLink) {
+                      <span class="chip__flag">!</span>
+                    }
+                  </span>
+                </button>
+              </li>
+            }
+          }
+          @if (list.length > maxPerDay) {
+            <li class="cell__more">+{{ list.length - maxPerDay }} más</li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- En móvil: agenda de los días con algo. -->
+<div class="agenda">
+  @for (entry of agenda(); track entry.day.key) {
+    <section class="agenda__day" [class.agenda__day--today]="entry.day.key === today">
+      <h3 class="agenda__title">{{ formatDay(entry.day.key) }}</h3>
+      <ul class="agenda__items">
+        @for (item of entry.items; track item.source + item.id) {
+          <li>
+            <button
+              type="button"
+              [class]="'row ' + categoryClass[item.category]"
+              [class.chip--cancelled]="item.status === 'CANCELLED'"
+              (click)="selectItem.emit(item)"
+            >
+              <span class="row__time">{{
+                item.allDay ? 'Todo el día' : formatTime(item.startsAt)
+              }}</span>
+              <span class="row__text">
+                <span class="row__title">{{ item.title }}</span>
+                <span class="row__meta">
+                  {{ kindLabels[item.kind] }}
+                  @if (item.offer) {
+                    · {{ item.offer.name }}
+                  }
+                  @if (item.status === 'CANCELLED') {
+                    · Cancelado
+                  }
+                  @if (item.edited) {
+                    · Reprogramada
+                  }
+                  @if (item.missingLink) {
+                    · Sin enlace
+                  }
+                </span>
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+    </section>
+  } @empty {
+    <p class="adm-state">No hay sesiones ni eventos este mes.</p>
+  }
+</div>

@@ -1,0 +1,152 @@
+<ui-dialog [(open)]="open" [title]="event() ? 'Editar evento' : 'Nuevo evento'" [busy]="saving()">
+  <form id="event-form" class="form" novalidate [formGroup]="form" (ngSubmit)="save()">
+    @if (event(); as e) {
+      @if (!isManual()) {
+        <p class="adm-callout adm-callout--info">
+          {{ kindLabels[e.kind] }}: fecha importante creada al generar las sesiones de «{{
+            e.offer?.name
+          }}».
+        </p>
+      }
+    } @else {
+      <p class="adm-field__hint">
+        Solo lo ve la audiencia elegida, en su calendario. No se envía aviso. Hora del centro de
+        México.
+      </p>
+    }
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="event-title">Título</label>
+      <input
+        id="event-title"
+        class="adm-field__input"
+        formControlName="title"
+        required
+        [attr.aria-invalid]="showError('title')"
+      />
+      @if (showError('title')) {
+        <p class="adm-field__error">Escribe el título.</p>
+      }
+    </div>
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="event-description"
+        >Descripción <span class="adm-field__hint">(opcional)</span></label
+      >
+      <textarea
+        id="event-description"
+        class="adm-field__input"
+        rows="3"
+        formControlName="description"
+      ></textarea>
+    </div>
+
+    <div class="row">
+      <div class="adm-field">
+        <label class="adm-field__label" for="event-date">Fecha</label>
+        <input
+          id="event-date"
+          class="adm-field__input"
+          type="date"
+          formControlName="date"
+          required
+          [attr.aria-invalid]="showError('date')"
+        />
+      </div>
+      @if (!allDay()) {
+        <div class="adm-field">
+          <label class="adm-field__label" for="event-start">Inicio</label>
+          <input
+            id="event-start"
+            class="adm-field__input"
+            type="time"
+            formControlName="startTime"
+          />
+        </div>
+        <div class="adm-field">
+          <label class="adm-field__label" for="event-end"
+            >Fin <span class="adm-field__hint">(opcional)</span></label
+          >
+          <input id="event-end" class="adm-field__input" type="time" formControlName="endTime" />
+        </div>
+      }
+    </div>
+    <label class="adm-check">
+      <input type="checkbox" formControlName="allDay" />
+      Todo el día
+    </label>
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="event-category">Categoría (color)</label>
+      <select id="event-category" class="adm-field__input" formControlName="category">
+        @for (c of categories; track c) {
+          <option [value]="c">{{ categoryLabels[c] }}</option>
+        }
+      </select>
+    </div>
+
+    <fieldset class="adm-field">
+      <legend class="adm-field__label">Quién lo ve</legend>
+      <div class="choices">
+        @for (a of audiences; track a) {
+          <label class="adm-check">
+            <input type="radio" formControlName="audience" [value]="a" />
+            {{ audienceLabels[a] }}
+          </label>
+        }
+      </div>
+    </fieldset>
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="event-offer"
+        >Oferta
+        <span class="adm-field__hint">{{
+          audience() === 'OFFER_ENROLLED' ? '(obligatoria)' : '(opcional, para «Ver oferta»)'
+        }}</span></label
+      >
+      <select id="event-offer" class="adm-field__input" formControlName="offerId">
+        <option value="">Ninguna</option>
+        @for (o of offers(); track o.value) {
+          <option [value]="o.value">{{ o.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="row">
+      <div class="adm-field">
+        <label class="adm-field__label" for="event-location"
+          >Lugar <span class="adm-field__hint">(opcional)</span></label
+        >
+        <input id="event-location" class="adm-field__input" formControlName="location" />
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="event-url"
+          >Enlace <span class="adm-field__hint">(opcional)</span></label
+        >
+        <input
+          id="event-url"
+          class="adm-field__input"
+          type="url"
+          formControlName="joinUrl"
+          placeholder="https://…"
+          [attr.aria-invalid]="showError('joinUrl')"
+        />
+        @if (showError('joinUrl')) {
+          <p class="adm-field__error">Usa un enlace que empiece con https://</p>
+        }
+      </div>
+    </div>
+
+    @if (error()) {
+      <p class="adm-field__error" role="alert">{{ error() }}</p>
+    }
+  </form>
+  <div uiDialogActions>
+    <adm-form-actions
+      form="event-form"
+      [submitLabel]="event() ? 'Guardar cambios' : 'Crear evento'"
+      [busy]="saving()"
+      (cancel)="open.set(false)"
+    />
+  </div>
+</ui-dialog>

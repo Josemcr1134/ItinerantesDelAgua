@@ -523,3 +523,25 @@ adm-filter-bar input[type='date'].adm-field__input {
   width: 100%;
   min-width: 0;
 }
+
+// Colores de las categorías del calendario (Formación azul, Territorio verde,
+// Comunidad naranja, Eventos morado, Fechas importantes rojo): `--cat`.
+.adm-cat--training {
+  --cat: #2f5fa8;
+}
+
+.adm-cat--territory {
+  --cat: #2f7a3e;
+}
+
+.adm-cat--community {
+  --cat: #c46a12;
+}
+
+.adm-cat--events {
+  --cat: #7a3fa0;
+}
+
+.adm-cat--important {
+  --cat: #b33a2a;
+}

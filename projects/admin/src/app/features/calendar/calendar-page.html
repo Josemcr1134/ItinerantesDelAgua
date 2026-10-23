@@ -1,0 +1,120 @@
+<adm-page-header
+  title="Calendario"
+  lead="Sesiones de todas las ofertas, eventos y fechas importantes. Horas del centro de México."
+>
+  @if (canWrite()) {
+    <button uiButton type="button" class="adm-page-action" (click)="openNew()">
+      <svg
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Nuevo evento
+    </button>
+  }
+</adm-page-header>
+
+<nav class="tabs" aria-label="Vista del calendario">
+  <a
+    class="tabs__tab"
+    [class.tabs__tab--active]="view() === 'mes'"
+    [attr.aria-current]="view() === 'mes' ? 'page' : null"
+    routerLink="."
+    [queryParams]="{ vista: 'mes', mes: month() }"
+    >Calendario</a
+  >
+  <a
+    class="tabs__tab"
+    [class.tabs__tab--active]="view() === 'eventos'"
+    [attr.aria-current]="view() === 'eventos' ? 'page' : null"
+    routerLink="."
+    [queryParams]="{ vista: 'eventos', mes: month() }"
+    >Eventos</a
+  >
+</nav>
+
+<adm-notice [(message)]="notice" />
+
+@if (view() === 'mes') {
+  <div class="toolbar">
+    <div class="month-nav">
+      <a
+        class="adm-action nav-btn"
+        routerLink="."
+        [queryParams]="{ vista: 'mes', mes: prevMonth() }"
+        aria-label="Mes anterior"
+        >‹</a
+      >
+      <h2 class="month-title" aria-live="polite">{{ monthTitle() }}</h2>
+      <a
+        class="adm-action nav-btn"
+        routerLink="."
+        [queryParams]="{ vista: 'mes', mes: nextMonth() }"
+        aria-label="Mes siguiente"
+        >›</a
+      >
+      @if (!isCurrentMonth()) {
+        <a class="adm-link" routerLink="." [queryParams]="{ vista: 'mes' }">Hoy</a>
+      }
+    </div>
+    <div class="filters">
+      @if (options.offers().length) {
+        <adm-filter-select
+          inputId="calendar-offer"
+          label="Oferta"
+          allLabel="Todas"
+          [options]="options.offers()"
+          [(value)]="offerId"
+        />
+      }
+      <adm-filter-select
+        inputId="calendar-category"
+        label="Categoría"
+        allLabel="Todas"
+        [options]="options.category"
+        [(value)]="category"
+      />
+    </div>
+  </div>
+
+  <ul class="legend" aria-label="Colores por categoría">
+    @for (l of legend; track l.className) {
+      <li [class]="l.className">
+        <span class="legend__dot" aria-hidden="true"></span>{{ l.label }}
+      </li>
+    }
+  </ul>
+
+  <adm-request-state
+    [error]="calendar.error()"
+    [loaded]="calendar.data() !== null"
+    loadingText="Cargando el calendario…"
+    (retry)="reload()"
+  >
+    <adm-month-view
+      [class.stale]="calendar.loading()"
+      [days]="grid().days"
+      [items]="items()"
+      (selectItem)="selectItem($event)"
+      (selectDay)="selectDay($event)"
+    />
+  </adm-request-state>
+} @else {
+  <adm-events-tab (edit)="openEdit($event)" (notice)="notice.set($event)" />
+}
+
+@if (canWrite()) {
+  <adm-event-form-dialog
+    [(open)]="formOpen"
+    [event]="editing()"
+    [date]="newDate()"
+    (saved)="onSaved($event)"
+  />
+}

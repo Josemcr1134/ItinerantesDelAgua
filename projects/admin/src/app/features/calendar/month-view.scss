@@ -1,0 +1,204 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+// --- Cuadrícula (desde md) ---
+.grid {
+  display: none;
+  overflow: hidden;
+  border-radius: 20px;
+  background-color: var(--color-surface);
+
+  @include bp.up(md) {
+    display: block;
+  }
+}
+
+.grid__head,
+.grid__body {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.grid__weekday {
+  padding: var(--space-2);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cell {
+  min-height: 7.5rem;
+  min-width: 0;
+  padding: 4px;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--color-primary) 10%, transparent);
+
+  &:nth-child(7n + 1) {
+    border-left: 0;
+  }
+}
+
+.cell--weekend {
+  background-color: color-mix(in srgb, var(--color-primary) 3%, transparent);
+}
+
+.cell--out {
+  opacity: 0.45;
+}
+
+.cell__day {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  margin-bottom: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  }
+}
+
+.cell--today .cell__day {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.cell__items {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: block;
+  width: 100%;
+  padding: 2px 6px;
+  overflow: hidden;
+  border: 0;
+  border-left: 3px solid var(--cat);
+  border-radius: 6px;
+  background-color: color-mix(in srgb, var(--cat) 12%, #fff);
+  color: var(--color-raisin-black);
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--cat) 22%, #fff);
+  }
+}
+
+.chip__time {
+  font-family: var(--font-family-numeric);
+  font-weight: 700;
+}
+
+.chip__flag {
+  margin-left: 2px;
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.chip--cancelled {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.cell__more {
+  padding: 0 6px;
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.75rem;
+}
+
+// --- Agenda (móvil) ---
+.agenda {
+  display: grid;
+  gap: var(--space-3);
+
+  @include bp.up(md) {
+    display: none;
+  }
+}
+
+.agenda__day {
+  padding: var(--space-3);
+  border-radius: 16px;
+  background-color: var(--color-surface);
+}
+
+.agenda__day--today {
+  box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+.agenda__title {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-family-body);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.agenda__items {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2);
+  border: 0;
+  border-left: 4px solid var(--cat);
+  border-radius: 10px;
+  background-color: color-mix(in srgb, var(--cat) 10%, #fff);
+  color: var(--color-raisin-black);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.row__time {
+  flex: none;
+  width: 4.5rem;
+  font-family: var(--font-family-numeric);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.row__text {
+  display: grid;
+  min-width: 0;
+}
+
+.row__title {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.row__meta {
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+}

@@ -1,0 +1,102 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.tabs__tab {
+  margin-bottom: -1px;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 3px solid transparent;
+  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.tabs__tab--active {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 var(--space-3);
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  padding: 0;
+  font-size: 1.25rem;
+  text-decoration: none;
+}
+
+.month-title {
+  min-width: 11rem;
+  margin: 0;
+  color: var(--color-primary);
+  font-family: var(--font-family-body);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--space-3);
+  flex: 1 1 18rem;
+  min-width: 0;
+  max-width: 32rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--cat);
+}
+
+.stale {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}

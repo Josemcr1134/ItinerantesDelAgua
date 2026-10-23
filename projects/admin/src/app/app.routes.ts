@@ -28,6 +28,12 @@ export const routes: Routes = [
         loadChildren: () => import('./features/offers/offers.routes'),
       },
       {
+        path: 'calendario',
+        title: 'Calendario · Administrador',
+        canActivate: [permissionGuard('offers.read')],
+        loadComponent: () => import('./features/calendar/calendar-page'),
+      },
+      {
         path: 'docentes',
         title: 'Docentes · Administrador',
         canActivate: [permissionGuard('offers.read')],

@@ -1,7 +1,15 @@
 import { Permission } from 'data-access';
 
 export type NavIcon =
-  'home' | 'offers' | 'teachers' | 'applications' | 'follow-up' | 'payments' | 'users' | 'site';
+  | 'home'
+  | 'calendar'
+  | 'offers'
+  | 'teachers'
+  | 'applications'
+  | 'follow-up'
+  | 'payments'
+  | 'users'
+  | 'site';
 
 export interface NavItem {
   readonly label: string;
@@ -17,6 +25,7 @@ export interface NavItem {
 export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Inicio', path: '/', icon: 'home', exact: true },
   { label: 'Oferta formativa', path: '/ofertas', icon: 'offers', permission: 'offers.read' },
+  { label: 'Calendario', path: '/calendario', icon: 'calendar', permission: 'offers.read' },
   { label: 'Docentes', path: '/docentes', icon: 'teachers', permission: 'offers.read' },
   {
     label: 'Postulaciones',

@@ -1,0 +1,129 @@
+<adm-filter-bar
+  label="Filtrar eventos"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-filter-select
+    inputId="events-kind"
+    label="Tipo"
+    allLabel="Todos"
+    [options]="options.kind"
+    [(value)]="kind"
+  />
+  <adm-filter-select
+    inputId="events-category"
+    label="Categoría"
+    allLabel="Todas"
+    [options]="options.category"
+    [(value)]="category"
+  />
+  <adm-filter-select
+    inputId="events-status"
+    label="Estado"
+    allLabel="Todos"
+    [options]="options.status"
+    [(value)]="status"
+  />
+  @if (options.offers().length) {
+    <adm-filter-select
+      inputId="events-offer"
+      label="Oferta"
+      allLabel="Todas"
+      [options]="options.offers()"
+      [(value)]="offerId"
+    />
+  }
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Eventos"
+  headingId="events-results"
+  loadingText="Cargando eventos…"
+  emptyText="Aún no hay eventos."
+  filteredText="No hay eventos con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Evento</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Audiencia</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (e of list.items(); track e.id) {
+        @let busy = rows.isBusy(e.id);
+        <tr [class.cancelled]="e.status === 'CANCELLED'">
+          <td data-label="Evento">
+            <p class="title">
+              <span [class]="'dot ' + categoryClass[e.category]" aria-hidden="true"></span>
+              {{ e.title }}
+            </p>
+            <p class="muted">
+              {{ kindLabels[e.kind] }} · {{ categoryLabels[e.category] }}
+              @if (e.status === 'CANCELLED') {
+                · <strong>Cancelado</strong>
+              }
+            </p>
+          </td>
+          <td data-label="Fecha">
+            <p>
+              {{
+                e.allDay ? formatDate(e.startsAt) + ' · Todo el día' : formatDateTime(e.startsAt)
+              }}
+            </p>
+            @if (e.location) {
+              <p class="muted">{{ e.location }}</p>
+            }
+          </td>
+          <td data-label="Audiencia">
+            <p>{{ audienceLabels[e.audience] }}</p>
+            @if (e.offer) {
+              <p class="muted">{{ e.offer.name }}</p>
+            }
+          </td>
+          <td class="adm-table__actions">
+            @if (canWrite()) {
+              <div class="adm-actions">
+                <button type="button" class="adm-action" [disabled]="busy" (click)="edit.emit(e)">
+                  Editar<span class="visually-hidden"> «{{ e.title }}»</span>
+                </button>
+                <adm-row-menu [label]="'Más acciones de ' + e.title">
+                  @if (e.status !== 'CANCELLED') {
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="cancel(e)"
+                    >
+                      Cancelar evento
+                    </button>
+                  }
+                  <button
+                    class="adm-menuitem adm-menuitem--danger"
+                    role="menuitem"
+                    type="button"
+                    [disabled]="busy"
+                    (click)="remove(e)"
+                  >
+                    Borrar
+                  </button>
+                </adm-row-menu>
+              </div>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['evento', 'eventos']"
+  />
+</adm-list-states>
