@@ -116,7 +116,11 @@ export class AdminApplicationsApi {
   }
 }
 
-/** Seguimiento de postulaciones aprobadas (HU-32): pendientes, inscritas o vencidas. */
+/**
+ * Seguimiento (HU-32): embudo de conversión por oferta, "Aprobados sin pagar"
+ * y "Vencidas", y el seguimiento de cada postulación aprobada (pendiente,
+ * inscrita o vencida). Ver: `followup.read`; actuar: `followup.manage`.
+ */
 @Injectable({ providedIn: 'root' })
 export class AdminFollowUpApi {
   private readonly api = inject(ApiClient);
@@ -124,6 +128,42 @@ export class AdminFollowUpApi {
   private path(id: Uuid, rest: string): string {
     return `/api/v1/admin/applications/${encodeURIComponent(id)}${rest}`;
   }
+
+  private funnelPath(offerId: Uuid, rest = ''): string {
+    return `/api/v1/admin/funnel/offers/${encodeURIComponent(offerId)}${rest}`;
+  }
+
+  // --- Por oferta ---
+
+  /** Ofertas con postulaciones o inscripciones (más reciente primero). */
+  offers(query: ApiQuery<'AdminFollowUp_offers'> = {}) {
+    return this.api.get<ApiResponse<'AdminFollowUp_offers'>>('/api/v1/admin/funnel/offers', {
+      query: { ...query },
+    });
+  }
+
+  /** Postulados → Aprobados → Con pago iniciado → Inscritos, más el resumen. */
+  funnel(offerId: Uuid) {
+    return this.api.get<ApiResponse<'AdminFollowUp_funnel'>>(this.funnelPath(offerId));
+  }
+
+  /** "Aprobados sin pagar" (`tab=PENDING`) o "Vencidas" (`tab=EXPIRED`). */
+  followUps(offerId: Uuid, query: ApiQuery<'AdminFollowUp_followUps'> = {}) {
+    return this.api.get<ApiResponse<'AdminFollowUp_followUps'>>(
+      this.funnelPath(offerId, '/follow-ups'),
+      { query: { ...query } },
+    );
+  }
+
+  /** Cierra las inscripciones (o la convocatoria) de la oferta en este momento. */
+  closeEnrollment(offerId: Uuid, body: ApiBody<'AdminFollowUp_closeEnrollment'> = {}) {
+    return this.api.post<ApiResponse<'AdminFollowUp_closeEnrollment'>>(
+      this.funnelPath(offerId, '/close-enrollment'),
+      body,
+    );
+  }
+
+  // --- Por postulación ---
 
   /** Contacto, saldo, plazo y línea de tiempo. */
   detail(id: Uuid) {

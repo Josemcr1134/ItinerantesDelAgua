@@ -6,6 +6,7 @@ import { provideApi } from '../api-config';
 import { AdminApplicationsApi, AdminFollowUpApi } from './admin-applications.api';
 
 const API = 'https://api.test/api/v1/admin/applications';
+const FUNNEL = 'https://api.test/api/v1/admin/funnel';
 
 describe('AdminApplicationsApi', () => {
   beforeEach(() =>
@@ -52,6 +53,12 @@ describe('AdminApplicationsApi', () => {
       [() => api.reject('a1', confirmed).subscribe(), 'POST', `${API}/a1/reject`],
       [() => api.retryEmail('a1').subscribe(), 'POST', `${API}/a1/retry-email`],
       [() => followUp.detail('a1').subscribe(), 'GET', `${API}/a1/follow-up`],
+      [() => followUp.funnel('o1').subscribe(), 'GET', `${FUNNEL}/offers/o1`],
+      [
+        () => followUp.closeEnrollment('o1', { reason: 'Cupo lleno' }).subscribe(),
+        'POST',
+        `${FUNNEL}/offers/o1/close-enrollment`,
+      ],
       [() => followUp.notes('a1').subscribe(), 'GET', `${API}/a1/notes`],
       [() => followUp.addNote('a1', { body: 'Llamé' }).subscribe(), 'POST', `${API}/a1/notes`],
       [() => followUp.remind('a1').subscribe(), 'POST', `${API}/a1/reminders`],
@@ -70,6 +77,18 @@ describe('AdminApplicationsApi', () => {
       expect(http.expectOne(url).request.method).toBe(method);
     }
     http.verify();
+  });
+
+  it('lista las ofertas del embudo y los seguimientos por pestaña', () => {
+    const followUp = TestBed.inject(AdminFollowUpApi);
+    const http = TestBed.inject(HttpTestingController);
+    followUp.offers({ q: 'Diplomado', pageSize: 100 }).subscribe();
+    const offers = http.expectOne((r) => r.url === `${FUNNEL}/offers`);
+    expect(offers.request.params.get('q')).toBe('Diplomado');
+    followUp.followUps('o1', { tab: 'EXPIRED', paymentStarted: false }).subscribe();
+    const list = http.expectOne((r) => r.url === `${FUNNEL}/offers/o1/follow-ups`);
+    expect(list.request.params.get('tab')).toBe('EXPIRED');
+    expect(list.request.params.get('paymentStarted')).toBe('false');
   });
 
   it('envía los estados separados por coma', () => {
