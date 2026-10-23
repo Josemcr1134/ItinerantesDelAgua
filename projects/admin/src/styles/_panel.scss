@@ -518,7 +518,8 @@ adm-filter-bar .adm-field {
   }
 }
 
-adm-filter-bar select.adm-field__input {
+adm-filter-bar select.adm-field__input,
+adm-filter-bar input[type='date'].adm-field__input {
   width: 100%;
   min-width: 0;
 }

@@ -1,11 +1,10 @@
 import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import {
   AdminApplicationListItemDto,
   AdminApplicationsApi,
   AdminApplicationsQuery,
-  AdminOffersApi,
   ApplicationKind,
   ApplicationSort,
   CatalogsApi,
@@ -14,13 +13,14 @@ import {
   SUBMITTED_APPLICATION_STATUS_VALUES,
   SubmittedApplicationStatus,
 } from 'data-access';
-import { catchError, firstValueFrom, map, of, switchMap } from 'rxjs';
+import { catchError, firstValueFrom, map, of } from 'rxjs';
 import { Button } from 'ui-kit';
 import { AdminAccess } from '../../../core/access/admin-access';
 import { saveFile } from '../../../core/download';
 import { ErrorPresenter } from '../../../core/error-presenter';
 import { FilterBar } from '../../../shared/filters/filter-bar';
 import { FilterOption, FilterSelect, optionsFrom } from '../../../shared/filters/filter-select';
+import { offerOptions } from '../../../shared/filters/offer-options';
 import { SearchField } from '../../../shared/filters/search-field';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
@@ -71,7 +71,6 @@ type Flag = 'true';
 })
 export default class ApplicationsPage {
   private readonly api = inject(AdminApplicationsApi);
-  private readonly offersApi = inject(AdminOffersApi);
   private readonly errors = inject(ErrorPresenter);
   private readonly access = inject(AdminAccess);
 
@@ -89,7 +88,6 @@ export default class ApplicationsPage {
   protected readonly canEvaluate = computed(() =>
     this.access.permissions().has('applications.evaluate'),
   );
-  private readonly canReadOffers = computed(() => this.access.permissions().has('offers.read'));
 
   protected readonly statusLabels = APPLICATION_STATUS_LABELS;
   protected readonly statusTones = APPLICATION_STATUS_TONES;
@@ -127,21 +125,7 @@ export default class ApplicationsPage {
   );
 
   /** Ofertas de la pestaña (solo si puede verlas: `offers.read`). */
-  private readonly offers = toSignal(
-    toObservable(computed(() => (this.canReadOffers() ? this.kind() : null))).pipe(
-      switchMap((kind) =>
-        kind
-          ? this.offersApi
-              .list({ type: OFFER_TYPE_BY_KIND[kind], pageSize: 100, sort: 'NAME_ASC' })
-              .pipe(
-                map((page) => page.data.map((o) => ({ value: o.id, label: o.name }))),
-                catchError(() => of([])),
-              )
-          : of([]),
-      ),
-    ),
-    { initialValue: [] as FilterOption<string>[] },
-  );
+  private readonly offers = offerOptions(() => OFFER_TYPE_BY_KIND[this.kind()]);
 
   protected readonly options = computed(() => ({
     offers: this.offers(),
