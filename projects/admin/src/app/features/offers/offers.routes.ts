@@ -1,4 +1,5 @@
 import { CanDeactivateFn, Routes } from '@angular/router';
+import { permissionGuard } from '../../core/access/access.guards';
 import type OfferEditorPage from './editor/offer-editor-page';
 
 /** Confirma antes de salir del asistente con cambios sin guardar. */
@@ -15,6 +16,12 @@ const routes: Routes = [
     path: ':id/contenido',
     title: 'Contenido del aula · Administrador',
     loadComponent: () => import('./content/content-page'),
+  },
+  {
+    path: ':id/asistencia',
+    title: 'Asistencia · Administrador',
+    canActivate: [permissionGuard('attendance.read')],
+    loadComponent: () => import('./attendance/attendance-page'),
   },
   {
     path: ':id/sesiones',

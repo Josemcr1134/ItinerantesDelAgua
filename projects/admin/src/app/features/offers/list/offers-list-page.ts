@@ -67,6 +67,9 @@ export default class OffersListPage {
 
   protected readonly canWrite = computed(() => this.access.permissions().has('offers.write'));
   protected readonly canPublish = computed(() => this.access.permissions().has('offers.publish'));
+  protected readonly canReadAttendance = computed(() =>
+    this.access.permissions().has('attendance.read'),
+  );
   protected readonly publicSiteUrl = environment.publicSiteUrl;
 
   protected readonly typeLabels = OFFER_TYPE_LABELS;

@@ -1,0 +1,287 @@
+<adm-request-state
+  [error]="store.chipsError()"
+  [loaded]="store.chipsLoaded()"
+  loadingText="Cargando sesiones…"
+  (retry)="store.reloadChips()"
+>
+  @if (store.chips().length) {
+    <nav class="chips" aria-label="Sesiones">
+      <ol class="chips__list">
+        @for (c of store.chips(); track c.sessionId; let i = $index) {
+          <li>
+            <button
+              type="button"
+              class="chip"
+              [class.chip--active]="c.sessionId === sessionId()"
+              [class.chip--cancelled]="c.state === 'CANCELLED'"
+              [attr.aria-current]="c.sessionId === sessionId() ? 'true' : null"
+              (click)="sessionId.set(c.sessionId)"
+            >
+              <span class="chip__day">{{ dayTitle(c.startsAt) }}</span>
+              <span class="chip__meta">
+                <span [class]="'dot dot--' + stateTones[c.state]" aria-hidden="true"></span>
+                {{ stateLabels[c.state] }}
+                @if (c.state !== 'CANCELLED' && c.state !== 'SCHEDULED') {
+                  · {{ c.registered }}/{{ c.total }}
+                }
+              </span>
+            </button>
+          </li>
+        }
+      </ol>
+    </nav>
+
+    @if (chip(); as c) {
+      <section class="adm-section session" aria-labelledby="attendance-session-title">
+        <div class="session__head">
+          <div>
+            <h2 id="attendance-session-title" class="adm-section__title session__title">
+              {{ dayTitle(c.startsAt) }} · {{ formatTime(c.startsAt, c.endsAt) }}
+            </h2>
+            <p class="muted">
+              <span [class]="'adm-badge adm-badge--' + stateTones[c.state]">{{
+                stateLabels[c.state]
+              }}</span>
+              @if (c.state !== 'CANCELLED') {
+                Registro: {{ formatDateTime(c.opensAt) }} – {{ formatDateTime(c.closesAt) }}
+              }
+            </p>
+          </div>
+          <div class="adm-actions session__actions">
+            @if (canWrite() && c.state === 'REGISTRATION_OPEN') {
+              <button type="button" class="adm-action" [disabled]="busy()" (click)="remind()">
+                Recordar a pendientes
+              </button>
+            }
+            <button type="button" class="adm-action" [disabled]="exporting()" (click)="exportCsv()">
+              {{ exporting() ? 'Exportando…' : 'Exportar' }}
+            </button>
+          </div>
+        </div>
+
+        @if (attendance.data(); as a) {
+          @if (!cancelled()) {
+            <div class="summary">
+              <p class="summary__label">{{ a.summary.label }}</p>
+              <div
+                class="bar"
+                role="progressbar"
+                aria-label="Registraron asistencia"
+                [attr.aria-valuenow]="a.summary.percent"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <span class="bar__fill" [style.width.%]="a.summary.percent"></span>
+              </div>
+            </div>
+          } @else {
+            <p class="adm-callout adm-callout--info">
+              Sesión cancelada: no tiene registro de asistencia ni cuenta para el porcentaje.
+            </p>
+          }
+        }
+
+        <adm-notice [(message)]="notice" />
+      </section>
+
+      <adm-filter-bar
+        label="Filtrar asistencia"
+        [activeCount]="activeFilters()"
+        (clear)="clearFilters()"
+      >
+        <adm-search-field
+          admFilterSearch
+          inputId="attendance-search"
+          placeholder="Nombre o correo"
+          [(value)]="searchText"
+        />
+        <adm-filter-select
+          inputId="attendance-status"
+          label="Estado"
+          allLabel="Todos"
+          [options]="statusOptions"
+          [(value)]="status"
+        />
+        @if (store.countryOptions().length) {
+          <adm-filter-select
+            inputId="attendance-country"
+            label="País"
+            allLabel="Todos"
+            [options]="store.countryOptions()"
+            [(value)]="countryCode"
+          />
+        }
+      </adm-filter-bar>
+
+      <adm-request-state
+        class="results"
+        [error]="attendance.error()"
+        [loaded]="attendance.data() !== null"
+        loadingText="Cargando asistencia…"
+        (retry)="reload()"
+      >
+        @let rows = attendance.data()?.rows ?? [];
+        @if (canWrite() && selected().size) {
+          <div class="bulk" role="region" aria-label="Selección">
+            <p>
+              {{ selected().size }}
+              {{ selected().size === 1 ? 'persona seleccionada' : 'personas seleccionadas' }}
+            </p>
+            <button type="button" class="adm-action" (click)="clearSelection()">
+              Quitar selección
+            </button>
+            <button
+              type="button"
+              class="adm-action bulk__mark"
+              [disabled]="busy()"
+              (click)="openMarkSelected()"
+            >
+              Marcar asistencia
+            </button>
+          </div>
+        }
+
+        @if (canWrite() && markable().length && !selected().size) {
+          <p class="select-all">
+            <button type="button" class="adm-link" (click)="toggleAll(true)">
+              Seleccionar a todas las personas sin registro ({{ markable().length }})
+            </button>
+          </p>
+        }
+        @if (rows.length) {
+          <table
+            class="adm-table adm-table--cards-2"
+            [class.adm-table--loading]="attendance.loading()"
+          >
+            <caption class="visually-hidden">
+              Asistencia de la sesión
+            </caption>
+            <thead>
+              <tr>
+                @if (canWrite()) {
+                  <th scope="col" class="select">
+                    <label class="adm-check">
+                      <input
+                        type="checkbox"
+                        [checked]="allSelected()"
+                        [disabled]="!markable().length"
+                        (change)="toggleAll($any($event.target).checked)"
+                      />
+                      <span class="visually-hidden"
+                        >Seleccionar a todas las personas sin registro</span
+                      >
+                    </label>
+                  </th>
+                }
+                <th scope="col">Persona</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Registro</th>
+                <th scope="col"><span class="visually-hidden">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows; track row.userId) {
+                <tr>
+                  @if (canWrite()) {
+                    <td class="select">
+                      @if (isMarkable(row)) {
+                        <label class="adm-check">
+                          <input
+                            type="checkbox"
+                            [checked]="selected().has(row.userId)"
+                            (change)="toggle(row, $any($event.target).checked)"
+                          />
+                          <span class="visually-hidden">Seleccionar a {{ row.fullName }}</span>
+                        </label>
+                      }
+                    </td>
+                  }
+                  <td data-label="Persona">
+                    <adm-person [name]="row.fullName" [detail]="row.email" [avatarSize]="36" />
+                    <p class="muted">
+                      {{ store.countryName(row.countryCode) }}
+                      @if (row.origin === 'MOODLE') {
+                        · Vía Moodle
+                      }
+                    </p>
+                  </td>
+                  <td data-label="Estado">
+                    <span [class]="'adm-badge adm-badge--' + statusTones[row.status]">{{
+                      statusLabels[row.status]
+                    }}</span>
+                  </td>
+                  <td data-label="Registro">
+                    @if (row.registeredAt) {
+                      <p class="cell">{{ formatDateTime(row.registeredAt) }}</p>
+                      @if (row.source) {
+                        <p class="muted">
+                          {{ sourceLabels[row.source] }}
+                          @if (row.recordedBy) {
+                            · {{ row.recordedBy.fullName }}
+                          }
+                        </p>
+                      }
+                      @if (row.manualReason) {
+                        <p class="muted">Motivo: {{ row.manualReason }}</p>
+                      }
+                      @if (row.comment) {
+                        <p class="comment">“{{ row.comment }}”</p>
+                      }
+                    } @else {
+                      <span class="muted">—</span>
+                    }
+                  </td>
+                  <td class="adm-table__actions">
+                    @if (canWrite()) {
+                      <div class="adm-actions">
+                        @if (row.status === 'REGISTERED') {
+                          <button
+                            type="button"
+                            class="adm-action adm-action--danger"
+                            [disabled]="busy()"
+                            (click)="openUnmark(row)"
+                          >
+                            Desmarcar<span class="visually-hidden"> a {{ row.fullName }}</span>
+                          </button>
+                        } @else if (isMarkable(row)) {
+                          <button
+                            type="button"
+                            class="adm-action"
+                            [disabled]="busy()"
+                            (click)="openMark([row])"
+                          >
+                            Marcar<span class="visually-hidden"> a {{ row.fullName }}</span>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <p class="adm-state">
+            {{
+              activeFilters() || searchText()
+                ? 'No hay personas con esos filtros.'
+                : 'Esta sesión aún no tiene personas inscritas.'
+            }}
+          </p>
+        }
+      </adm-request-state>
+    }
+  } @else {
+    <div class="adm-state">
+      <p>La oferta aún no tiene sesiones.</p>
+    </div>
+  }
+</adm-request-state>
+
+<adm-attendance-reason-dialog
+  [(open)]="dialogOpen"
+  [action]="dialogAction()"
+  [names]="dialogNames()"
+  [busy]="busy()"
+  (confirmed)="confirm($event)"
+/>

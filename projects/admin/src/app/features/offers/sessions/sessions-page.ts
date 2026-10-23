@@ -52,6 +52,9 @@ export default class SessionsPage {
   private readonly access = inject(AdminAccess);
   private readonly alerts = inject(AlertService);
   protected readonly canWrite = computed(() => this.access.permissions().has('offers.write'));
+  protected readonly canReadAttendance = computed(() =>
+    this.access.permissions().has('attendance.read'),
+  );
 
   protected readonly stateLabels = SESSION_STATE_LABELS;
   protected readonly stateTones = SESSION_STATE_TONES;

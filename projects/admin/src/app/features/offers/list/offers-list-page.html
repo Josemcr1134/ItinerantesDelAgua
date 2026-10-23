@@ -163,6 +163,14 @@
                   [routerLink]="['/ofertas', offer.id, 'sesiones']"
                   >Sesiones</a
                 >
+                @if (canReadAttendance()) {
+                  <a
+                    class="adm-menuitem"
+                    role="menuitem"
+                    [routerLink]="['/ofertas', offer.id, 'asistencia']"
+                    >Asistencia</a
+                  >
+                }
                 @if (previewUrl(offer); as url) {
                   <a
                     class="adm-menuitem"

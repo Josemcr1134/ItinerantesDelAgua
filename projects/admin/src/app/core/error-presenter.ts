@@ -35,6 +35,9 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   SESSION_CANCELLED: 'La sesión está cancelada',
   SESSION_HAS_ATTENDANCE: 'La sesión tiene asistencias',
   SESSION_GENERATION_BLOCKED: 'No se pueden crear las sesiones',
+  ATTENDANCE_NOT_ENROLLED: 'Sin inscripción vigente',
+  ATTENDANCE_NOT_OPEN_YET: 'El registro aún no abre',
+  ATTENDANCE_WINDOW_CLOSED: 'El registro ya cerró',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -63,6 +66,9 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'SESSION_CANCELLED',
   'SESSION_HAS_ATTENDANCE',
   'SESSION_GENERATION_BLOCKED',
+  'ATTENDANCE_NOT_ENROLLED',
+  'ATTENDANCE_NOT_OPEN_YET',
+  'ATTENDANCE_WINDOW_CLOSED',
 ];
 
 export interface PresentErrorOptions {

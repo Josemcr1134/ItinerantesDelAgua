@@ -187,6 +187,18 @@
               } @else {
                 <span class="count">{{ session.attendance.registered }}</span>
                 <span class="meta"> / {{ session.attendance.enrolled }} inscritos</span>
+                @if (canReadAttendance()) {
+                  <p class="meta">
+                    <a
+                      class="adm-link"
+                      [routerLink]="['/ofertas', id(), 'asistencia']"
+                      [queryParams]="{ sesion: session.id }"
+                      >Ver asistencia<span class="visually-hidden">
+                        de la {{ formatSlot(session.startsAt, session.endsAt) }}</span
+                      ></a
+                    >
+                  </p>
+                }
               }
             </td>
             <td class="adm-table__actions">

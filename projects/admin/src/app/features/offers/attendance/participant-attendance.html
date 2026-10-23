@@ -1,0 +1,122 @@
+<div class="toolbar">
+  @if (participants.data(); as p) {
+    <p class="muted">
+      {{ p.heldSessions }}
+      {{ p.heldSessions === 1 ? 'sesión realizada' : 'sesiones realizadas' }} · alerta bajo el
+      {{ p.thresholdPercent }}%
+    </p>
+  }
+  <button type="button" class="adm-action" [disabled]="exporting()" (click)="exportCsv()">
+    {{ exporting() ? 'Exportando…' : 'Exportar' }}
+  </button>
+</div>
+
+<adm-filter-bar
+  label="Filtrar participantes"
+  [activeCount]="activeFilters()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="participants-search"
+    placeholder="Nombre o correo"
+    [(value)]="searchText"
+  />
+  @if (store.countryOptions().length) {
+    <adm-filter-select
+      inputId="participants-country"
+      label="País"
+      allLabel="Todos"
+      [options]="store.countryOptions()"
+      [(value)]="countryCode"
+    />
+  }
+  <adm-filter-select
+    inputId="participants-below"
+    label="Asistencia"
+    allLabel="Todas"
+    [options]="belowOptions"
+    [(value)]="below"
+  />
+</adm-filter-bar>
+
+<adm-request-state
+  class="results"
+  [error]="participants.error()"
+  [loaded]="participants.data() !== null"
+  loadingText="Cargando participantes…"
+  (retry)="reload()"
+>
+  @if (participants.data(); as p) {
+    @if (p.rows.length) {
+      <table
+        class="adm-table adm-table--cards-2"
+        [class.adm-table--loading]="participants.loading()"
+      >
+        <caption class="visually-hidden">
+          Asistencia por participante
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Persona</th>
+            <th scope="col">Inscripción</th>
+            <th scope="col">Asistencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of p.rows; track row.userId) {
+            <tr>
+              <td data-label="Persona">
+                <adm-person [name]="row.fullName" [detail]="row.email" [avatarSize]="36" />
+                <p class="muted">
+                  {{ store.countryName(row.countryCode) }}
+                  @if (row.origin === 'MOODLE') {
+                    · Vía Moodle
+                  }
+                </p>
+              </td>
+              <td data-label="Inscripción">{{ enrollmentLabels[row.enrollmentStatus] }}</td>
+              <td data-label="Asistencia">
+                @if (row.percent !== null) {
+                  <div class="percent" [class.percent--low]="row.belowThreshold">
+                    <span class="percent__value">{{ row.percent }}%</span>
+                    <span class="muted">{{ row.attended }} de {{ row.heldSessions }}</span>
+                    @if (row.belowThreshold) {
+                      <span class="adm-badge adm-badge--danger"
+                        >Bajo {{ p.thresholdPercent }}%</span
+                      >
+                    }
+                  </div>
+                  <div
+                    class="bar"
+                    role="progressbar"
+                    [attr.aria-label]="'Asistencia de ' + row.fullName"
+                    [attr.aria-valuenow]="row.percent"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  >
+                    <span
+                      class="bar__fill"
+                      [class.bar__fill--low]="row.belowThreshold"
+                      [style.width.%]="row.percent"
+                    ></span>
+                  </div>
+                } @else {
+                  <span class="muted">Aún sin sesiones realizadas</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="adm-state">
+        {{
+          activeFilters() || searchText()
+            ? 'No hay personas con esos filtros.'
+            : 'La oferta aún no tiene personas inscritas.'
+        }}
+      </p>
+    }
+  }
+</adm-request-state>
