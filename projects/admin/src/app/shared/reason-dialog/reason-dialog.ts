@@ -6,7 +6,7 @@ import { FormActions } from '../form-actions/form-actions';
 let nextId = 0;
 
 /**
- * Confirmar una acción con motivo obligatorio (marcar asistencia, suspender
+ * Confirmar una acción con un motivo (obligatorio salvo `[required]="false"`) (marcar asistencia, suspender
  * un acceso, cancelar un plan…). Emite el motivo; quien lo abre envía la
  * petición y lo cierra al terminar (`open.set(false)`).
  *
@@ -28,7 +28,7 @@ let nextId = 0;
             class="adm-field__input"
             name="reason"
             rows="3"
-            required
+            [required]="required()"
             [id]="id"
             [maxlength]="maxLength()"
             [placeholder]="placeholder()"
@@ -69,6 +69,8 @@ export class ReasonDialog {
   readonly title = input.required<string>();
   readonly submitLabel = input.required<string>();
   readonly label = input('Motivo');
+  /** Sin él, el motivo es opcional (se emite `''`). */
+  readonly required = input(true);
   readonly hint = input('');
   readonly placeholder = input('');
   readonly maxLength = input(500);
@@ -91,7 +93,7 @@ export class ReasonDialog {
 
   protected submit(): void {
     const reason = this.reason().trim();
-    if (!reason) {
+    if (!reason && this.required()) {
       this.error.set('Escribe el motivo.');
       return;
     }

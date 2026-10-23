@@ -14,6 +14,7 @@ import { RequestState } from '../../../shared/request-state/request-state';
 import { isoToZonedInput, zonedInputToIso } from '../../offers/shared/zoned-time';
 import { FOLLOW_UP_OUTCOME_LABELS } from '../application-labels';
 import { formatDateTime, formatMoney } from '../../../shared/format/format';
+import { FollowUpActions } from '../follow-up-actions';
 import { ApplicationStore } from './application-store';
 
 const TEXT_MAX = 1000;
@@ -241,6 +242,7 @@ const TEXT_MAX = 1000;
 export class FollowUpPanel {
   protected readonly store = inject(ApplicationStore);
   private readonly api = inject(AdminFollowUpApi);
+  private readonly actions = inject(FollowUpActions);
 
   protected readonly followUp = requestState<FollowUpDetailDto>();
   protected readonly outcomeLabels = FOLLOW_UP_OUTCOME_LABELS;
@@ -285,34 +287,16 @@ export class FollowUpPanel {
   }
 
   protected async remind(): Promise<void> {
-    const result = await this.store.run((id) => firstValueFrom(this.api.remind(id)));
-    if (!result) return;
-    this.store.notice.set(
-      result.emailStatus === 'FAILED'
-        ? 'Se registró el recordatorio, pero el correo no se envió.'
-        : 'Se envió el recordatorio por correo.',
-    );
+    const message = await this.store.run((id) => this.actions.remind(id));
+    if (!message) return;
+    this.store.notice.set(message);
     this.load();
   }
 
-  /**
-   * Abre la pestaña al hacer clic (si no, el navegador la bloquea) y la lleva
-   * al enlace de wa.me cuando la API lo arma y registra el contacto.
-   */
   protected async whatsapp(): Promise<void> {
-    const tab = window.open('', '_blank');
-    const result = await this.store.run((id) => firstValueFrom(this.api.whatsapp(id)));
-    if (!result) {
-      tab?.close();
-      return;
-    }
-    if (tab) {
-      tab.opener = null;
-      tab.location.href = result.url;
-    } else {
-      window.open(result.url, '_blank', 'noopener');
-    }
-    this.store.notice.set('Se abrió WhatsApp con el mensaje y se registró el contacto.');
+    const message = await this.store.run((id) => this.actions.whatsapp(id));
+    if (!message) return;
+    this.store.notice.set(message);
     this.load();
   }
 
