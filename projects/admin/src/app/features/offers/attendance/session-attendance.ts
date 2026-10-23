@@ -39,8 +39,10 @@ import {
   ATTENDANCE_STATUS_LABELS,
   ATTENDANCE_STATUS_TONES,
 } from './attendance-labels';
-import { AttendanceAction, AttendanceReasonDialog } from './attendance-reason-dialog';
+import { ReasonDialog } from '../../../shared/reason-dialog/reason-dialog';
 import { AttendanceStore } from './attendance-store';
+
+type AttendanceAction = 'mark' | 'unmark';
 
 /** Estados que se pueden marcar a mano. */
 const MARKABLE: readonly AttendanceStatus[] = ['PENDING', 'NOT_REGISTERED'];
@@ -52,15 +54,7 @@ const MARKABLE: readonly AttendanceStatus[] = ['PENDING', 'NOT_REGISTERED'];
  */
 @Component({
   selector: 'adm-session-attendance',
-  imports: [
-    FilterBar,
-    Notice,
-    FilterSelect,
-    SearchField,
-    Person,
-    RequestState,
-    AttendanceReasonDialog,
-  ],
+  imports: [FilterBar, Notice, FilterSelect, SearchField, Person, RequestState, ReasonDialog],
   templateUrl: './session-attendance.html',
   styleUrl: './attendance.scss',
 })
@@ -121,7 +115,14 @@ export class SessionAttendance {
   protected readonly dialogOpen = signal(false);
   protected readonly dialogAction = signal<AttendanceAction>('mark');
   protected readonly dialogRows = signal<readonly SessionAttendanceRowDto[]>([]);
-  protected readonly dialogNames = computed(() => this.dialogRows().map((r) => r.fullName));
+  /** "Se registra la asistencia de Ana como «Manual»." */
+  protected readonly dialogLead = computed(() => {
+    const rows = this.dialogRows();
+    const who = rows.length === 1 ? rows[0].fullName : `${rows.length} personas`;
+    return this.dialogAction() === 'mark'
+      ? `Se registra la asistencia de ${who} como «Manual».`
+      : `Se borra el registro de asistencia de ${who} y su porcentaje se recalcula.`;
+  });
   protected readonly notice = signal('');
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);

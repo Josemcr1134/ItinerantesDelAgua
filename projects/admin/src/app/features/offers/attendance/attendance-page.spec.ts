@@ -140,11 +140,11 @@ describe('AttendancePage', () => {
     await settle();
     button('Marcar asistencia', host.querySelector('.bulk')!)!.click();
     await settle();
-    const reason = document.querySelector<HTMLTextAreaElement>('#attendance-reason')!;
+    const reason = document.querySelector<HTMLTextAreaElement>('dialog[open] textarea')!;
     reason.value = 'Pasó lista en sitio';
     reason.dispatchEvent(new Event('input'));
     await settle();
-    document.querySelector<HTMLFormElement>('#attendance-reason-form')!.requestSubmit();
+    document.querySelector<HTMLFormElement>('dialog[open] form')!.requestSubmit();
     await settle();
 
     const mark = http.expectOne(`${API}/admin/sessions/s2/attendance/mark`);

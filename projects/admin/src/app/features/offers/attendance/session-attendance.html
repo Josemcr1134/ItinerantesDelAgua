@@ -278,10 +278,19 @@
   }
 </adm-request-state>
 
-<adm-attendance-reason-dialog
+<adm-reason-dialog
   [(open)]="dialogOpen"
-  [action]="dialogAction()"
-  [names]="dialogNames()"
+  [title]="dialogAction() === 'mark' ? 'Marcar asistencia' : 'Desmarcar asistencia'"
+  [submitLabel]="dialogAction() === 'mark' ? 'Marcar asistencia' : 'Desmarcar'"
+  [placeholder]="dialogAction() === 'mark' ? 'Por ejemplo: pasó lista en sitio' : ''"
+  [hint]="
+    dialogAction() === 'mark'
+      ? 'Queda registrado con tu nombre.'
+      : 'Queda registrado con tu nombre en la auditoría.'
+  "
+  [maxLength]="1000"
   [busy]="busy()"
   (confirmed)="confirm($event)"
-/>
+>
+  {{ dialogLead() }}
+</adm-reason-dialog>
