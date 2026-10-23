@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+.picker {
+  max-width: 40rem;
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.stale {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.list {
+  margin-top: var(--space-5);
+}

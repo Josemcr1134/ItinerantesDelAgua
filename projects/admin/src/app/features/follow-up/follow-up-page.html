@@ -1,0 +1,82 @@
+<adm-page-header
+  title="Seguimiento"
+  lead="Conversión de cada oferta y personas aprobadas que aún no pagan o confirman."
+>
+  @if (canManage() && offer()) {
+    <button
+      uiButton
+      variant="secondary"
+      type="button"
+      class="adm-page-action"
+      (click)="closing.set(true)"
+    >
+      Cerrar inscripciones
+    </button>
+  }
+</adm-page-header>
+
+<adm-request-state
+  [error]="offers.error()"
+  [loaded]="offers.data() !== null"
+  loadingText="Cargando ofertas…"
+  (retry)="loadOffers()"
+>
+  @if (offers.data()?.data?.length) {
+    <div class="picker adm-field">
+      <label class="adm-field__label" for="follow-up-offer">Oferta</label>
+      <select
+        id="follow-up-offer"
+        class="adm-field__input"
+        (change)="pick($any($event.target).value)"
+      >
+        @for (o of offers.data()!.data; track o.id) {
+          <option [value]="o.id" [selected]="o.id === offerId()">
+            {{ o.name }} · {{ typeLabels[o.type] }} ({{ o.applications }} postulaciones,
+            {{ o.enrollments }} inscritos)
+          </option>
+        }
+      </select>
+      @if ((offers.data()?.meta?.total ?? 0) > offers.data()!.data.length) {
+        <p class="adm-field__hint">
+          Se muestran las {{ offers.data()!.data.length }} más recientes.
+        </p>
+      }
+    </div>
+
+    <adm-notice [(message)]="notice" />
+
+    <adm-request-state
+      [error]="funnel.error()"
+      [loaded]="funnel.data() !== null"
+      loadingText="Cargando el embudo…"
+      (retry)="reloadFunnel()"
+    >
+      @if (funnel.data(); as f) {
+        <adm-funnel-view [funnel]="f" [class.stale]="funnel.loading()" />
+      }
+    </adm-request-state>
+
+    @if (offerId(); as id) {
+      <section class="list" aria-label="Personas por contactar">
+        <adm-follow-up-list [offerId]="id" />
+      </section>
+    }
+  } @else {
+    <p class="adm-state">Aún no hay ofertas con postulaciones o inscripciones.</p>
+  }
+</adm-request-state>
+
+@if (canManage()) {
+  <adm-reason-dialog
+    [(open)]="closing"
+    title="Cerrar inscripciones"
+    submitLabel="Cerrar inscripciones"
+    [required]="false"
+    label="Motivo (opcional)"
+    [busy]="closeBusy()"
+    (confirmed)="closeEnrollment($event)"
+  >
+    Las inscripciones de «{{ offer()?.name }}» (o su convocatoria) se cierran en este momento y ya
+    nadie podrá inscribirse ni postular.
+  </adm-reason-dialog>
+}

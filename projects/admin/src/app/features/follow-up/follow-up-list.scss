@@ -1,0 +1,85 @@
+:host {
+  display: block;
+}
+
+p {
+  margin: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.started {
+  min-width: 12rem;
+  margin-bottom: var(--space-2);
+}
+
+.tabs__tab {
+  margin-bottom: -1px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.tabs__tab--active {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.muted {
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.alert {
+  color: var(--color-danger);
+}
+
+.folio,
+.amount {
+  font-family: var(--font-family-numeric);
+}
+
+.amount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.flags {
+  margin-top: var(--space-1);
+
+  &:empty {
+    display: none;
+  }
+}
+
+// Plazo de 2 días o menos: destacado.
+.due-soon {
+  box-shadow: inset 4px 0 0 var(--color-danger);
+}

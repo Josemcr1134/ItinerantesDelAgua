@@ -1,7 +1,7 @@
 import { Permission } from 'data-access';
 
 export type NavIcon =
-  'home' | 'offers' | 'teachers' | 'applications' | 'payments' | 'users' | 'site';
+  'home' | 'offers' | 'teachers' | 'applications' | 'follow-up' | 'payments' | 'users' | 'site';
 
 export interface NavItem {
   readonly label: string;
@@ -23,6 +23,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
     path: '/postulaciones',
     icon: 'applications',
     permission: 'applications.read',
+  },
+  {
+    label: 'Seguimiento',
+    path: '/seguimiento',
+    icon: 'follow-up',
+    permission: 'followup.read',
   },
   { label: 'Pagos', path: '/pagos', icon: 'payments', permission: 'payments.read' },
   { label: 'Administradores', path: '/administradores', icon: 'users', permission: 'users.manage' },

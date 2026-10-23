@@ -1,0 +1,155 @@
+<div class="toolbar">
+  <nav class="tabs" aria-label="Listas de seguimiento">
+    @for (t of tabs; track t.tab) {
+      <button
+        type="button"
+        class="tabs__tab"
+        [class.tabs__tab--active]="tab() === t.tab"
+        [attr.aria-pressed]="tab() === t.tab"
+        (click)="tab.set(t.tab)"
+      >
+        {{ t.label }}
+      </button>
+    }
+  </nav>
+  <adm-filter-select
+    class="started"
+    inputId="follow-up-started"
+    label="Pago"
+    allLabel="Todos"
+    [options]="startedOptions"
+    [(value)]="started"
+  />
+</div>
+
+<adm-notice [(message)]="notice" />
+
+<adm-list-states
+  [list]="list"
+  heading="Personas"
+  headingId="follow-up-results"
+  loadingText="Cargando seguimiento…"
+  [emptyText]="
+    tab() === 'PENDING'
+      ? 'No hay personas aprobadas pendientes de pago.'
+      : 'No hay postulaciones vencidas.'
+  "
+  filteredText="No hay personas con ese filtro."
+  (clearFilters)="started.set('')"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Persona</th>
+        <th scope="col">Saldo</th>
+        <th scope="col">Plazo</th>
+        <th scope="col">Último contacto</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of list.items(); track item.applicationId) {
+        @let busy = busyId() === item.applicationId;
+        <tr [class.due-soon]="item.dueSoon">
+          <td data-label="Persona">
+            <adm-person [name]="item.name" [detail]="item.email" [avatarSize]="36" />
+            <p class="muted">
+              @if (canOpenApplication()) {
+                <a class="adm-link folio" [routerLink]="['/postulaciones', item.applicationId]"
+                  >{{ item.folio
+                  }}<span class="visually-hidden"> (ver la postulación de {{ item.name }})</span></a
+                >
+              } @else {
+                <span class="folio">{{ item.folio }}</span>
+              }
+              @if (item.phone.number) {
+                · {{ item.phone.countryCode }} {{ item.phone.number }}
+              }
+            </p>
+          </td>
+          <td data-label="Saldo">
+            <p class="amount">{{ item.balance ? money(item.balance) : 'Sin costo' }}</p>
+            @if (item.assignedLevel) {
+              <p class="muted">
+                Beca {{ levelLabels[item.assignedLevel] }}
+                @if (item.assignedPercent !== null) {
+                  ({{ item.assignedPercent }}%)
+                }
+              </p>
+            }
+            <ul class="adm-chips flags">
+              @if (item.paymentStarted) {
+                <li class="adm-chip">Pago iniciado</li>
+              }
+              @if (item.pendingTransfer) {
+                <li class="adm-chip">Transferencia por validar</li>
+              }
+            </ul>
+          </td>
+          <td data-label="Plazo">
+            @if (remaining(item); as r) {
+              <p [class.alert]="item.dueSoon || (item.remainingDays ?? 0) < 0" class="strong">
+                {{ r }}
+              </p>
+            }
+            @if (item.responseDueAt) {
+              <p class="muted">{{ formatDateTime(item.responseDueAt) }}</p>
+            }
+          </td>
+          <td data-label="Último contacto">
+            @if (item.lastContactAt) {
+              <p>{{ formatDateTime(item.lastContactAt) }}</p>
+              @if (item.lastOutcome) {
+                <span class="adm-chip">{{ outcomeLabels[item.lastOutcome] }}</span>
+              }
+            } @else {
+              <span class="muted">Sin contacto</span>
+            }
+            @if (canManage() && tab() === 'PENDING' && !item.canRemind && item.remindAvailableAt) {
+              <p class="muted">
+                Próximo recordatorio: {{ formatDateTime(item.remindAvailableAt) }}
+              </p>
+            }
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              @if (canManage()) {
+                @if (tab() === 'PENDING') {
+                  <button
+                    type="button"
+                    class="adm-action"
+                    [disabled]="busy || !item.canRemind"
+                    [title]="
+                      item.canRemind || !item.remindAvailableAt
+                        ? ''
+                        : 'Disponible ' + formatDateTime(item.remindAvailableAt)
+                    "
+                    (click)="remind(item)"
+                  >
+                    Recordar<span class="visually-hidden"> a {{ item.name }}</span>
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="adm-action"
+                  [disabled]="busy || !item.phone.whatsappUrl"
+                  (click)="whatsapp(item)"
+                >
+                  WhatsApp<span class="visually-hidden">
+                    a {{ item.name }} (se abre en otra pestaña)</span
+                  >
+                </button>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['persona', 'personas']"
+  />
+</adm-list-states>

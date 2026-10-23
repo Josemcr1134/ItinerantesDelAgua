@@ -39,6 +39,12 @@ export const routes: Routes = [
         loadChildren: () => import('./features/applications/applications.routes'),
       },
       {
+        path: 'seguimiento',
+        title: 'Seguimiento · Administrador',
+        canActivate: [permissionGuard('followup.read')],
+        loadComponent: () => import('./features/follow-up/follow-up-page'),
+      },
+      {
         path: 'pagos',
         canActivate: [permissionGuard('payments.read')],
         loadChildren: () => import('./features/payments/payments.routes'),
