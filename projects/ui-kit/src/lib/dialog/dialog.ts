@@ -91,7 +91,11 @@ export class Dialog {
           dialog.setAttribute('open', '');
         }
       } else if (!this.open() && dialog.open) {
-        dialog.close();
+        if (typeof dialog.close === 'function') {
+          dialog.close();
+        } else {
+          dialog.removeAttribute('open');
+        }
       }
     });
   }
