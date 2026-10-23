@@ -32,3 +32,4 @@ export * from './services/admin-sessions.api';
 export * from './services/admin-attendance.api';
 export * from './services/admin-payments.api';
 export * from './services/admin-calendar.api';
+export * from './services/admin-moodle.api';
