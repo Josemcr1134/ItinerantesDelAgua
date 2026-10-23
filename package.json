@@ -4,7 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:landing": "ng serve public-site --port 4200",
+    "start:portal": "ng serve portal --port 4201",
+    "start:admin": "ng serve admin --port 4202",
     "build": "ng build",
+    "build:landing": "ng build public-site --configuration production",
+    "build:portal": "ng build portal --configuration production",
+    "build:admin": "ng build admin --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "api:models": "node tools/generate-api-models.mjs",
