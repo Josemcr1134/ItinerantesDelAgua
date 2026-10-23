@@ -1,0 +1,108 @@
+<adm-filter-bar
+  label="Filtrar transferencias"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="transfers-search"
+    placeholder="Folio, nombre, correo u oferta"
+    [(value)]="list.searchText"
+  />
+  <adm-filter-select
+    inputId="transfers-status"
+    label="Estado"
+    [options]="options.status"
+    [(value)]="status"
+  />
+  @if (options.offers().length) {
+    <adm-filter-select
+      inputId="transfers-offer"
+      label="Oferta"
+      allLabel="Todas"
+      [options]="options.offers()"
+      [(value)]="offerId"
+    />
+  }
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Transferencias"
+  headingId="transfers-results"
+  loadingText="Cargando transferencias…"
+  [emptyText]="
+    status() === 'PENDING_VALIDATION'
+      ? 'No hay transferencias por conciliar.'
+      : 'No hay transferencias en este estado.'
+  "
+  filteredText="No hay transferencias con esa búsqueda."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Persona</th>
+        <th scope="col">Oferta</th>
+        <th scope="col">Esperado / declarado</th>
+        <th scope="col">Comprobante</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of list.items(); track p.id) {
+        @let t = p.transfer;
+        <tr>
+          <td data-label="Persona">
+            <adm-person [name]="p.payer.fullName" [detail]="p.payer.email" [avatarSize]="36" />
+          </td>
+          <td data-label="Oferta">
+            <p class="strong">{{ p.offer.name }}</p>
+            <p class="muted">
+              <span class="folio">{{ p.folio }}</span> · {{ p.conceptLabel }}
+            </p>
+          </td>
+          <td data-label="Esperado / declarado">
+            <p class="amount">{{ money(t?.expectedAmount) }}</p>
+            @if (t?.declaredAmount; as declared) {
+              <p
+                class="muted"
+                [class.mismatch]="declared.amountCents !== t?.expectedAmount!.amountCents"
+              >
+                Declaró {{ money(declared) }}
+                @if (t?.declaredPaidOn) {
+                  el {{ formatDate(t!.declaredPaidOn) }}
+                }
+              </p>
+            }
+          </td>
+          <td data-label="Comprobante">
+            <span [class]="'adm-badge adm-badge--' + paymentTones[p.status]">{{
+              paymentLabels[p.status]
+            }}</span>
+            @if (t?.submittedAt) {
+              <p class="muted">Enviado {{ formatDateTime(t!.submittedAt) }}</p>
+            }
+            @if (t?.reference) {
+              <p class="muted">Referencia {{ t?.reference }}</p>
+            }
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              <a class="adm-action" [routerLink]="['/pagos', p.id]">
+                {{ p.status === 'PENDING_VALIDATION' ? 'Revisar' : 'Ver'
+                }}<span class="visually-hidden"> la transferencia {{ p.folio }}</span>
+              </a>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['transferencia', 'transferencias']"
+  />
+</adm-list-states>

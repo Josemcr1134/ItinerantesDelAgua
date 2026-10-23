@@ -1,0 +1,285 @@
+<a class="back" routerLink="/pagos">
+  <svg
+    aria-hidden="true"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+  Pagos
+</a>
+
+<adm-request-state
+  [error]="payment.error()"
+  [loaded]="payment.data() !== null"
+  loadingText="Cargando el pago…"
+  (retry)="reload()"
+>
+  @if (payment.data(); as p) {
+    <header class="head">
+      <p class="eyebrow">
+        <span class="folio">{{ p.folio }}</span> · {{ p.conceptLabel }}
+      </p>
+      <h1 class="title">{{ money(p.amount) }}</h1>
+      <p class="status">
+        <span [class]="'adm-badge adm-badge--' + statusTones[p.status]">{{
+          statusLabels[p.status]
+        }}</span>
+        <span class="muted">
+          {{ methodLabels[p.method] }}
+          @if (card(p.card); as c) {
+            · {{ c }}
+          }
+        </span>
+      </p>
+      @if (p.actions.canReview || p.actions.canRefund) {
+        <div class="actions">
+          @if (p.actions.canReview) {
+            <button uiButton type="button" (click)="review('validate')">Validar</button>
+            <button uiButton variant="secondary" type="button" (click)="review('reject')">
+              Rechazar
+            </button>
+          }
+          @if (p.actions.canRefund && p.refundable.amountCents > 0) {
+            <button uiButton variant="secondary" type="button" (click)="refunding.set(true)">
+              Reembolsar
+            </button>
+          }
+        </div>
+      }
+    </header>
+
+    <adm-notice [(message)]="notice" />
+
+    <div class="layout">
+      <section class="adm-section" aria-labelledby="payment-data">
+        <h2 id="payment-data" class="adm-section__title">Pago</h2>
+        <dl class="facts">
+          <div>
+            <dt>Quién paga</dt>
+            <dd>
+              {{ p.payer.fullName }}<br />
+              <a class="adm-link" [href]="'mailto:' + p.payer.email">{{ p.payer.email }}</a>
+              @if (p.payer.phone) {
+                <br />{{ p.payer.phone }}
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Oferta</dt>
+            <dd>
+              {{ p.offer.name }}
+              @if (p.offer.cohortLabel) {
+                · {{ p.offer.cohortLabel }}
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Creado</dt>
+            <dd>{{ formatDateTime(p.createdAt) }}</dd>
+          </div>
+          @if (p.paidAt) {
+            <div>
+              <dt>Pagado</dt>
+              <dd>{{ formatDateTime(p.paidAt) }}</dd>
+            </div>
+          }
+          @if (p.failedAt) {
+            <div>
+              <dt>Falló</dt>
+              <dd>{{ formatDateTime(p.failedAt) }}</dd>
+            </div>
+          }
+          @if (p.refunded.amountCents) {
+            <div>
+              <dt>Reembolsado</dt>
+              <dd>{{ money(p.refunded) }}</dd>
+            </div>
+          }
+          @if (p.status === 'PAID' || p.status === 'VALIDATED' || p.refunded.amountCents) {
+            <div>
+              <dt>Aún reembolsable</dt>
+              <dd>{{ money(p.refundable) }}</dd>
+            </div>
+          }
+        </dl>
+        @if (p.failureMessage) {
+          <p class="adm-callout">{{ p.failureMessage }}</p>
+        }
+        <p class="links">
+          @if (p.planId) {
+            <a class="adm-link" [routerLink]="['/pagos/planes', p.planId]">Ver el plan de cuotas</a>
+          }
+          @if (p.applicationId && canReadApplications()) {
+            <a class="adm-link" [routerLink]="['/postulaciones', p.applicationId]"
+              >Ver la postulación</a
+            >
+          }
+          @if (p.stripe.receiptUrl) {
+            <a class="adm-link" [href]="p.stripe.receiptUrl" target="_blank" rel="noopener"
+              >Recibo de Stripe<span class="visually-hidden"> (se abre en otra pestaña)</span></a
+            >
+          }
+        </p>
+      </section>
+
+      @if (p.transfer; as t) {
+        <section class="adm-section" aria-labelledby="payment-transfer">
+          <h2 id="payment-transfer" class="adm-section__title">Transferencia</h2>
+          <dl class="facts">
+            <div>
+              <dt>Saldo esperado</dt>
+              <dd class="strong">{{ money(t.expectedAmount) }}</dd>
+            </div>
+            <div>
+              <dt>Declaró</dt>
+              <dd
+                [class.mismatch]="
+                  t.declaredAmount && t.declaredAmount.amountCents !== t.expectedAmount.amountCents
+                "
+              >
+                {{ t.declaredAmount ? money(t.declaredAmount) : '—' }}
+                @if (t.declaredPaidOn) {
+                  · {{ formatDate(t.declaredPaidOn) }}
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>Referencia</dt>
+              <dd class="folio">{{ t.reference }}</dd>
+            </div>
+            @if (t.trackingKey) {
+              <div>
+                <dt>Clave de rastreo</dt>
+                <dd class="folio">{{ t.trackingKey }}</dd>
+              </div>
+            }
+            @if (t.submittedAt) {
+              <div>
+                <dt>Comprobante enviado</dt>
+                <dd>{{ formatDateTime(t.submittedAt) }}</dd>
+              </div>
+            }
+            @if (t.receivedAmount) {
+              <div>
+                <dt>Recibido</dt>
+                <dd>
+                  {{ money(t.receivedAmount) }}
+                  @if (t.receivedOn) {
+                    · {{ formatDate(t.receivedOn) }}
+                  }
+                </dd>
+              </div>
+            }
+            @if (t.reviewedAt) {
+              <div>
+                <dt>Revisó</dt>
+                <dd>{{ t.reviewedBy?.fullName ?? '—' }} · {{ formatDateTime(t.reviewedAt) }}</dd>
+              </div>
+            }
+            @if (t.rejectionReason) {
+              <div>
+                <dt>Motivo del rechazo</dt>
+                <dd>
+                  {{ rejectionLabels[t.rejectionReason] }}
+                  @if (t.rejectionNote) {
+                    — {{ t.rejectionNote }}
+                  }
+                </dd>
+              </div>
+            }
+          </dl>
+          @if (t.proofFileName) {
+            <button
+              type="button"
+              class="adm-action"
+              [disabled]="openingProof()"
+              (click)="openProof()"
+            >
+              {{ openingProof() ? 'Abriendo…' : 'Ver comprobante' }}
+              <span class="muted">
+                {{ t.proofFileName }}
+                @if (formatBytes(t.proofSizeBytes); as size) {
+                  · {{ size }}
+                }
+              </span>
+              <span class="visually-hidden"> (se abre en otra pestaña)</span>
+            </button>
+          }
+        </section>
+      }
+
+      @if (p.stripe.paymentIntentId || p.stripe.chargeId || p.stripe.checkoutSessionId) {
+        <section class="adm-section" aria-labelledby="payment-stripe">
+          <h2 id="payment-stripe" class="adm-section__title">Stripe</h2>
+          <dl class="facts facts--ids">
+            @if (p.stripe.paymentIntentId) {
+              <div>
+                <dt>PaymentIntent</dt>
+                <dd class="folio">{{ p.stripe.paymentIntentId }}</dd>
+              </div>
+            }
+            @if (p.stripe.chargeId) {
+              <div>
+                <dt>Cargo</dt>
+                <dd class="folio">{{ p.stripe.chargeId }}</dd>
+              </div>
+            }
+            @if (p.stripe.checkoutSessionId) {
+              <div>
+                <dt>Checkout</dt>
+                <dd class="folio">{{ p.stripe.checkoutSessionId }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      }
+
+      @if (p.refunds.length) {
+        <section class="adm-section" aria-labelledby="payment-refunds">
+          <h2 id="payment-refunds" class="adm-section__title">Reembolsos</h2>
+          <ul class="plain">
+            @for (r of p.refunds; track r.id) {
+              <li class="refund">
+                <p>
+                  <strong>{{ money(r.amount) }}</strong>
+                  <span [class]="'adm-badge adm-badge--' + refundTones[r.status]">{{
+                    refundLabels[r.status]
+                  }}</span>
+                </p>
+                <p class="muted">
+                  {{ formatDateTime(r.createdAt) }}
+                  @if (r.createdBy) {
+                    · {{ r.createdBy.fullName }}
+                  }
+                </p>
+                <p>{{ r.reason }}</p>
+                @if (r.failureMessage) {
+                  <p class="mismatch">{{ r.failureMessage }}</p>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    @if (p.actions.canRefund) {
+      <adm-refund-dialog [(open)]="refunding" [payment]="p" (done)="onRefunded($event)" />
+    }
+    @if (p.actions.canReview) {
+      <adm-transfer-review-dialog
+        [(open)]="reviewing"
+        [(mode)]="reviewMode"
+        [payment]="p"
+        (done)="onReviewed($event)"
+      />
+    }
+  }
+</adm-request-state>

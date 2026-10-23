@@ -1,0 +1,112 @@
+<adm-filter-bar
+  label="Filtrar planes de cuotas"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="plans-search"
+    placeholder="Nombre o correo"
+    [(value)]="list.searchText"
+  />
+  <adm-filter-select
+    inputId="plans-status"
+    label="Estado"
+    allLabel="Todos"
+    [options]="options.status"
+    [(value)]="status"
+  />
+  @if (options.offers().length) {
+    <adm-filter-select
+      inputId="plans-offer"
+      label="Oferta"
+      allLabel="Todas"
+      [options]="options.offers()"
+      [(value)]="offerId"
+    />
+  }
+  <adm-filter-select
+    inputId="plans-sort"
+    label="Ordenar por"
+    [options]="options.sort"
+    [(value)]="sort"
+  />
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Planes de cuotas"
+  headingId="plans-results"
+  loadingText="Cargando planes…"
+  emptyText="Aún no hay planes de cuotas."
+  filteredText="No hay planes con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Persona</th>
+        <th scope="col">Cuotas</th>
+        <th scope="col">Próximo cobro</th>
+        <th scope="col">Estado</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (plan of list.items(); track plan.id) {
+        <tr>
+          <td data-label="Persona">
+            <adm-person
+              [name]="plan.payer.fullName"
+              [detail]="plan.payer.email"
+              [avatarSize]="36"
+            />
+            <p class="muted">{{ plan.offer.name }}</p>
+          </td>
+          <td data-label="Cuotas">
+            <p class="strong">{{ plan.paidCount }} de {{ plan.installmentCount }} pagadas</p>
+            <adm-installment-dots [installments]="plan.installments" />
+            <p class="muted">
+              Pendiente {{ money(plan.pendingAmount) }} de {{ money(plan.total) }}
+            </p>
+          </td>
+          <td data-label="Próximo cobro">
+            @if (plan.nextCharge; as next) {
+              <p class="amount">{{ money(next.amount) }}</p>
+              <p class="muted">{{ formatDate(next.dueAt) }}</p>
+            } @else {
+              <span class="muted">—</span>
+            }
+          </td>
+          <td data-label="Estado">
+            <span [class]="'adm-badge adm-badge--' + statusTones[plan.status]">{{
+              statusLabels[plan.status]
+            }}</span>
+            @if (plan.daysSinceFailure) {
+              <p class="muted mismatch">
+                {{ plan.daysSinceFailure }}
+                {{ plan.daysSinceFailure === 1 ? 'día' : 'días' }} con cobro fallido
+              </p>
+            }
+            @if (plan.accessSuspended) {
+              <p class="muted mismatch">Acceso suspendido</p>
+            }
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              <a class="adm-action" [routerLink]="['/pagos/planes', plan.id]">
+                Ver plan<span class="visually-hidden"> de {{ plan.payer.fullName }}</span>
+              </a>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['plan', 'planes']"
+  />
+</adm-list-states>

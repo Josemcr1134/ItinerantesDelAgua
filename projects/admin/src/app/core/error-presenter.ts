@@ -38,6 +38,13 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   ATTENDANCE_NOT_ENROLLED: 'Sin inscripción vigente',
   ATTENDANCE_NOT_OPEN_YET: 'El registro aún no abre',
   ATTENDANCE_WINDOW_CLOSED: 'El registro ya cerró',
+  PAYMENT_INVALID_STATE: 'El pago ya cambió de estado',
+  PAYMENT_REFUND_INVALID: 'Reembolso no válido',
+  PAYMENT_TRANSFER_AMOUNT_MISMATCH: 'El monto no coincide',
+  PAYMENT_PLAN_INVALID_STATE: 'No es posible en este estado del plan',
+  PAYMENT_CHARGE_FAILED: 'El cobro fue rechazado',
+  PAYMENT_PROVIDER_ERROR: 'Stripe no respondió',
+  PAYMENTS_NOT_CONFIGURED: 'Pagos sin configurar',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -69,6 +76,11 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'ATTENDANCE_NOT_ENROLLED',
   'ATTENDANCE_NOT_OPEN_YET',
   'ATTENDANCE_WINDOW_CLOSED',
+  'PAYMENT_INVALID_STATE',
+  'PAYMENT_REFUND_INVALID',
+  'PAYMENT_TRANSFER_AMOUNT_MISMATCH',
+  'PAYMENT_PLAN_INVALID_STATE',
+  'PAYMENT_CHARGE_FAILED',
 ];
 
 export interface PresentErrorOptions {

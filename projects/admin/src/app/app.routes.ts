@@ -39,6 +39,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/applications/applications.routes'),
       },
       {
+        path: 'pagos',
+        canActivate: [permissionGuard('payments.read')],
+        loadChildren: () => import('./features/payments/payments.routes'),
+      },
+      {
         path: 'administradores',
         title: 'Administradores · Administrador',
         canActivate: [permissionGuard('users.manage')],

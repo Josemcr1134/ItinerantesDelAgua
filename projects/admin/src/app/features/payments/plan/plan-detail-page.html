@@ -1,0 +1,231 @@
+<a class="back" routerLink="/pagos" [queryParams]="{ pestana: 'planes' }">
+  <svg
+    aria-hidden="true"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+  Planes de cuotas
+</a>
+
+<adm-request-state
+  [error]="plan.error()"
+  [loaded]="plan.data() !== null"
+  loadingText="Cargando el plan…"
+  (retry)="reload()"
+>
+  @if (plan.data(); as p) {
+    <header class="head">
+      <p class="eyebrow">Plan de cuotas · {{ conceptLabels[p.concept] }}</p>
+      <h1 class="title">{{ p.payer.fullName }}</h1>
+      <p class="muted">{{ p.offer.name }}</p>
+      <p class="status">
+        <span [class]="'adm-badge adm-badge--' + statusTones[p.status]">{{
+          statusLabels[p.status]
+        }}</span>
+        @if (p.accessSuspended) {
+          <span class="adm-badge adm-badge--danger">Acceso suspendido</span>
+        }
+        @if (p.daysSinceFailure) {
+          <span class="mismatch">
+            {{ p.daysSinceFailure }} {{ p.daysSinceFailure === 1 ? 'día' : 'días' }} con cobro
+            fallido
+          </span>
+        }
+      </p>
+      @if (actions().size) {
+        <div class="actions">
+          @if (actions().has('RETRY')) {
+            <button uiButton type="button" [disabled]="busy()" (click)="retry()">
+              Reintentar cobro
+            </button>
+          }
+          @if (actions().has('MARK_DELINQUENT')) {
+            <button
+              uiButton
+              variant="secondary"
+              type="button"
+              [disabled]="busy()"
+              (click)="markDelinquent()"
+            >
+              Marcar en mora
+            </button>
+          }
+          @if (actions().has('SUSPEND_ACCESS')) {
+            <button
+              uiButton
+              variant="secondary"
+              type="button"
+              [disabled]="busy()"
+              (click)="askReason('SUSPEND_ACCESS')"
+            >
+              Suspender acceso
+            </button>
+          }
+          @if (actions().has('RESTORE_ACCESS')) {
+            <button
+              uiButton
+              variant="secondary"
+              type="button"
+              [disabled]="busy()"
+              (click)="askReason('RESTORE_ACCESS')"
+            >
+              Restablecer acceso
+            </button>
+          }
+          @if (actions().has('CANCEL')) {
+            <button
+              type="button"
+              class="adm-action adm-action--danger"
+              [disabled]="busy()"
+              (click)="askReason('CANCEL')"
+            >
+              Cancelar plan
+            </button>
+          }
+        </div>
+      }
+    </header>
+
+    <adm-notice [(message)]="notice" />
+
+    <div class="layout">
+      <section class="adm-section" aria-labelledby="plan-summary">
+        <h2 id="plan-summary" class="adm-section__title">Resumen</h2>
+        <dl class="facts">
+          <div>
+            <dt>Cuotas</dt>
+            <dd>
+              <strong>{{ p.paidCount }} de {{ p.installmentCount }}</strong> pagadas
+              <adm-installment-dots [installments]="p.installments" />
+            </dd>
+          </div>
+          <div>
+            <dt>Pagado</dt>
+            <dd>{{ money(p.paidAmount) }} de {{ money(p.total) }}</dd>
+          </div>
+          <div>
+            <dt>Pendiente</dt>
+            <dd class="strong">{{ money(p.pendingAmount) }}</dd>
+          </div>
+          @if (p.nextCharge; as next) {
+            <div>
+              <dt>Próximo cobro</dt>
+              <dd>{{ money(next.amount) }} · {{ formatDate(next.dueAt) }}</dd>
+            </div>
+          }
+          @if (card(p.card); as c) {
+            <div>
+              <dt>Tarjeta</dt>
+              <dd>{{ c }}</dd>
+            </div>
+          }
+          @if (p.enrollmentStatus) {
+            <div>
+              <dt>Inscripción</dt>
+              <dd>{{ enrollmentLabels[p.enrollmentStatus] }}</dd>
+            </div>
+          }
+          @if (p.failedSince) {
+            <div>
+              <dt>Cobro fallido desde</dt>
+              <dd class="mismatch">{{ formatDateTime(p.failedSince) }}</dd>
+            </div>
+          }
+          @if (p.delinquencyAt && p.status === 'PAST_DUE') {
+            <div>
+              <dt>Pasa a mora</dt>
+              <dd>{{ formatDateTime(p.delinquencyAt) }}</dd>
+            </div>
+          }
+          @if (p.accessSuspendedAt) {
+            <div>
+              <dt>Acceso suspendido</dt>
+              <dd>{{ formatDateTime(p.accessSuspendedAt) }}</dd>
+            </div>
+          }
+          @if (p.cancelledAt) {
+            <div>
+              <dt>Cancelado</dt>
+              <dd>
+                {{ formatDateTime(p.cancelledAt) }}
+                @if (p.cancelReason) {
+                  — {{ p.cancelReason }}
+                }
+              </dd>
+            </div>
+          }
+          <div>
+            <dt>Contacto</dt>
+            <dd>
+              <a class="adm-link" [href]="'mailto:' + p.payer.email">{{ p.payer.email }}</a>
+              @if (p.payer.phone) {
+                <br />{{ p.payer.phone }}
+              }
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="adm-section" aria-labelledby="plan-installments">
+        <h2 id="plan-installments" class="adm-section__title">Cuotas</h2>
+        <table class="adm-table installments">
+          <thead>
+            <tr>
+              <th scope="col">Cuota</th>
+              <th scope="col">Monto</th>
+              <th scope="col">Vence</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of p.installments; track i.id) {
+              <tr>
+                <td data-label="Cuota">{{ i.sequence }} de {{ p.installmentCount }}</td>
+                <td data-label="Monto" class="strong">{{ money(i.amount) }}</td>
+                <td data-label="Vence">{{ formatDate(i.dueAt) }}</td>
+                <td data-label="Estado">
+                  <span [class.mismatch]="i.status === 'FAILED'">{{
+                    installmentLabels[i.status]
+                  }}</span>
+                  @if (i.paidAt) {
+                    <p class="muted">Pagada {{ formatDateTime(i.paidAt) }}</p>
+                  }
+                  @if (i.attempts) {
+                    <p class="muted">
+                      {{ i.attempts }} {{ i.attempts === 1 ? 'intento' : 'intentos' }}
+                      @if (i.nextRetryAt) {
+                        · próximo {{ formatDateTime(i.nextRetryAt) }}
+                      }
+                    </p>
+                  }
+                  @if (i.failureMessage) {
+                    <p class="muted mismatch">{{ i.failureMessage }}</p>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <adm-reason-dialog
+      [(open)]="reasonOpen"
+      [title]="reasonCopy().title"
+      [submitLabel]="reasonCopy().submit"
+      hint="Queda en la auditoría y en el plan."
+      [busy]="busy()"
+      (confirmed)="confirmReason($event)"
+    >
+      {{ reasonCopy().lead }}
+    </adm-reason-dialog>
+  }
+</adm-request-state>

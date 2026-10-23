@@ -1,0 +1,97 @@
+<ui-dialog
+  [(open)]="open"
+  [title]="mode() === 'validate' ? 'Validar transferencia' : 'Rechazar transferencia'"
+  [busy]="busy()"
+>
+  <form id="transfer-review-form" class="form" (ngSubmit)="save()">
+    @if (mode() === 'validate') {
+      <p>
+        Saldo esperado: <strong>{{ money(expected()) }}</strong
+        >. Con el monto completo se activa la inscripción y se avisa a la persona.
+      </p>
+      <div class="row">
+        <div class="adm-field">
+          <label class="adm-field__label" for="transfer-received">Monto recibido (MXN)</label>
+          <input
+            id="transfer-received"
+            class="adm-field__input"
+            type="number"
+            name="received"
+            inputmode="decimal"
+            step="0.01"
+            min="0.01"
+            required
+            [(ngModel)]="received"
+          />
+        </div>
+        <div class="adm-field">
+          <label class="adm-field__label" for="transfer-received-on">Fecha de recepción</label>
+          <input
+            id="transfer-received-on"
+            class="adm-field__input"
+            type="date"
+            name="receivedOn"
+            required
+            [max]="today"
+            [(ngModel)]="receivedOn"
+          />
+        </div>
+      </div>
+      @if (shortByText(); as short) {
+        <div class="adm-callout" role="alert">
+          <p>
+            El monto recibido es menor al esperado por
+            <strong>{{ short }}</strong
+            >: no se puede validar.
+          </p>
+          <button type="button" class="adm-link" (click)="rejectMismatch()">
+            Rechazar con «Monto no coincide»
+          </button>
+        </div>
+      }
+    } @else {
+      <fieldset class="adm-field">
+        <legend class="adm-field__label">Motivo</legend>
+        <div class="choices">
+          @for (r of reasons; track r) {
+            <label class="adm-check">
+              <input type="radio" name="reason" [value]="r" [(ngModel)]="reason" />
+              {{ reasonLabels[r] }}
+            </label>
+          }
+        </div>
+      </fieldset>
+      <div class="adm-field">
+        <label class="adm-field__label" for="transfer-note"
+          >Detalle para la persona
+          <span class="adm-field__hint">{{
+            reason() === 'OTHER' ? '(obligatorio)' : '(opcional)'
+          }}</span></label
+        >
+        <textarea
+          id="transfer-note"
+          class="adm-field__input"
+          name="note"
+          rows="3"
+          maxlength="500"
+          [(ngModel)]="note"
+          aria-describedby="transfer-note-hint"
+        ></textarea>
+        <p id="transfer-note-hint" class="adm-field__hint">
+          Se le avisa con el motivo y puede subir otro comprobante.
+        </p>
+      </div>
+    }
+    @if (error()) {
+      <p class="adm-field__error" role="alert">{{ error() }}</p>
+    }
+  </form>
+  <div uiDialogActions>
+    <adm-form-actions
+      form="transfer-review-form"
+      [submitLabel]="mode() === 'validate' ? 'Validar y activar' : 'Rechazar y avisar'"
+      [busy]="busy()"
+      (cancel)="open.set(false)"
+    />
+  </div>
+</ui-dialog>

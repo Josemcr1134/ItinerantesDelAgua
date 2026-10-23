@@ -1,0 +1,125 @@
+<adm-filter-bar
+  label="Filtrar pagos"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="payments-search"
+    placeholder="Folio, nombre, correo u oferta"
+    [(value)]="list.searchText"
+  />
+  <adm-filter-select
+    inputId="payments-status"
+    label="Estado"
+    allLabel="Todos"
+    [options]="options.status"
+    [(value)]="status"
+  />
+  <adm-filter-select
+    inputId="payments-method"
+    label="Método"
+    allLabel="Todos"
+    [options]="options.method"
+    [(value)]="method"
+  />
+  <adm-filter-select
+    inputId="payments-concept"
+    label="Concepto"
+    allLabel="Todos"
+    [options]="options.concept"
+    [(value)]="concept"
+  />
+  <adm-filter-select
+    inputId="payments-currency"
+    label="Moneda"
+    allLabel="Ambas"
+    [options]="options.currency"
+    [(value)]="currency"
+  />
+  @if (hasOffers()) {
+    <adm-filter-select
+      inputId="payments-offer"
+      label="Oferta"
+      allLabel="Todas"
+      [options]="options.offers()"
+      [(value)]="offerId"
+    />
+  }
+  <adm-filter-date inputId="payments-from" label="Desde" [max]="to()" [(value)]="from" />
+  <adm-filter-date inputId="payments-to" label="Hasta" [min]="from()" [(value)]="to" />
+  <adm-filter-select
+    inputId="payments-sort"
+    label="Ordenar por"
+    [options]="options.sort"
+    [(value)]="sort"
+  />
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Pagos"
+  headingId="payments-results"
+  loadingText="Cargando pagos…"
+  emptyText="Aún no hay pagos."
+  filteredText="No hay pagos con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Pago</th>
+        <th scope="col">Persona</th>
+        <th scope="col">Monto</th>
+        <th scope="col">Estado</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of list.items(); track p.id) {
+        <tr>
+          <td data-label="Pago">
+            <p class="strong">
+              <span class="folio">{{ p.folio }}</span> · {{ p.conceptLabel }}
+            </p>
+            <p class="muted">{{ p.offer.name }}</p>
+            <p class="muted">{{ formatDateTime(p.paidAt ?? p.createdAt) }}</p>
+          </td>
+          <td data-label="Persona">
+            <adm-person [name]="p.payer.fullName" [detail]="p.payer.email" [avatarSize]="36" />
+          </td>
+          <td data-label="Monto">
+            <p class="amount">{{ money(p.amount) }}</p>
+            @if (p.refunded.amountCents) {
+              <p class="muted">Reembolsado {{ money(p.refunded) }}</p>
+            }
+          </td>
+          <td data-label="Estado">
+            <span [class]="'adm-badge adm-badge--' + statusTones[p.status]">{{
+              statusLabels[p.status]
+            }}</span>
+            <p class="muted">
+              {{ methodLabels[p.method] }}
+              @if (card(p.card); as c) {
+                · {{ c }}
+              }
+            </p>
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              <a class="adm-action" [routerLink]="['/pagos', p.id]">
+                Ver<span class="visually-hidden"> el pago {{ p.folio }}</span>
+              </a>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['pago', 'pagos']"
+  />
+</adm-list-states>

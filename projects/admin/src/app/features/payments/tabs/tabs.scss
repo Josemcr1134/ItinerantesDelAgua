@@ -1,0 +1,37 @@
+// Estilos compartidos de las pestañas de pagos.
+:host {
+  display: block;
+}
+
+p {
+  margin: 0;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.muted {
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+}
+
+.folio {
+  font-family: var(--font-family-numeric);
+}
+
+.amount {
+  font-family: var(--font-family-numeric);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mismatch {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.cell {
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,93 @@
+<adm-filter-bar
+  label="Filtrar reembolsos"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-filter-select
+    inputId="refunds-status"
+    label="Estado"
+    allLabel="Todos"
+    [options]="options.status"
+    [(value)]="status"
+  />
+  <adm-filter-select
+    inputId="refunds-method"
+    label="Método"
+    allLabel="Todos"
+    [options]="options.method"
+    [(value)]="method"
+  />
+  @if (options.offers().length) {
+    <adm-filter-select
+      inputId="refunds-offer"
+      label="Oferta"
+      allLabel="Todas"
+      [options]="options.offers()"
+      [(value)]="offerId"
+    />
+  }
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Reembolsos"
+  headingId="refunds-results"
+  loadingText="Cargando reembolsos…"
+  emptyText="Aún no hay reembolsos."
+  filteredText="No hay reembolsos con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Reembolso</th>
+        <th scope="col">Persona</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Motivo</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of list.items(); track r.id) {
+        <tr>
+          <td data-label="Reembolso">
+            <p class="amount">{{ money(r.amount) }}</p>
+            <p class="muted">{{ methodLabels[r.method] }}</p>
+            <p class="muted">{{ formatDateTime(r.createdAt) }}</p>
+          </td>
+          <td data-label="Persona">
+            <adm-person [name]="r.payer.fullName" [detail]="r.payer.email" [avatarSize]="36" />
+            <p class="muted">{{ r.offer.name }}</p>
+          </td>
+          <td data-label="Estado">
+            <span [class]="'adm-badge adm-badge--' + statusTones[r.status]">{{
+              statusLabels[r.status]
+            }}</span>
+            @if (r.failureMessage) {
+              <p class="muted mismatch">{{ r.failureMessage }}</p>
+            }
+          </td>
+          <td data-label="Motivo">
+            <p class="cell">{{ r.reason }}</p>
+            @if (r.createdBy) {
+              <p class="muted">Por {{ r.createdBy.fullName }}</p>
+            }
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              <a class="adm-action" [routerLink]="['/pagos', r.paymentId]">
+                Ver pago<span class="visually-hidden"> {{ r.paymentFolio }}</span>
+              </a>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['reembolso', 'reembolsos']"
+  />
+</adm-list-states>
