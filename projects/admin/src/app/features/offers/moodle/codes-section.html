@@ -1,0 +1,64 @@
+<div class="codes-toolbar">
+  <adm-filter-select
+    inputId="codes-used"
+    label="Estado"
+    allLabel="Todos"
+    [options]="usedOptions"
+    [(value)]="used"
+  />
+  <p class="muted">
+    Por seguridad solo se guardan los últimos 4 caracteres: el código completo se ve una sola vez,
+    al generarlo.
+  </p>
+</div>
+
+<adm-list-states
+  [list]="codes"
+  heading="Códigos"
+  headingId="codes-results"
+  loadingText="Cargando códigos…"
+  emptyText="Aún no hay códigos de acceso."
+  filteredText="No hay códigos en ese estado."
+  (clearFilters)="used.set('')"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Código</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Vence</th>
+        <th scope="col">Generado</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (code of codes.items(); track code.id) {
+        <tr>
+          <td data-label="Código" class="code">{{ codeLabel(code) }}</td>
+          <td data-label="Estado">
+            @if (code.used) {
+              <span class="adm-badge adm-badge--info">Canjeado</span>
+              @if (code.usedBy) {
+                <p class="muted">
+                  {{ code.usedBy.fullName }}
+                  @if (code.usedAt) {
+                    · {{ formatDateTime(code.usedAt) }}
+                  }
+                </p>
+              }
+            } @else {
+              <span class="adm-badge adm-badge--success">Disponible</span>
+            }
+          </td>
+          <td data-label="Vence">{{ code.expiresAt ? formatDate(code.expiresAt) : '—' }}</td>
+          <td data-label="Generado">{{ formatDate(code.createdAt) }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="codes.meta()"
+    [(page)]="codes.page"
+    [loading]="codes.loading()"
+    [noun]="['código', 'códigos']"
+  />
+</adm-list-states>

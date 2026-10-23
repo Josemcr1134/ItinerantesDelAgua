@@ -1,0 +1,84 @@
+<adm-filter-bar
+  label="Filtrar correos"
+  [activeCount]="roster.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="roster-search"
+    placeholder="Correo"
+    [(value)]="roster.searchText"
+  />
+  <adm-filter-select
+    inputId="roster-linked"
+    label="Estado"
+    allLabel="Todos"
+    [options]="linkedOptions"
+    [(value)]="linked"
+  />
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="roster"
+  heading="Correos"
+  headingId="roster-results"
+  loadingText="Cargando correos…"
+  emptyText="Aún no hay correos. Cárgalos desde el CSV del curso en Moodle."
+  filteredText="No hay correos con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Correo</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Cargado</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (entry of roster.items(); track entry.id) {
+        <tr>
+          <td data-label="Correo" class="email">{{ entry.email }}</td>
+          <td data-label="Estado">
+            @if (entry.linked) {
+              <span class="adm-badge adm-badge--success">Vinculado</span>
+              @if (entry.linkedUser) {
+                <p class="muted">
+                  {{ entry.linkedUser.fullName }}
+                  @if (entry.linkedAt) {
+                    · {{ formatDateTime(entry.linkedAt) }}
+                  }
+                </p>
+              }
+            } @else {
+              <span class="adm-badge adm-badge--pending">Pendiente</span>
+              <p class="muted">Se inscribe al registrarse con este correo.</p>
+            }
+          </td>
+          <td data-label="Cargado">{{ formatDate(entry.createdAt) }}</td>
+          <td class="adm-table__actions">
+            @if (canWrite() && !entry.linked) {
+              <div class="adm-actions">
+                <button
+                  type="button"
+                  class="adm-action adm-action--danger"
+                  [disabled]="rows.isBusy(entry.id)"
+                  (click)="remove(entry)"
+                >
+                  Quitar<span class="visually-hidden"> {{ entry.email }}</span>
+                </button>
+              </div>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <adm-pagination
+    [meta]="roster.meta()"
+    [(page)]="roster.page"
+    [loading]="roster.loading()"
+    [noun]="['correo', 'correos']"
+  />
+</adm-list-states>

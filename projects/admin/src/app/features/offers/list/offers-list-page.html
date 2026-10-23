@@ -163,6 +163,14 @@
                   [routerLink]="['/ofertas', offer.id, 'sesiones']"
                   >Sesiones</a
                 >
+                @if (offer.origin === 'MOODLE') {
+                  <a
+                    class="adm-menuitem"
+                    role="menuitem"
+                    [routerLink]="['/ofertas', offer.id, 'moodle']"
+                    >Acceso Moodle</a
+                  >
+                }
                 @if (canReadAttendance()) {
                   <a
                     class="adm-menuitem"

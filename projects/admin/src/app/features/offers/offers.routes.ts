@@ -24,6 +24,11 @@ const routes: Routes = [
     loadComponent: () => import('./attendance/attendance-page'),
   },
   {
+    path: ':id/moodle',
+    title: 'Acceso Moodle · Administrador',
+    loadComponent: () => import('./moodle/moodle-page'),
+  },
+  {
     path: ':id/sesiones',
     title: 'Sesiones · Administrador',
     loadComponent: () => import('./sessions/sessions-page'),

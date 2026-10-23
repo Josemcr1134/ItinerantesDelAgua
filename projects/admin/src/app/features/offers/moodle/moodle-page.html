@@ -1,0 +1,88 @@
+<a class="back" [routerLink]="['/ofertas', id()]">
+  <svg
+    aria-hidden="true"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+  {{ offer.data()?.name ?? 'Volver a la oferta' }}
+</a>
+
+<adm-page-header
+  title="Acceso Moodle"
+  lead="Quiénes del curso en Moodle pueden entrar a la plataforma: por su correo o con un código de acceso."
+>
+  @if (canWrite() && isMoodle()) {
+    @if (section() === 'correos') {
+      <button uiButton type="button" class="adm-page-action" (click)="importing.set(true)">
+        Cargar correos
+      </button>
+    } @else {
+      <button uiButton type="button" class="adm-page-action" (click)="generating.set(true)">
+        Generar códigos
+      </button>
+    }
+  }
+</adm-page-header>
+
+<adm-request-state
+  [error]="offer.error()"
+  [loaded]="offer.data() !== null"
+  loadingText="Cargando la oferta…"
+  (retry)="reloadOffer()"
+>
+  @if (!isMoodle()) {
+    <p class="adm-callout adm-callout--info">
+      Esta oferta se imparte en la plataforma propia. La lista de correos y los códigos solo aplican
+      a ofertas de origen Moodle (paso «Origen y precio»).
+    </p>
+  } @else {
+    <nav class="tabs" aria-label="Acceso Moodle">
+      <a
+        class="tabs__tab"
+        [class.tabs__tab--active]="section() === 'correos'"
+        [attr.aria-current]="section() === 'correos' ? 'page' : null"
+        routerLink="."
+        [queryParams]="{ seccion: 'correos' }"
+        >Lista de correos</a
+      >
+      <a
+        class="tabs__tab"
+        [class.tabs__tab--active]="section() === 'codigos'"
+        [attr.aria-current]="section() === 'codigos' ? 'page' : null"
+        routerLink="."
+        [queryParams]="{ seccion: 'codigos' }"
+        >Códigos de acceso</a
+      >
+    </nav>
+
+    <adm-notice [(message)]="notice" />
+
+    @if (section() === 'correos') {
+      <adm-roster-section [offerId]="id()" (notice)="notice.set($event)" />
+    } @else {
+      <adm-codes-section [offerId]="id()" />
+    }
+
+    @if (canWrite()) {
+      <adm-import-roster-dialog
+        [(open)]="importing"
+        [offerId]="id()"
+        (imported)="onImported($event)"
+      />
+      <adm-generate-codes-dialog
+        [(open)]="generating"
+        [offerId]="id()"
+        [offerName]="offer.data()?.name ?? ''"
+        (generated)="onGenerated($event)"
+      />
+    }
+  }
+</adm-request-state>

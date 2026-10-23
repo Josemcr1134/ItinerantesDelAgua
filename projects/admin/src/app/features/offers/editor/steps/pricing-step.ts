@@ -1,5 +1,6 @@
 import { Component, computed, effect, forwardRef, inject, signal, untracked } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   AdminOfferDetailDto,
   OFFER_ORIGIN_VALUES,
@@ -21,7 +22,7 @@ const fromCents = (cents: number | null): number | null => (cents === null ? nul
 /** Paso 4 — Origen y precio (NAS/Moodle, precio, cuotas y beca). */
 @Component({
   selector: 'adm-pricing-step',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   providers: [{ provide: OfferStep, useExisting: forwardRef(() => PricingStep) }],
   templateUrl: './pricing-step.html',
   styles: `

@@ -1,0 +1,89 @@
+<ui-dialog [(open)]="open" title="Cargar correos" [busy]="busy()">
+  @if (result(); as r) {
+    <div class="form" role="status">
+      <ul class="results">
+        <li>
+          <strong>{{ r.added }}</strong> {{ r.added === 1 ? 'correo nuevo' : 'correos nuevos' }}
+        </li>
+        <li>
+          <strong>{{ r.linkedUsers }}</strong>
+          {{
+            r.linkedUsers === 1
+              ? 'persona ya registrada quedó inscrita'
+              : 'personas ya registradas quedaron inscritas'
+          }}
+          (se les avisó)
+        </li>
+        <li>
+          <strong>{{ r.duplicates }}</strong>
+          {{ r.duplicates === 1 ? 'repetido' : 'repetidos' }} (no se volvieron a cargar)
+        </li>
+      </ul>
+      @if (r.invalid.length) {
+        <div class="adm-callout">
+          <p>
+            {{ r.invalid.length }}
+            {{ r.invalid.length === 1 ? 'valor no es un correo' : 'valores no son correos' }} y no
+            se cargaron:
+          </p>
+          <ul class="invalid">
+            @for (value of r.invalid; track $index) {
+              <li>{{ value }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  } @else {
+    <form id="import-roster-form" class="form" (ngSubmit)="submit()">
+      <p>
+        Las personas que ya tengan cuenta quedan inscritas «Vía Moodle» al momento; las demás, al
+        registrarse con ese correo. Se puede cargar varias veces: no se duplican.
+      </p>
+      <div class="file">
+        <label class="adm-action file__pick">
+          Elegir CSV
+          <input
+            class="visually-hidden"
+            type="file"
+            accept=".csv,text/csv,text/plain"
+            (change)="pick($any($event.target))"
+          />
+        </label>
+        <span class="muted">{{ fileName() ?? 'Columna «email» o «correo».' }}</span>
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="roster-text">O pega los correos (uno por línea)</label>
+        <textarea
+          id="roster-text"
+          class="adm-field__input mono"
+          name="text"
+          rows="8"
+          [(ngModel)]="text"
+          placeholder="ana@correo.mx&#10;luis@correo.mx"
+        ></textarea>
+      </div>
+      @if (error()) {
+        <p class="adm-field__error" role="alert">{{ error() }}</p>
+      }
+    </form>
+  }
+  <div uiDialogActions>
+    @if (result()) {
+      <button uiButton type="button" (click)="open.set(false)">Listo</button>
+    } @else {
+      <button
+        uiButton
+        variant="secondary"
+        type="button"
+        [disabled]="busy()"
+        (click)="open.set(false)"
+      >
+        Cancelar
+      </button>
+      <button uiButton type="submit" form="import-roster-form" [disabled]="busy()">
+        {{ busy() ? 'Cargando…' : 'Cargar correos' }}
+      </button>
+    }
+  </div>
+</ui-dialog>

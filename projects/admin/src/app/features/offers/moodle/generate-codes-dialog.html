@@ -1,0 +1,76 @@
+<ui-dialog
+  [(open)]="open"
+  title="Generar códigos de acceso"
+  [busy]="busy() || (!!result() && !kept())"
+>
+  @if (result(); as r) {
+    <div class="form">
+      <p class="adm-callout" role="status">
+        Copia o descarga los {{ r.codes.length }} códigos ahora:
+        <strong>no se vuelven a mostrar</strong>.
+        @if (r.expiresAt) {
+          Vencen el {{ formatDate(r.expiresAt) }}.
+        }
+      </p>
+      <ol class="codes" aria-label="Códigos generados">
+        @for (code of r.codes; track code) {
+          <li class="mono">{{ code }}</li>
+        }
+      </ol>
+      <div class="adm-actions">
+        <button type="button" class="adm-action" (click)="copy()">
+          {{ copied() ? 'Copiados ✓' : 'Copiar todos' }}
+        </button>
+        <button type="button" class="adm-action" (click)="download()">Descargar CSV</button>
+      </div>
+      @if (error()) {
+        <p class="adm-field__error" role="alert">{{ error() }}</p>
+      }
+    </div>
+  } @else {
+    <form id="generate-codes-form" class="form" (ngSubmit)="submit()">
+      <p>
+        Códigos <span class="mono">XXXX-XXXX</span> de un solo uso para que las personas del curso
+        entren a la plataforma. Vencen al terminar la cohorte.
+      </p>
+      <div class="adm-field narrow">
+        <label class="adm-field__label" for="codes-count">Cantidad</label>
+        <input
+          id="codes-count"
+          class="adm-field__input"
+          type="number"
+          name="count"
+          inputmode="numeric"
+          min="1"
+          [max]="maxCodes"
+          step="1"
+          required
+          [(ngModel)]="count"
+          aria-describedby="codes-count-hint"
+        />
+        <p id="codes-count-hint" class="adm-field__hint">Entre 1 y {{ maxCodes }}.</p>
+      </div>
+      @if (error()) {
+        <p class="adm-field__error" role="alert">{{ error() }}</p>
+      }
+    </form>
+  }
+  <div uiDialogActions>
+    @if (result()) {
+      <button uiButton type="button" (click)="open.set(false)">Ya los guardé</button>
+    } @else {
+      <button
+        uiButton
+        variant="secondary"
+        type="button"
+        [disabled]="busy()"
+        (click)="open.set(false)"
+      >
+        Cancelar
+      </button>
+      <button uiButton type="submit" form="generate-codes-form" [disabled]="busy()">
+        {{ busy() ? 'Generando…' : 'Generar' }}
+      </button>
+    }
+  </div>
+</ui-dialog>

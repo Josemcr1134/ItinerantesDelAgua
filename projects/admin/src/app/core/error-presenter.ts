@@ -45,6 +45,7 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   PAYMENT_CHARGE_FAILED: 'El cobro fue rechazado',
   PAYMENT_PROVIDER_ERROR: 'Stripe no respondió',
   PAYMENTS_NOT_CONFIGURED: 'Pagos sin configurar',
+  OFFER_NOT_MOODLE: 'La oferta no es de Moodle',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -81,6 +82,7 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'PAYMENT_TRANSFER_AMOUNT_MISMATCH',
   'PAYMENT_PLAN_INVALID_STATE',
   'PAYMENT_CHARGE_FAILED',
+  'OFFER_NOT_MOODLE',
 ];
 
 export interface PresentErrorOptions {

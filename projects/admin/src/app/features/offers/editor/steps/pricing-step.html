@@ -33,8 +33,8 @@
           <p class="adm-field__error">{{ issue('moodleCourseUrl') }}</p>
         }
         <p class="adm-field__hint">
-          La lista de correos y los códigos de acceso se cargan en la sección de Moodle de la
-          oferta.
+          La lista de correos y los códigos de acceso se cargan en
+          <a class="adm-link" [routerLink]="['/ofertas', offer().id, 'moodle']">Acceso Moodle</a>.
         </p>
       </div>
     }
