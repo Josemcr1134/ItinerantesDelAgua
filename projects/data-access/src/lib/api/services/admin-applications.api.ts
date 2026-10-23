@@ -1,7 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
-import { ApiClient, toHttpParams } from '../api-client';
+import { ApiClient } from '../api-client';
 import { DecisionPreviewDto, Uuid } from '../models.generated';
 import { ApiBody, ApiQuery, ApiResponse } from '../operations.generated';
 
@@ -26,12 +24,6 @@ export type DecisionPreview = Omit<DecisionPreviewDto, 'email'> & {
   readonly email: DecisionEmailPreview;
 };
 
-/** CSV descargado: contenido y nombre sugerido por la API. */
-export interface DownloadedFile {
-  readonly blob: Blob;
-  readonly fileName: string;
-}
-
 /** La API recibe los estados separados por coma. */
 function serialize(query: AdminApplicationsQuery) {
   return { ...query, status: query.status?.length ? query.status.join(',') : undefined };
@@ -41,7 +33,6 @@ function serialize(query: AdminApplicationsQuery) {
 @Injectable({ providedIn: 'root' })
 export class AdminApplicationsApi {
   private readonly api = inject(ApiClient);
-  private readonly http = inject(HttpClient);
 
   private path(id: Uuid, rest = ''): string {
     return `/api/v1/admin/applications/${encodeURIComponent(id)}${rest}`;
@@ -55,21 +46,11 @@ export class AdminApplicationsApi {
   }
 
   /** CSV (UTF-8 con BOM) con los mismos filtros; máx. 5000 filas. */
-  export(query: AdminApplicationsQuery = {}): Observable<DownloadedFile> {
+  export(query: AdminApplicationsQuery = {}) {
     const { page: _page, pageSize: _pageSize, ...filters } = query;
-    return this.http
-      .get(this.api.url('/api/v1/admin/applications/export'), {
-        params: toHttpParams(serialize(filters)),
-        responseType: 'blob',
-        observe: 'response',
-      })
-      .pipe(
-        map((response) => ({
-          blob: response.body ?? new Blob([], { type: 'text/csv' }),
-          fileName:
-            fileNameFrom(response.headers.get('content-disposition')) ?? 'postulaciones.csv',
-        })),
-      );
+    return this.api.getFile('/api/v1/admin/applications/export', 'postulaciones.csv', {
+      query: serialize(filters),
+    });
   }
 
   /**
@@ -175,12 +156,4 @@ export class AdminFollowUpApi {
       body,
     );
   }
-}
-
-/** `attachment; filename="x.csv"` (o `filename*=UTF-8''x.csv`) → `x.csv`. */
-function fileNameFrom(disposition: string | null): string | null {
-  if (!disposition) return null;
-  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(disposition);
-  if (encoded) return decodeURIComponent(encoded[1]);
-  return /filename="?([^";]+)"?/i.exec(disposition)?.[1] ?? null;
 }

@@ -1,6 +1,6 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { API_BASE_URL } from './api-config';
 import { PaginationMetaDto } from './models.generated';
 
@@ -25,6 +25,12 @@ export interface RequestOptions {
   readonly query?: Query;
   readonly context?: HttpContext;
   readonly headers?: Readonly<Record<string, string>>;
+}
+
+/** Archivo descargado de la API: contenido y nombre sugerido. */
+export interface DownloadedFile {
+  readonly blob: Blob;
+  readonly fileName: string;
 }
 
 /** Construye `HttpParams` ignorando valores vacíos. */
@@ -73,6 +79,29 @@ export class ApiClient {
     return this.http.delete<T>(this.url(path), this.httpOptions(options));
   }
 
+  /**
+   * Descarga un archivo (p. ej. un CSV) con la sesión. El nombre sale de
+   * `Content-Disposition` o, si la API no lo expone, de `fallbackName`.
+   */
+  getFile(
+    path: string,
+    fallbackName: string,
+    options: RequestOptions = {},
+  ): Observable<DownloadedFile> {
+    return this.http
+      .get(this.url(path), {
+        ...this.httpOptions(options),
+        responseType: 'blob',
+        observe: 'response',
+      })
+      .pipe(
+        map((response) => ({
+          blob: response.body ?? new Blob([]),
+          fileName: fileNameFrom(response.headers.get('content-disposition')) ?? fallbackName,
+        })),
+      );
+  }
+
   private httpOptions(options: RequestOptions) {
     return {
       params: toHttpParams(options.query),
@@ -80,4 +109,12 @@ export class ApiClient {
       headers: options.headers ? { ...options.headers } : undefined,
     };
   }
+}
+
+/** `attachment; filename="x.csv"` (o `filename*=UTF-8''x.csv`) → `x.csv`. */
+function fileNameFrom(disposition: string | null): string | null {
+  if (!disposition) return null;
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(disposition);
+  if (encoded) return decodeURIComponent(encoded[1]);
+  return /filename="?([^";]+)"?/i.exec(disposition)?.[1] ?? null;
 }
