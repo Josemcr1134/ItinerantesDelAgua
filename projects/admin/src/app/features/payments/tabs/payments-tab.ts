@@ -22,7 +22,7 @@ import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
 import { Pagination } from '../../../shared/list/pagination';
 import { Person } from '../../../shared/person/person';
-import { dayEndIso, dayStartIso } from '../date-range';
+import { dayEndIso, dayStartIso } from '../../../shared/format/date-range';
 import {
   PAYMENT_CONCEPT_LABELS,
   PAYMENT_METHOD_LABELS,
