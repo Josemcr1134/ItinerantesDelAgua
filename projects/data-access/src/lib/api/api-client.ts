@@ -33,6 +33,11 @@ export interface DownloadedFile {
   readonly fileName: string;
 }
 
+/** Lista para las queries que la API recibe separadas por coma (`?status=A,B`). */
+export function commaList(values: readonly string[] | undefined): string | undefined {
+  return values?.length ? values.join(',') : undefined;
+}
+
 /** Construye `HttpParams` ignorando valores vacíos. */
 export function toHttpParams(query: Query = {}): HttpParams {
   let params = new HttpParams();

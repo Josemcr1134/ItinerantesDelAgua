@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ApiClient } from '../api-client';
+import { ApiClient, commaList } from '../api-client';
 import { DecisionPreviewDto, Uuid } from '../models.generated';
 import { ApiBody, ApiQuery, ApiResponse } from '../operations.generated';
 
@@ -26,7 +26,7 @@ export type DecisionPreview = Omit<DecisionPreviewDto, 'email'> & {
 
 /** La API recibe los estados separados por coma. */
 function serialize(query: AdminApplicationsQuery) {
-  return { ...query, status: query.status?.length ? query.status.join(',') : undefined };
+  return { ...query, status: commaList(query.status) };
 }
 
 /** Bandeja de postulaciones (HU-31): evaluación, entrevista y decisión. */
