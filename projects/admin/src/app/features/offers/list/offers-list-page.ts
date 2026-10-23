@@ -67,6 +67,7 @@ export default class OffersListPage {
 
   protected readonly canWrite = computed(() => this.access.permissions().has('offers.write'));
   protected readonly canPublish = computed(() => this.access.permissions().has('offers.publish'));
+  protected readonly canReadAudit = computed(() => this.access.permissions().has('audit.read'));
   protected readonly canReadAttendance = computed(() =>
     this.access.permissions().has('attendance.read'),
   );

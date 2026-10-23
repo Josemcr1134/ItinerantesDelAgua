@@ -1,0 +1,86 @@
+<adm-page-header
+  title="Auditoría"
+  lead="Cada cambio hecho desde el panel: quién, cuándo, sobre qué y qué cambió. Más reciente primero."
+/>
+
+@if (entityFilter(); as e) {
+  <p class="entity" role="status">
+    Historial de <strong>{{ e.type }}</strong>
+    @if (e.id) {
+      <span class="mono">{{ e.id }}</span>
+    }
+    <button type="button" class="adm-link" (click)="clearEntity()">Ver todo</button>
+  </p>
+}
+
+<adm-filter-bar
+  label="Filtrar auditoría"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="audit-action"
+    placeholder="Acción, p. ej. offer."
+    [(value)]="list.searchText"
+  />
+  @if (actors().length) {
+    <adm-filter-select
+      inputId="audit-actor"
+      label="Quién"
+      allLabel="Todo el equipo"
+      [options]="actors()"
+      [(value)]="actorId"
+    />
+  }
+  <adm-filter-date inputId="audit-from" label="Desde" [max]="to()" [(value)]="from" />
+  <adm-filter-date inputId="audit-to" label="Hasta" [min]="from()" [(value)]="to" />
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Registro"
+  headingId="audit-results"
+  loadingText="Cargando auditoría…"
+  emptyText="Aún no hay acciones registradas."
+  filteredText="No hay acciones con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <ol class="log">
+    @for (entry of list.items(); track entry.id) {
+      <li class="entry">
+        <div class="entry__head">
+          <adm-person
+            [name]="entry.actor.fullName || entry.actor.email"
+            [detail]="entry.actor.fullName ? entry.actor.email : null"
+            [avatarSize]="32"
+          />
+          <time class="muted" [attr.datetime]="entry.createdAt">{{
+            formatDateTime(entry.createdAt)
+          }}</time>
+        </div>
+        <p class="summary">{{ entry.summary }}</p>
+        <p class="meta">
+          <span class="mono action">{{ entry.action }}</span>
+          ·
+          <a
+            class="adm-link"
+            routerLink="."
+            [queryParams]="entityLink(entry.entityType, entry.entityId)"
+            >{{ entry.entityType }}<span class="visually-hidden"> (ver su historial)</span></a
+          >
+          @if (!entry.actor.id) {
+            · <span class="muted">cuenta borrada</span>
+          }
+        </p>
+        <adm-audit-changes [changes]="entry.changes" />
+      </li>
+    }
+  </ol>
+  <adm-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['acción', 'acciones']"
+  />
+</adm-list-states>

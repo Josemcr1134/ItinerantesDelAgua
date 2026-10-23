@@ -67,6 +67,12 @@ export const routes: Routes = [
         canActivate: [permissionGuard('site.write')],
         loadComponent: () => import('./features/site/site-page'),
       },
+      {
+        path: 'auditoria',
+        title: 'Auditoría · Administrador',
+        canActivate: [permissionGuard('audit.read')],
+        loadComponent: () => import('./features/audit/audit-page'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

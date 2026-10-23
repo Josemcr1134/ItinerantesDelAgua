@@ -171,6 +171,15 @@
                     >Acceso Moodle</a
                   >
                 }
+                @if (canReadAudit()) {
+                  <a
+                    class="adm-menuitem"
+                    role="menuitem"
+                    routerLink="/auditoria"
+                    [queryParams]="{ entidad: 'Offer', entidadId: offer.id }"
+                    >Historial de cambios</a
+                  >
+                }
                 @if (canReadAttendance()) {
                   <a
                     class="adm-menuitem"

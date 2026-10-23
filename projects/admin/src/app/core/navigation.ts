@@ -9,7 +9,8 @@ export type NavIcon =
   | 'follow-up'
   | 'payments'
   | 'users'
-  | 'site';
+  | 'site'
+  | 'audit';
 
 export interface NavItem {
   readonly label: string;
@@ -42,4 +43,5 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Pagos', path: '/pagos', icon: 'payments', permission: 'payments.read' },
   { label: 'Administradores', path: '/administradores', icon: 'users', permission: 'users.manage' },
   { label: 'Página web', path: '/pagina-web', icon: 'site', permission: 'site.write' },
+  { label: 'Auditoría', path: '/auditoria', icon: 'audit', permission: 'audit.read' },
 ];
