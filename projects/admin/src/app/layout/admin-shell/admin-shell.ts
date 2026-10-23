@@ -42,12 +42,12 @@ export default class AdminShell {
   protected readonly navItems = computed(() =>
     NAV_ITEMS.filter((item) => !item.permission || this.access.permissions().has(item.permission)),
   );
+  /** Roles del equipo; en el menú se ve el primero y el resto se despliega. */
   protected readonly roles = computed(() =>
-    this.access
-      .roles()
-      .map((role) => this.access.roleLabel(role))
-      .join(' · '),
+    this.access.roles().map((role) => this.access.roleLabel(role)),
   );
+  protected readonly extraRoles = computed(() => this.roles().slice(1));
+  protected readonly rolesOpen = signal(false);
 
   constructor() {
     // Al navegar desde el menú móvil, se cierra.

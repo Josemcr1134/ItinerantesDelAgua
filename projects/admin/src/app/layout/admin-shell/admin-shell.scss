@@ -157,8 +157,50 @@ $sidebar-width: 272px;
 }
 
 .person {
+  // Arriba: con los roles desplegados, el avatar queda junto al nombre.
+  align-items: flex-start;
   padding: 0 var(--space-2);
   color: var(--color-primary);
+}
+
+// Roles: el primero como detalle; el resto, desplegable y con altura limitada.
+.roles {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  margin-top: 2px;
+}
+
+.roles__toggle {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.roles__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 6.5rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.roles__item {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-raisin-black);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .sidebar__footer {

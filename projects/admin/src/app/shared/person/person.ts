@@ -3,7 +3,8 @@ import { Avatar } from '../avatar/avatar';
 
 /**
  * Persona en una lista o tarjeta: avatar, nombre y un detalle (correo,
- * roles, uso…). Lo proyectado se muestra junto al nombre (p. ej. "Tú").
+ * roles, uso…). Lo proyectado se muestra junto al nombre (p. ej. "Tú"); lo
+ * marcado con `admPersonExtra`, debajo del detalle.
  * Usa `span` para poder ir dentro de botones.
  */
 @Component({
@@ -18,6 +19,7 @@ import { Avatar } from '../avatar/avatar';
       @if (detail()) {
         <span class="person__detail">{{ detail() }}</span>
       }
+      <ng-content select="[admPersonExtra]" />
     </span>
   `,
   styles: `

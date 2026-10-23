@@ -67,7 +67,28 @@
 
   <div class="sidebar__footer">
     @if (access.me(); as me) {
-      <adm-person class="person" [name]="me.user.fullName" [detail]="roles()" />
+      <adm-person class="person" [name]="me.user.fullName" [detail]="roles()[0] ?? null">
+        @if (extraRoles().length; as extra) {
+          <span admPersonExtra class="roles">
+            <button
+              type="button"
+              class="roles__toggle"
+              [attr.aria-expanded]="rolesOpen()"
+              aria-controls="sidebar-roles"
+              (click)="rolesOpen.set(!rolesOpen())"
+            >
+              {{ rolesOpen() ? 'Ocultar roles' : '+' + extra + (extra === 1 ? ' rol' : ' roles') }}
+            </button>
+            @if (rolesOpen()) {
+              <span id="sidebar-roles" class="roles__list" role="list">
+                @for (role of extraRoles(); track role) {
+                  <span class="roles__item" role="listitem">{{ role }}</span>
+                }
+              </span>
+            }
+          </span>
+        }
+      </adm-person>
     }
     <button type="button" class="logout" (click)="logout()">
       <svg
