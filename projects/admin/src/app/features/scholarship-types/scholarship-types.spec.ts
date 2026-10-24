@@ -112,7 +112,7 @@ describe('ScholarshipTypesPage', () => {
     expect(host.querySelector('tbody button')).toBeNull();
   });
 
-  it('con `applications.read` enlaza a las solicitudes y aprobadas de cada tipo en uso', async () => {
+  it('con `applications.read` enlaza a las solicitudes y aprobadas de cada tipo', async () => {
     const { host } = await setup(
       ['admin.access', 'offers.read', 'applications.read'],
       [
@@ -128,7 +128,13 @@ describe('ScholarshipTypesPage', () => {
       '/postulaciones?tipo=becas&beca=t1',
       '/postulaciones?tipo=becas&beca=t1&estado=aprobadas',
     ]);
-    expect(rows[1].querySelector('.links')).toBeNull();
+    // También sin postulaciones: el acceso siempre está (la lista puede salir vacía).
+    expect(rows[1].querySelectorAll('.links a').length).toBe(2);
+  });
+
+  it('sin `applications.read` no muestra los enlaces a postulaciones', async () => {
+    const { host } = await setup(['admin.access', 'offers.read'], [type('t1', 'Agua Viva')]);
+    expect(host.querySelector('.links')).toBeNull();
   });
 
   it('no intenta borrar un tipo en uso: sugiere desactivarlo', async () => {

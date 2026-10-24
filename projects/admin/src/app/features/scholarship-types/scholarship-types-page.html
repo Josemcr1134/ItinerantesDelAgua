@@ -96,7 +96,7 @@
             </td>
             <td data-label="Uso">
               <p class="muted">{{ usage(type) }}</p>
-              @if (canReadApplications() && type.usage.applications) {
+              @if (canReadApplications()) {
                 <p class="links">
                   <a
                     class="adm-link"
