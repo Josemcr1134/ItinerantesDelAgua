@@ -85,7 +85,7 @@ export function offerFixture(
       installmentsMax: null,
       moodleCourseUrl: null,
       scholarshipEnabled: false,
-      scholarshipLevels: [],
+      scholarshipTypes: [],
       scholarshipOpensAt: null,
       scholarshipClosesAt: null,
     },

@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 import { SessionStore } from 'auth';
 import {
   AdminApplicationDetailDto,
+  AdminScholarshipTypeOptionDto,
   apiErrorInterceptor,
   ApplicationStatus,
   Permission,
@@ -18,6 +19,36 @@ import ApplicationDetailPage from './application-detail-page';
 const API = 'https://api.test/api/v1';
 const APP = `${API}/admin/applications/a1`;
 
+const AGUAS_LIBRES = {
+  id: 't-al',
+  key: 'AGUAS_LIBRES',
+  name: 'Aguas Libres',
+  minPercent: 50,
+  maxPercent: 50,
+  requiresInterview: false,
+};
+const CENOTES = { ...AGUAS_LIBRES, id: 't-cv', key: 'CENOTES_VIVOS', name: 'Cenotes Vivos' };
+
+/** Tipo de beca habilitado en la oferta con su cupo. */
+function option(
+  type: typeof AGUAS_LIBRES,
+  quota: { availableRecipients: number | null; isFull: boolean },
+): AdminScholarshipTypeOptionDto {
+  return {
+    scholarshipTypeId: type.id,
+    scholarshipType: type,
+    active: true,
+    quota: {
+      typeMaxRecipients: 10,
+      typeUsedRecipients: 7,
+      offerMaxRecipients: null,
+      offerUsedRecipients: 2,
+      ...quota,
+    },
+    balanceAtMaxPercent: { amountCents: 510000, currency: 'MXN' },
+  };
+}
+
 function detail(status: ApplicationStatus, extra: Partial<AdminApplicationDetailDto> = {}) {
   return {
     id: 'a1',
@@ -26,8 +57,10 @@ function detail(status: ApplicationStatus, extra: Partial<AdminApplicationDetail
     status,
     applicant: { userId: 'p1', name: 'María López', email: 'maria@example.com', countryCode: 'MX' },
     offer: { id: 'o1', name: 'Diplomado en Ecotecnologías del Agua', slug: 'eco' },
-    requestedLevel: 'AGUAS_LIBRES',
-    assignedLevel: null,
+    requestedScholarshipTypeId: 't-al',
+    requestedScholarshipType: AGUAS_LIBRES,
+    assignedScholarshipTypeId: null,
+    assignedScholarshipType: null,
     assignedPercent: null,
     submittedAt: '2026-10-12T16:00:00.000Z',
     requiresInterview: false,
@@ -65,7 +98,8 @@ function detail(status: ApplicationStatus, extra: Partial<AdminApplicationDetail
       notSelect: 0,
       unsure: 0,
       total: 0,
-      mostSuggestedLevel: null,
+      mostSuggestedScholarshipTypeId: null,
+      mostSuggestedScholarshipType: null,
       label: '',
     },
     myEvaluationDetail: null,
@@ -75,17 +109,12 @@ function detail(status: ApplicationStatus, extra: Partial<AdminApplicationDetail
       hasCompletedInterview: false,
       blockedReason: null,
       price: { amountCents: 1020000, currency: 'MXN' },
-      levels: [
-        {
-          level: 'AGUAS_LIBRES',
-          label: 'Aguas Libres',
-          minPercent: 50,
-          maxPercent: 50,
-          requiresInterview: false,
-          balanceAtMaxPercent: { amountCents: 510000, currency: 'MXN' },
-        },
+      scholarshipTypes: [
+        option(AGUAS_LIBRES, { availableRecipients: 3, isFull: false }),
+        option(CENOTES, { availableRecipients: 0, isFull: true }),
       ],
-      assignedLevel: null,
+      assignedScholarshipTypeId: null,
+      assignedScholarshipType: null,
       assignedPercent: null,
       balance: null,
       responseDueAt: null,
@@ -180,7 +209,7 @@ describe('ApplicationDetailPage', () => {
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual({
       recommendation: 'UNSURE',
-      suggestedLevel: null,
+      suggestedScholarshipTypeId: null,
       comment: null,
     });
   });
@@ -192,15 +221,21 @@ describe('ApplicationDetailPage', () => {
     );
     button('Aprobar')!.click();
     await settle();
-    // Se preselecciona el nivel solicitado.
+    // Se preselecciona el tipo solicitado; el que no tiene cupo no se puede elegir.
+    const radios = [
+      ...document.querySelectorAll<HTMLInputElement>('dialog[open] input[name=scholarshipType]'),
+    ];
+    expect(radios.map((r) => r.disabled)).toEqual([false, true]);
+    expect(document.querySelector('dialog[open]')!.textContent).toContain('Sin cupo');
     button('Ver vista previa')!.click();
     await settle();
     const preview = http.expectOne((r) => r.url === `${APP}/decision-preview`);
-    expect(preview.request.params.get('assignedLevel')).toBe('AGUAS_LIBRES');
+    expect(preview.request.params.get('assignedScholarshipTypeId')).toBe('t-al');
     preview.flush({
       decision: 'APPROVE',
       status: 'APPROVED_PENDING_PAYMENT',
-      assignedLevel: 'AGUAS_LIBRES',
+      assignedScholarshipTypeId: 't-al',
+      assignedScholarshipType: AGUAS_LIBRES,
       assignedPercent: 50,
       balance: { amountCents: 510000, currency: 'MXN' },
       responseDueAt: '2026-10-29T06:00:00.000Z',
@@ -220,7 +255,7 @@ describe('ApplicationDetailPage', () => {
 
     const approve = http.expectOne(`${APP}/approve`);
     expect(approve.request.body).toEqual({
-      assignedLevel: 'AGUAS_LIBRES',
+      assignedScholarshipTypeId: 't-al',
       emailPreviewConfirmed: true,
     });
   });

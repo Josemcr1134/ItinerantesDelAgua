@@ -102,14 +102,14 @@ describe('AdminApplicationsApi', () => {
     expect(req.request.params.get('page')).toBe('2');
   });
 
-  it('pide la vista previa con la decisión y el nivel', () => {
+  it('pide la vista previa con la decisión y el tipo de beca', () => {
     const http = TestBed.inject(HttpTestingController);
     TestBed.inject(AdminApplicationsApi)
-      .decisionPreview('a1', { decision: 'APPROVE', assignedLevel: 'AGUAS_LIBRES' })
+      .decisionPreview('a1', { decision: 'APPROVE', assignedScholarshipTypeId: 't1' })
       .subscribe();
     const req = http.expectOne((r) => r.url === `${API}/a1/decision-preview`);
     expect(req.request.params.get('decision')).toBe('APPROVE');
-    expect(req.request.params.get('assignedLevel')).toBe('AGUAS_LIBRES');
+    expect(req.request.params.get('assignedScholarshipTypeId')).toBe('t1');
   });
 
   it('exporta el CSV sin paginar y con el nombre que envía la API', async () => {

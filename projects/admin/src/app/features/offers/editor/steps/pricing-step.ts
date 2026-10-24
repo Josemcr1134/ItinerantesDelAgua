@@ -5,11 +5,11 @@ import {
   AdminOfferDetailDto,
   OFFER_ORIGIN_VALUES,
   OfferOrigin,
-  SCHOLARSHIP_LEVEL_VALUES,
-  ScholarshipLevel,
   UpdateOriginPricingStepDto,
 } from 'data-access';
-import { OFFER_ORIGIN_LABELS, SCHOLARSHIP_LEVEL_LABELS } from '../../offer-labels';
+import { scholarshipTypeCatalog } from '../../../scholarship-types/scholarship-type-labels';
+import { OfferScholarshipChoice, ScholarshipTypesField } from '../fields/scholarship-types-field';
+import { OFFER_ORIGIN_LABELS } from '../../offer-labels';
 import { isoToZonedInput, zonedInputToIso } from '../../shared/zoned-time';
 import { formDirty } from './form-dirty';
 import { OfferStep, orNull } from './offer-step';
@@ -22,7 +22,7 @@ const fromCents = (cents: number | null): number | null => (cents === null ? nul
 /** Paso 4 — Origen y precio (NAS/Moodle, precio, cuotas y beca). */
 @Component({
   selector: 'adm-pricing-step',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, ScholarshipTypesField],
   providers: [{ provide: OfferStep, useExisting: forwardRef(() => PricingStep) }],
   templateUrl: './pricing-step.html',
   styles: `
@@ -78,19 +78,6 @@ const fromCents = (cents: number | null): number | null => (cents === null ? nul
     .rule {
       margin-top: var(--space-3);
     }
-    .levels-field {
-      margin: 0;
-      padding: 0;
-      border: 0;
-    }
-    .levels {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2) var(--space-4);
-      margin: var(--space-2) 0 0;
-      padding: 0;
-      border: 0;
-    }
   `,
 })
 export class PricingStep extends OfferStep {
@@ -99,8 +86,8 @@ export class PricingStep extends OfferStep {
   private readonly fb = inject(NonNullableFormBuilder);
   protected readonly origins = OFFER_ORIGIN_VALUES;
   protected readonly originLabels = OFFER_ORIGIN_LABELS;
-  protected readonly levels = SCHOLARSHIP_LEVEL_VALUES;
-  protected readonly levelLabels = SCHOLARSHIP_LEVEL_LABELS;
+  /** Catálogo de tipos de beca (incluye inactivos). */
+  protected readonly catalog = scholarshipTypeCatalog();
 
   protected readonly form = this.fb.group({
     origin: this.fb.control<OfferOrigin>('NAS'),
@@ -114,11 +101,11 @@ export class PricingStep extends OfferStep {
     scholarshipOpensAt: [''],
     scholarshipClosesAt: [''],
   });
-  protected readonly scholarshipLevels = signal<readonly ScholarshipLevel[]>([]);
+  protected readonly scholarshipTypes = signal<readonly OfferScholarshipChoice[]>([]);
   private readonly snapshot = signal('');
   private readonly formIsDirty = formDirty(this.form);
   readonly dirty = computed(
-    () => this.formIsDirty() || JSON.stringify(this.scholarshipLevels()) !== this.snapshot(),
+    () => this.formIsDirty() || JSON.stringify(this.scholarshipTypes()) !== this.snapshot(),
   );
 
   // Valores que muestran u ocultan secciones.
@@ -145,12 +132,6 @@ export class PricingStep extends OfferStep {
     c.scholarshipEnabled.valueChanges.subscribe((v) => this.scholarship.set(v));
   }
 
-  protected toggleLevel(level: ScholarshipLevel, checked: boolean): void {
-    this.scholarshipLevels.update((list) =>
-      checked ? [...list, level] : list.filter((l) => l !== level),
-    );
-  }
-
   async save(): Promise<AdminOfferDetailDto | null> {
     const v = this.form.getRawValue();
     const tz = this.timezone();
@@ -166,7 +147,7 @@ export class PricingStep extends OfferStep {
       installmentsEnabled: paid && v.installmentsEnabled,
       installmentsMax: paid && v.installmentsEnabled ? v.installmentsMax : null,
       scholarshipEnabled: withScholarship,
-      scholarshipLevels: withScholarship ? [...this.scholarshipLevels()] : [],
+      scholarshipTypes: withScholarship ? [...this.scholarshipTypes()] : [],
       scholarshipOpensAt: withScholarship ? zonedInputToIso(v.scholarshipOpensAt, tz) : null,
       scholarshipClosesAt: withScholarship ? zonedInputToIso(v.scholarshipClosesAt, tz) : null,
     };
@@ -192,8 +173,14 @@ export class PricingStep extends OfferStep {
     this.isFree.set(p.isFree);
     this.installments.set(p.installmentsEnabled);
     this.scholarship.set(p.scholarshipEnabled);
-    this.scholarshipLevels.set(p.scholarshipLevels);
-    this.snapshot.set(JSON.stringify(p.scholarshipLevels));
+    const choices = p.scholarshipTypes.map((t) => ({
+      scholarshipTypeId: t.scholarshipTypeId,
+      minPercent: t.minPercent,
+      maxPercent: t.maxPercent,
+      maxRecipients: t.maxRecipients,
+    }));
+    this.scholarshipTypes.set(choices);
+    this.snapshot.set(JSON.stringify(choices));
     this.applyReadonly(this.form);
     if (offer.hasEnrollments) {
       this.form.controls.origin.disable({ emitEvent: false });

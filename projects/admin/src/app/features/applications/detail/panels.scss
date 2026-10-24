@@ -172,6 +172,11 @@
   background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
+.level--full {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .level__name {
   font-weight: 700;
 }

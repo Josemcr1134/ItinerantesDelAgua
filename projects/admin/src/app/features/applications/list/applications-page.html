@@ -66,11 +66,11 @@
   />
   @if (kind() === 'SCHOLARSHIP') {
     <adm-filter-select
-      inputId="applications-level"
-      label="Nivel solicitado"
-      allLabel="Todos"
-      [options]="options().level"
-      [(value)]="level"
+      inputId="applications-scholarship"
+      label="Beca solicitada"
+      allLabel="Todas"
+      [options]="options().scholarshipTypes"
+      [(value)]="scholarshipTypeId"
     />
   }
   @if (options().countries.length) {
@@ -141,8 +141,8 @@
           </td>
           <td data-label="Oferta">
             <span class="offer">{{ item.offer.name }}</span>
-            @if (levelText(item); as level) {
-              <p class="meta">Nivel: {{ level }}</p>
+            @if (scholarshipText(item); as scholarship) {
+              <p class="meta">Beca: {{ scholarship }}</p>
             }
             @if (item.submittedAt) {
               <p class="meta">Enviada el {{ formatDate(item.submittedAt) }}</p>

@@ -5,7 +5,6 @@ import {
   OfferOrigin,
   OfferTopic,
   OfferType,
-  ScholarshipLevel,
 } from 'data-access';
 
 /** Textos visibles de los enums de ofertas. TODO(contenido): validar con el equipo. */
@@ -56,14 +55,6 @@ export const CALENDAR_CATEGORY_LABELS: Readonly<Record<CalendarCategory, string>
   COMMUNITY: 'Comunidad',
   EVENTS: 'Eventos',
   IMPORTANT_DATES: 'Fechas importantes',
-};
-
-export const SCHOLARSHIP_LEVEL_LABELS: Readonly<Record<ScholarshipLevel, string>> = {
-  AGUA_VIVA: 'Agua Viva',
-  RIOS_VIVOS: 'Ríos Vivos',
-  AGUAS_LIBRES: 'Aguas Libres',
-  CENOTES_VIVOS: 'Cenotes Vivos',
-  SPECIAL: 'Especial',
 };
 
 /** Días ISO (1 = lunes … 7 = domingo). */

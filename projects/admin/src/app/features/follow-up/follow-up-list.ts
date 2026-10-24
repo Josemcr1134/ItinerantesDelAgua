@@ -12,7 +12,6 @@ import { Notice } from '../../shared/notice/notice';
 import { Person } from '../../shared/person/person';
 import { FOLLOW_UP_OUTCOME_LABELS } from '../applications/application-labels';
 import { FollowUpActions } from '../applications/follow-up-actions';
-import { SCHOLARSHIP_LEVEL_LABELS } from '../offers/offer-labels';
 
 type Started = 'true' | 'false';
 
@@ -37,7 +36,6 @@ export class FollowUpList {
   protected readonly canManage = computed(() => this.access.can('followup.manage'));
   protected readonly canOpenApplication = computed(() => this.access.can('applications.read'));
 
-  protected readonly levelLabels = SCHOLARSHIP_LEVEL_LABELS;
   protected readonly outcomeLabels = FOLLOW_UP_OUTCOME_LABELS;
   protected readonly money = formatMoney;
   protected readonly formatDateTime = formatDateTime;

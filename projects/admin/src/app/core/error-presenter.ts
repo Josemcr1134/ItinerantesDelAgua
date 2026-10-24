@@ -46,6 +46,11 @@ const TITLES: Partial<Record<ApiErrorCode, string>> = {
   PAYMENT_PROVIDER_ERROR: 'Stripe no respondió',
   PAYMENTS_NOT_CONFIGURED: 'Pagos sin configurar',
   OFFER_NOT_MOODLE: 'La oferta no es de Moodle',
+  SCHOLARSHIP_TYPE_KEY_TAKEN: 'Esa clave ya existe',
+  SCHOLARSHIP_TYPE_IN_USE: 'El tipo de beca está en uso',
+  SCHOLARSHIP_TYPE_INVALID_RANGE: 'Rango de porcentaje no válido',
+  SCHOLARSHIP_TYPE_FULL: 'Sin cupo para esta beca',
+  SCHOLARSHIP_TYPE_NOT_AVAILABLE: 'Tipo de beca no disponible',
 };
 
 const DEFAULT_TITLE = 'Algo salió mal';
@@ -83,6 +88,11 @@ const WARNING_CODES: readonly ApiErrorCode[] = [
   'PAYMENT_PLAN_INVALID_STATE',
   'PAYMENT_CHARGE_FAILED',
   'OFFER_NOT_MOODLE',
+  'SCHOLARSHIP_TYPE_KEY_TAKEN',
+  'SCHOLARSHIP_TYPE_IN_USE',
+  'SCHOLARSHIP_TYPE_INVALID_RANGE',
+  'SCHOLARSHIP_TYPE_FULL',
+  'SCHOLARSHIP_TYPE_NOT_AVAILABLE',
 ];
 
 export interface PresentErrorOptions {

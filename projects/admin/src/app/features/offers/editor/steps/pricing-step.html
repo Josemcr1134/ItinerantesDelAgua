@@ -122,25 +122,14 @@
         </label>
         @if (scholarship()) {
           <div class="adm-grid rule">
-            <fieldset class="adm-grid__full levels-field">
-              <legend class="adm-field__label">Niveles de beca</legend>
-              <div class="levels">
-                @for (level of levels; track level) {
-                  <label class="adm-check">
-                    <input
-                      type="checkbox"
-                      [checked]="scholarshipLevels().includes(level)"
-                      [disabled]="readonly()"
-                      (change)="toggleLevel(level, $any($event.target).checked)"
-                    />
-                    {{ levelLabels[level] }}
-                  </label>
-                }
-              </div>
-              @if (issue('scholarshipLevels')) {
-                <p class="adm-field__error">{{ issue('scholarshipLevels') }}</p>
-              }
-            </fieldset>
+            <adm-scholarship-types-field
+              class="adm-grid__full"
+              [(value)]="scholarshipTypes"
+              [catalog]="catalog()"
+              [saved]="offer().originPricing.scholarshipTypes"
+              [disabled]="readonly()"
+              [error]="issue('scholarshipTypes')"
+            />
             <div class="adm-field">
               <label class="adm-field__label" for="p-sch-opens">Abre la postulación a beca</label>
               <input

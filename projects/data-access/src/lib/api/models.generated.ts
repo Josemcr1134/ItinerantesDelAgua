@@ -80,7 +80,8 @@ export const APPLICATION_FIELD_ISSUE_CODE_VALUES = [
   'MAX_LENGTH',
   'MIN_FILES',
   'MUST_ACCEPT',
-  'LEVEL_NOT_ENABLED',
+  'SCHOLARSHIP_TYPE_NOT_ENABLED',
+  'SCHOLARSHIP_TYPE_FULL',
   'NOT_APPLICABLE',
 ] as const;
 export type ApplicationFieldIssueCode = (typeof APPLICATION_FIELD_ISSUE_CODE_VALUES)[number];
@@ -295,6 +296,11 @@ export const ERROR_CODE_VALUES = [
   'FOLLOW_UP_PHONE_INVALID',
   'PAYMENT_PLAN_INVALID_STATE',
   'PAYMENT_REFUND_INVALID',
+  'SCHOLARSHIP_TYPE_KEY_TAKEN',
+  'SCHOLARSHIP_TYPE_IN_USE',
+  'SCHOLARSHIP_TYPE_INVALID_RANGE',
+  'SCHOLARSHIP_TYPE_FULL',
+  'SCHOLARSHIP_TYPE_NOT_AVAILABLE',
   'ADMIN_LAST_SUPER_ADMIN',
   'ADMIN_SELF_ACTION',
 ] as const;
@@ -581,6 +587,7 @@ export const PERMISSION_VALUES = [
   'users.manage',
   'audit.read',
   'site.write',
+  'scholarship_types.write',
 ] as const;
 export type Permission = (typeof PERMISSION_VALUES)[number];
 
@@ -619,15 +626,6 @@ export const SCHEDULE_STATUS_VALUES = [
   'FINISHED',
 ] as const;
 export type ScheduleStatus = (typeof SCHEDULE_STATUS_VALUES)[number];
-
-export const SCHOLARSHIP_LEVEL_VALUES = [
-  'AGUA_VIVA',
-  'RIOS_VIVOS',
-  'AGUAS_LIBRES',
-  'CENOTES_VIVOS',
-  'SPECIAL',
-] as const;
-export type ScholarshipLevel = (typeof SCHOLARSHIP_LEVEL_VALUES)[number];
 
 export const SESSION_EXCLUSION_REASON_VALUES = ['MANUAL', 'MX_HOLIDAY'] as const;
 export type SessionExclusionReason = (typeof SESSION_EXCLUSION_REASON_VALUES)[number];
@@ -1448,6 +1446,105 @@ export interface UpdateSiteMetricRequestDto {
   readonly visible?: boolean;
 }
 
+export interface ScholarshipTypeDto {
+  readonly id: Uuid;
+  /** Clave estable (no cambia). */
+  readonly key: string;
+  /** Texto a mostrar (editable en el panel). */
+  readonly name: string;
+  readonly minPercent: number;
+  /** Igual a minPercent si el porcentaje es fijo. */
+  readonly maxPercent: number;
+  /** La postulación requiere entrevista por Zoom. */
+  readonly requiresInterview: boolean;
+  readonly description: string | null;
+  /** Orden de presentación (menor primero). */
+  readonly sortOrder: number;
+  /** Becas de este tipo que aún se pueden asignar (cupo global). null = sin límite. */
+  readonly availableRecipients: number | null;
+  /** Cupo agotado: se muestra "Agotado" y no se puede solicitar en postulaciones nuevas. */
+  readonly isFull: boolean;
+}
+
+export interface ScholarshipTypesResponseDto {
+  /** Solo los activos, ordenados. */
+  readonly data: ScholarshipTypeDto[];
+}
+
+export interface ScholarshipTypeUsageDto {
+  /** Ofertas que lo habilitan. */
+  readonly offers: number;
+  /** Postulaciones que lo solicitaron o lo tienen asignado. */
+  readonly applications: number;
+  /** Evaluaciones del comité que lo sugieren. */
+  readonly evaluations: number;
+}
+
+export interface AdminScholarshipTypeDto {
+  readonly id: Uuid;
+  /** Clave estable (no cambia). */
+  readonly key: string;
+  /** Texto a mostrar (editable en el panel). */
+  readonly name: string;
+  readonly minPercent: number;
+  /** Igual a minPercent si el porcentaje es fijo. */
+  readonly maxPercent: number;
+  /** La postulación requiere entrevista por Zoom. */
+  readonly requiresInterview: boolean;
+  readonly description: string | null;
+  /** Orden de presentación (menor primero). */
+  readonly sortOrder: number;
+  /** Becas de este tipo que aún se pueden asignar (cupo global). null = sin límite. */
+  readonly availableRecipients: number | null;
+  /** Cupo agotado: se muestra "Agotado" y no se puede solicitar en postulaciones nuevas. */
+  readonly isFull: boolean;
+  /** Cupo global (todas las ofertas). null = sin límite. */
+  readonly maxRecipients: number | null;
+  /** Becas asignadas que ocupan cupo (aprobadas pendientes de pago/confirmación e inscritas). */
+  readonly usedRecipients: number;
+  /** Desactivado = no se ofrece en ofertas ni postulaciones nuevas. */
+  readonly active: boolean;
+  /** Uso actual. Solo se puede borrar si todo es 0 (si no, desactívalo). */
+  readonly usage: ScholarshipTypeUsageDto;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+export interface AdminScholarshipTypesResponseDto {
+  /** Todos (incluye inactivos), ordenados. */
+  readonly data: AdminScholarshipTypeDto[];
+}
+
+export interface CreateScholarshipTypeRequestDto {
+  /** MAYÚSCULAS_CON_GUION_BAJO, única. No se puede cambiar después. */
+  readonly key: string;
+  readonly name: string;
+  readonly description?: string | null;
+  readonly minPercent: number;
+  /** Igual a minPercent = % fijo. */
+  readonly maxPercent: number;
+  readonly requiresInterview?: boolean;
+  /** Cupo global: cuántas personas pueden tener asignada esta beca (todas las ofertas). null = sin límite. Puede quedar por debajo de lo ya asignado (no quita becas; bloquea nuevas). */
+  readonly maxRecipients?: number | null;
+  readonly active?: boolean;
+  /** Por defecto, al final. */
+  readonly sortOrder?: number;
+}
+
+export interface UpdateScholarshipTypeRequestDto {
+  readonly name?: string;
+  readonly description?: string | null;
+  readonly minPercent?: number;
+  /** Igual a minPercent = % fijo. */
+  readonly maxPercent?: number;
+  readonly requiresInterview?: boolean;
+  /** Cupo global: cuántas personas pueden tener asignada esta beca (todas las ofertas). null = sin límite. Puede quedar por debajo de lo ya asignado (no quita becas; bloquea nuevas). */
+  readonly maxRecipients?: number | null;
+  /** false = deja de ofrecerse en ofertas y postulaciones nuevas (lo asignado se conserva). */
+  readonly active?: boolean;
+  readonly sortOrder?: number;
+}
+
 export interface OfferDatesDto {
   /** Apertura de inscripciones (o de postulación en convocatorias). */
   readonly enrollmentOpensAt: IsoDateTime | null;
@@ -1597,35 +1694,49 @@ export interface OfferModuleDto {
   readonly description: string | null;
 }
 
+export interface ScholarshipTypeSummaryDto {
+  readonly id: Uuid;
+  /** Clave estable (no cambia). */
+  readonly key: string;
+  /** Texto a mostrar (editable en el panel). */
+  readonly name: string;
+  readonly minPercent: number;
+  /** Igual a minPercent si el porcentaje es fijo. */
+  readonly maxPercent: number;
+  /** La postulación requiere entrevista por Zoom. */
+  readonly requiresInterview: boolean;
+}
+
 export interface AmountRangeDto {
   readonly minAmountCents: number;
   readonly maxAmountCents: number;
   readonly currency: Currency;
 }
 
-export interface ScholarshipLevelDto {
-  readonly level: ScholarshipLevel;
-  readonly label: string;
-  readonly minPercent: number;
-  /** Igual a minPercent salvo en Beca especial (71–80). */
-  readonly maxPercent: number;
-  /** Más de 70%: entrevista por Zoom. */
-  readonly requiresInterview: boolean;
+export interface OfferScholarshipTypeDto {
+  readonly scholarshipTypeId: Uuid;
+  /** Tipo de beca con el rango EFECTIVO en esta oferta (la oferta puede ajustar el rango del tipo). `requiresInterview` = la postulación pasa por entrevista por Zoom. */
+  readonly scholarshipType: ScholarshipTypeSummaryDto;
+  readonly description: string | null;
   /** Monto estimado de la beca en la moneda del visitante. */
   readonly estimatedScholarship: AmountRangeDto | null;
-  /** Saldo estimado a pagar ("el nivel final lo asigna el equipo"). */
+  /** Saldo estimado a pagar ("el tipo final lo asigna el equipo"). */
   readonly estimatedBalance: AmountRangeDto | null;
+  /** Becas de este tipo que aún se pueden asignar en esta oferta (mínimo entre el cupo global del tipo y el de la oferta). null = sin límite. */
+  readonly availableRecipients: number | null;
+  /** Cupo agotado: muéstralo como "Agotado"; no se puede solicitar. */
+  readonly isFull: boolean;
 }
 
 export interface OfferScholarshipDto {
   readonly minPercent: number;
   readonly maxPercent: number;
-  readonly interviewRequiredAbovePercent: number;
   /** Convocatoria de becas. */
   readonly windowStatus: WindowStatus;
   readonly opensAt: IsoDateTime | null;
   readonly closesAt: IsoDateTime | null;
-  readonly levels: ScholarshipLevelDto[];
+  /** Tipos de beca activos de esta oferta, ordenados (antes `levels`). */
+  readonly scholarshipTypes: OfferScholarshipTypeDto[];
 }
 
 export interface EligibleCountryDto {
@@ -1839,6 +1950,37 @@ export interface AdminOfferScheduleDto {
   readonly timezone: string;
 }
 
+export interface OfferScholarshipQuotaDto {
+  /** Cupo global del tipo. */
+  readonly typeMaxRecipients: number | null;
+  /** Asignadas del tipo en todas las ofertas. */
+  readonly typeUsedRecipients: number;
+  /** Tope propio de la oferta. */
+  readonly offerMaxRecipients: number | null;
+  /** Asignadas del tipo en esta oferta. */
+  readonly offerUsedRecipients: number;
+  /** Disponibles = mínimo entre ambos cupos. null = sin límite. */
+  readonly availableRecipients: number | null;
+  readonly isFull: boolean;
+}
+
+export interface AdminOfferScholarshipTypeDto {
+  readonly scholarshipTypeId: Uuid;
+  /** Override de la oferta. */
+  readonly minPercent: number | null;
+  /** Override de la oferta. */
+  readonly maxPercent: number | null;
+  readonly sortOrder: number | null;
+  /** Tope propio de la oferta. */
+  readonly maxRecipients: number | null;
+  /** Cupo global + de la oferta. */
+  readonly quota: OfferScholarshipQuotaDto;
+  /** false = tipo desactivado: no se ofrece. */
+  readonly active: boolean;
+  /** Tipo con el rango EFECTIVO en esta oferta. */
+  readonly scholarshipType: ScholarshipTypeSummaryDto;
+}
+
 export interface AdminOfferOriginPricingDto {
   readonly origin: OfferOrigin;
   readonly isFree: boolean;
@@ -1848,7 +1990,8 @@ export interface AdminOfferOriginPricingDto {
   readonly installmentsMax: number | null;
   readonly moodleCourseUrl: string | null;
   readonly scholarshipEnabled: boolean;
-  readonly scholarshipLevels: ScholarshipLevel[];
+  /** Tipos de beca habilitados (antes `scholarshipLevels`), incluye desactivados. */
+  readonly scholarshipTypes: AdminOfferScholarshipTypeDto[];
   readonly scholarshipOpensAt: string | null;
   readonly scholarshipClosesAt: string | null;
 }
@@ -1999,6 +2142,18 @@ export interface UpdateScheduleStepDto {
   readonly calendarCategory?: CalendarCategory;
 }
 
+export interface OfferScholarshipTypeInputDto {
+  readonly scholarshipTypeId: Uuid;
+  /** Sobrescribe el % mínimo del tipo SOLO en esta oferta (null = el del tipo). */
+  readonly minPercent?: number | null;
+  /** Sobrescribe el % máximo del tipo SOLO en esta oferta (null = el del tipo). */
+  readonly maxPercent?: number | null;
+  /** Orden en esta oferta (null = el del tipo). */
+  readonly sortOrder?: number | null;
+  /** Tope de becas de este tipo SOLO en esta oferta (además del cupo global del tipo). null = sin tope propio. */
+  readonly maxRecipients?: number | null;
+}
+
 export interface UpdateOriginPricingStepDto {
   /** MOODLE oculta precio, cuotas y beca (se limpian). No editable con inscritos. */
   readonly origin?: OfferOrigin;
@@ -2012,7 +2167,8 @@ export interface UpdateOriginPricingStepDto {
   readonly moodleCourseUrl?: string | null;
   /** Solo diplomados NAS. */
   readonly scholarshipEnabled?: boolean;
-  readonly scholarshipLevels?: ScholarshipLevel[];
+  /** Tipos de beca habilitados (REEMPLAZA la lista; antes `scholarshipLevels`). Ids de `GET /admin/scholarship-types`. Un tipo inexistente o desactivado → 422 `SCHOLARSHIP_TYPE_NOT_AVAILABLE` (los desactivados que la oferta ya tenía se pueden conservar). `minPercent`/`maxPercent` opcionales ajustan el rango SOLO en esta oferta (rango inválido → 422 `SCHOLARSHIP_TYPE_INVALID_RANGE`). */
+  readonly scholarshipTypes?: OfferScholarshipTypeInputDto[];
   /** Null = ventana de inscripción. */
   readonly scholarshipOpensAt?: string | null;
   readonly scholarshipClosesAt?: string | null;
@@ -2336,8 +2492,8 @@ export interface ApplicationOpportunityDto {
   readonly window: ApplicationWindowDto;
   /** Costo en tu moneda; null = "Gratuito". */
   readonly price: MoneyDto | null;
-  /** Beca: niveles y monto estimado. Vacío en convocatorias. */
-  readonly levels: ScholarshipLevelDto[];
+  /** Beca: tipos de beca y monto estimado (antes `levels`). Vacío en convocatorias. */
+  readonly scholarshipTypes: OfferScholarshipTypeDto[];
   readonly eligibility: ApplicationEligibilityDto | null;
   /** Mi postulación (una por cohorte): en vez de [Postular] → [Ver mi postulación]. */
   readonly myApplication: MyApplicationRefDto | null;
@@ -2392,9 +2548,12 @@ export interface InterviewDto {
 }
 
 export interface ScholarshipResultDto {
-  readonly requestedLevel: ScholarshipLevel | null;
-  readonly assignedLevel: ScholarshipLevel;
-  /** % asignado (Beca especial: 71–80). */
+  readonly requestedScholarshipTypeId: Uuid | null;
+  readonly requestedScholarshipType: ScholarshipTypeSummaryDto | null;
+  readonly assignedScholarshipTypeId: Uuid;
+  /** Tipo asignado. `name` es el nombre que tenía al aprobar (no cambia si luego se renombra). */
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto;
+  /** % asignado (dentro del rango del tipo en la oferta). */
   readonly assignedPercent: number;
   /** Monto original de la oferta. */
   readonly originalAmount: MoneyDto | null;
@@ -2439,7 +2598,7 @@ export interface ApplicationCardDto {
   readonly timeline: TimelineStepDto[];
   /** Solo en "Entrevista agendada" (y como referencia después). */
   readonly interview: InterviewDto | null;
-  /** Solo becas aprobadas: nivel solicitado y asignado, saldo y fecha límite. */
+  /** Solo becas aprobadas: tipo solicitado y asignado, saldo y fecha límite. */
   readonly scholarshipResult: ScholarshipResultDto | null;
   /** Solo en "Aprobada – …": qué hacer y hasta cuándo. */
   readonly response: ApplicationResponseDeadlineDto | null;
@@ -2456,8 +2615,8 @@ export interface CreateApplicationRequestDto {
   readonly organization?: string | null;
   /** Rol en la organización (obligatorio en convocatorias). */
   readonly organizationRole?: string | null;
-  /** Beca: nivel solicitado (solo niveles habilitados en el diplomado: `form.levels`). `SPECIAL` (Beca especial, > 70%) requiere entrevista por Zoom. */
-  readonly requestedLevel?: ScholarshipLevel | null;
+  /** Beca: tipo de beca solicitado (antes `requestedLevel`). Solo los tipos activos del diplomado (`form.scholarshipTypes[].scholarshipTypeId`); otro → 400 `SCHOLARSHIP_TYPE_NOT_ENABLED`. Si el tipo tiene `requiresInterview`, habrá entrevista por Zoom. */
+  readonly requestedScholarshipTypeId?: Uuid | null;
   /** Beca: carta de intención (800–4000 caracteres al enviar). */
   readonly intentLetter?: string | null;
   /** Convocatoria: "Confirmo que cumplo con la elegibilidad" (obligatoria). */
@@ -2496,7 +2655,9 @@ export interface ApplicationAnswersDto {
   readonly partnerCode: string | null;
   readonly organization: string | null;
   readonly organizationRole: string | null;
-  readonly requestedLevel: ScholarshipLevel | null;
+  /** Tipo de beca solicitado (antes `requestedLevel`). */
+  readonly requestedScholarshipTypeId: Uuid | null;
+  readonly requestedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly intentLetter: string | null;
   readonly eligibilityConfirmed: boolean;
   readonly experience: string | null;
@@ -2549,12 +2710,12 @@ export interface ApplicationFormLimitsDto {
 
 export interface ApplicationFormDto {
   readonly window: ApplicationWindowDto;
-  /** Beca: niveles habilitados con monto estimado en tu moneda ("el nivel final lo asigna el equipo"). Vacío en convocatorias. */
-  readonly levels: ScholarshipLevelDto[];
+  /** Beca: tipos de beca activos del diplomado con monto estimado en tu moneda ("el tipo final lo asigna el equipo"; antes `levels`). Vacío en convocatorias. */
+  readonly scholarshipTypes: OfferScholarshipTypeDto[];
   /** Costo de la oferta en tu moneda. */
   readonly price: MoneyDto | null;
   readonly eligibility: ApplicationEligibilityDto | null;
-  /** Mostrar aviso de entrevista por Zoom: siempre en convocatorias; en becas al elegir Beca especial. */
+  /** Mostrar aviso de entrevista por Zoom: siempre en convocatorias; en becas si el tipo solicitado tiene `requiresInterview`. */
   readonly interviewNotice: boolean;
   readonly limits: ApplicationFormLimitsDto;
 }
@@ -2580,7 +2741,7 @@ export interface ApplicationDetailDto {
   readonly timeline: TimelineStepDto[];
   /** Solo en "Entrevista agendada" (y como referencia después). */
   readonly interview: InterviewDto | null;
-  /** Solo becas aprobadas: nivel solicitado y asignado, saldo y fecha límite. */
+  /** Solo becas aprobadas: tipo solicitado y asignado, saldo y fecha límite. */
   readonly scholarshipResult: ScholarshipResultDto | null;
   /** Solo en "Aprobada – …": qué hacer y hasta cuándo. */
   readonly response: ApplicationResponseDeadlineDto | null;
@@ -2608,8 +2769,8 @@ export interface UpdateApplicationRequestDto {
   readonly organization?: string | null;
   /** Rol en la organización (obligatorio en convocatorias). */
   readonly organizationRole?: string | null;
-  /** Beca: nivel solicitado (solo niveles habilitados en el diplomado: `form.levels`). `SPECIAL` (Beca especial, > 70%) requiere entrevista por Zoom. */
-  readonly requestedLevel?: ScholarshipLevel | null;
+  /** Beca: tipo de beca solicitado (antes `requestedLevel`). Solo los tipos activos del diplomado (`form.scholarshipTypes[].scholarshipTypeId`); otro → 400 `SCHOLARSHIP_TYPE_NOT_ENABLED`. Si el tipo tiene `requiresInterview`, habrá entrevista por Zoom. */
+  readonly requestedScholarshipTypeId?: Uuid | null;
   /** Beca: carta de intención (800–4000 caracteres al enviar). */
   readonly intentLetter?: string | null;
   /** Convocatoria: "Confirmo que cumplo con la elegibilidad" (obligatoria). */
@@ -2684,8 +2845,13 @@ export interface AdminApplicationListItemDto {
   readonly status: ApplicationStatus;
   readonly applicant: AdminApplicantDto;
   readonly offer: AdminOfferRefDto;
-  readonly requestedLevel: ScholarshipLevel | null;
-  readonly assignedLevel: ScholarshipLevel | null;
+  /** Tipo de beca solicitado (antes `requestedLevel`). */
+  readonly requestedScholarshipTypeId: Uuid | null;
+  readonly requestedScholarshipType: ScholarshipTypeSummaryDto | null;
+  /** Tipo de beca asignado (antes `assignedLevel`). */
+  readonly assignedScholarshipTypeId: Uuid | null;
+  /** `name` = nombre que tenía el tipo al aprobar. */
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly assignedPercent: number | null;
   readonly submittedAt: string | null;
   /** Insignia "Requiere entrevista". */
@@ -2766,7 +2932,9 @@ export interface AdminEvaluationDto {
   readonly id: Uuid;
   readonly evaluator: AdminPersonRefDto;
   readonly recommendation: EvaluationRecommendation;
-  readonly suggestedLevel: ScholarshipLevel | null;
+  /** Tipo de beca sugerido (antes `suggestedLevel`). */
+  readonly suggestedScholarshipTypeId: Uuid | null;
+  readonly suggestedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly comment: string | null;
   readonly updatedAt: string;
 }
@@ -2776,7 +2944,10 @@ export interface EvaluationSummaryDto {
   readonly notSelect: number;
   readonly unsure: number;
   readonly total: number;
-  readonly mostSuggestedLevel: ScholarshipLevel | null;
+  /** Tipo más sugerido (empate → el de menor %). */
+  readonly mostSuggestedScholarshipTypeId: Uuid | null;
+  /** Antes `mostSuggestedLevel`. */
+  readonly mostSuggestedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly label: string;
 }
 
@@ -2785,14 +2956,15 @@ export interface MoneyAmountDto {
   readonly currency: Currency;
 }
 
-export interface AdminLevelOptionDto {
-  readonly level: ScholarshipLevel;
-  readonly label: string;
-  readonly minPercent: number;
-  readonly maxPercent: number;
-  /** > 70%: exige entrevista "Realizada". */
-  readonly requiresInterview: boolean;
-  /** Saldo con el % máximo del nivel en la moneda del postulante. */
+export interface AdminScholarshipTypeOptionDto {
+  readonly scholarshipTypeId: Uuid;
+  /** Con el rango EFECTIVO en la oferta. `requiresInterview` exige entrevista "Realizada". */
+  readonly scholarshipType: ScholarshipTypeSummaryDto;
+  /** false = tipo desactivado (se puede asignar si la oferta ya lo tenía). */
+  readonly active: boolean;
+  /** Cupo global del tipo y propio de la oferta; `isFull` → no se puede asignar (409). */
+  readonly quota: OfferScholarshipQuotaDto;
+  /** Saldo con el % máximo del tipo en la moneda del postulante. */
   readonly balanceAtMaxPercent: MoneyAmountDto | null;
 }
 
@@ -2802,13 +2974,14 @@ export interface AdminDecisionDto {
   readonly interviewRequired: boolean;
   /** Hay una entrevista "Realizada". */
   readonly hasCompletedInterview: boolean;
-  /** `APPLICATION_INTERVIEW_REQUIRED` = "Esta postulación requiere entrevista por Zoom" (aplica a convocatorias siempre y a becas cuando el nivel asignado supera 70%). */
+  /** `APPLICATION_INTERVIEW_REQUIRED` = "Esta postulación requiere entrevista por Zoom" (aplica a convocatorias siempre y a becas cuyo tipo asignado/solicitado tiene `requiresInterview`). */
   readonly blockedReason: string | null;
   /** Precio en la moneda del postulante. */
   readonly price: MoneyAmountDto | null;
-  /** Niveles habilitados en la oferta. */
-  readonly levels: AdminLevelOptionDto[];
-  readonly assignedLevel: ScholarshipLevel | null;
+  /** Tipos de beca habilitados en la oferta (antes `levels`). */
+  readonly scholarshipTypes: AdminScholarshipTypeOptionDto[];
+  readonly assignedScholarshipTypeId: Uuid | null;
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly assignedPercent: number | null;
   readonly balance: MoneyAmountDto | null;
   readonly responseDueAt: string | null;
@@ -2837,8 +3010,13 @@ export interface AdminApplicationDetailDto {
   readonly status: ApplicationStatus;
   readonly applicant: AdminApplicantDto;
   readonly offer: AdminOfferRefDto;
-  readonly requestedLevel: ScholarshipLevel | null;
-  readonly assignedLevel: ScholarshipLevel | null;
+  /** Tipo de beca solicitado (antes `requestedLevel`). */
+  readonly requestedScholarshipTypeId: Uuid | null;
+  readonly requestedScholarshipType: ScholarshipTypeSummaryDto | null;
+  /** Tipo de beca asignado (antes `assignedLevel`). */
+  readonly assignedScholarshipTypeId: Uuid | null;
+  /** `name` = nombre que tenía el tipo al aprobar. */
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly assignedPercent: number | null;
   readonly submittedAt: string | null;
   /** Insignia "Requiere entrevista". */
@@ -2876,8 +3054,8 @@ export interface AdminApplicationDetailDto {
 export interface UpsertEvaluationRequestDto {
   /** Aprobar / No seleccionar / Tengo dudas. */
   readonly recommendation: EvaluationRecommendation;
-  /** Solo becas: nivel sugerido (habilitado en la oferta). */
-  readonly suggestedLevel?: ScholarshipLevel | null;
+  /** Solo becas: tipo de beca sugerido, habilitado en la oferta (antes `suggestedLevel`). Otro → 400 `SCHOLARSHIP_TYPE_NOT_ENABLED`. */
+  readonly suggestedScholarshipTypeId?: Uuid | null;
   readonly comment?: Record<string, unknown>;
 }
 
@@ -2901,23 +3079,24 @@ export interface DecisionPreviewDto {
   readonly decision: ApplicationDecision;
   /** Estado resultante. */
   readonly status: ApplicationStatus;
-  readonly assignedLevel: ScholarshipLevel | null;
+  readonly assignedScholarshipTypeId: Uuid | null;
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly assignedPercent: number | null;
   /** Saldo a pagar (5,100 MXN con 50% sobre 10,200). */
   readonly balance: MoneyAmountDto | null;
   /** Plazo (7 días, sin superar el inicio). */
   readonly responseDueAt: string | null;
   readonly interviewRequired: boolean;
-  /** `APPLICATION_INTERVIEW_REQUIRED` si falta la entrevista. */
+  /** `SCHOLARSHIP_TYPE_FULL` si el tipo ya no tiene cupo (global o de la oferta); `APPLICATION_INTERVIEW_REQUIRED` si falta la entrevista. */
   readonly blockedReason: string | null;
   /** Vista previa del correo/notificación (asunto y cuerpo). */
   readonly email: Record<string, unknown>;
 }
 
 export interface ApproveApplicationRequestDto {
-  /** Obligatorio en becas. */
-  readonly assignedLevel?: ScholarshipLevel;
-  /** Beca especial: entero 71–80. */
+  /** Obligatorio en becas (antes `assignedLevel`): tipo habilitado en la oferta (otro → 400 `SCHOLARSHIP_TYPE_NOT_ENABLED`). */
+  readonly assignedScholarshipTypeId?: Uuid;
+  /** Beca: % final, entero dentro del rango EFECTIVO del tipo en la oferta (fuera → 400 `INVALID`). Si el rango es fijo se toma solo. */
   readonly assignedPercent?: number;
   /** Nota interna (historial; nunca visible). */
   readonly note?: string;
@@ -3003,7 +3182,9 @@ export interface FollowUpItemDto {
   readonly email: string;
   readonly phone: FollowUpPhoneDto;
   readonly countryCode: string;
-  readonly assignedLevel: ScholarshipLevel | null;
+  /** Tipo de beca asignado (antes `assignedLevel`). */
+  readonly assignedScholarshipTypeId: Uuid | null;
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly assignedPercent: number | null;
   readonly balance: MoneyAmountDto | null;
   readonly responseDueAt: string | null;
@@ -3052,7 +3233,9 @@ export interface FollowUpDetailDto {
   readonly email: string;
   readonly phone: FollowUpPhoneDto;
   readonly countryCode: string;
-  readonly assignedLevel: ScholarshipLevel | null;
+  /** Tipo de beca asignado (antes `assignedLevel`). */
+  readonly assignedScholarshipTypeId: Uuid | null;
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly assignedPercent: number | null;
   readonly balance: MoneyAmountDto | null;
   readonly responseDueAt: string | null;
@@ -3869,7 +4052,10 @@ export interface QuoteApplicationDto {
   readonly folio: string;
   readonly kind: ApplicationKind;
   readonly status: ApplicationStatus;
-  readonly assignedLevel: ScholarshipLevel | null;
+  /** Tipo de beca asignado (antes `assignedLevel`). */
+  readonly assignedScholarshipTypeId: Uuid | null;
+  /** `name` = nombre del tipo al aprobar. */
+  readonly assignedScholarshipType: ScholarshipTypeSummaryDto | null;
   readonly assignedPercent: number | null;
   /** Monto original. */
   readonly originalAmount: MoneyDto | null;

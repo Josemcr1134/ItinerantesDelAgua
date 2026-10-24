@@ -82,10 +82,15 @@
                   <dd>{{ a.contact.partnerCode }}</dd>
                 </div>
               }
-              @if (a.requestedLevel) {
+              @if (a.requestedScholarshipType; as requested) {
                 <div>
-                  <dt>Nivel solicitado</dt>
-                  <dd>{{ levelLabels[a.requestedLevel] }}</dd>
+                  <dt>Beca solicitada</dt>
+                  <dd>
+                    {{ requested.name }} ({{ range(requested.minPercent, requested.maxPercent) }})
+                    @if (requested.requiresInterview) {
+                      · requiere entrevista
+                    }
+                  </dd>
                 </div>
               }
             </dl>

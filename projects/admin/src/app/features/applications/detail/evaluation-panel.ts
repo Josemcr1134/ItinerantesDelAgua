@@ -4,10 +4,9 @@ import {
   AdminApplicationsApi,
   EVALUATION_RECOMMENDATION_VALUES,
   EvaluationRecommendation,
-  ScholarshipLevel,
 } from 'data-access';
 import { Button } from 'ui-kit';
-import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
+import { percentRange } from '../../scholarship-types/scholarship-type-labels';
 import { RECOMMENDATION_LABELS, RECOMMENDATION_TONES } from '../application-labels';
 import { formatDateTime } from '../../../shared/format/format';
 import { ApplicationStore } from './application-store';
@@ -40,8 +39,8 @@ const COMMENT_MAX = 2000;
                     labels[e.recommendation]
                   }}</span>
                 </p>
-                @if (e.suggestedLevel) {
-                  <p class="muted">Nivel sugerido: {{ levelLabels[e.suggestedLevel] }}</p>
+                @if (e.suggestedScholarshipType; as suggested) {
+                  <p class="muted">Beca sugerida: {{ suggested.name }}</p>
                 }
                 @if (e.comment) {
                   <p class="eval__comment">{{ e.comment }}</p>
@@ -70,15 +69,24 @@ const COMMENT_MAX = 2000;
                 }
               </div>
             </fieldset>
-            @if (levels().length) {
+            @if (scholarshipTypes().length) {
               <div class="adm-field">
-                <label class="adm-field__label" for="eval-level"
-                  >Nivel sugerido <span class="adm-field__hint">(opcional)</span></label
+                <label class="adm-field__label" for="eval-scholarship"
+                  >Beca sugerida <span class="adm-field__hint">(opcional)</span></label
                 >
-                <select id="eval-level" class="adm-field__input" name="level" [(ngModel)]="level">
+                <select
+                  id="eval-scholarship"
+                  class="adm-field__input"
+                  name="scholarshipType"
+                  [(ngModel)]="scholarshipTypeId"
+                >
                   <option value="">Sin sugerir</option>
-                  @for (option of levels(); track option.level) {
-                    <option [value]="option.level">{{ option.label }}</option>
+                  @for (option of scholarshipTypes(); track option.scholarshipTypeId) {
+                    <option [value]="option.scholarshipTypeId">
+                      {{ option.scholarshipType.name }} ({{
+                        range(option.scholarshipType.minPercent, option.scholarshipType.maxPercent)
+                      }}){{ option.quota.isFull ? ' · sin cupo' : '' }}
+                    </option>
                   }
                 </select>
               </div>
@@ -121,7 +129,7 @@ export class EvaluationPanel {
 
   protected readonly labels = RECOMMENDATION_LABELS;
   protected readonly tones = RECOMMENDATION_TONES;
-  protected readonly levelLabels = SCHOLARSHIP_LEVEL_LABELS;
+  protected readonly range = percentRange;
   protected readonly recommendations = EVALUATION_RECOMMENDATION_VALUES;
   protected readonly formatDateTime = formatDateTime;
   protected readonly commentMax = COMMENT_MAX;
@@ -133,14 +141,14 @@ export class EvaluationPanel {
     const mineId = this.mine()?.id;
     return (a?.evaluations ?? []).filter((e) => e.id !== mineId || !this.store.canEvaluate());
   });
-  /** Niveles habilitados en la oferta (solo becas). */
-  protected readonly levels = computed(() => {
+  /** Tipos de beca habilitados en la oferta (solo becas). */
+  protected readonly scholarshipTypes = computed(() => {
     const a = this.store.application();
-    return a?.kind === 'SCHOLARSHIP' ? a.decision.levels : [];
+    return a?.kind === 'SCHOLARSHIP' ? a.decision.scholarshipTypes : [];
   });
 
   protected readonly recommendation = signal<EvaluationRecommendation | null>(null);
-  protected readonly level = signal<ScholarshipLevel | ''>('');
+  protected readonly scholarshipTypeId = signal('');
   protected readonly comment = signal('');
 
   constructor() {
@@ -149,7 +157,7 @@ export class EvaluationPanel {
       const mine = this.mine();
       untracked(() => {
         this.recommendation.set(mine?.recommendation ?? null);
-        this.level.set(mine?.suggestedLevel ?? '');
+        this.scholarshipTypeId.set(mine?.suggestedScholarshipTypeId ?? '');
         this.comment.set(mine?.comment ?? '');
       });
     });
@@ -160,7 +168,9 @@ export class EvaluationPanel {
     if (!recommendation) return Promise.resolve();
     const body = {
       recommendation,
-      suggestedLevel: this.levels().length ? this.level() || null : undefined,
+      suggestedScholarshipTypeId: this.scholarshipTypes().length
+        ? this.scholarshipTypeId() || null
+        : undefined,
       comment: this.comment().trim() || null,
     };
     return this.store.update(

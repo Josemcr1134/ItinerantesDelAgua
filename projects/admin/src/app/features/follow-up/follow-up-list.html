@@ -69,9 +69,9 @@
           </td>
           <td data-label="Saldo">
             <p class="amount">{{ item.balance ? money(item.balance) : 'Sin costo' }}</p>
-            @if (item.assignedLevel) {
+            @if (item.assignedScholarshipType; as assigned) {
               <p class="muted">
-                Beca {{ levelLabels[item.assignedLevel] }}
+                Beca {{ assigned.name }}
                 @if (item.assignedPercent !== null) {
                   ({{ item.assignedPercent }}%)
                 }

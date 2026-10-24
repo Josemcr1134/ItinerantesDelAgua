@@ -23,6 +23,8 @@ import type {
   AdminPaymentPlanDto,
   AdminPaymentsSummaryDto,
   AdminRefundDto,
+  AdminScholarshipTypeDto,
+  AdminScholarshipTypesResponseDto,
   AdminSessionDto,
   AdminSessionListDto,
   AdminSiteMetricDto,
@@ -69,6 +71,7 @@ import type {
   CreateModuleRequestDto,
   CreateOfferRequestDto,
   CreateResourceRequestDto,
+  CreateScholarshipTypeRequestDto,
   CreateSessionRequestDto,
   CreateTeacherRequestDto,
   Currency,
@@ -162,7 +165,7 @@ import type {
   RosterEntryDto,
   RosterImportResultDto,
   ScheduleInterviewRequestDto,
-  ScholarshipLevel,
+  ScholarshipTypesResponseDto,
   SessionAttendanceDto,
   SessionCardDto,
   SessionChangeResultDto,
@@ -191,6 +194,7 @@ import type {
   UpdateProfileRequestDto,
   UpdateResourceRequestDto,
   UpdateScheduleStepDto,
+  UpdateScholarshipTypeRequestDto,
   UpdateSessionRequestDto,
   UpdateSiteMetricRequestDto,
   UpdateTeacherRequestDto,
@@ -372,8 +376,8 @@ export interface AdminApplicationsListQuery {
   readonly offerId?: Uuid;
   /** Estados separados por coma. Por defecto todos menos `DRAFT`. */
   readonly status?: readonly SubmittedApplicationStatus[];
-  /** Nivel solicitado. */
-  readonly level?: ScholarshipLevel;
+  /** Tipo de beca solicitado (antes `level`). Ids de `GET /admin/scholarship-types`. */
+  readonly scholarshipTypeId?: Uuid;
   readonly countryCode?: string;
   /** "Requiere entrevista". */
   readonly requiresInterview?: boolean;
@@ -394,8 +398,8 @@ export interface AdminApplicationsExportQuery {
   readonly offerId?: Uuid;
   /** Estados separados por coma. Por defecto todos menos `DRAFT`. */
   readonly status?: readonly SubmittedApplicationStatus[];
-  /** Nivel solicitado. */
-  readonly level?: ScholarshipLevel;
+  /** Tipo de beca solicitado (antes `level`). Ids de `GET /admin/scholarship-types`. */
+  readonly scholarshipTypeId?: Uuid;
   readonly countryCode?: string;
   /** "Requiere entrevista". */
   readonly requiresInterview?: boolean;
@@ -409,9 +413,9 @@ export interface AdminApplicationsExportQuery {
 /** Query de `GET /api/v1/admin/applications/{id}/decision-preview`. */
 export interface AdminApplicationsDecisionPreviewQuery {
   readonly decision: ApplicationDecision;
-  /** Beca: nivel a asignar. */
-  readonly assignedLevel?: ScholarshipLevel;
-  /** Beca especial: 71–80. */
+  /** Beca: tipo a asignar. */
+  readonly assignedScholarshipTypeId?: Uuid;
+  /** Beca: % dentro del rango del tipo en la oferta (opcional si es fijo). */
   readonly assignedPercent?: number;
   /** Párrafo editable que se agregaría al correo. */
   readonly message?: string;
@@ -1048,6 +1052,51 @@ export interface ApiOperations {
     readonly query: never;
     readonly body: UpdateSiteMetricRequestDto;
     readonly response: AdminSiteMetricDto;
+  };
+  /** Tipos de beca vigentes */
+  readonly ScholarshipTypes_list: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/scholarship-types';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: never;
+    readonly response: ScholarshipTypesResponseDto;
+  };
+  /** Tipos de beca (incluye inactivos) */
+  readonly AdminScholarshipTypes_list: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/scholarship-types';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: never;
+    readonly response: AdminScholarshipTypesResponseDto;
+  };
+  /** Crear tipo de beca */
+  readonly AdminScholarshipTypes_create: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/admin/scholarship-types';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: CreateScholarshipTypeRequestDto;
+    readonly response: AdminScholarshipTypeDto;
+  };
+  /** Editar tipo de beca */
+  readonly AdminScholarshipTypes_update: {
+    readonly method: 'PATCH';
+    readonly path: '/api/v1/admin/scholarship-types/{id}';
+    readonly pathParams: 'id';
+    readonly query: never;
+    readonly body: UpdateScholarshipTypeRequestDto;
+    readonly response: AdminScholarshipTypeDto;
+  };
+  /** Borrar tipo de beca */
+  readonly AdminScholarshipTypes_remove: {
+    readonly method: 'DELETE';
+    readonly path: '/api/v1/admin/scholarship-types/{id}';
+    readonly pathParams: 'id';
+    readonly query: never;
+    readonly body: never;
+    readonly response: void;
   };
   /** Catálogo de oferta formativa */
   readonly Offers_list: {

@@ -9,15 +9,10 @@ import {
   untracked,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  AdminApplicationsApi,
-  ApplicationDecision,
-  DecisionPreview,
-  ScholarshipLevel,
-} from 'data-access';
+import { AdminApplicationsApi, ApplicationDecision, DecisionPreview } from 'data-access';
 import { firstValueFrom } from 'rxjs';
 import { Button, Dialog, DialogActions } from 'ui-kit';
-import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
+import { percentRange } from '../../scholarship-types/scholarship-type-labels';
 import { formatOfferDate } from '../../offers/shared/zoned-time';
 import { APPLICATION_STATUS_LABELS } from '../application-labels';
 import { formatMoney } from '../../../shared/format/format';
@@ -42,29 +37,55 @@ const TEXT_MAX = 1000;
     >
       @if (!preview()) {
         <form id="decision-form" class="form" (ngSubmit)="showPreview()">
-          @if (needsLevel()) {
+          @if (needsType()) {
             <fieldset class="adm-field">
-              <legend class="adm-field__label">Nivel de beca a asignar</legend>
+              <legend class="adm-field__label">Tipo de beca a asignar</legend>
               <p class="adm-field__hint">
-                Solicitó {{ requestedLabel() }}. Puedes asignar otro nivel.
+                Solicitó {{ requestedLabel() }}. Puedes asignar otro tipo de los que ofrece la
+                oferta.
               </p>
               <div class="levels">
-                @for (option of levels(); track option.level) {
-                  <label class="level" [class.level--active]="level() === option.level">
-                    <input type="radio" name="level" [value]="option.level" [(ngModel)]="level" />
-                    <span class="level__name">{{ option.label }}</span>
+                @for (option of options(); track option.scholarshipTypeId) {
+                  <label
+                    class="level"
+                    [class.level--active]="typeId() === option.scholarshipTypeId"
+                    [class.level--full]="option.quota.isFull"
+                  >
+                    <input
+                      type="radio"
+                      name="scholarshipType"
+                      [value]="option.scholarshipTypeId"
+                      [attr.disabled]="option.quota.isFull ? '' : null"
+                      [(ngModel)]="typeId"
+                    />
+                    <span class="level__name">{{ option.scholarshipType.name }}</span>
                     <span class="muted">
                       {{
-                        option.minPercent === option.maxPercent
-                          ? option.maxPercent + '%'
-                          : option.minPercent + '–' + option.maxPercent + '%'
+                        range(option.scholarshipType.minPercent, option.scholarshipType.maxPercent)
                       }}
                       @if (option.balanceAtMaxPercent) {
                         · saldo {{ money(option.balanceAtMaxPercent) }}
                       }
                     </span>
-                    @if (option.requiresInterview) {
+                    <span class="muted" [class.mismatch]="option.quota.isFull">
+                      @if (option.quota.isFull) {
+                        Sin cupo: no se puede asignar
+                      } @else if (option.quota.availableRecipients !== null) {
+                        {{ option.quota.availableRecipients }}
+                        {{
+                          option.quota.availableRecipients === 1
+                            ? 'cupo disponible'
+                            : 'cupos disponibles'
+                        }}
+                      } @else {
+                        Sin límite de cupo
+                      }
+                    </span>
+                    @if (option.scholarshipType.requiresInterview) {
                       <span class="muted">Requiere entrevista realizada</span>
+                    }
+                    @if (!option.active) {
+                      <span class="muted">Tipo desactivado</span>
                     }
                   </label>
                 }
@@ -130,11 +151,11 @@ const TEXT_MAX = 1000;
               <dt>Nuevo estado</dt>
               <dd>{{ statusLabels[p.status] }}</dd>
             </div>
-            @if (p.assignedLevel) {
+            @if (p.assignedScholarshipType; as assigned) {
               <div>
-                <dt>Nivel</dt>
+                <dt>Beca</dt>
                 <dd>
-                  {{ levelLabels[p.assignedLevel] }}
+                  {{ assigned.name }}
                   @if (p.assignedPercent !== null) {
                     ({{ p.assignedPercent }}%)
                   }
@@ -159,7 +180,9 @@ const TEXT_MAX = 1000;
               {{
                 p.blockedReason === 'APPLICATION_INTERVIEW_REQUIRED'
                   ? 'Esta postulación requiere una entrevista por Zoom «Realizada» antes de aprobarse.'
-                  : 'No se puede registrar esta decisión todavía.'
+                  : p.blockedReason === 'SCHOLARSHIP_TYPE_FULL'
+                    ? 'Este tipo de beca ya no tiene cupo (global o de la oferta). Vuelve y elige otro.'
+                    : 'No se puede registrar esta decisión todavía.'
               }}
             </p>
           }
@@ -221,12 +244,12 @@ export class DecisionDialog {
   private readonly api = inject(AdminApplicationsApi);
 
   protected readonly statusLabels = APPLICATION_STATUS_LABELS;
-  protected readonly levelLabels = SCHOLARSHIP_LEVEL_LABELS;
+  protected readonly range = percentRange;
   protected readonly money = formatMoney;
   protected readonly formatDate = formatOfferDate;
   protected readonly textMax = TEXT_MAX;
 
-  protected readonly level = signal<ScholarshipLevel | null>(null);
+  protected readonly typeId = signal<string | null>(null);
   protected readonly percent = signal<number | null>(null);
   protected readonly message = signal('');
   protected readonly note = signal('');
@@ -236,24 +259,24 @@ export class DecisionDialog {
 
   private readonly app = this.store.application;
   protected readonly applicantName = computed(() => this.app()?.applicant.name ?? '');
-  protected readonly levels = computed(() => this.app()?.decision.levels ?? []);
-  protected readonly needsLevel = computed(
+  /** Tipos de beca habilitados en la oferta, con su cupo. */
+  protected readonly options = computed(() => this.app()?.decision.scholarshipTypes ?? []);
+  protected readonly needsType = computed(
     () => this.decision() === 'APPROVE' && this.app()?.kind === 'SCHOLARSHIP',
   );
   protected readonly requestedLabel = computed(() => {
-    const requested = this.app()?.requestedLevel;
-    return requested ? this.levelLabels[requested] : 'sin nivel';
+    return this.app()?.requestedScholarshipType?.name ?? 'sin tipo de beca';
   });
-  /** Rango del % cuando el nivel elegido no tiene uno fijo (Beca especial). */
+  /** Rango del % (efectivo en la oferta) cuando el tipo elegido no tiene uno fijo. */
   protected readonly percentRange = computed(() => {
-    const option = this.levels().find((l) => l.level === this.level());
-    return option && option.minPercent !== option.maxPercent
-      ? { min: option.minPercent, max: option.maxPercent }
+    const type = this.options().find((o) => o.scholarshipTypeId === this.typeId())?.scholarshipType;
+    return type && type.minPercent !== type.maxPercent
+      ? { min: type.minPercent, max: type.maxPercent }
       : null;
   });
   protected readonly formValid = computed(() => {
-    if (!this.needsLevel()) return true;
-    if (!this.level()) return false;
+    if (!this.needsType()) return true;
+    if (!this.typeId()) return false;
     const range = this.percentRange();
     const percent = this.percent();
     return (
@@ -270,8 +293,13 @@ export class DecisionDialog {
       if (!this.open()) return;
       untracked(() => {
         const a = this.app();
-        const suggested = a?.decision.assignedLevel ?? a?.requestedLevel ?? null;
-        this.level.set(this.levels().some((l) => l.level === suggested) ? suggested : null);
+        // Se propone el ya asignado o el solicitado, si sigue disponible.
+        const suggested =
+          a?.decision.assignedScholarshipTypeId ?? a?.requestedScholarshipTypeId ?? null;
+        const usable = this.options().some(
+          (o) => o.scholarshipTypeId === suggested && !o.quota.isFull,
+        );
+        this.typeId.set(usable ? suggested : null);
         this.percent.set(a?.decision.assignedPercent ?? null);
         this.message.set('');
         this.note.set('');
@@ -283,10 +311,10 @@ export class DecisionDialog {
 
   /** Datos de la decisión tal como los esperan la vista previa y el registro. */
   private choice() {
-    const level = this.needsLevel() ? (this.level() ?? undefined) : undefined;
+    const typeId = this.needsType() ? (this.typeId() ?? undefined) : undefined;
     return {
-      assignedLevel: level,
-      assignedPercent: level && this.percentRange() ? (this.percent() ?? undefined) : undefined,
+      assignedScholarshipTypeId: typeId,
+      assignedPercent: typeId && this.percentRange() ? (this.percent() ?? undefined) : undefined,
       message: this.message().trim() || undefined,
     };
   }

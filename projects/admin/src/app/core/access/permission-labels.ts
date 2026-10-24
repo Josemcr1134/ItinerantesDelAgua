@@ -22,4 +22,5 @@ export const PERMISSION_LABELS: Readonly<Record<Permission, string>> = {
   'users.manage': 'Gestionar administradores',
   'audit.read': 'Ver auditoría',
   'site.write': 'Editar las cifras de la landing',
+  'scholarship_types.write': 'Administrar los tipos de beca',
 };

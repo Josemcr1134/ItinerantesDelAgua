@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { AdminApplicationEmailDto, AdminApplicationsApi, ApplicationDecision } from 'data-access';
 import { firstValueFrom } from 'rxjs';
 import { Button } from 'ui-kit';
-import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
 import { formatOfferDate } from '../../offers/shared/zoned-time';
 import { EMAIL_STATUS_LABELS } from '../application-labels';
 import { formatDateTime, formatMoney } from '../../../shared/format/format';
@@ -24,11 +23,11 @@ import { DecisionDialog } from './decision-dialog';
 
         @if (a.decision.decidedAt) {
           <dl class="summary">
-            @if (a.decision.assignedLevel) {
+            @if (a.decision.assignedScholarshipType; as assigned) {
               <div>
-                <dt>Nivel asignado</dt>
+                <dt>Beca asignada</dt>
                 <dd>
-                  {{ levelLabels[a.decision.assignedLevel] }}
+                  {{ assigned.name }}
                   @if (a.decision.assignedPercent !== null) {
                     ({{ a.decision.assignedPercent }}%)
                   }
@@ -71,6 +70,10 @@ import { DecisionDialog } from './decision-dialog';
           @if (a.decision.blockedReason === 'APPLICATION_INTERVIEW_REQUIRED') {
             <p class="adm-callout adm-callout--info">
               Para aprobarla hace falta una entrevista por Zoom «Realizada».
+            </p>
+          } @else if (a.decision.blockedReason === 'SCHOLARSHIP_TYPE_FULL') {
+            <p class="adm-callout adm-callout--info">
+              El tipo de beca solicitado ya no tiene cupo: al aprobar, asigna otro.
             </p>
           }
           @if (a.decision.price; as price) {
@@ -131,7 +134,6 @@ export class DecisionPanel {
   protected readonly store = inject(ApplicationStore);
   private readonly api = inject(AdminApplicationsApi);
 
-  protected readonly levelLabels = SCHOLARSHIP_LEVEL_LABELS;
   protected readonly emailLabels = EMAIL_STATUS_LABELS;
   protected readonly money = formatMoney;
   protected readonly formatDate = formatOfferDate;

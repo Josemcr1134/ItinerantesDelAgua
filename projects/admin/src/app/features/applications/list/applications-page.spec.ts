@@ -22,8 +22,17 @@ const item = (id: string, name: string): AdminApplicationListItemDto => ({
   status: 'SUBMITTED',
   applicant: { userId: `u-${id}`, name, email: `${id}@example.com`, countryCode: 'MX' },
   offer: { id: 'o1', name: 'Diplomado en Ecotecnologías del Agua', slug: 'eco' },
-  requestedLevel: 'AGUAS_LIBRES',
-  assignedLevel: null,
+  requestedScholarshipTypeId: 't-al',
+  requestedScholarshipType: {
+    id: 't-al',
+    key: 'AGUAS_LIBRES',
+    name: 'Aguas Libres',
+    minPercent: 50,
+    maxPercent: 50,
+    requiresInterview: false,
+  },
+  assignedScholarshipTypeId: null,
+  assignedScholarshipType: null,
   assignedPercent: null,
   submittedAt: '2026-10-12T16:00:00.000Z',
   requiresInterview: false,
@@ -85,7 +94,7 @@ describe('ApplicationsPage', () => {
     const row = host.querySelector('tbody tr')!;
     expect(row.textContent).toContain('BEC-2026-0041');
     expect(row.textContent).toContain('México');
-    expect(row.textContent).toContain('Nivel: Aguas Libres');
+    expect(row.textContent).toContain('Beca: Aguas Libres');
     expect(row.textContent).toContain('Sin mi evaluación');
   });
 
@@ -98,7 +107,7 @@ describe('ApplicationsPage', () => {
     await fixture.whenStable();
     let params = await answer([]);
     expect(params.get('kind')).toBe('OPEN_CALL');
-    expect(host.querySelector('#applications-level')).toBeNull();
+    expect(host.querySelector('#applications-scholarship')).toBeNull();
 
     const select = (id: string, value: string) => {
       const el = host.querySelector<HTMLSelectElement>(id)!;

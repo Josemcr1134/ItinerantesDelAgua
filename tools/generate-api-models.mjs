@@ -39,7 +39,6 @@ const ENUM_NAMES = {
   'OFFER|CATALOG|NONE': 'TopicLinkKind',
   'SPECIALIZED_TRAINING|ONLINE_COURSES_WORKSHOPS|HANDS_ON_LEARNING': 'TopicGroup',
   'ENROLLMENT_OPEN|UPCOMING|ENROLLMENT_CLOSED|OPEN_CALL|NO_SCHEDULED_DATES': 'TopicAvailability',
-  'AGUA_VIVA|RIOS_VIVOS|AGUAS_LIBRES|CENOTES_VIVOS|SPECIAL': 'ScholarshipLevel',
   'TRAINING|TERRITORY|COMMUNITY|EVENTS|IMPORTANT_DATES': 'CalendarCategory',
   'PENDING_PAYMENT|ACTIVE|COMPLETED|SUSPENDED|CANCELLED': 'EnrollmentStatus',
   'ACTIVE|COMPLETED': 'FormationPhase',
@@ -79,7 +78,7 @@ const ENUM_NAMES = {
   'COMPLETED|NO_SHOW': 'InterviewOutcome',
   'PAYMENT|CONFIRMATION': 'ResponseDeadlineKind',
   'IMAGE|VIDEO': 'EvidenceMediaType',
-  'REQUIRED|MIN_LENGTH|MAX_LENGTH|MIN_FILES|MUST_ACCEPT|LEVEL_NOT_ENABLED|NOT_APPLICABLE':
+  'REQUIRED|MIN_LENGTH|MAX_LENGTH|MIN_FILES|MUST_ACCEPT|SCHOLARSHIP_TYPE_NOT_ENABLED|SCHOLARSHIP_TYPE_FULL|NOT_APPLICABLE':
     'ApplicationFieldIssueCode',
   'image/jpeg|image/png|image/heic|video/mp4|video/quicktime': 'EvidenceContentType',
   'APPROVE|NOT_SELECT|UNSURE': 'EvaluationRecommendation',
@@ -97,7 +96,7 @@ const ENUM_NAMES = {
   'NOTE|REMINDER_SENT|WHATSAPP_CONTACT': 'FollowUpNoteKind',
   'PENDING|EXPIRED': 'FollowUpTab',
   // --- Panel: ofertas, contenido y sesiones ---
-  'admin.access|offers.read|offers.write|offers.publish|attendance.read|attendance.write|applications.read|applications.evaluate|applications.interview|applications.decide|followup.read|followup.manage|payments.read|payments.manage|users.manage|audit.read|site.write':
+  'admin.access|offers.read|offers.write|offers.publish|attendance.read|attendance.write|applications.read|applications.evaluate|applications.interview|applications.decide|followup.read|followup.manage|payments.read|payments.manage|users.manage|audit.read|site.write|scholarship_types.write':
     'Permission',
   'DRAFT|PUBLISHED|ARCHIVED': 'PublicationStatus',
   'DRAFT|PUBLISHED|ENROLLMENT_CLOSED|FINISHED|ARCHIVED': 'AdminOfferStatus',
@@ -181,7 +180,12 @@ const FORMAT_ALIASES = {
 const refName = (ref) => ref.split('/').pop();
 const literal = (v) => (typeof v === 'string' ? `'${v.replace(/'/g, "\\'")}'` : String(v));
 const doc = (text, indent = '') =>
-  text ? `${indent}/** ${String(text).replace(/\*\//g, '*\\/').replace(/\s*\n+\s*/g, ' ').trim()} */\n` : '';
+  text
+    ? `${indent}/** ${String(text)
+        .replace(/\*\//g, '*\\/')
+        .replace(/\s*\n+\s*/g, ' ')
+        .trim()} */\n`
+    : '';
 const wrap = (t) => (/[|&]/.test(t) ? `(${t})` : t);
 const pascal = (s) => s.replace(/(^|[_\s-]+)(\w)/g, (_, __, c) => c.toUpperCase());
 const constName = (name) => name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase() + '_VALUES';
@@ -215,14 +219,18 @@ function enumName(values, where) {
 function typeOf(schema, where = '') {
   if (!schema) return 'unknown';
   // Algunos esquemas traen el subesquema dentro de `type`.
-  if (schema.type && typeof schema.type === 'object') return withNull(typeOf(schema.type, where), schema);
+  if (schema.type && typeof schema.type === 'object')
+    return withNull(typeOf(schema.type, where), schema);
   if (schema.$ref) return withNull(refName(schema.$ref), schema);
   if (schema.allOf) {
     const parts = schema.allOf.map((s) => typeOf(s, where));
     return withNull(parts.length === 1 ? parts[0] : parts.join(' & '), schema);
   }
   if (schema.oneOf || schema.anyOf) {
-    return withNull((schema.oneOf ?? schema.anyOf).map((s) => typeOf(s, where)).join(' | '), schema);
+    return withNull(
+      (schema.oneOf ?? schema.anyOf).map((s) => typeOf(s, where)).join(' | '),
+      schema,
+    );
   }
   if (schema.enum) {
     const values = schema.enum.filter((v) => v !== null);
@@ -268,7 +276,8 @@ function objectType(schema, indent = '', where = '') {
     return `${doc(prop.description, indent + '  ')}${indent}  readonly ${key}${opt}: ${typeOf(prop, `${where}.${name}`)};`;
   });
   if (schema.additionalProperties) {
-    const extra = schema.additionalProperties === true ? 'unknown' : typeOf(schema.additionalProperties, where);
+    const extra =
+      schema.additionalProperties === true ? 'unknown' : typeOf(schema.additionalProperties, where);
     lines.push(`${indent}  readonly [key: string]: ${extra};`);
   }
   return lines.length ? `{\n${lines.join('\n')}\n${indent}}` : 'Record<string, unknown>';
@@ -299,7 +308,8 @@ for (const [name, schema] of Object.entries(schemas)) {
 const operations = [];
 const queryTypes = [];
 const modelImports = new Set();
-const collect = (t) => (t.match(/\b[A-Z][A-Za-z0-9]*\b/g) ?? []).forEach((n) => modelImports.add(n));
+const collect = (t) =>
+  (t.match(/\b[A-Z][A-Za-z0-9]*\b/g) ?? []).forEach((n) => modelImports.add(n));
 
 /** Respuesta `{ data: T[], meta: PaginationMetaDto }` → `Paginated<T>`. */
 function responseType(schema, where) {
@@ -334,7 +344,9 @@ for (const [path, ops] of Object.entries(spec.paths ?? {})) {
         const opt = p.required ? '' : '?';
         return `${doc(p.description, '  ')}  readonly ${p.name}${opt}: ${t};`;
       });
-      queryTypes.push(`/** Query de \`${method.toUpperCase()} ${path}\`. */\nexport interface ${queryName} {\n${lines.join('\n')}\n}\n`);
+      queryTypes.push(
+        `/** Query de \`${method.toUpperCase()} ${path}\`. */\nexport interface ${queryName} {\n${lines.join('\n')}\n}\n`,
+      );
     }
 
     const pathParams = params.filter((p) => p.in === 'path').map((p) => p.name);

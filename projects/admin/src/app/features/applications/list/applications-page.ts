@@ -8,8 +8,6 @@ import {
   ApplicationKind,
   ApplicationSort,
   CatalogsApi,
-  SCHOLARSHIP_LEVEL_VALUES,
-  ScholarshipLevel,
   SUBMITTED_APPLICATION_STATUS_VALUES,
   SubmittedApplicationStatus,
 } from 'data-access';
@@ -27,7 +25,7 @@ import { ListStates } from '../../../shared/list/list-states';
 import { Pagination } from '../../../shared/list/pagination';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { Person } from '../../../shared/person/person';
-import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
+import { scholarshipTypeOptions } from '../../scholarship-types/scholarship-type-labels';
 import { formatOfferDate } from '../../offers/shared/zoned-time';
 import {
   APPLICATION_KIND_LABELS,
@@ -91,7 +89,6 @@ export default class ApplicationsPage {
 
   protected readonly statusLabels = APPLICATION_STATUS_LABELS;
   protected readonly statusTones = APPLICATION_STATUS_TONES;
-  protected readonly levelLabels = SCHOLARSHIP_LEVEL_LABELS;
   protected readonly recommendationLabels = RECOMMENDATION_LABELS;
   protected readonly formatDate = formatOfferDate;
   protected readonly formatDateTime = formatDateTime;
@@ -101,7 +98,7 @@ export default class ApplicationsPage {
     source: this.kind,
     computation: () => '',
   });
-  protected readonly level = linkedSignal<ApplicationKind, ScholarshipLevel | ''>({
+  protected readonly scholarshipTypeId = linkedSignal<ApplicationKind, string>({
     source: this.kind,
     computation: () => '',
   });
@@ -127,10 +124,13 @@ export default class ApplicationsPage {
   /** Ofertas de la pestaña (solo si puede verlas: `offers.read`). */
   private readonly offers = offerOptions(() => OFFER_TYPE_BY_KIND[this.kind()]);
 
+  /** Tipos de beca del catálogo, para filtrar. */
+  private readonly scholarshipTypes = scholarshipTypeOptions();
+
   protected readonly options = computed(() => ({
     offers: this.offers(),
     status: optionsFrom(SUBMITTED_APPLICATION_STATUS_VALUES, APPLICATION_STATUS_LABELS),
-    level: optionsFrom(SCHOLARSHIP_LEVEL_VALUES, SCHOLARSHIP_LEVEL_LABELS),
+    scholarshipTypes: this.scholarshipTypes(),
     countries: this.countries().map((c) => ({ value: c.code, label: c.name })),
     interview: [{ value: 'true', label: 'Requiere entrevista' }] as FilterOption<Flag>[],
     mine: [{ value: 'true', label: 'Sin mi evaluación' }] as FilterOption<Flag>[],
@@ -145,7 +145,7 @@ export default class ApplicationsPage {
     kind: this.kind(),
     offerId: this.offerId(),
     status: this.status(),
-    level: this.kind() === 'SCHOLARSHIP' ? this.level() : '',
+    scholarshipTypeId: this.kind() === 'SCHOLARSHIP' ? this.scholarshipTypeId() : '',
     countryCode: this.countryCode(),
     requiresInterview: this.interview(),
     withoutMyEvaluation: this.withoutMine(),
@@ -166,23 +166,24 @@ export default class ApplicationsPage {
   protected clearFilters(): void {
     this.list.clearSearch();
     this.offerId.set('');
-    this.level.set('');
+    this.scholarshipTypeId.set('');
     this.status.set('');
     this.countryCode.set('');
     this.interview.set('');
     this.withoutMine.set('');
   }
 
-  /** "Aguas Libres → Ríos Vivos 60%" (solicitado → asignado). */
-  protected levelText(item: AdminApplicationListItemDto): string | null {
-    const requested = item.requestedLevel ? this.levelLabels[item.requestedLevel] : null;
-    if (!item.assignedLevel) return requested;
-    const assigned = `${this.levelLabels[item.assignedLevel]}${
+  /** "Aguas Libres → Ríos Vivos 60%" (tipo de beca solicitado → asignado). */
+  protected scholarshipText(item: AdminApplicationListItemDto): string | null {
+    const requested = item.requestedScholarshipType?.name ?? null;
+    const assigned = item.assignedScholarshipType;
+    if (!assigned) return requested;
+    const assignedText = `${assigned.name}${
       item.assignedPercent !== null ? ` ${item.assignedPercent}%` : ''
     }`;
-    return requested && item.assignedLevel !== item.requestedLevel
-      ? `${requested} → ${assigned}`
-      : assigned;
+    return requested && item.assignedScholarshipTypeId !== item.requestedScholarshipTypeId
+      ? `${requested} → ${assignedText}`
+      : assignedText;
   }
 
   /** Descarga el CSV con los filtros actuales (máx. 5000 filas). */
@@ -205,7 +206,7 @@ interface ScreenFilters {
   readonly kind: ApplicationKind;
   readonly offerId: string;
   readonly status: SubmittedApplicationStatus | '';
-  readonly level: ScholarshipLevel | '';
+  readonly scholarshipTypeId: string;
   readonly countryCode: string;
   readonly requiresInterview: Flag | '';
   readonly withoutMyEvaluation: Flag | '';
@@ -220,7 +221,7 @@ function toApiQuery(
     kind: query.kind,
     offerId: query.offerId || undefined,
     status: query.status ? [query.status] : undefined,
-    level: query.level || undefined,
+    scholarshipTypeId: query.scholarshipTypeId || undefined,
     countryCode: query.countryCode || undefined,
     requiresInterview: query.requiresInterview ? true : undefined,
     withoutMyEvaluation: query.withoutMyEvaluation ? true : undefined,

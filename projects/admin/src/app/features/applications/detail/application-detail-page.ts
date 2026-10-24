@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AdminStatusEventDto } from 'data-access';
 import { Notice } from '../../../shared/notice/notice';
 import { RequestState } from '../../../shared/request-state/request-state';
-import { SCHOLARSHIP_LEVEL_LABELS } from '../../offers/offer-labels';
+import { percentRange } from '../../scholarship-types/scholarship-type-labels';
 import { formatBytes } from '../../offers/content/content-labels';
 import {
   APPLICATION_KIND_LABELS,
@@ -49,7 +49,7 @@ export default class ApplicationDetailPage {
   protected readonly statusLabels = APPLICATION_STATUS_LABELS;
   protected readonly statusTones = APPLICATION_STATUS_TONES;
   protected readonly kindLabels = APPLICATION_KIND_LABELS;
-  protected readonly levelLabels = SCHOLARSHIP_LEVEL_LABELS;
+  protected readonly range = percentRange;
   protected readonly formatDateTime = formatDateTime;
   protected readonly formatBytes = formatBytes;
 
