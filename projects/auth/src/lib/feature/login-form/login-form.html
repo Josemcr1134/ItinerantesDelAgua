@@ -37,6 +37,7 @@
         autocomplete="current-password"
         formControlName="password"
         required
+        [placeholder]="texts.password.placeholder"
         [type]="showPassword() ? 'text' : 'password'"
         [attr.aria-invalid]="showError('password')"
         [attr.aria-describedby]="showError('password') ? 'login-password-error' : null"

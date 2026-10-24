@@ -7,6 +7,7 @@ export const AUTH_TEXTS = {
   email: { label: 'Correo electrónico', placeholder: 'tucorreo@ejemplo.com' },
   password: {
     label: 'Contraseña',
+    placeholder: '•••••••••',
     show: 'Mostrar contraseña',
     hide: 'Ocultar contraseña',
   },
