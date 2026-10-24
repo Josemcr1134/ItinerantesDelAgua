@@ -1,12 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LoadingService } from 'data-access';
+import { LoadingOverlay } from 'ui-kit';
 
+/** Shell del portal de participantes: loader general y contenido de la ruta. */
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, LoadingOverlay],
   selector: 'portal-root',
-  styleUrl: './app.scss',
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly title = signal('portal');
+  protected readonly loading = inject(LoadingService);
 }

@@ -1,0 +1,42 @@
+<div class="page">
+  <header class="page__brand">
+    <img
+      class="page__logo"
+      src="assets/login/logo-escuela.webp"
+      alt="Escuela Itinerante del Agua"
+      width="198"
+      height="138"
+    />
+  </header>
+
+  <main class="page__main">
+    <div class="stage">
+      <section class="card" aria-labelledby="login-title">
+        <h1 id="login-title" class="card__title">Ingresar al Portal</h1>
+        <auth-login-form appearance="portal" [showRememberMe]="false" [returnUrl]="returnUrl()" />
+        <p class="card__register">
+          ¿No tienes una Cuenta?
+          <!-- TODO(registro): crear la pantalla de registro (POST /auth/register). -->
+          <a class="card__register-link" routerLink="/registro">Regístrate Aquí</a>
+        </p>
+      </section>
+
+      <!-- Escena junto a la tarjeta (solo escritorio). -->
+      <div class="scene" aria-hidden="true">
+        <img class="scene__leaf scene__leaf--1" src="assets/login/leaves.webp" alt="" />
+        <img class="scene__leaf scene__leaf--2" src="assets/login/leaves.webp" alt="" />
+        <img class="scene__ground" src="assets/login/ground.svg" alt="" />
+        <img class="scene__tree" src="assets/login/tree.webp" alt="" />
+        <img class="scene__woman" src="assets/login/woman.webp" alt="" />
+        <img class="scene__leaf scene__leaf--3" src="assets/login/leaves.webp" alt="" />
+        <img class="scene__leaf scene__leaf--4" src="assets/login/leaves.webp" alt="" />
+      </div>
+    </div>
+  </main>
+
+  <!-- Hojas de la esquina superior izquierda (solo escritorio). -->
+  <div class="corner" aria-hidden="true">
+    <img class="corner__leaf corner__leaf--1" src="assets/login/leaves.webp" alt="" />
+    <img class="corner__leaf corner__leaf--2" src="assets/login/leaves.webp" alt="" />
+  </div>
+</div>
