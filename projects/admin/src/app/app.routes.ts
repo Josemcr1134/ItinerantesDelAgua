@@ -34,6 +34,12 @@ export const routes: Routes = [
         loadComponent: () => import('./features/calendar/calendar-page'),
       },
       {
+        path: 'tipos-de-beca',
+        title: 'Tipos de beca · Administrador',
+        canActivate: [permissionGuard('offers.read')],
+        loadComponent: () => import('./features/scholarship-types/scholarship-types-page'),
+      },
+      {
         path: 'docentes',
         title: 'Docentes · Administrador',
         canActivate: [permissionGuard('offers.read')],

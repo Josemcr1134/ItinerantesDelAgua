@@ -1,0 +1,161 @@
+<ui-dialog
+  [(open)]="open"
+  [title]="type() ? 'Editar tipo de beca' : 'Nuevo tipo de beca'"
+  [busy]="saving()"
+>
+  <form id="scholarship-type-form" class="form" novalidate [formGroup]="form" (ngSubmit)="save()">
+    @if (preview(); as p) {
+      <p class="preview" aria-live="polite">{{ p }}</p>
+    }
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="st-name">Nombre</label>
+      <input
+        id="st-name"
+        class="adm-field__input"
+        formControlName="name"
+        required
+        [attr.maxlength]="limits.name"
+        [attr.aria-invalid]="showError('name')"
+      />
+      @if (showError('name')) {
+        <p class="adm-field__error">Escribe el nombre (hasta {{ limits.name }} caracteres).</p>
+      }
+    </div>
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="st-key">Clave</label>
+      <input
+        id="st-key"
+        class="adm-field__input mono"
+        formControlName="key"
+        required
+        [attr.maxlength]="limits.key"
+        aria-describedby="st-key-hint"
+        [attr.aria-invalid]="showError('key')"
+        (input)="touchKey()"
+      />
+      <p id="st-key-hint" class="adm-field__hint">
+        {{
+          type()
+            ? 'No se puede cambiar.'
+            : 'MAYÚSCULAS_CON_GUION_BAJO, única. No se podrá cambiar después.'
+        }}
+      </p>
+      @if (showError('key')) {
+        <p class="adm-field__error">
+          Usa mayúsculas, números y guion bajo, empezando por una letra.
+        </p>
+      }
+    </div>
+
+    <div class="adm-field">
+      <label class="adm-field__label" for="st-description"
+        >Descripción <span class="adm-field__hint">(opcional)</span></label
+      >
+      <textarea
+        id="st-description"
+        class="adm-field__input"
+        rows="3"
+        formControlName="description"
+        [attr.maxlength]="limits.description"
+      ></textarea>
+    </div>
+
+    <div class="row">
+      <div class="adm-field">
+        <label class="adm-field__label" for="st-min">% mínimo</label>
+        <input
+          id="st-min"
+          class="adm-field__input"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="100"
+          formControlName="minPercent"
+          required
+          [attr.aria-invalid]="showError('minPercent')"
+        />
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="st-max">% máximo</label>
+        <input
+          id="st-max"
+          class="adm-field__input"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="100"
+          formControlName="maxPercent"
+          required
+          aria-describedby="st-range-hint"
+          [attr.aria-invalid]="showError('maxPercent')"
+        />
+      </div>
+    </div>
+    <p id="st-range-hint" class="adm-field__hint">
+      Iguales = porcentaje fijo; distintos = el comité elige el % al aprobar. De 1 a 100.
+    </p>
+    @if (showError('minPercent') || showError('maxPercent')) {
+      <p class="adm-field__error">Escribe porcentajes entre 1 y 100.</p>
+    }
+
+    <div class="row">
+      <div class="adm-field">
+        <label class="adm-field__label" for="st-cap"
+          >Cupo global <span class="adm-field__hint">(opcional)</span></label
+        >
+        <input
+          id="st-cap"
+          class="adm-field__input"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          placeholder="Sin límite"
+          formControlName="maxRecipients"
+          aria-describedby="st-cap-hint"
+          [attr.aria-invalid]="showError('maxRecipients')"
+        />
+      </div>
+      <div class="adm-field">
+        <label class="adm-field__label" for="st-order"
+          >Orden <span class="adm-field__hint">(opcional)</span></label
+        >
+        <input
+          id="st-order"
+          class="adm-field__input"
+          type="number"
+          inputmode="numeric"
+          step="1"
+          placeholder="Al final"
+          formControlName="sortOrder"
+        />
+      </div>
+    </div>
+    <p id="st-cap-hint" class="adm-field__hint">
+      Cuántas personas pueden tener esta beca, sumando todas las ofertas. Si queda por debajo de lo
+      ya asignado no se quitan becas: solo se bloquean nuevas.
+    </p>
+
+    <label class="adm-check">
+      <input type="checkbox" formControlName="requiresInterview" />
+      La postulación requiere entrevista por Zoom «Realizada»
+    </label>
+    <label class="adm-check">
+      <input type="checkbox" formControlName="active" />
+      Activo (se ofrece en ofertas y postulaciones nuevas)
+    </label>
+
+    @if (error()) {
+      <p class="adm-field__error" role="alert">{{ error() }}</p>
+    }
+  </form>
+  <div uiDialogActions>
+    <adm-form-actions
+      form="scholarship-type-form"
+      [submitLabel]="type() ? 'Guardar cambios' : 'Crear tipo de beca'"
+      [busy]="saving()"
+      (cancel)="open.set(false)"
+    />
+  </div>
+</ui-dialog>

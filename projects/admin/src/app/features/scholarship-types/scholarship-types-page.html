@@ -1,0 +1,150 @@
+<adm-page-header
+  title="Tipos de beca"
+  lead="Catálogo de becas: cada oferta habilita los suyos (y puede ajustar % y cupo) y el comité asigna el tipo y el % final."
+>
+  @if (canWrite()) {
+    <button uiButton type="button" class="adm-page-action" (click)="openForm(null)">
+      <svg
+        aria-hidden="true"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      Nuevo tipo de beca
+    </button>
+  }
+</adm-page-header>
+
+<adm-notice [(message)]="notice" />
+
+<adm-request-state
+  [error]="types.error()"
+  [loaded]="types.data() !== null"
+  loadingText="Cargando tipos de beca…"
+  (retry)="load()"
+>
+  @if (types.data()?.length) {
+    <table class="adm-table adm-table--cards-2" [class.adm-table--loading]="types.loading()">
+      <caption class="visually-hidden">
+        Tipos de beca
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Tipo</th>
+          <th scope="col">Porcentaje</th>
+          <th scope="col">Cupo</th>
+          <th scope="col">Uso</th>
+          <th scope="col"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (type of types.data(); track type.id) {
+          @let busy = rows.isBusy(type.id);
+          <tr [class.inactive]="!type.active">
+            <td data-label="Tipo">
+              <p class="name">
+                {{ type.name }}
+                @if (!type.active) {
+                  <span class="adm-badge">Desactivado</span>
+                }
+              </p>
+              <p class="muted mono">{{ type.key }}</p>
+              @if (type.description) {
+                <p class="muted description">{{ type.description }}</p>
+              }
+            </td>
+            <td data-label="Porcentaje">
+              <p class="strong">{{ range(type.minPercent, type.maxPercent) }}</p>
+              <p class="muted">
+                {{ type.minPercent === type.maxPercent ? 'Fijo' : 'El comité elige' }}
+                @if (type.requiresInterview) {
+                  · requiere entrevista
+                }
+              </p>
+            </td>
+            <td data-label="Cupo">
+              @if (type.maxRecipients === null) {
+                <p>Sin límite</p>
+                <p class="muted">{{ type.usedRecipients }} asignadas</p>
+              } @else {
+                <p class="strong" [class.full]="type.isFull">
+                  {{ type.usedRecipients }} / {{ type.maxRecipients }}
+                </p>
+                <div
+                  class="bar"
+                  role="progressbar"
+                  [attr.aria-label]="'Cupo usado de ' + type.name"
+                  [attr.aria-valuenow]="type.usedRecipients"
+                  aria-valuemin="0"
+                  [attr.aria-valuemax]="type.maxRecipients"
+                >
+                  <span
+                    class="bar__fill"
+                    [class.bar__fill--full]="type.isFull"
+                    [style.width.%]="(type.usedRecipients / type.maxRecipients) * 100"
+                  ></span>
+                </div>
+                <p class="muted" [class.full]="type.isFull">
+                  {{ type.isFull ? 'Agotado' : type.availableRecipients + ' disponibles' }}
+                </p>
+              }
+            </td>
+            <td data-label="Uso">
+              <p class="muted">{{ usage(type) }}</p>
+            </td>
+            <td class="adm-table__actions">
+              @if (canWrite()) {
+                <div class="adm-actions">
+                  <button
+                    type="button"
+                    class="adm-action"
+                    [disabled]="busy"
+                    (click)="openForm(type)"
+                  >
+                    Editar<span class="visually-hidden"> «{{ type.name }}»</span>
+                  </button>
+                  <adm-row-menu [label]="'Más acciones de ' + type.name">
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="toggleActive(type)"
+                    >
+                      {{ type.active ? 'Desactivar' : 'Activar' }}
+                    </button>
+                    <button
+                      class="adm-menuitem adm-menuitem--danger"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="remove(type)"
+                    >
+                      Borrar
+                    </button>
+                  </adm-row-menu>
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p class="adm-state">Aún no hay tipos de beca.</p>
+  }
+</adm-request-state>
+
+@if (canWrite()) {
+  <adm-scholarship-type-form-dialog
+    [(open)]="formOpen"
+    [type]="editing()"
+    (saved)="onSaved($event)"
+  />
+}
