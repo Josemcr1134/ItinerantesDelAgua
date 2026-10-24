@@ -4,13 +4,13 @@ import { FilterSelect } from './filter-select';
 let nextBarId = 0;
 
 /** Filtros que caben junto a la búsqueda en una sola fila (desde xl). */
-const MAX_FILTERS_IN_ROW = 5;
+const MAX_FILTERS_IN_ROW = 4;
 
 /**
  * Barra de filtros de una lista. La búsqueda (`[admFilterSearch]`) siempre
  * está a la vista; el resto de filtros se pliega en pantallas pequeñas (hasta
  * xl) tras el botón "Filtros", que muestra cuántos hay aplicados. Desde xl
- * todo se ve en una fila (con más de cinco filtros, la búsqueda arriba y los
+ * todo se ve en una fila (con más de cuatro filtros, la búsqueda arriba y los
  * filtros en rejilla debajo).
  *
  * ```html
