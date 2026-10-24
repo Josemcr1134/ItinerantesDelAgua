@@ -1,0 +1,86 @@
+@let t = texts.forgot.code;
+<portal-access-layout labelledBy="verify-title">
+  <h1 id="verify-title" class="title">{{ t.label }}</h1>
+  @if (delivery(); as otp) {
+    <p class="subtitle">{{ t.subtitle(otp.maskedEmail) }}</p>
+  }
+
+  <form class="form" novalidate [formGroup]="form" (ngSubmit)="verify()">
+    <p class="notice" role="alert">{{ errorMessage() }}</p>
+    @if (resent()) {
+      <p class="notice notice--info" role="status">{{ t.resent }}</p>
+    }
+
+    <div class="grid">
+      @if (!knownEmail) {
+        <div class="field field--full">
+          <label class="field__label" for="verify-email">{{ texts.email.label }}</label>
+          <input
+            id="verify-email"
+            class="field__input"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            formControlName="email"
+            required
+            [placeholder]="texts.email.placeholder"
+            [attr.aria-invalid]="showError('email')"
+            [attr.aria-describedby]="showError('email') ? 'verify-email-error' : null"
+          />
+          @if (showError('email')) {
+            <p id="verify-email-error" class="field__error">
+              {{
+                form.controls.email.hasError('required')
+                  ? texts.errors.required
+                  : texts.errors.email
+              }}
+            </p>
+          }
+        </div>
+      }
+
+      <div class="field field--full">
+        <label class="field__label" for="verify-code">{{ t.label }}</label>
+        <input
+          id="verify-code"
+          class="field__input code"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          formControlName="code"
+          required
+          [attr.maxlength]="codeLength()"
+          [attr.aria-invalid]="showError('code')"
+          [attr.aria-describedby]="showError('code') ? 'verify-code-error' : null"
+          (input)="normalizeCode($event)"
+        />
+        @if (showError('code')) {
+          <p id="verify-code-error" class="field__error">
+            {{
+              form.controls.code.hasError('required')
+                ? texts.errors.required
+                : texts.errors.code(codeLength())
+            }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <button type="button" class="resend" [disabled]="resend.remaining() > 0" (click)="resendCode()">
+      {{ resendLabel() }}
+    </button>
+
+    <button
+      uiButton
+      type="submit"
+      variant="secondary"
+      class="submit"
+      [disabled]="request.loading()"
+    >
+      {{ request.loading() ? t.submitting : t.submit }}
+    </button>
+  </form>
+
+  <p class="switch">
+    <a [routerLink]="config.loginUrl">{{ texts.forgot.back }}</a>
+  </p>
+</portal-access-layout>

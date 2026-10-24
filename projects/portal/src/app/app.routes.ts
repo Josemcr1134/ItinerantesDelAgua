@@ -11,6 +11,18 @@ export const routes: Routes = [
   },
   ...authRoutes.filter((route) => route.path !== 'login'),
   {
+    path: 'registro',
+    title: 'Crear cuenta · Itinerantes del Agua',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/access/register/register-page'),
+  },
+  {
+    path: 'verificar-correo',
+    title: 'Verificar correo · Itinerantes del Agua',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/access/verify-email/verify-email-page'),
+  },
+  {
     path: '',
     title: 'Inicio · Portal',
     canActivate: [authGuard],

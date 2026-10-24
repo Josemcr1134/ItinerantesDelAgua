@@ -1,0 +1,322 @@
+@let t = texts;
+<portal-access-layout labelledBy="register-title" [wide]="true">
+  <!-- Serpientes en las esquinas superior izquierda e inferior derecha (solo escritorio). -->
+  <div accessDecor class="decor" aria-hidden="true">
+    <img
+      class="decor__snake decor__snake--1"
+      src="assets/access/snake.webp"
+      alt=""
+      loading="lazy"
+    />
+    <img
+      class="decor__snake decor__snake--2"
+      src="assets/access/snake.webp"
+      alt=""
+      loading="lazy"
+    />
+  </div>
+
+  <h1 id="register-title" class="title">{{ t.title }}</h1>
+
+  <form class="form" novalidate [formGroup]="form" (ngSubmit)="submit()">
+    <p class="notice" role="alert">{{ errorMessage() }}</p>
+    @if (catalogFailed()) {
+      <p class="notice" role="alert">{{ t.catalogError }}</p>
+    }
+
+    <div class="grid">
+      <div class="field field--full">
+        <label class="field__label" for="reg-full-name">{{ t.fullName }}</label>
+        <input
+          id="reg-full-name"
+          class="field__input"
+          autocomplete="name"
+          maxlength="120"
+          formControlName="fullName"
+          required
+          [attr.aria-invalid]="showError('fullName')"
+          [attr.aria-describedby]="showError('fullName') ? 'reg-full-name-error' : null"
+        />
+        @if (showError('fullName')) {
+          <p id="reg-full-name-error" class="field__error">{{ errorFor('fullName') }}</p>
+        }
+      </div>
+
+      <div class="field field--full">
+        <label class="field__label" for="reg-username">{{ t.username }}</label>
+        <input
+          id="reg-username"
+          class="field__input"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+          maxlength="30"
+          formControlName="username"
+          required
+          [attr.aria-invalid]="showError('username')"
+          [attr.aria-describedby]="showError('username') ? 'reg-username-error' : null"
+        />
+        @if (showError('username')) {
+          <p id="reg-username-error" class="field__error">{{ errorFor('username') }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="reg-email">{{ t.email }}</label>
+        <input
+          id="reg-email"
+          class="field__input"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          formControlName="email"
+          required
+          [placeholder]="authTexts.email.placeholder"
+          [attr.aria-invalid]="showError('email')"
+          [attr.aria-describedby]="showError('email') ? 'reg-email-error' : null"
+        />
+        @if (showError('email')) {
+          <p id="reg-email-error" class="field__error">{{ errorFor('email') }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="reg-phone">{{ t.phone }}</label>
+        <div class="phone" [class.phone--invalid]="showError('phoneNumber')">
+          <div class="select phone__code">
+            <select
+              class="select__input"
+              formControlName="phoneCode"
+              [attr.aria-label]="t.phoneCode"
+            >
+              @for (code of phoneCodes(); track code) {
+                <option [value]="code">{{ code }}</option>
+              } @empty {
+                <option [value]="form.controls.phoneCode.value">
+                  {{ form.controls.phoneCode.value }}
+                </option>
+              }
+            </select>
+            <img
+              class="select__arrow"
+              src="assets/access/select-arrow.svg"
+              alt=""
+              width="13"
+              height="7"
+            />
+          </div>
+          <input
+            id="reg-phone"
+            class="phone__number"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel-national"
+            formControlName="phoneNumber"
+            required
+            [attr.aria-invalid]="showError('phoneNumber')"
+            [attr.aria-describedby]="showError('phoneNumber') ? 'reg-phone-error' : null"
+          />
+        </div>
+        @if (showError('phoneNumber')) {
+          <p id="reg-phone-error" class="field__error">{{ errorFor('phoneNumber') }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="reg-country">{{ t.country }}</label>
+        <div class="select">
+          <select
+            id="reg-country"
+            class="field__input select__input"
+            autocomplete="country"
+            formControlName="country"
+            required
+            [attr.aria-invalid]="showError('country')"
+          >
+            @for (country of countries.value(); track country.code) {
+              <option [value]="country.code">{{ country.name }}</option>
+            }
+          </select>
+          <img
+            class="select__arrow"
+            src="assets/access/select-arrow.svg"
+            alt=""
+            width="13"
+            height="7"
+          />
+        </div>
+        @if (showError('country')) {
+          <p class="field__error">{{ errorFor('country') }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="reg-division">{{ t.division }}</label>
+        @if (divisionMode() === 'text') {
+          <input
+            id="reg-division"
+            class="field__input"
+            autocomplete="address-level1"
+            maxlength="120"
+            formControlName="divisionName"
+            required
+            [attr.aria-invalid]="showError('divisionName')"
+            [attr.aria-describedby]="showError('divisionName') ? 'reg-division-error' : null"
+          />
+          @if (showError('divisionName')) {
+            <p id="reg-division-error" class="field__error">{{ errorFor('divisionName') }}</p>
+          }
+        } @else {
+          <div class="select">
+            <select
+              id="reg-division"
+              class="field__input select__input"
+              formControlName="divisionId"
+              required
+              [attr.aria-busy]="divisionMode() === 'waiting'"
+              [attr.aria-invalid]="showError('divisionId')"
+              [attr.aria-describedby]="showError('divisionId') ? 'reg-division-error' : null"
+            >
+              <option value="" disabled>{{ t.select }}</option>
+              @for (division of divisions.value(); track division.id) {
+                <option [value]="division.id">{{ division.name }}</option>
+              }
+            </select>
+            <img
+              class="select__arrow"
+              src="assets/access/select-arrow.svg"
+              alt=""
+              width="13"
+              height="7"
+            />
+          </div>
+          @if (showError('divisionId')) {
+            <p id="reg-division-error" class="field__error">{{ errorFor('divisionId') }}</p>
+          }
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="reg-municipality">{{ t.municipality }}</label>
+        @if (municipalityMode() === 'text') {
+          <input
+            id="reg-municipality"
+            class="field__input"
+            autocomplete="address-level2"
+            maxlength="120"
+            formControlName="municipalityName"
+            required
+            [attr.aria-invalid]="showError('municipalityName')"
+            [attr.aria-describedby]="
+              showError('municipalityName') ? 'reg-municipality-error' : null
+            "
+          />
+          @if (showError('municipalityName')) {
+            <p id="reg-municipality-error" class="field__error">
+              {{ errorFor('municipalityName') }}
+            </p>
+          }
+        } @else {
+          <!-- Sin estado elegido, la lista queda vacía hasta que se elija. -->
+          <div class="select">
+            <select
+              id="reg-municipality"
+              class="field__input select__input"
+              formControlName="municipalityId"
+              required
+              [attr.aria-busy]="municipalityMode() === 'waiting' && !!division()"
+              [attr.aria-invalid]="showError('municipalityId')"
+              [attr.aria-describedby]="
+                showError('municipalityId') ? 'reg-municipality-error' : null
+              "
+            >
+              <option value="" disabled>{{ t.select }}</option>
+              @for (municipality of municipalities.value(); track municipality.id) {
+                <option [value]="municipality.id">{{ municipality.name }}</option>
+              }
+            </select>
+            <img
+              class="select__arrow"
+              src="assets/access/select-arrow.svg"
+              alt=""
+              width="13"
+              height="7"
+            />
+          </div>
+          @if (showError('municipalityId')) {
+            <p id="reg-municipality-error" class="field__error">{{ errorFor('municipalityId') }}</p>
+          }
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="reg-timezone">{{ t.timezone }}</label>
+        <div class="select">
+          <select
+            id="reg-timezone"
+            class="field__input select__input"
+            formControlName="timezone"
+            required
+          >
+            @for (zone of timezones(); track zone.id) {
+              <option [value]="zone.id">
+                {{ zone.label }}{{ zone.utcOffset ? ' (UTC' + zone.utcOffset + ')' : '' }}
+              </option>
+            } @empty {
+              <option [value]="form.controls.timezone.value">
+                {{ form.controls.timezone.value }}
+              </option>
+            }
+          </select>
+          <img
+            class="select__arrow"
+            src="assets/access/select-arrow.svg"
+            alt=""
+            width="13"
+            height="7"
+          />
+        </div>
+      </div>
+
+      <div class="field field--full">
+        <label class="field__label" for="reg-password">{{ t.password }}</label>
+        <div class="field__control">
+          <input
+            id="reg-password"
+            class="field__input field__input--with-action"
+            autocomplete="new-password"
+            formControlName="password"
+            required
+            [type]="showPassword() ? 'text' : 'password'"
+            [placeholder]="authTexts.password.placeholder"
+            [attr.aria-invalid]="showError('password')"
+            [attr.aria-describedby]="showError('password') ? 'reg-password-error' : null"
+          />
+          <auth-password-toggle
+            class="field__action"
+            [(visible)]="showPassword"
+            controls="reg-password"
+          />
+        </div>
+        @if (showError('password')) {
+          <p id="reg-password-error" class="field__error">{{ errorFor('password') }}</p>
+        }
+      </div>
+    </div>
+
+    <button
+      uiButton
+      type="submit"
+      variant="secondary"
+      class="submit"
+      [disabled]="request.loading()"
+    >
+      {{ request.loading() ? t.submitting : t.submit }}
+    </button>
+  </form>
+
+  <p class="switch">
+    {{ t.haveAccount }}
+    <a routerLink="/login">{{ t.login }}</a>
+  </p>
+</portal-access-layout>

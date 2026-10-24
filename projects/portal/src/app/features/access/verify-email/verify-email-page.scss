@@ -1,0 +1,52 @@
+@use '../access';
+
+:host {
+  display: block;
+}
+
+.title {
+  @include access.title;
+}
+
+.subtitle {
+  margin: 4px 0 14px;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.code {
+  font-family: var(--font-family-numeric);
+  font-size: 1.25rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+.notice--info {
+  color: var(--color-primary);
+  font-weight: 400;
+}
+
+.resend {
+  align-self: flex-end;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+
+  &:disabled {
+    color: color-mix(in srgb, var(--color-primary) 60%, transparent);
+    text-decoration: none;
+    cursor: default;
+  }
+}
+
+.switch {
+  @include access.switch;
+}

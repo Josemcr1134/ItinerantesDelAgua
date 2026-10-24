@@ -1,0 +1,43 @@
+@use 'breakpoints' as bp;
+@use '../access';
+@use '../frame' as *;
+
+:host {
+  display: block;
+}
+
+.title {
+  @include access.title;
+
+  margin-bottom: 14px;
+}
+
+.switch {
+  @include access.switch;
+}
+
+// --- Serpientes (Figma HU-02, desde 1024 px) ------------------------------
+.decor {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  @include bp.up(lg) {
+    display: block;
+  }
+}
+
+.decor__snake {
+  position: absolute;
+  max-width: none;
+  object-fit: cover;
+}
+
+.decor__snake--1 {
+  @include piece(0.5, 342.5, 663, 829, rotate(-90deg), $x: left, $y: top);
+}
+
+.decor__snake--2 {
+  @include piece(1387.56, 1024.5, 785, 981.13, rotate(-90deg));
+}
