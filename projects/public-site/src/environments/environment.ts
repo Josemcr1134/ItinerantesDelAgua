@@ -2,4 +2,9 @@
 export const environment = {
   production: true,
   apiBaseUrl: 'https://itinerantes-backend-production.up.railway.app',
+  /**
+   * Portal de participantes (registro, login).
+   * TODO(despliegue): definir el dominio; sin él "Regístrate" no lleva a ningún lado.
+   */
+  portalUrl: null as string | null,
 };
