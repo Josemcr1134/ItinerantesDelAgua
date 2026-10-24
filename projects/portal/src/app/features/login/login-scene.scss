@@ -1,0 +1,109 @@
+@use 'breakpoints' as bp;
+@use 'frame' as *;
+
+// Ilustraciones del login (Figma, marco de 1440 × 1024), aparte de la
+// página para que cada hoja quede dentro del presupuesto de estilos.
+
+// --- Decoración (desde 1024 px) -------------------------------------------
+.scene,
+.corner,
+.microbes {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  img {
+    position: absolute;
+    max-width: none;
+    object-fit: contain;
+  }
+}
+
+// Las capas se funden entre sí: visibility las saca del árbol de
+// accesibilidad y de la pintura cuando terminan de desvanecerse.
+@include bp.up(lg) {
+  .scene,
+  .corner,
+  .microbes {
+    display: block;
+  }
+}
+
+.microbes {
+  visibility: hidden;
+  opacity: 0;
+  scale: 0.96;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scene,
+  .corner,
+  .microbes {
+    transition:
+      opacity 0.6s ease,
+      scale 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0.6s;
+  }
+}
+
+// Intento fallido (Figma HU-04 con error): microorganismos en lugar de la escena.
+.page:has(.login-form--error) {
+  .scene,
+  .corner {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .microbes {
+    visibility: visible;
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.microbes__img--1 {
+  @include piece(268.51, 761.63, 845.27, 1127.02, rotate(-90deg), $x: left);
+}
+
+.microbes__img--2 {
+  @include piece(1170.51, 297.63, 845.27, 1127.02, rotate(90deg), $y: top);
+}
+
+// Esquina inferior derecha, pegada a los bordes como en el Figma.
+.scene__leaf--1 {
+  @include piece(854.71, 849.89, 213.74, 280.01, rotate(15deg));
+}
+
+.scene__leaf--2 {
+  @include piece(796.57, 893.16, 213.74, 280.01, rotate(-45deg));
+}
+
+.scene__ground {
+  @include piece(1104, 1051.5, 772, 431);
+}
+
+.scene__tree {
+  @include piece(1332.64, 664.55, 600.71, 751.11);
+}
+
+// En el Figma la persona está volteada horizontalmente.
+.scene__woman {
+  @include piece(1052.2, 792.39, 526.39, 445.89, scaleX(-1));
+}
+
+.scene__leaf--3 {
+  @include piece(757.84, 985.32, 195.93, 256.68, rotate(165deg) scaleY(-1));
+}
+
+.scene__leaf--4 {
+  @include piece(811.14, 1024.98, 195.93, 256.68, rotate(-135deg) scaleY(-1));
+}
+
+.corner__leaf--1 {
+  @include piece(132.18, 269.7, 424.06, 555.53, rotate(105deg), $x: left, $y: top);
+}
+
+.corner__leaf--2 {
+  @include piece(46.34, 154.34, 424.06, 555.53, rotate(45deg), $x: left, $y: top);
+}

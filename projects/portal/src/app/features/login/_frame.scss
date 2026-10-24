@@ -1,0 +1,30 @@
+// Medidas del marco del Figma (1440 × 1024) escaladas a la pantalla con
+// `--u` (lo define `.page`).
+
+// Px del marco escalados a la pantalla (como el Figma: 1 en 1440 × 1024).
+@function u($px) {
+  @return calc(#{$px} * var(--u));
+}
+
+// Pieza decorativa por su centro (coordenadas del marco), para conservar el
+// giro del Figma, anclada a la esquina de la pantalla que indican $x y $y.
+@mixin piece($cx, $cy, $w, $h, $transform: none, $x: right, $y: bottom) {
+  $tx: 50%;
+  $ty: 50%;
+  @if $x == left {
+    left: u($cx);
+    $tx: -50%;
+  } @else {
+    right: u(1440 - $cx);
+  }
+  @if $y == top {
+    top: u($cy);
+    $ty: -50%;
+  } @else {
+    bottom: u(1024 - $cy);
+  }
+  width: u($w);
+  height: u($h);
+  translate: $tx $ty;
+  transform: $transform;
+}

@@ -7,7 +7,7 @@ import { LoginForm } from 'auth';
   selector: 'portal-login-page',
   imports: [RouterLink, LoginForm],
   templateUrl: './login-page.html',
-  styleUrl: './login-page.scss',
+  styleUrls: ['./login-page.scss', './login-scene.scss'],
 })
 export default class LoginPage {
   /** Página protegida desde la que se llegó (`?returnUrl=`). */
