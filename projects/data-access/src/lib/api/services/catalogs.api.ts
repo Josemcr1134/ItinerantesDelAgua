@@ -1,17 +1,20 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiClient } from '../api-client';
 import { cachedRequest, hours } from '../cache/cache-options';
-import { publicRequest } from '../http-context';
+import { publicRequest, silentRequest } from '../http-context';
 import { Uuid } from '../models.generated';
 import { ApiQuery, ApiResponse } from '../operations.generated';
 
-/** Catálogos públicos: ubicaciones y zonas horarias (casi nunca cambian: caché de 24 h). */
+/**
+ * Catálogos públicos: ubicaciones y zonas horarias (casi nunca cambian: caché
+ * de 24 h). Se cargan en segundo plano, sin el loader general.
+ */
 @Injectable({ providedIn: 'root' })
 export class CatalogsApi {
   private readonly api = inject(ApiClient);
 
   private get options() {
-    return { context: cachedRequest({ ttl: hours(24) }, publicRequest()) };
+    return { context: cachedRequest({ ttl: hours(24) }, silentRequest(publicRequest())) };
   }
 
   countries() {

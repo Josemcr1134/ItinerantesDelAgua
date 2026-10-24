@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiClient } from '../api-client';
-import { publicRequest } from '../http-context';
+import { publicRequest, silentRequest } from '../http-context';
 import { ApiBody, ApiQuery, ApiResponse } from '../operations.generated';
 
 /** Autenticación (todas las rutas son públicas). */
@@ -13,9 +13,10 @@ export class AuthApi {
     return this.api.post<ApiResponse<'Auth_register'>>('/api/v1/auth/register', body, this.options);
   }
 
+  /** Validación en línea del registro: sin el loader general. */
   availability(query: ApiQuery<'Auth_availability'>) {
     return this.api.get<ApiResponse<'Auth_availability'>>('/api/v1/auth/availability', {
-      ...this.options,
+      context: silentRequest(publicRequest()),
       query: { ...query },
     });
   }
