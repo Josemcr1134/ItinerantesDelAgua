@@ -1,5 +1,5 @@
 <adm-page-header
-  title="Tipos de beca"
+  title="Becas"
   lead="Catálogo de becas: cada oferta habilita los suyos (y puede ajustar % y cupo) y el comité asigna el tipo y el % final."
 >
   @if (canWrite()) {
@@ -54,7 +54,6 @@
                   <span class="adm-badge">Desactivado</span>
                 }
               </p>
-              <p class="muted mono">{{ type.key }}</p>
               @if (type.description) {
                 <p class="muted description">{{ type.description }}</p>
               }

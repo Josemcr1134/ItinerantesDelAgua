@@ -28,7 +28,7 @@ type Override = 'minPercent' | 'maxPercent' | 'maxRecipients';
       </p>
       @if (!rows().length) {
         <p class="adm-callout adm-callout--info">
-          Aún no hay tipos de beca activos en el catálogo («Tipos de beca»).
+          Aún no hay tipos de beca activos (se crean en «Becas»).
         </p>
       }
       <ul class="types">

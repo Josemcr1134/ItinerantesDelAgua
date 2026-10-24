@@ -28,12 +28,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Inicio', path: '/', icon: 'home', exact: true },
   { label: 'Oferta formativa', path: '/ofertas', icon: 'offers', permission: 'offers.read' },
   { label: 'Calendario', path: '/calendario', icon: 'calendar', permission: 'offers.read' },
-  {
-    label: 'Tipos de beca',
-    path: '/tipos-de-beca',
-    icon: 'scholarships',
-    permission: 'offers.read',
-  },
+  { label: 'Becas', path: '/tipos-de-beca', icon: 'scholarships', permission: 'offers.read' },
   { label: 'Docentes', path: '/docentes', icon: 'teachers', permission: 'offers.read' },
   {
     label: 'Postulaciones',

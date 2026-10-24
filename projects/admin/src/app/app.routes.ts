@@ -35,7 +35,7 @@ export const routes: Routes = [
       },
       {
         path: 'tipos-de-beca',
-        title: 'Tipos de beca · Administrador',
+        title: 'Becas · Administrador',
         canActivate: [permissionGuard('offers.read')],
         loadComponent: () => import('./features/scholarship-types/scholarship-types-page'),
       },
