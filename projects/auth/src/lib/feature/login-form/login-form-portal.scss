@@ -1,0 +1,121 @@
+// Aspecto del portal de participantes (`appearance="portal"`), aparte de la
+// base para que cada hoja quede dentro del presupuesto de estilos.
+
+// Color del botón del portal registrado como color para poder animarlo
+// (contorno, texto y relleno cambian juntos al pasar a rojo).
+@property --login-submit-color {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: #0067ff;
+}
+
+// --- Portal de participantes (Figma HU-04: "Ingresar al Portal") ----------
+// Campos de 44 px, borde #c4c4c5, radio 12 px; 10 px entre campos; botón
+// pastilla azul de contorno (algo más
+// compacto que el Figma, a pedido del equipo).
+:host(.login-form--portal) {
+  .form {
+    gap: 10px;
+  }
+
+  .field {
+    gap: 0;
+  }
+
+  .field__label {
+    font-size: 1rem;
+    font-weight: var(--font-weight-regular);
+    line-height: 22px;
+  }
+
+  .field__input {
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #c4c4c5;
+    border-radius: 12px;
+    color: var(--color-primary);
+    font-size: 1rem;
+    line-height: 22px;
+
+    &[aria-invalid='true'] {
+      border-color: #ff383c;
+    }
+  }
+
+  .field__error {
+    color: #ea1700;
+  }
+
+  .field__input--with-action {
+    padding-right: 3rem;
+  }
+
+  .field__action {
+    right: 0;
+  }
+
+  // Sin "Recordarme": solo el enlace de recuperar contraseña, a la derecha.
+  .options {
+    justify-content: flex-end;
+  }
+
+  .link {
+    font-size: 0.875rem;
+  }
+
+  // Aviso de error: texto rojo centrado sobre los campos, sin recuadro.
+  .notice:not(.notice--info) {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #ea1700;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+  }
+
+  .notice:not(:empty) {
+    animation: notice-in 0.35s ease;
+  }
+
+  .submit {
+    --login-submit-color: var(--color-accent);
+    --ui-button-color: var(--login-submit-color);
+    --ui-button-on-color: #fff;
+    --ui-button-border-width: 3px;
+
+    align-self: center;
+    width: auto;
+    min-width: 12.5rem;
+    min-height: 3.5rem;
+    margin-top: 18px;
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+  }
+}
+
+// Intento rechazado (Figma HU-04 con error): campos y botón en rojo.
+:host(.login-form--portal.login-form--error) {
+  .field__input {
+    color: #ea1700;
+  }
+
+  .submit {
+    --login-submit-color: #ea1700;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :host(.login-form--portal) .submit {
+    transition:
+      --login-submit-color 0.4s ease,
+      color 0.3s ease 0.25s;
+  }
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    translate: 0 -4px;
+  }
+}

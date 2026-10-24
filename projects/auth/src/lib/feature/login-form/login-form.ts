@@ -21,7 +21,7 @@ export type LoginFormAppearance = 'default' | 'portal';
   selector: 'auth-login-form',
   imports: [ReactiveFormsModule, RouterLink, Button, PasswordToggle],
   templateUrl: './login-form.html',
-  styleUrl: './login-form.scss',
+  styleUrls: ['./login-form.scss', './login-form-portal.scss'],
   host: {
     '[class.login-form--portal]': 'portal()',
     '[class.login-form--error]': 'failed()',
@@ -41,8 +41,11 @@ export class LoginForm {
   protected readonly expired = inject(SessionStore).ended() === 'expired';
   protected readonly request = requestState<UserProfileDto>();
   protected readonly portal = computed(() => this.appearance() === 'portal');
-  /** Último intento rechazado por la API (hasta el siguiente envío). */
-  protected readonly failed = computed(() => this.request.error() !== null);
+  /**
+   * El último intento fue rechazado por la API. Se mantiene mientras se
+   * reintenta, para que el estado de error no parpadee entre envíos.
+   */
+  protected readonly failed = signal(false);
   protected readonly showPassword = signal(false);
   private readonly emailInput = viewChild.required<ElementRef<HTMLInputElement>>('email');
   private readonly passwordInput = viewChild.required<ElementRef<HTMLInputElement>>('password');
@@ -96,6 +99,7 @@ export class LoginForm {
     const user = await this.request.run(
       this.auth.login({ email: email.trim().toLowerCase(), password, rememberMe }),
     );
+    this.failed.set(!user);
     if (user) {
       await this.router.navigateByUrl(this.safeReturnUrl());
     } else {
