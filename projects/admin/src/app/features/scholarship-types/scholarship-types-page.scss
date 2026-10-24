@@ -66,3 +66,11 @@ p {
 .inactive .strong {
   opacity: 0.6;
 }
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--space-3);
+  margin-top: var(--space-1);
+  font-size: 0.8125rem;
+}

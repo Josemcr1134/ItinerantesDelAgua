@@ -46,7 +46,7 @@ const tick = () => new Promise((r) => setTimeout(r));
 const isList = (url: string) => url === `${API}/admin/applications`;
 
 describe('ApplicationsPage', () => {
-  async function setup(permissions: Permission[]) {
+  async function setup(permissions: Permission[], inputs: Record<string, string> = {}) {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -66,6 +66,7 @@ describe('ApplicationsPage', () => {
     http.expectOne(`${API}/admin/roles`).flush({ data: [] });
 
     const fixture = TestBed.createComponent(ApplicationsPage);
+    for (const [key, value] of Object.entries(inputs)) fixture.componentRef.setInput(key, value);
     await fixture.whenStable();
     http.expectOne(`${API}/locations/countries`).flush({ data: [{ code: 'MX', name: 'México' }] });
     const answer = async (data: AdminApplicationListItemDto[]) => {
@@ -120,6 +121,20 @@ describe('ApplicationsPage', () => {
     params = await answer([]);
     expect(params.get('status')).toBe('IN_REVIEW');
     expect(params.get('requiresInterview')).toBe('true');
+  });
+
+  it('desde «Becas» abre las aprobadas de un tipo (estados que ocupan cupo)', async () => {
+    const { fixture, host, answer } = await setup(['admin.access', 'applications.read'], {
+      beca: 't-al',
+      estado: 'aprobadas',
+    });
+    const params = await answer([]);
+    expect(params.get('scholarshipTypeId')).toBe('t-al');
+    expect(params.get('status')).toBe(
+      'APPROVED_PENDING_PAYMENT,APPROVED_PENDING_CONFIRMATION,ENROLLED',
+    );
+    await fixture.whenStable();
+    expect(host.querySelector('.hint')?.textContent).toContain('solicitaron');
   });
 
   it('exporta con los filtros actuales y descarga el archivo', async () => {

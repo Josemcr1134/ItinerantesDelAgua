@@ -106,6 +106,13 @@
   />
 </adm-filter-bar>
 
+@if (approvedByScholarship()) {
+  <p class="adm-callout adm-callout--info hint">
+    Se muestran las aprobadas que <strong>solicitaron</strong> esta beca. El comité puede haber
+    asignado otra: la asignada se ve en cada fila («Beca: solicitada → asignada»).
+  </p>
+}
+
 <adm-list-states
   [list]="list"
   heading="Postulaciones"

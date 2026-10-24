@@ -41,6 +41,18 @@ const KIND_PARAMS: Readonly<Record<ApplicationKind, string>> = {
   OPEN_CALL: 'convocatorias',
 };
 
+/**
+ * "Aprobadas": los estados que ocupan cupo de beca (pendiente de pago, de
+ * confirmación e inscrita). En la URL, `?estado=aprobadas`.
+ */
+const APPROVED = 'APPROVED';
+const APPROVED_STATUSES: readonly SubmittedApplicationStatus[] = [
+  'APPROVED_PENDING_PAYMENT',
+  'APPROVED_PENDING_CONFIRMATION',
+  'ENROLLED',
+];
+type StatusFilter = SubmittedApplicationStatus | typeof APPROVED;
+
 /** Las becas son de diplomados; las convocatorias, ofertas de tipo convocatoria. */
 const OFFER_TYPE_BY_KIND = { SCHOLARSHIP: 'DIPLOMA', OPEN_CALL: 'OPEN_CALL' } as const;
 
@@ -74,6 +86,10 @@ export default class ApplicationsPage {
 
   /** `?tipo=becas|convocatorias`. */
   readonly tipo = input<string>();
+  /** `?beca=<id>`: tipo de beca solicitado (desde «Becas»). */
+  readonly beca = input<string>();
+  /** `?estado=aprobadas` o un estado de la API. */
+  readonly estado = input<string>();
   protected readonly kind = computed<ApplicationKind>(() =>
     this.tipo() === KIND_PARAMS.OPEN_CALL ? 'OPEN_CALL' : 'SCHOLARSHIP',
   );
@@ -98,11 +114,23 @@ export default class ApplicationsPage {
     source: this.kind,
     computation: () => '',
   });
-  protected readonly scholarshipTypeId = linkedSignal<ApplicationKind, string>({
-    source: this.kind,
-    computation: () => '',
+  protected readonly scholarshipTypeId = linkedSignal({
+    source: () => ({ kind: this.kind(), beca: this.beca() }),
+    computation: ({ beca }) => beca ?? '',
   });
-  protected readonly status = signal<SubmittedApplicationStatus | ''>('');
+  protected readonly status = linkedSignal<string | undefined, StatusFilter | ''>({
+    source: this.estado,
+    computation: (estado) =>
+      estado === 'aprobadas'
+        ? APPROVED
+        : (SUBMITTED_APPLICATION_STATUS_VALUES as readonly string[]).includes(estado ?? '')
+          ? (estado as SubmittedApplicationStatus)
+          : '',
+  });
+  /** Filtrar por beca aprobada usa la solicitada: la asignada puede ser otra. */
+  protected readonly approvedByScholarship = computed(
+    () => this.status() === APPROVED && !!this.scholarshipTypeId(),
+  );
   protected readonly countryCode = signal('');
   protected readonly interview = signal<Flag | ''>('');
   protected readonly withoutMine = signal<Flag | ''>('');
@@ -129,7 +157,10 @@ export default class ApplicationsPage {
 
   protected readonly options = computed(() => ({
     offers: this.offers(),
-    status: optionsFrom(SUBMITTED_APPLICATION_STATUS_VALUES, APPLICATION_STATUS_LABELS),
+    status: [
+      { value: APPROVED, label: 'Aprobadas (todas)' },
+      ...optionsFrom(SUBMITTED_APPLICATION_STATUS_VALUES, APPLICATION_STATUS_LABELS),
+    ] as FilterOption<StatusFilter>[],
     scholarshipTypes: this.scholarshipTypes(),
     countries: this.countries().map((c) => ({ value: c.code, label: c.name })),
     interview: [{ value: 'true', label: 'Requiere entrevista' }] as FilterOption<Flag>[],
@@ -205,7 +236,7 @@ export default class ApplicationsPage {
 interface ScreenFilters {
   readonly kind: ApplicationKind;
   readonly offerId: string;
-  readonly status: SubmittedApplicationStatus | '';
+  readonly status: StatusFilter | '';
   readonly scholarshipTypeId: string;
   readonly countryCode: string;
   readonly requiresInterview: Flag | '';
@@ -220,7 +251,12 @@ function toApiQuery(
   return {
     kind: query.kind,
     offerId: query.offerId || undefined,
-    status: query.status ? [query.status] : undefined,
+    status:
+      query.status === APPROVED
+        ? [...APPROVED_STATUSES]
+        : query.status
+          ? [query.status]
+          : undefined,
     scholarshipTypeId: query.scholarshipTypeId || undefined,
     countryCode: query.countryCode || undefined,
     requiresInterview: query.requiresInterview ? true : undefined,

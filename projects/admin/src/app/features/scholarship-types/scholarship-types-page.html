@@ -96,6 +96,22 @@
             </td>
             <td data-label="Uso">
               <p class="muted">{{ usage(type) }}</p>
+              @if (canReadApplications() && type.usage.applications) {
+                <p class="links">
+                  <a
+                    class="adm-link"
+                    routerLink="/postulaciones"
+                    [queryParams]="{ tipo: 'becas', beca: type.id }"
+                    >Ver solicitudes<span class="visually-hidden"> de {{ type.name }}</span></a
+                  >
+                  <a
+                    class="adm-link"
+                    routerLink="/postulaciones"
+                    [queryParams]="{ tipo: 'becas', beca: type.id, estado: 'aprobadas' }"
+                    >Ver aprobadas<span class="visually-hidden"> de {{ type.name }}</span></a
+                  >
+                </p>
+              }
             </td>
             <td class="adm-table__actions">
               @if (canWrite()) {

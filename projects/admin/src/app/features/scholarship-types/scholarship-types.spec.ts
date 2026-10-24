@@ -112,6 +112,25 @@ describe('ScholarshipTypesPage', () => {
     expect(host.querySelector('tbody button')).toBeNull();
   });
 
+  it('con `applications.read` enlaza a las solicitudes y aprobadas de cada tipo en uso', async () => {
+    const { host } = await setup(
+      ['admin.access', 'offers.read', 'applications.read'],
+      [
+        type('t1', 'Agua Viva', { usage: { offers: 1, applications: 4, evaluations: 2 } }),
+        type('t2', 'Sin uso'),
+      ],
+    );
+    const rows = host.querySelectorAll('tbody tr');
+    const hrefs = [...rows[0].querySelectorAll<HTMLAnchorElement>('.links a')].map((a) =>
+      decodeURIComponent(a.getAttribute('href') ?? ''),
+    );
+    expect(hrefs).toEqual([
+      '/postulaciones?tipo=becas&beca=t1',
+      '/postulaciones?tipo=becas&beca=t1&estado=aprobadas',
+    ]);
+    expect(rows[1].querySelector('.links')).toBeNull();
+  });
+
   it('no intenta borrar un tipo en uso: sugiere desactivarlo', async () => {
     const { http, host, settle, button } = await setup(
       ['admin.access', 'offers.read', 'scholarship_types.write'],

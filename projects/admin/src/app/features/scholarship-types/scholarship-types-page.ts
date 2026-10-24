@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AdminScholarshipTypeDto, AdminScholarshipTypesApi, requestState } from 'data-access';
 import { firstValueFrom, map } from 'rxjs';
 import { AlertService, Button } from 'ui-kit';
@@ -19,7 +20,15 @@ import { percentRange } from './scholarship-type-labels';
  */
 @Component({
   selector: 'adm-scholarship-types-page',
-  imports: [Button, Notice, PageHeader, RequestState, RowMenu, ScholarshipTypeFormDialog],
+  imports: [
+    RouterLink,
+    Button,
+    Notice,
+    PageHeader,
+    RequestState,
+    RowMenu,
+    ScholarshipTypeFormDialog,
+  ],
   templateUrl: './scholarship-types-page.html',
   styleUrl: './scholarship-types-page.scss',
 })
@@ -28,6 +37,7 @@ export default class ScholarshipTypesPage implements OnInit {
   private readonly alerts = inject(AlertService);
   private readonly access = inject(AdminAccess);
   protected readonly canWrite = computed(() => this.access.can('scholarship_types.write'));
+  protected readonly canReadApplications = computed(() => this.access.can('applications.read'));
 
   protected readonly types = requestState<readonly AdminScholarshipTypeDto[]>();
   protected readonly rows = rowActions();
