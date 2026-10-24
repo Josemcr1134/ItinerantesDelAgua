@@ -1,8 +1,12 @@
 @use 'breakpoints' as bp;
 @use '../frame' as *;
 
-// Medidas del Figma (marco de 1440 × 1024): logo a 68 px del borde superior y
-// tarjeta centrada. En móvil, logo más chico y tarjeta a todo el ancho.
+// Móvil: logo y tarjeta uno debajo del otro. Desde 768 px la tarjeta queda
+// centrada en ambos ejes y el logo ocupa el espacio libre de arriba (se achica
+// si hace falta); si la tarjeta no cabe, se deja un margen parejo y se
+// desplaza la página.
+
+$zone-min: 72px; // espacio mínimo para el logo arriba (y el mismo abajo)
 
 :host {
   display: block;
@@ -13,7 +17,7 @@
 
   position: relative;
   display: grid;
-  grid-template-rows: 1fr auto 1fr;
+  align-content: start;
   justify-items: center;
   min-height: 100dvh;
   padding: var(--space-4) var(--space-3);
@@ -21,17 +25,24 @@
   background-color: var(--color-surface);
 
   @include bp.up(md) {
-    padding: 68px var(--space-4) var(--space-5);
-  }
-
-  @include bp.up(lg) {
-    padding-top: u(68);
+    // Filas iguales arriba y abajo: la tarjeta queda al centro. El logo va
+    // posicionado para no aportar alto a su fila (si no, la fila de abajo
+    // crecería igual y aparecería un scroll de sobra).
+    grid-template-rows: minmax($zone-min, 1fr) auto minmax($zone-min, 1fr);
+    align-content: stretch;
+    padding-block: 0;
   }
 }
 
 .page__brand {
-  align-self: start;
   padding-bottom: var(--space-4);
+
+  @include bp.up(md) {
+    position: relative;
+    align-self: stretch;
+    justify-self: stretch;
+    padding: 0;
+  }
 }
 
 .page__logo {
@@ -40,11 +51,16 @@
   height: auto;
 
   @include bp.up(md) {
-    width: 198px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: clamp(48px, 100% - 24px, 138px);
+    translate: -50% -50%;
   }
 
   @include bp.up(lg) {
-    width: clamp(150px, u(198), 198px);
+    height: clamp(48px, 100% - 24px, u(138));
   }
 }
 
@@ -72,11 +88,11 @@
   }
 }
 
-// Registro: 748 px con campos de 588 px (Figma HU-02).
+// Registro: 748 px con campos de 588 px y márgenes más justos (Figma HU-02).
 .card--wide {
   width: min(748px, 100%);
 
   @include bp.up(sm) {
-    padding-inline: 80px;
+    padding: 36px 80px 28px;
   }
 }

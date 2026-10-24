@@ -9,14 +9,15 @@
 .title {
   @include access.title;
 
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .switch {
   @include access.switch;
 }
 
-// --- Serpientes (Figma HU-02, desde 1024 px) ------------------------------
+// --- Serpientes (desde 1024 px) --------------------------------------------
+// Más adentro que en el Figma: pasan por debajo de la tarjeta centrada.
 .decor {
   display: none;
   position: absolute;
@@ -35,9 +36,9 @@
 }
 
 .decor__snake--1 {
-  @include piece(0.5, 342.5, 663, 829, rotate(-90deg), $x: left, $y: top);
+  @include piece(150, 380, 663, 829, rotate(-90deg), $x: left, $y: top);
 }
 
 .decor__snake--2 {
-  @include piece(1387.56, 1024.5, 785, 981.13, rotate(-90deg));
+  @include piece(1270, 830, 785, 981.13, rotate(-90deg));
 }
