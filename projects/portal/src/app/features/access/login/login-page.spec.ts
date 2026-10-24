@@ -29,7 +29,7 @@ describe('LoginPage (portal)', () => {
     const form = host.querySelector('auth-login-form');
     expect(form?.classList).toContain('login-form--portal');
     expect(form?.querySelector('input[type="checkbox"]')).toBeNull();
-    expect(host.querySelector('.card__register-link')?.getAttribute('href')).toBe('/registro');
+    expect(host.querySelector('.switch a')?.getAttribute('href')).toBe('/registro');
   });
 
   it('la ilustración es decorativa (oculta a lectores de pantalla)', async () => {

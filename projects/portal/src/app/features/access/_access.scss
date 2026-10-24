@@ -1,0 +1,42 @@
+@use 'breakpoints' as bp;
+
+// Piezas comunes del contenido de la tarjeta de acceso (Figma HU-02 / HU-04).
+
+// Título de la tarjeta: Acumin semibold, verde de marca.
+@mixin title {
+  color: var(--color-primary);
+  font-family: var(--font-family-body);
+  font-size: 1.625rem;
+  font-weight: 600;
+  font-feature-settings:
+    'lnum' 1,
+    'pnum' 1;
+  line-height: 1.3;
+  text-align: center;
+
+  @include bp.up(sm) {
+    font-size: 1.75rem;
+    line-height: 44px;
+  }
+}
+
+// "¿No tienes una Cuenta? Regístrate Aquí" / "¿Ya tienes una Cuenta? Inicia Sesión".
+@mixin switch {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  margin-top: 16px;
+  color: var(--color-raisin-black);
+  line-height: 22px;
+
+  a {
+    color: var(--color-accent);
+    font-weight: 700;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

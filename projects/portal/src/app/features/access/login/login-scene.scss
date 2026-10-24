@@ -1,5 +1,5 @@
 @use 'breakpoints' as bp;
-@use 'frame' as *;
+@use '../frame' as *;
 
 // Ilustraciones del login (Figma, marco de 1440 × 1024), aparte de la
 // página para que cada hoja quede dentro del presupuesto de estilos.
@@ -48,7 +48,7 @@
 }
 
 // Intento fallido (Figma HU-04 con error): microorganismos en lugar de la escena.
-.page:has(.login-form--error) {
+:host:has(.login-form--error) {
   .scene,
   .corner {
     visibility: hidden;

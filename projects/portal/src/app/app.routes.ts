@@ -7,7 +7,7 @@ export const routes: Routes = [
     path: 'login',
     title: 'Ingresar al Portal · Itinerantes del Agua',
     canActivate: [guestGuard],
-    loadComponent: () => import('./features/login/login-page'),
+    loadComponent: () => import('./features/access/login/login-page'),
   },
   ...authRoutes.filter((route) => route.path !== 'login'),
   {
