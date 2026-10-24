@@ -1,15 +1,30 @@
 @use 'breakpoints' as bp;
 
-// Medidas del Figma (marco de 1440 × 1024): tarjeta de 492 px centrada, logo
-// a 68 px del borde superior y la ilustración pegada a la tarjeta. En móvil
-// solo quedan el logo y la tarjeta.
+// Medidas del Figma (marco de 1440 × 1024): logo a 68 px del borde superior,
+// tarjeta centrada y la ilustración en las esquinas. En móvil solo quedan el
+// logo y la tarjeta.
 
-// Pieza decorativa por su centro, para conservar el giro del Figma.
-@mixin piece($cx, $cy, $w, $h, $transform) {
-  left: $cx;
-  top: $cy;
-  width: $w;
-  height: $h;
+// Px del marco escalados a la pantalla (como el Figma: 1 en 1440 × 1024).
+@function u($px) {
+  @return calc(#{$px} * var(--u));
+}
+
+// Pieza decorativa por su centro (coordenadas del marco), para conservar el
+// giro del Figma. Anclada a la esquina inferior derecha o superior izquierda.
+@mixin bottom-right($cx, $cy, $w, $h, $transform: none) {
+  right: u(1440 - $cx);
+  bottom: u(1024 - $cy);
+  width: u($w);
+  height: u($h);
+  translate: 50% 50%;
+  transform: $transform;
+}
+
+@mixin top-left($cx, $cy, $w, $h, $transform: none) {
+  left: u($cx);
+  top: u($cy);
+  width: u($w);
+  height: u($h);
   translate: -50% -50%;
   transform: $transform;
 }
@@ -19,6 +34,8 @@
 }
 
 .page {
+  --u: min(100vw / 1440, 100dvh / 1024);
+
   position: relative;
   display: grid;
   grid-template-rows: 1fr auto 1fr;
@@ -30,6 +47,10 @@
 
   @include bp.up(md) {
     padding: 68px var(--space-4) var(--space-5);
+  }
+
+  @include bp.up(lg) {
+    padding-top: u(68);
   }
 }
 
@@ -46,36 +67,36 @@
   @include bp.up(md) {
     width: 198px;
   }
+
+  @include bp.up(lg) {
+    width: clamp(150px, u(198), 198px);
+  }
 }
 
 .page__main {
   width: 100%;
 }
 
-.stage {
-  position: relative;
-  width: min(492px, 100%);
-  margin-inline: auto;
-}
-
 .card {
   position: relative;
+  width: min(440px, 100%);
+  margin-inline: auto;
   padding: 48px var(--space-4) 40px;
   border-radius: 32px;
   background-color: #fffefb;
   backdrop-filter: blur(22.5px);
 
   @include bp.up(sm) {
-    padding: 63px 84px 62px;
-    border-radius: 50px;
+    padding: 52px 60px 50px;
+    border-radius: 44px;
   }
 }
 
 .card__title {
-  margin-bottom: 15px;
+  margin-bottom: 14px;
   color: var(--color-primary);
   font-family: var(--font-family-body);
-  font-size: 1.75rem;
+  font-size: 1.625rem;
   font-weight: 600;
   font-feature-settings:
     'lnum' 1,
@@ -84,8 +105,8 @@
   text-align: center;
 
   @include bp.up(sm) {
-    font-size: 2rem;
-    line-height: 52px;
+    font-size: 1.75rem;
+    line-height: 44px;
   }
 }
 
@@ -94,7 +115,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.25rem 1rem;
-  margin-top: 19px;
+  margin-top: 16px;
   color: var(--color-raisin-black);
   line-height: 22px;
 }
@@ -113,6 +134,8 @@
 .scene,
 .corner {
   display: none;
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 
   @include bp.up(lg) {
@@ -126,61 +149,40 @@
   }
 }
 
-// Coordenadas relativas a la esquina superior izquierda de la tarjeta.
-.scene {
-  position: absolute;
-  inset: 0;
-}
-
+// Esquina inferior derecha, pegada a los bordes como en el Figma.
 .scene__leaf--1 {
-  @include piece(380.71px, 574.89px, 213.74px, 280.01px, rotate(15deg));
+  @include bottom-right(854.71, 849.89, 213.74, 280.01, rotate(15deg));
 }
 
 .scene__leaf--2 {
-  @include piece(322.57px, 618.16px, 213.74px, 280.01px, rotate(-45deg));
+  @include bottom-right(796.57, 893.16, 213.74, 280.01, rotate(-45deg));
 }
 
 .scene__ground {
-  left: 244px;
-  top: 561px;
-  width: 772px;
-  height: 431px;
+  @include bottom-right(1104, 1051.5, 772, 431);
 }
 
 .scene__tree {
-  left: 558.29px;
-  top: 14px;
-  width: 600.71px;
-  height: 751.11px;
+  @include bottom-right(1332.64, 664.55, 600.71, 751.11);
 }
 
 // En el Figma la persona está volteada horizontalmente.
 .scene__woman {
-  left: 315px;
-  top: 294.45px;
-  width: 526.39px;
-  height: 445.89px;
-  transform: scaleX(-1);
+  @include bottom-right(1052.2, 792.39, 526.39, 445.89, scaleX(-1));
 }
 
 .scene__leaf--3 {
-  @include piece(283.84px, 710.32px, 195.93px, 256.68px, rotate(165deg) scaleY(-1));
+  @include bottom-right(757.84, 985.32, 195.93, 256.68, rotate(165deg) scaleY(-1));
 }
 
 .scene__leaf--4 {
-  @include piece(337.14px, 749.98px, 195.93px, 256.68px, rotate(-135deg) scaleY(-1));
-}
-
-// Coordenadas relativas a la esquina superior izquierda de la página.
-.corner {
-  position: absolute;
-  inset: 0 auto auto 0;
+  @include bottom-right(811.14, 1024.98, 195.93, 256.68, rotate(-135deg) scaleY(-1));
 }
 
 .corner__leaf--1 {
-  @include piece(132.18px, 269.7px, 424.06px, 555.53px, rotate(105deg));
+  @include top-left(132.18, 269.7, 424.06, 555.53, rotate(105deg));
 }
 
 .corner__leaf--2 {
-  @include piece(46.34px, 154.34px, 424.06px, 555.53px, rotate(45deg));
+  @include top-left(46.34, 154.34, 424.06, 555.53, rotate(45deg));
 }

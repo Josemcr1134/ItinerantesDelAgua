@@ -34,7 +34,8 @@
 
 // --- Portal de participantes (Figma HU-04: "Ingresar al Portal") ----------
 // Campos de 44 px, borde #c4c4c5, radio 12 px; 10 px entre campos; botón
-// pastilla azul de contorno.
+// pastilla azul de contorno (algo más
+// compacto que el Figma, a pedido del equipo).
 :host(.login-form--portal) {
   .form {
     gap: 10px;
@@ -81,14 +82,14 @@
   .submit {
     --ui-button-color: var(--color-accent);
     --ui-button-on-color: #fff;
-    --ui-button-border-width: 4px;
+    --ui-button-border-width: 3px;
 
     align-self: center;
     width: auto;
-    min-width: 14.5rem;
-    min-height: 4.25rem;
-    margin-top: 21px;
-    font-size: clamp(1.5rem, 1.1rem + 1.2vw, 1.93rem);
+    min-width: 12.5rem;
+    min-height: 3.5rem;
+    margin-top: 18px;
+    font-size: 1.5rem;
     letter-spacing: -0.04em;
   }
 }

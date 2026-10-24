@@ -86,16 +86,14 @@ describe('LoginForm', () => {
     type('#login-email', 'ana@correo.com');
     type('#login-password', 'mala');
     host.querySelector<HTMLButtonElement>('.submit')!.click();
-    http
-      .expectOne(`${API}/auth/login`)
-      .flush(
-        {
-          statusCode: 401,
-          code: 'INVALID_CREDENTIALS',
-          message: 'Correo o contraseña incorrectos.',
-        },
-        { status: 401, statusText: 'Unauthorized' },
-      );
+    http.expectOne(`${API}/auth/login`).flush(
+      {
+        statusCode: 401,
+        code: 'INVALID_CREDENTIALS',
+        message: 'Correo o contraseña incorrectos.',
+      },
+      { status: 401, statusText: 'Unauthorized' },
+    );
     await fixture.whenStable();
     expect(host.querySelector('[role="alert"]')?.textContent).toContain(
       'Correo o contraseña incorrectos.',
