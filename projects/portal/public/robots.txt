@@ -1,0 +1,9 @@
+# Se indexan el login y el registro. Las páginas privadas llevan además
+# `noindex` (PortalSeo); los scripts y estilos deben quedar accesibles para
+# que el buscador pueda pintar las páginas.
+User-agent: *
+Allow: /
+Disallow: /verificar-correo
+Disallow: /recuperar-contrasena
+
+Sitemap: https://portal.itinerantesdelagua.com/sitemap.xml

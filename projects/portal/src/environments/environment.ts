@@ -2,4 +2,6 @@
 export const environment = {
   production: true,
   apiBaseUrl: 'https://itinerantes-backend-production.up.railway.app',
+  /** Dominio público del portal (URL canónica y metadatos para compartir). */
+  siteUrl: 'https://portal.itinerantesdelagua.com',
 };
