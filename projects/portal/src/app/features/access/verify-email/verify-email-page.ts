@@ -1,23 +1,23 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { afterNextRender, Component, computed, inject, Injector, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AUTH_CONFIG, AUTH_TEXTS, countdown, formatSeconds, formatTime } from 'auth';
+import { AUTH_CONFIG, AUTH_TEXTS, countdown, formatTime } from 'auth';
 import { ApiError, AuthApi, OtpDeliveryDto, requestState, toApiError } from 'data-access';
 import { firstValueFrom } from 'rxjs';
 import { AlertService, Button } from 'ui-kit';
 import { AccessLayout } from '../access-layout/access-layout';
+import { CodeInput } from '../code-input/code-input';
 import { VerifyEmailState } from './verify-email-state';
+import { formatClock, VERIFY_TEXTS } from './verify-email-texts';
 
 /**
- * Verificación del correo tras el registro (HU-03): código de 6 dígitos,
- * reenvío con cuenta regresiva y, al confirmar, vuelta al login.
- *
- * TODO(diseño): provisional hasta tener el Figma de HU-03; usa los textos del
- * paso "código" de recuperar contraseña.
+ * Verificación del correo tras el registro (HU-03, Figma "Verifica tu
+ * Correo"): código de 6 dígitos en casillas, reenvío con cuenta regresiva y,
+ * al confirmar, vuelta al login.
  */
 @Component({
   selector: 'portal-verify-email-page',
-  imports: [ReactiveFormsModule, RouterLink, Button, AccessLayout],
+  imports: [ReactiveFormsModule, RouterLink, Button, AccessLayout, CodeInput],
   templateUrl: './verify-email-page.html',
   styleUrls: ['../access-form.scss', './verify-email-page.scss'],
 })
@@ -26,7 +26,8 @@ export default class VerifyEmailPage {
   private readonly alerts = inject(AlertService);
   private readonly router = inject(Router);
   protected readonly config = inject(AUTH_CONFIG);
-  protected readonly texts = AUTH_TEXTS;
+  protected readonly texts = VERIFY_TEXTS;
+  protected readonly authTexts = AUTH_TEXTS;
 
   /** Llega del registro; sin él (p. ej. al recargar) se pide el correo. */
   private readonly state = this.router.currentNavigation()?.extras.state as
@@ -36,6 +37,9 @@ export default class VerifyEmailPage {
   protected readonly resend = countdown();
   protected readonly resent = signal(false);
   protected readonly request = requestState<unknown>();
+  /** El último código fue rechazado: casillas en rojo hasta escribir otro. */
+  protected readonly rejected = signal(false);
+  private readonly injector = inject(Injector);
   private readonly resendError = signal<ApiError | null>(null);
 
   private readonly fb = inject(NonNullableFormBuilder);
@@ -49,7 +53,7 @@ export default class VerifyEmailPage {
   protected readonly errorMessage = computed(() => {
     const error = this.request.error() ?? this.resendError();
     if (!error) return null;
-    const t = this.texts.forgot.code;
+    const t = this.authTexts.forgot.code;
     const attempts = error.metaNumber('attemptsRemaining');
     const lockedUntil = error.metaString('lockedUntil');
     const extra =
@@ -61,27 +65,20 @@ export default class VerifyEmailPage {
     return `${error.message} ${extra}`.trim();
   });
 
-  protected readonly resendLabel = computed(() => {
-    const remaining = this.resend.remaining();
-    const t = this.texts.forgot.code;
-    return remaining > 0 ? t.resendIn(formatSeconds(remaining)) : t.resend;
-  });
+  /** "00:25" mientras no se puede pedir otro código. */
+  protected readonly resendClock = computed(() => formatClock(this.resend.remaining()));
 
   constructor() {
     const otp = this.delivery();
     if (otp) this.resend.start(otp.resendAvailableAt);
+    this.form.controls.code.valueChanges.subscribe((code) => {
+      if (code) this.rejected.set(false);
+    });
   }
 
   protected showError(name: 'email' | 'code'): boolean {
     const control = this.form.controls[name];
     return control.invalid && control.touched;
-  }
-
-  /** Deja solo dígitos (pegar "123 456" funciona). */
-  protected normalizeCode(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const digits = input.value.replace(/\D/g, '').slice(0, this.codeLength());
-    if (digits !== input.value) this.form.controls.code.setValue(digits);
   }
 
   protected async verify(): Promise<void> {
@@ -95,13 +92,17 @@ export default class VerifyEmailPage {
     const result = await this.request.run(this.api.verifyEmail({ email: this.email(), code }));
     if (!result) {
       this.form.controls.code.reset();
+      this.rejected.set(true);
+      afterNextRender(() => document.getElementById('verify-code')?.focus(), {
+        injector: this.injector,
+      });
       const availableAt = this.request.error()?.metaString('resendAvailableAt');
       if (availableAt) this.resend.start(availableAt);
       return;
     }
-    // TODO(contenido): confirmar el mensaje de cuenta verificada.
-    await this.alerts.success('Correo verificado', 'Ya puedes iniciar sesión.', {
-      confirmLabel: this.texts.forgot.done.confirm,
+    const done = this.texts.done;
+    await this.alerts.success(done.title, done.message, {
+      confirmLabel: this.authTexts.forgot.done.confirm,
     });
     await this.router.navigateByUrl(this.config.loginUrl);
   }

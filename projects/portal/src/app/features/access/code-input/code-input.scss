@@ -1,0 +1,98 @@
+// Casillas blancas de 89 px, radio 20 px y dígitos azules de 48 px (Figma
+// HU-03); en pantallas angostas se reparten el ancho disponible.
+
+:host {
+  display: block;
+}
+
+.code {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--slots), minmax(0, 89px));
+  justify-content: center;
+  gap: clamp(6px, 2vw, 10px);
+}
+
+.code__box {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: clamp(12px, 4vw, 20px);
+  background-color: #fff;
+  box-shadow: inset 0 0 0 3px transparent;
+  color: var(--color-accent);
+  font-family: var(--font-family-body);
+  font-size: clamp(1.75rem, 6vw, 3rem);
+  font-weight: 600;
+  font-feature-settings:
+    'lnum' 1,
+    'pnum' 1;
+  line-height: 1;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      box-shadow 0.25s ease,
+      scale 0.15s ease;
+  }
+}
+
+.code__box--active {
+  box-shadow: inset 0 0 0 3px var(--color-accent);
+
+  // Cursor parpadeante en la casilla vacía.
+  &:not(.code__box--filled)::after {
+    content: '';
+    width: 2px;
+    height: 40%;
+    background-color: var(--color-accent);
+    animation: caret 1s steps(1) infinite;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .code__box--filled {
+    animation: pop 0.15s ease;
+  }
+}
+
+:host(.code--invalid) .code__box {
+  box-shadow: inset 0 0 0 3px #ff383c;
+  color: #ea1700;
+}
+
+:host(.code--disabled) .code__box {
+  opacity: 0.7;
+}
+
+// El input real cubre las casillas, invisible pero enfocable y clicable.
+.code__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px; // evita el zoom de iOS al enfocar
+  letter-spacing: 0;
+  cursor: text;
+  outline: none;
+
+  &::selection {
+    background: transparent;
+  }
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    scale: 0.92;
+  }
+}

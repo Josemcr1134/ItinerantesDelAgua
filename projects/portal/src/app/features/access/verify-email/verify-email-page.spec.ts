@@ -9,7 +9,7 @@ import VerifyEmailPage from './verify-email-page';
 const API = 'https://api.test/api/v1';
 
 describe('VerifyEmailPage', () => {
-  it('sin el estado del registro pide el correo y muestra los intentos restantes', async () => {
+  it('sin el estado del registro pide el correo, muestra los intentos restantes y limpia el rojo al reintentar', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -44,5 +44,11 @@ describe('VerifyEmailPage', () => {
     );
     await fixture.whenStable();
     expect(host.querySelector('[role="alert"]')?.textContent).toContain('Te quedan 4 intentos.');
+    // Casillas en rojo hasta escribir el siguiente código.
+    const code = () => host.querySelector('portal-code-input')!;
+    expect(code().classList).toContain('code--invalid');
+    type('#verify-code', '7');
+    await fixture.whenStable();
+    expect(code().classList).not.toContain('code--invalid');
   });
 });

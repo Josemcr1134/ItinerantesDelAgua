@@ -1,73 +1,87 @@
-@let t = texts.forgot.code;
-<portal-access-layout labelledBy="verify-title">
-  <h1 id="verify-title" class="title">{{ t.label }}</h1>
-  @if (delivery(); as otp) {
-    <p class="subtitle">{{ t.subtitle(otp.maskedEmail) }}</p>
-  }
+@let t = texts;
+<portal-access-layout labelledBy="verify-title" tone="water" [wide]="true">
+  <!-- Siluetas marinas (solo escritorio). -->
+  <div accessDecor class="sea" aria-hidden="true">
+    <img class="sea__whale" src="assets/access/sea/whale.svg" alt="" />
+    <img class="sea__jellyfish-1" src="assets/access/sea/jellyfish-1.svg" alt="" />
+    <img class="sea__jellyfish-2" src="assets/access/sea/jellyfish-2.svg" alt="" />
+    <img class="sea__jellyfish-3" src="assets/access/sea/jellyfish-3.svg" alt="" />
+    <img class="sea__turtle" src="assets/access/sea/turtle.svg" alt="" />
+    <img class="sea__fish-1" src="assets/access/sea/fish-1.svg" alt="" />
+    <img class="sea__fish-2" src="assets/access/sea/fish-2.svg" alt="" />
+    <img class="sea__fish-3" src="assets/access/sea/fish-3.svg" alt="" />
+    <img class="sea__fish-4" src="assets/access/sea/fish-4.svg" alt="" />
+    <img class="sea__fish-5" src="assets/access/sea/fish-5.svg" alt="" />
+  </div>
+
+  <h1 id="verify-title" class="title">{{ t.title }}</h1>
+  <p class="subtitle">
+    {{ delivery() ? t.sent(delivery()!.maskedEmail) : t.askEmail }}
+  </p>
 
   <form class="form" novalidate [formGroup]="form" (ngSubmit)="verify()">
-    <p class="notice" role="alert">{{ errorMessage() }}</p>
+    <p id="verify-error" class="notice" role="alert">{{ errorMessage() }}</p>
     @if (resent()) {
       <p class="notice notice--info" role="status">{{ t.resent }}</p>
     }
 
-    <div class="grid">
-      @if (!knownEmail) {
-        <div class="field field--full">
-          <label class="field__label" for="verify-email">{{ texts.email.label }}</label>
-          <input
-            id="verify-email"
-            class="field__input"
-            type="email"
-            inputmode="email"
-            autocomplete="email"
-            formControlName="email"
-            required
-            [placeholder]="texts.email.placeholder"
-            [attr.aria-invalid]="showError('email')"
-            [attr.aria-describedby]="showError('email') ? 'verify-email-error' : null"
-          />
-          @if (showError('email')) {
-            <p id="verify-email-error" class="field__error">
-              {{
-                form.controls.email.hasError('required')
-                  ? texts.errors.required
-                  : texts.errors.email
-              }}
-            </p>
-          }
-        </div>
-      }
-
-      <div class="field field--full">
-        <label class="field__label" for="verify-code">{{ t.label }}</label>
+    @if (!knownEmail) {
+      <div class="field">
+        <label class="field__label" for="verify-email">{{ authTexts.email.label }}</label>
         <input
-          id="verify-code"
-          class="field__input code"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          formControlName="code"
+          id="verify-email"
+          class="field__input"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          formControlName="email"
           required
-          [attr.maxlength]="codeLength()"
-          [attr.aria-invalid]="showError('code')"
-          [attr.aria-describedby]="showError('code') ? 'verify-code-error' : null"
-          (input)="normalizeCode($event)"
+          [placeholder]="authTexts.email.placeholder"
+          [attr.aria-invalid]="showError('email')"
+          [attr.aria-describedby]="showError('email') ? 'verify-email-error' : null"
         />
-        @if (showError('code')) {
-          <p id="verify-code-error" class="field__error">
+        @if (showError('email')) {
+          <p id="verify-email-error" class="field__error">
             {{
-              form.controls.code.hasError('required')
-                ? texts.errors.required
-                : texts.errors.code(codeLength())
+              form.controls.email.hasError('required')
+                ? authTexts.errors.required
+                : authTexts.errors.email
             }}
           </p>
         }
       </div>
-    </div>
+    }
 
-    <button type="button" class="resend" [disabled]="resend.remaining() > 0" (click)="resendCode()">
-      {{ resendLabel() }}
-    </button>
+    <portal-code-input
+      class="code"
+      inputId="verify-code"
+      formControlName="code"
+      [label]="t.codeLabel"
+      [length]="codeLength()"
+      [invalid]="showError('code') || rejected()"
+      [describedBy]="
+        showError('code') ? 'verify-code-error' : request.error() ? 'verify-error' : null
+      "
+    />
+    @if (showError('code')) {
+      <p id="verify-code-error" class="field__error code-error">
+        {{
+          form.controls.code.hasError('required')
+            ? authTexts.errors.required
+            : authTexts.errors.code(codeLength())
+        }}
+      </p>
+    }
+
+    <p class="resend" aria-live="polite">
+      @if (resend.remaining() > 0) {
+        {{ t.resendIn }} <strong>{{ resendClock() }}</strong>
+      } @else {
+        <button type="button" class="resend__button" (click)="resendCode()">
+          {{ t.resend }}
+        </button>
+      }
+    </p>
 
     <button
       uiButton
@@ -81,6 +95,7 @@
   </form>
 
   <p class="switch">
-    <a [routerLink]="config.loginUrl">{{ texts.forgot.back }}</a>
+    {{ t.notYourEmail }}
+    <a routerLink="/registro">{{ t.backToRegister }}</a>
   </p>
 </portal-access-layout>

@@ -1,4 +1,8 @@
+@use 'breakpoints' as bp;
 @use '../access';
+@use '../frame' as *;
+
+// Figma HU-03: texto blanco sobre la tarjeta azul oscuro, 22 px entre bloques.
 
 :host {
   display: block;
@@ -6,47 +10,139 @@
 
 .title {
   @include access.title;
+
+  color: #fff;
 }
 
 .subtitle {
-  margin: 4px 0 14px;
-  color: var(--color-primary);
+  margin-bottom: 22px;
+  line-height: 22px;
   text-align: center;
 }
 
-.code {
-  font-family: var(--font-family-numeric);
-  font-size: 1.25rem;
-  letter-spacing: 0.4em;
-  text-align: center;
+.field__label {
+  color: #fff;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.notice {
+  color: #ffd2cc;
 }
 
 .notice--info {
-  color: var(--color-primary);
+  color: #fff;
   font-weight: 400;
 }
 
+// Rojo claro: el rojo de error no se lee sobre el azul oscuro.
+.field__error {
+  color: #ffd2cc;
+}
+
+.code-error {
+  text-align: center;
+}
+
 .resend {
-  align-self: flex-end;
-  margin-top: 8px;
+  margin-top: 22px;
+  line-height: 22px;
+  text-align: center;
+
+  strong {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.resend__button {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--color-primary);
+  color: #fff;
   font: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 0.2em;
   cursor: pointer;
+}
 
-  &:disabled {
-    color: color-mix(in srgb, var(--color-primary) 60%, transparent);
-    text-decoration: none;
-    cursor: default;
-  }
+// Botón de contorno blanco; al pasar el cursor se llena de blanco.
+.submit {
+  --ui-button-color: #fff;
+  --ui-button-on-color: #375084;
+
+  margin-top: 22px;
 }
 
 .switch {
   @include access.switch;
+
+  margin-top: 19px;
+  color: #fff;
+
+  a {
+    color: #eaa700;
+  }
+}
+
+// --- Siluetas marinas (Figma, desde 1024 px) ------------------------------
+// Multiplicadas sobre el azul al 50 %; cada una anclada a su esquina.
+.sea {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  @include bp.up(lg) {
+    display: block;
+  }
+
+  img {
+    position: absolute;
+    max-width: none;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+  }
+}
+
+.sea__whale {
+  @include piece(268.4, 223.6, 573.09, 279.33, $x: left, $y: top);
+}
+
+.sea__jellyfish-1 {
+  @include piece(1098.7, 927.3, 61.39, 106.67);
+}
+
+.sea__jellyfish-2 {
+  @include piece(1206, 186.8, 110, 211.51, $y: top);
+}
+
+.sea__jellyfish-3 {
+  @include piece(1324.4, 169.5, 56.69, 109, $y: top);
+}
+
+.sea__turtle {
+  @include piece(1260.9, 845.8, 289.09, 197.55);
+}
+
+.sea__fish-1 {
+  @include piece(228.3, 679.5, 36.41, 36.7, $x: left);
+}
+
+.sea__fish-2 {
+  @include piece(93.4, 729.4, 62.69, 62.96, $x: left);
+}
+
+.sea__fish-3 {
+  @include piece(1314.8, 492.9, 37.63, 37.79, $y: top);
+}
+
+.sea__fish-4 {
+  @include piece(47.5, 641.1, 28.85, 29.07, $x: left);
+}
+
+.sea__fish-5 {
+  @include piece(1443.6, 706.9, 28.85, 29.07);
 }

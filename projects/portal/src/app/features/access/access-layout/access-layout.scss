@@ -96,3 +96,19 @@ $zone-min: 72px; // espacio mínimo para el logo arriba (y el mismo abajo)
     padding: 36px 80px 28px;
   }
 }
+
+// Agua (Figma HU-03): fondo azul, tarjeta azul oscuro y texto blanco.
+.page--water {
+  background-color: #4671ff;
+  color: #fff;
+
+  .card {
+    background-color: #375084;
+  }
+
+  .card--wide {
+    @include bp.up(sm) {
+      padding: 46px 80px;
+    }
+  }
+}

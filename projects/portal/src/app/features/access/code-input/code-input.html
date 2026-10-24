@@ -1,0 +1,29 @@
+<div class="code" [style.--slots]="length()">
+  @for (i of slots(); track i) {
+    <span
+      class="code__box"
+      aria-hidden="true"
+      [class.code__box--active]="focused() && i === active()"
+      [class.code__box--filled]="i < value().length"
+      >{{ value()[i] ?? '' }}</span
+    >
+  }
+  <input
+    class="code__input"
+    inputmode="numeric"
+    autocomplete="one-time-code"
+    spellcheck="false"
+    [id]="inputId()"
+    [attr.aria-label]="label()"
+    [attr.maxlength]="length()"
+    [attr.aria-invalid]="invalid()"
+    [attr.aria-describedby]="describedBy()"
+    [value]="value()"
+    [disabled]="disabled()"
+    (input)="onInput($event)"
+    (focus)="focused.set(true); keepCaretAtEnd($event)"
+    (blur)="focused.set(false); onTouched()"
+    (click)="keepCaretAtEnd($event)"
+    (select)="keepCaretAtEnd($event)"
+  />
+</div>
