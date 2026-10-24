@@ -25,6 +25,10 @@ export const AUTH_TEXTS = {
     forgot: '¿Olvidaste tu contraseña?',
     submit: 'Ingresar',
     submitting: 'Ingresando…',
+    /** Botón tras un intento fallido (portal). */
+    retry: 'Reintentar',
+    /** Credenciales incorrectas, en el portal (Figma HU-04). */
+    invalidCredentials: 'Credenciales Inválidas',
     expired: 'Tu sesión expiró. Inicia sesión de nuevo para continuar.',
     lockedUntil: (time: string) => `Podrás intentarlo de nuevo a las ${time}.`,
   },

@@ -100,4 +100,27 @@ describe('LoginForm', () => {
     );
     expect(host.querySelector<HTMLInputElement>('#login-password')!.value).toBe('');
   });
+
+  it('portal: un intento rechazado marca los campos y cambia el botón a "Reintentar"', async () => {
+    const { fixture, host, type, http } = await setup({ appearance: 'portal' });
+    type('#login-email', 'ana@correo.com');
+    type('#login-password', 'mala');
+    host.querySelector<HTMLButtonElement>('.submit')!.click();
+    http
+      .expectOne(`${API}/auth/login`)
+      .flush(
+        { statusCode: 401, code: 'AUTH_INVALID_CREDENTIALS', message: 'Mensaje de la API.' },
+        { status: 401, statusText: 'Unauthorized' },
+      );
+    await fixture.whenStable();
+
+    expect(host.classList).toContain('login-form--error');
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain('Credenciales Inválidas');
+    expect(host.querySelector('.submit')?.textContent).toContain('Reintentar');
+    for (const id of ['#login-email', '#login-password']) {
+      const input = host.querySelector(id)!;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      expect(input.getAttribute('aria-describedby')).toContain('login-error');
+    }
+  });
 });

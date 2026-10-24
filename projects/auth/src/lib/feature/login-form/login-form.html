@@ -3,7 +3,7 @@
   @if (expired && !errorMessage()) {
     <p class="notice notice--info" role="status">{{ t.expired }}</p>
   }
-  <p class="notice" role="alert">{{ errorMessage() }}</p>
+  <p id="login-error" class="notice" role="alert">{{ errorMessage() }}</p>
 
   <div class="field">
     <label class="field__label" for="login-email">{{ texts.email.label }}</label>
@@ -17,8 +17,8 @@
       formControlName="email"
       required
       [placeholder]="texts.email.placeholder"
-      [attr.aria-invalid]="showError('email')"
-      [attr.aria-describedby]="showError('email') ? 'login-email-error' : null"
+      [attr.aria-invalid]="invalid('email')"
+      [attr.aria-describedby]="describedBy('email')"
     />
     @if (showError('email')) {
       <p id="login-email-error" class="field__error">
@@ -39,8 +39,8 @@
         required
         [placeholder]="texts.password.placeholder"
         [type]="showPassword() ? 'text' : 'password'"
-        [attr.aria-invalid]="showError('password')"
-        [attr.aria-describedby]="showError('password') ? 'login-password-error' : null"
+        [attr.aria-invalid]="invalid('password')"
+        [attr.aria-describedby]="describedBy('password')"
       />
       <auth-password-toggle
         class="field__action"
@@ -67,9 +67,9 @@
     uiButton
     type="submit"
     class="submit"
-    [variant]="appearance() === 'portal' ? 'secondary' : 'primary'"
+    [variant]="portal() ? 'secondary' : 'primary'"
     [disabled]="request.loading()"
   >
-    {{ request.loading() ? t.submitting : t.submit }}
+    {{ request.loading() ? t.submitting : portal() && failed() ? t.retry : t.submit }}
   </button>
 </form>

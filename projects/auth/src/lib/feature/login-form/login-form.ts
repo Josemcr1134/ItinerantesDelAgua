@@ -22,7 +22,10 @@ export type LoginFormAppearance = 'default' | 'portal';
   imports: [ReactiveFormsModule, RouterLink, Button, PasswordToggle],
   templateUrl: './login-form.html',
   styleUrl: './login-form.scss',
-  host: { '[class.login-form--portal]': "appearance() === 'portal'" },
+  host: {
+    '[class.login-form--portal]': 'portal()',
+    '[class.login-form--error]': 'failed()',
+  },
 })
 export class LoginForm {
   /** Página a la que volver tras iniciar sesión. */
@@ -37,6 +40,9 @@ export class LoginForm {
   protected readonly texts = AUTH_TEXTS;
   protected readonly expired = inject(SessionStore).ended() === 'expired';
   protected readonly request = requestState<UserProfileDto>();
+  protected readonly portal = computed(() => this.appearance() === 'portal');
+  /** Último intento rechazado por la API (hasta el siguiente envío). */
+  protected readonly failed = computed(() => this.request.error() !== null);
   protected readonly showPassword = signal(false);
   private readonly emailInput = viewChild.required<ElementRef<HTMLInputElement>>('email');
   private readonly passwordInput = viewChild.required<ElementRef<HTMLInputElement>>('password');
@@ -52,11 +58,27 @@ export class LoginForm {
     if (!error) {
       return null;
     }
+    if (this.portal() && error.code === 'AUTH_INVALID_CREDENTIALS') {
+      return this.texts.login.invalidCredentials;
+    }
     const lockedUntil = error.metaString('lockedUntil');
     return lockedUntil
       ? `${error.message} ${this.texts.login.lockedUntil(formatTime(lockedUntil))}`
       : error.message;
   });
+
+  /** Campo marcado como inválido: por su validación o por un intento rechazado. */
+  protected invalid(name: 'email' | 'password'): boolean {
+    return this.showError(name) || this.failed();
+  }
+
+  protected describedBy(name: 'email' | 'password'): string | null {
+    const ids = [
+      this.failed() ? 'login-error' : '',
+      this.showError(name) ? `login-${name}-error` : '',
+    ];
+    return ids.filter(Boolean).join(' ') || null;
+  }
 
   protected showError(name: 'email' | 'password'): boolean {
     const control = this.form.controls[name];

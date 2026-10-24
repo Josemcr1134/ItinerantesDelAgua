@@ -46,7 +46,6 @@
   }
 
   .field__label {
-    color: var(--color-primary);
     font-size: 1rem;
     font-weight: var(--font-weight-regular);
     line-height: 22px;
@@ -60,6 +59,14 @@
     color: var(--color-primary);
     font-size: 1rem;
     line-height: 22px;
+
+    &[aria-invalid='true'] {
+      border-color: #ff383c;
+    }
+  }
+
+  .field__error {
+    color: #ea1700;
   }
 
   .field__input--with-action {
@@ -79,6 +86,17 @@
     font-size: 0.875rem;
   }
 
+  // Aviso de error: texto rojo centrado sobre los campos, sin recuadro.
+  .notice:not(.notice--info) {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #ea1700;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+  }
+
   .submit {
     --ui-button-color: var(--color-accent);
     --ui-button-on-color: #fff;
@@ -91,5 +109,16 @@
     margin-top: 18px;
     font-size: 1.5rem;
     letter-spacing: -0.04em;
+  }
+}
+
+// Intento rechazado (Figma HU-04 con error): campos y botón en rojo.
+:host(.login-form--portal.login-form--error) {
+  .field__input {
+    color: #ea1700;
+  }
+
+  .submit {
+    --ui-button-color: #ea1700;
   }
 }
