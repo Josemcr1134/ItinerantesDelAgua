@@ -1,0 +1,210 @@
+@use 'breakpoints' as bp;
+
+// Encabezado del aula: verde del portal con una ilustración grande de fondo
+// (el árbol, o la portada de la oferta) bajo un velo que deja leer el texto
+// en blanco. El anillo dorado muestra la asistencia.
+
+:host {
+  display: block;
+}
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: 22px;
+  overflow: hidden;
+  padding: 28px clamp(20px, 3.5vw, 44px);
+  border-radius: 25px;
+  background-color: var(--color-primary);
+  color: #fff;
+
+  // Velo: verde sólido a la izquierda, se abre hacia la ilustración.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      100deg,
+      rgb(63 86 68 / 0.97) 30%,
+      rgb(63 86 68 / 0.62) 60%,
+      rgb(63 86 68 / 0.25)
+    );
+  }
+
+  @include bp.up(md) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 260px;
+    padding-block: 36px;
+  }
+}
+
+.hero__cover {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// El árbol desborda el encabezado por la derecha (con portada, más tenue).
+.hero__art {
+  position: absolute;
+  top: -12%;
+  right: -60px;
+  z-index: -2;
+  width: min(62%, 520px);
+  height: auto;
+  opacity: 0.9;
+
+  .hero--cover & {
+    z-index: 0;
+    opacity: 0.35;
+    mix-blend-mode: luminosity;
+  }
+
+  @include bp.up(md) {
+    right: 4%;
+    top: -28%;
+  }
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 3px 12px;
+  border: 1px solid rgb(255 255 255 / 0.6);
+  border-radius: 54px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.chip--gold {
+  border-color: #eaa700;
+  background-color: #eaa700;
+  color: #2b2100;
+}
+
+.hero__title {
+  max-width: 24ch;
+  font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.375rem);
+  font-weight: 700;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.hero__meta {
+  color: rgb(255 255 255 / 0.85);
+}
+
+.teachers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.teacher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.teacher portal-avatar {
+  --avatar-bg: #399f71;
+
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.7);
+}
+
+.teacher__photo {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+// Anillo de asistencia en un disco translúcido.
+.progress {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-self: start;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 0.12);
+  backdrop-filter: blur(10px);
+
+  svg {
+    grid-area: 1 / 1;
+    width: 100px;
+    height: 100px;
+    transform: rotate(-90deg);
+  }
+
+  @include bp.up(md) {
+    justify-self: end;
+    width: 168px;
+    height: 168px;
+
+    svg {
+      width: 132px;
+      height: 132px;
+    }
+  }
+}
+
+.progress__track,
+.progress__value {
+  fill: none;
+  stroke-width: 9;
+}
+
+.progress__track {
+  stroke: rgb(255 255 255 / 0.22);
+}
+
+.progress__value {
+  stroke: #eaa700;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.progress__percent {
+  grid-area: 1 / 1;
+  margin-top: -14px;
+  font-size: clamp(1.375rem, 1rem + 1vw, 1.75rem);
+  font-weight: 700;
+}
+
+.progress__caption {
+  grid-area: 1 / 1;
+  margin-top: 34px;
+  font-size: 0.6875rem;
+  opacity: 0.85;
+}

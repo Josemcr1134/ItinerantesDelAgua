@@ -1,0 +1,92 @@
+// Columna del aula: tarjetas blancas; "Antes de empezar" destacada en
+// amarillo suave y el botón de WhatsApp en verde vivo.
+
+:host {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.card {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 20px 22px;
+  border-radius: 22px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.1);
+  color: var(--color-primary);
+}
+
+.card--welcome {
+  border: 1px solid #eaa700;
+  background-color: #fffaf0;
+}
+
+.card__label {
+  margin-bottom: 4px;
+  color: #5a6b60;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.card__eyebrow {
+  color: #5a6b60;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.card__title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.card__when {
+  color: var(--color-raisin-black);
+  font-weight: 600;
+}
+
+.card__muted {
+  color: #5a6b60;
+  font-size: 0.875rem;
+}
+
+.card__message {
+  color: var(--color-raisin-black);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+portal-session-join {
+  margin-top: 8px;
+}
+
+.whatsapp {
+  display: inline-flex;
+  justify-self: stretch;
+  justify-content: center;
+  padding-block: 8px;
+  text-align: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  margin-top: 6px;
+  padding: 0 18px;
+  border-radius: 100px;
+  background-color: #399f71;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+
+  svg {
+    flex: none;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #399f71;
+    outline-offset: 3px;
+  }
+}

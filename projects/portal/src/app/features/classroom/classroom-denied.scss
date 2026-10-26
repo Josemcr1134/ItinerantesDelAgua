@@ -1,0 +1,68 @@
+@use 'breakpoints' as bp;
+
+// Sin acceso al aula: tarjeta con la ilustración de la mujer y la salida a
+// "Mi formación".
+
+.denied {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  overflow: hidden;
+  padding: 32px clamp(20px, 4vw, 48px);
+  border-radius: 25px;
+  background: linear-gradient(110deg, #fff 40%, #e3f1e9);
+  color: var(--color-primary);
+  text-align: center;
+
+  @include bp.up(md) {
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: start;
+    text-align: left;
+  }
+}
+
+.denied__art {
+  width: 180px;
+  height: auto;
+}
+
+.denied__text {
+  display: grid;
+  justify-items: inherit;
+  gap: 10px;
+  max-width: 52ch;
+  color: var(--color-raisin-black);
+}
+
+.denied__title {
+  color: var(--color-primary);
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+  font-weight: 700;
+}
+
+.denied__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.denied__button {
+  display: inline-grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 0 22px;
+  border: 2px solid var(--color-primary);
+  border-radius: 100px;
+  background-color: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.denied__button--outline {
+  background-color: transparent;
+  color: var(--color-primary);
+}

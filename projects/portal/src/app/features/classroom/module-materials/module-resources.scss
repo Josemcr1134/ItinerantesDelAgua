@@ -1,0 +1,122 @@
+// Grupos de materiales y cada recurso: ícono en círculo por grupo, título,
+// datos del archivo y la acción (Descargar / Ver) como pastilla de contorno.
+
+.group {
+  display: grid;
+  gap: 8px;
+}
+
+.group__title {
+  color: #5a6b60;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.resources {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resource {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background-color: #f6f8f4;
+}
+
+.resource__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #e3ebe3;
+
+  &[data-group='readings'] {
+    background-color: #e6eef9;
+    color: #2f5d9c;
+  }
+
+  &[data-group='activities'] {
+    background-color: #fdf1cf;
+    color: #8a5d00;
+  }
+
+  &[data-group='recordings'] {
+    background-color: #f6e3ef;
+    color: #8f1f66;
+  }
+}
+
+.resource__info {
+  display: grid;
+  flex: 1 1 220px;
+  gap: 2px;
+  min-width: 0;
+}
+
+.resource__title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.resource__description {
+  color: var(--color-raisin-black);
+  font-size: 0.875rem;
+}
+
+.resource__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+  color: #5a6b60;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+
+  strong {
+    color: #8a5d00;
+  }
+}
+
+.resource__action {
+  display: inline-grid;
+  place-items: center;
+  min-height: 38px;
+  margin-left: auto;
+  padding: 0 18px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 100px;
+  background: #fff;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--color-primary);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.resource__state {
+  margin-left: auto;
+  color: #5a6b60;
+  font-size: 0.8125rem;
+  font-style: italic;
+}

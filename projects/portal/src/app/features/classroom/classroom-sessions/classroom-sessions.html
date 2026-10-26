@@ -1,0 +1,82 @@
+@for (list of lists(); track list.key) {
+  <section class="block" [attr.aria-labelledby]="'sessions-' + list.key">
+    <h3 class="block__title" [id]="'sessions-' + list.key">{{ list.title }}</h3>
+    @if (list.error) {
+      <p class="note" role="alert">
+        {{ message(list.error) }}
+        <button type="button" class="note__retry" (click)="retry(list.key)">Reintentar</button>
+      </p>
+    } @else if (list.items; as items) {
+      @if (items.length) {
+        <ul class="sessions">
+          @for (s of items; track s.id) {
+            @let d = day(s.startsAt);
+            <li class="session" [attr.data-status]="s.status">
+              <span class="session__date" aria-hidden="true">
+                <strong>{{ d.day }}</strong
+                >{{ d.month }}
+              </span>
+              <div class="session__info">
+                <p class="session__title">{{ title(s) }}</p>
+                <p class="session__when">
+                  {{ when(s) }}
+                  @if (cdmx(s.startsAt); as reference) {
+                    <span class="session__cdmx">· {{ reference }}</span>
+                  }
+                </p>
+                @if (s.teacherNames.length) {
+                  <p class="session__meta">{{ s.teacherNames.join(', ') }}</p>
+                }
+                @if (s.venue; as venue) {
+                  <p class="session__meta">
+                    {{ venue.name }}
+                    @if (venue.address) {
+                      · {{ venue.address }}
+                    }
+                  </p>
+                }
+                @if (s.status === 'CANCELLED') {
+                  <p class="session__flag">
+                    Cancelada{{ s.changeReason ? ': ' + s.changeReason : '' }}
+                  </p>
+                } @else if (s.originalStartsAt) {
+                  <p class="session__flag session__flag--moved">
+                    Reprogramada (antes: {{ moment(s.originalStartsAt) }}){{
+                      s.changeReason ? ' · ' + s.changeReason : ''
+                    }}
+                  </p>
+                }
+              </div>
+              <div class="session__side">
+                @if (list.key === 'upcoming') {
+                  <portal-session-join [join]="s.join" [venue]="s.venue" [timezone]="timezone()" />
+                } @else if (s.status !== 'CANCELLED') {
+                  @if (s.recording.state === 'AVAILABLE' && s.recording.url) {
+                    <a class="link" [href]="s.recording.url" target="_blank" rel="noopener">
+                      Ver grabación
+                    </a>
+                  } @else if (s.recording.state !== 'NOT_APPLICABLE') {
+                    <span class="session__state">{{ recordings[s.recording.state] }}</span>
+                  }
+                  @if (attendance(s); as status) {
+                    @if (status === 'PENDING') {
+                      <a class="chip chip--pending" [routerLink]="['/asistencia', s.id]">
+                        Registrar asistencia
+                      </a>
+                    } @else {
+                      <span class="chip" [attr.data-status]="status">{{
+                        attendanceLabels[status]
+                      }}</span>
+                    }
+                  }
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="note">{{ list.empty }}</p>
+      }
+    }
+  </section>
+}

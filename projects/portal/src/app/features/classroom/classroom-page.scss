@@ -1,0 +1,83 @@
+@use 'breakpoints' as bp;
+
+// Aula: el encabezado ilustrado a todo el ancho y, debajo, el contenido con
+// pestañas y la columna de la próxima sesión (a la derecha en escritorio).
+
+:host {
+  display: block;
+}
+
+.layout {
+  display: grid;
+  gap: 22px;
+  margin-top: 24px;
+
+  @include bp.up(xl) {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+}
+
+.main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+// En móvil, la próxima sesión va antes que las pestañas.
+.aside {
+  order: -1;
+
+  @include bp.up(xl) {
+    position: sticky;
+    top: 24px;
+    order: 0;
+  }
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tab {
+  display: inline-grid;
+  place-items: center;
+  height: 38px;
+  padding: 0 20px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  color: var(--color-primary);
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.tab--on {
+  background-color: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.notice {
+  padding: var(--space-4);
+  border-radius: 22px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+}
+
+.notice__retry {
+  margin-left: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}

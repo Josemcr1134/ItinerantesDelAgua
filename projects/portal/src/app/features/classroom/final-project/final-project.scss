@@ -1,0 +1,152 @@
+// Proyecto final: tarjeta blanca con la fecha de entrega, lineamientos, la
+// entrega actual y la zona para soltar el archivo (borde punteado verde).
+
+:host {
+  display: block;
+}
+
+.project {
+  display: grid;
+  gap: 16px;
+  padding: 22px clamp(16px, 2.5vw, 28px);
+  border-radius: 22px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.1);
+  color: var(--color-primary);
+}
+
+.project__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+
+.project__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.project__due {
+  color: #5a6b60;
+  font-size: 0.875rem;
+
+  strong {
+    color: var(--color-primary);
+  }
+}
+
+.project__guidelines {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background-color: #f6f8f4;
+  color: var(--color-raisin-black);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.project__label {
+  color: #5a6b60;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.project__note {
+  color: #5a6b60;
+}
+
+.project__error {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: #fbe9e4;
+  color: #9a3a22;
+  font-weight: 600;
+}
+
+.submission {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  border: 1px solid #399f71;
+  border-radius: 16px;
+  background-color: #eef6f1;
+}
+
+.submission__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #399f71;
+  color: #fff;
+}
+
+.submission__info {
+  display: grid;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.submission__name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.submission__meta {
+  color: #5a6b60;
+  font-size: 0.8125rem;
+}
+
+.submission__action {
+  min-height: 38px;
+  padding: 0 18px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 100px;
+  background: #fff;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.drop {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 26px 16px;
+  border: 1.5px dashed #9cb59f;
+  border-radius: 16px;
+  background-color: #f4f6f1;
+  text-align: center;
+  cursor: pointer;
+
+  svg {
+    color: #eaa700;
+  }
+
+  &:focus-within {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+
+.drop--busy {
+  cursor: progress;
+}
+
+.drop__link {
+  text-decoration: underline;
+}
+
+.drop__hint {
+  color: #5a6b60;
+  font-size: 0.75rem;
+}

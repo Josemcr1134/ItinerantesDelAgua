@@ -1,0 +1,98 @@
+@let p = project();
+<section class="project" aria-labelledby="final-project-title">
+  <header class="project__head">
+    <h3 id="final-project-title" class="project__title">Proyecto final</h3>
+    @if (p.dueAt) {
+      <p class="project__due">
+        Entrega: <strong>{{ date(p.dueAt) }}</strong> (tu zona horaria)
+      </p>
+    }
+  </header>
+
+  @if (p.guidelines) {
+    <div class="project__guidelines">
+      <h4 class="project__label">Lineamientos</h4>
+      <p>{{ p.guidelines }}</p>
+    </div>
+  }
+
+  @switch (p.submissionState) {
+    @case ('DISABLED') {
+      <p class="project__note">Este proyecto se presenta en vivo: no necesitas subir un archivo.</p>
+    }
+    @case ('CLOSED') {
+      <p class="project__note">La fecha de entrega pasó. Tu entrega queda en solo lectura.</p>
+    }
+  }
+
+  @if (p.submission; as submission) {
+    <div class="submission">
+      <span class="submission__icon" aria-hidden="true">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M9 15l2 2 4-4"
+          />
+        </svg>
+      </span>
+      <span class="submission__info">
+        <span class="submission__name">{{ submission.fileName }}</span>
+        <span class="submission__meta">
+          Entregado el {{ date(submission.submittedAt) }} · {{ size(submission.sizeBytes) }}
+        </span>
+      </span>
+      <button type="button" class="submission__action" (click)="download()">Descargar</button>
+    </div>
+  }
+
+  @if (p.submissionState === 'OPEN') {
+    <label
+      class="drop"
+      [class.drop--busy]="!!uploading()"
+      (dragover)="$event.preventDefault()"
+      (drop)="$event.preventDefault(); upload($event.dataTransfer?.files ?? null)"
+    >
+      <input
+        class="visually-hidden"
+        type="file"
+        [accept]="accept"
+        [disabled]="!!uploading()"
+        (change)="upload($any($event.target).files); $any($event.target).value = ''"
+      />
+      <svg
+        aria-hidden="true"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 16V4M6 10l6-6 6 6M4 20h16" />
+      </svg>
+      @if (uploading(); as name) {
+        <span role="status">Subiendo {{ name }}…</span>
+      } @else {
+        <span>
+          {{ p.submission ? 'Reemplazar mi entrega:' : 'Sube tu proyecto:' }} arrastra aquí o
+          <strong class="drop__link">Seleccionar</strong>
+        </span>
+        <span class="drop__hint">PDF, DOCX, PPTX o ZIP · hasta {{ maxLabel() }}</span>
+      }
+    </label>
+  }
+
+  @if (error(); as message) {
+    <p class="project__error" role="alert">{{ message }}</p>
+  }
+</section>

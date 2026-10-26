@@ -109,9 +109,8 @@ export const routes: Routes = [
           { path: '', pathMatch: 'full', redirectTo: 'diplomados' },
           {
             path: 'aula/:offerId',
-            title: 'Aula · Portal',
-            data: { section: 'Aula' },
-            loadComponent: () => import('./features/coming-soon/coming-soon-page'),
+            title: 'Mi aula · Portal',
+            loadComponent: () => import('./features/classroom/classroom-page'),
           },
           {
             path: ':tipo',

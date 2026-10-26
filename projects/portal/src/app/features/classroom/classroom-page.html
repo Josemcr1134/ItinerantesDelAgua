@@ -1,0 +1,101 @@
+@if (current(); as c) {
+  <portal-classroom-hero [classroom]="c" [timezone]="timezone()" />
+
+  <div class="layout">
+    <div class="main">
+      <nav class="tabs" aria-label="Secciones del aula">
+        <a
+          class="tab"
+          [class.tab--on]="section() === 'materiales'"
+          routerLink="."
+          [queryParams]="{ seccion: null }"
+          queryParamsHandling="merge"
+          [attr.aria-current]="section() === 'materiales' ? 'page' : null"
+        >
+          Módulos y materiales
+        </a>
+        <a
+          class="tab"
+          [class.tab--on]="section() === 'sesiones'"
+          routerLink="."
+          [queryParams]="{ seccion: 'sesiones' }"
+          queryParamsHandling="merge"
+          [attr.aria-current]="section() === 'sesiones' ? 'page' : null"
+        >
+          Sesiones
+        </a>
+        @if (c.finalProject) {
+          <a
+            class="tab"
+            [class.tab--on]="section() === 'proyecto'"
+            routerLink="."
+            [queryParams]="{ seccion: 'proyecto' }"
+            queryParamsHandling="merge"
+            [attr.aria-current]="section() === 'proyecto' ? 'page' : null"
+          >
+            Proyecto final
+          </a>
+        }
+      </nav>
+
+      @switch (section()) {
+        @case ('sesiones') {
+          <portal-classroom-sessions [offerId]="offerId()" [timezone]="timezone()" />
+        }
+        @case ('proyecto') {
+          @if (c.finalProject; as project) {
+            <portal-final-project
+              [offerId]="offerId()"
+              [project]="project"
+              [timezone]="timezone()"
+              (changed)="onProjectChanged($event)"
+            />
+          }
+        }
+        @default {
+          @if (materialsError(); as message) {
+            <p class="notice" role="alert">
+              {{ message }}
+              <button type="button" class="notice__retry" (click)="materials.reload()">
+                Reintentar
+              </button>
+            </p>
+          } @else if (materials.hasValue()) {
+            <portal-module-materials
+              [offerId]="offerId()"
+              [modules]="materials.value()"
+              [timezone]="timezone()"
+            />
+          }
+        }
+      }
+    </div>
+
+    <portal-classroom-aside class="aside" [classroom]="c" [timezone]="timezone()" />
+  </div>
+} @else if (denied(); as d) {
+  <section class="denied" aria-labelledby="denied-title">
+    <img
+      class="denied__art"
+      src="assets/access/woman.webp"
+      alt=""
+      width="220"
+      height="220"
+      aria-hidden="true"
+    />
+    <div class="denied__text">
+      <h2 id="denied-title" class="denied__title">{{ d.title }}</h2>
+      <p>{{ d.text }}</p>
+      <div class="denied__actions">
+        @if (d.retry) {
+          <button type="button" class="denied__button" (click)="classroom.reload()">
+            Reintentar
+          </button>
+        }
+        <a class="denied__button denied__button--outline" [routerLink]="backLink()">
+          Ver mi formación
+        </a>
+      </div>
+    </div>
+  </section>
+}

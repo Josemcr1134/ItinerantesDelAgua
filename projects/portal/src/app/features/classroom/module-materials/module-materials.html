@@ -1,0 +1,164 @@
+@if (modules().length) {
+  <ol class="modules">
+    @for (module of modules(); track module.id) {
+      <li>
+        <details class="module" [attr.data-status]="module.status" [open]="module.id === openId()">
+          <summary class="module__head">
+            <span class="module__number" aria-hidden="true">{{ module.number }}</span>
+            <span class="module__info">
+              <span class="module__eyebrow">
+                Módulo {{ module.number }}
+                <span class="module__status">{{ statuses[module.status] }}</span>
+              </span>
+              <span class="module__title">{{ module.title }}</span>
+              <span class="module__meta">
+                {{ counts(module) }}
+                @if (module.teacherNames.length) {
+                  · {{ module.teacherNames.join(', ') }}
+                }
+              </span>
+            </span>
+            <svg
+              class="module__chevron"
+              aria-hidden="true"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </summary>
+
+          <div class="module__body">
+            @if (module.description) {
+              <p class="module__description">{{ module.description }}</p>
+            }
+            @for (group of groups(module); track group.key) {
+              <section class="group" [attr.data-group]="group.key">
+                <h3 class="group__title">{{ group.title }}</h3>
+                <ul class="resources">
+                  @for (resource of group.items; track resource.id) {
+                    <li class="resource">
+                      <span class="resource__icon" [attr.data-group]="group.key" aria-hidden="true">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          @switch (group.key) {
+                            @case ('presentation') {
+                              <path
+                                d="M3 4h18M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4M12 16v4M8 20h8"
+                              />
+                            }
+                            @case ('readings') {
+                              <path
+                                d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"
+                              />
+                            }
+                            @default {
+                              <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                            }
+                          }
+                        </svg>
+                      </span>
+                      <span class="resource__info">
+                        <span class="resource__title">{{ resource.title }}</span>
+                        @if (resource.description) {
+                          <span class="resource__description">{{ resource.description }}</span>
+                        }
+                        <span class="resource__meta">
+                          @if (resource.activityDueAt) {
+                            <strong>Fecha: {{ date(resource.activityDueAt) }}</strong>
+                          }
+                          @if (resource.kind === 'EXTERNAL_LINK') {
+                            Enlace externo
+                          } @else if (resource.fileName) {
+                            {{ resource.fileName }}
+                            @if (size(resource.sizeBytes); as bytes) {
+                              · {{ bytes }}
+                            }
+                          }
+                        </span>
+                      </span>
+                      @if (resource.kind === 'EXTERNAL_LINK' && resource.url) {
+                        <a
+                          class="resource__action"
+                          [href]="resource.url"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          Ver<span class="visually-hidden">: {{ resource.title }}</span>
+                        </a>
+                      } @else if (resource.kind === 'FILE') {
+                        <button type="button" class="resource__action" (click)="openFile(resource)">
+                          Descargar<span class="visually-hidden">: {{ resource.title }}</span>
+                        </button>
+                      }
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+            @if (module.recordings.length) {
+              <section class="group" data-group="recordings">
+                <h3 class="group__title">Grabación de la sesión</h3>
+                <ul class="resources">
+                  @for (recording of module.recordings; track recording.sessionId) {
+                    <li class="resource">
+                      <span class="resource__icon" data-group="recordings" aria-hidden="true">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <rect x="2" y="5" width="14" height="14" rx="2.5" />
+                          <path d="m16 10 6-3.5v11L16 14" />
+                        </svg>
+                      </span>
+                      <span class="resource__info">
+                        <span class="resource__title">Sesión del {{ when(recording) }}</span>
+                      </span>
+                      @if (recording.state === 'AVAILABLE' && recording.url) {
+                        <a
+                          class="resource__action"
+                          [href]="recording.url"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          Ver grabación
+                        </a>
+                      } @else {
+                        <span class="resource__state">{{ recordingLabels[recording.state] }}</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+            @if (isEmpty(module)) {
+              <p class="module__empty">Los materiales de este módulo se publicarán pronto.</p>
+            }
+          </div>
+        </details>
+      </li>
+    }
+  </ol>
+} @else {
+  <p class="empty">Aún no hay módulos publicados. Te avisaremos cuando estén listos.</p>
+}
