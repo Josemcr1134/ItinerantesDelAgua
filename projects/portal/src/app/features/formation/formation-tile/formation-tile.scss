@@ -54,6 +54,34 @@
   font-size: 0.875rem;
 }
 
+// Pastillas "Progreso" (contorno) y "60%" (relleno), separadas.
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-feature-settings:
+    'lnum' 1,
+    'pnum' 1;
+}
+
+.progress__label,
+.progress__value {
+  display: inline-grid;
+  place-items: center;
+  height: 35px;
+  padding: 0 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  color: var(--color-primary);
+}
+
+.progress__value {
+  padding: 0 10px;
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
 // Mismo botón de contorno que "Entrar a Sesión" (verde de la marca).
 .card__action {
   --ui-button-color: var(--color-primary);

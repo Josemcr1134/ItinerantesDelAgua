@@ -73,6 +73,9 @@ describe('FormationPage', () => {
     );
     expect(host.querySelector<HTMLButtonElement>('button.card__action')?.disabled).toBe(true);
     expect(host.textContent).toContain('Acceso suspendido');
+    expect(
+      [...host.querySelectorAll('.progress__value')].map((v) => v.textContent?.trim()),
+    ).toEqual(['50%', '50%']);
   });
 
   it('al salir de la página el encabezado vuelve al de la Escuela', async () => {

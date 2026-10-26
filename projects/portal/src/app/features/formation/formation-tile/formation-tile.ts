@@ -11,8 +11,8 @@ export const FORMATION_COVERS = [
 ] as const;
 
 /**
- * Tarjeta de una formación inscrita (Figma HU-07): portada, nombre y
- * [Continuar] hacia el aula (deshabilitado si el acceso está suspendido).
+ * Tarjeta de una formación inscrita (Figma HU-07): portada, nombre, progreso
+ * y [Continuar] hacia el aula (deshabilitado si el acceso está suspendido).
  */
 @Component({
   selector: 'portal-formation-tile',
@@ -34,6 +34,11 @@ export const FORMATION_COVERS = [
           @if (note(); as text) {
             <p class="card__note">{{ text }}</p>
           }
+          <!-- Mismas pastillas que en el Dashboard: sesiones asistidas ÷ programadas. -->
+          <p class="progress">
+            <span class="progress__label">Progreso</span>
+            <span class="progress__value">{{ f.progress.percent }}%</span>
+          </p>
         </div>
         @if (f.canContinue) {
           <a
