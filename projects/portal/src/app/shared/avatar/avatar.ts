@@ -2,6 +2,7 @@ import { Component, computed, input } from '@angular/core';
 
 /**
  * Avatar con las iniciales del nombre (la API aún no guarda foto de perfil).
+ * El fondo se cambia con `--avatar-bg` (p. ej. sobre el menú verde).
  * Decorativo: el nombre siempre está escrito al lado o en el botón que lo usa.
  */
 @Component({
@@ -16,7 +17,7 @@ import { Component, computed, input } from '@angular/core';
       width: var(--avatar-size);
       height: var(--avatar-size);
       border-radius: 50%;
-      background-color: var(--color-primary);
+      background-color: var(--avatar-bg, var(--color-primary));
       color: #fff;
       font-size: calc(var(--avatar-size) * 0.4);
       font-weight: 600;

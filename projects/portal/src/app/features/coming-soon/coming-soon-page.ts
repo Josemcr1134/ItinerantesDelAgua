@@ -29,7 +29,7 @@ import { RouterLink } from '@angular/router';
       font-weight: 600;
     }
     a {
-      color: #2a5af4;
+      color: var(--color-primary);
       font-weight: 600;
     }
   `,

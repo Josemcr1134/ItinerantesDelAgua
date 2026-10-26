@@ -1,12 +1,13 @@
 @use 'breakpoints' as bp;
 
-$ink: var(--color-primary);
-$active: #0067ff;
-$active-bg: #f5f8ff;
 $edge: clamp(16px, 3.4vw, 49px);
+// Paleta verde del Figma (HU-06, segunda versión).
+$bg: var(--color-primary); // #3f5644
+$fresh: #399f71; // ítem activo, línea y botones
+$gold: #eaa700; // íconos y barra del activo
 
-// Menú lateral (Figma HU-06): 244 px expandido, 74 px contraído; en móvil,
-// panel desplegable.
+// Menú lateral (Figma HU-06): verde oscuro con íconos dorados; 244 px
+// expandido, 74 px contraído; en móvil, panel desplegable.
 
 // --- Menú lateral ------------------------------------------------------------
 .sidebar {
@@ -16,7 +17,8 @@ $edge: clamp(16px, 3.4vw, 49px);
   display: flex;
   flex-direction: column;
   width: min(280px, 85vw);
-  background-color: #fffefb;
+  background-color: $bg;
+  color: #fff;
   translate: -100% 0;
   visibility: hidden;
 
@@ -53,7 +55,7 @@ $edge: clamp(16px, 3.4vw, 49px);
   flex: none;
   height: 88px;
   padding: 13px 25px;
-  border-bottom: 1px solid color-mix(in srgb, #{$ink} 12%, transparent);
+  border-bottom: 1px solid $fresh;
 }
 
 .sidebar__brand {
@@ -84,9 +86,14 @@ $edge: clamp(16px, 3.4vw, 49px);
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background-color: $ink;
+  background-color: $fresh;
   color: #fff;
   cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid $gold;
+    outline-offset: 2px;
+  }
 
   svg {
     rotate: 90deg;
@@ -124,26 +131,33 @@ $edge: clamp(16px, 3.4vw, 49px);
   margin: 0 8px 0 12px;
   padding: 0 12px;
   border-radius: 10px;
-  color: $ink;
+  color: #fff;
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
 
+  portal-menu-icon {
+    color: $gold;
+  }
+
   &:hover {
-    background-color: color-mix(in srgb, #{$active-bg} 60%, transparent);
+    background-color: color-mix(in srgb, #{$fresh} 35%, transparent);
   }
 
   &:focus-visible {
-    outline: 3px solid $active;
+    outline: 3px solid $gold;
     outline-offset: -3px;
   }
 }
 
-// Activo: fondo azul claro y barra azul en el borde del menú.
+// Activo: fondo verde claro, ícono blanco y barra dorada en el borde.
 .nav__link--active {
-  background-color: $active-bg;
-  color: $active;
+  background-color: $fresh;
+
+  portal-menu-icon {
+    color: #fff;
+  }
 
   &::before {
     content: '';
@@ -153,7 +167,7 @@ $edge: clamp(16px, 3.4vw, 49px);
     width: 4px;
     height: 36px;
     border-radius: 25px;
-    background-color: $active;
+    background-color: $gold;
   }
 }
 

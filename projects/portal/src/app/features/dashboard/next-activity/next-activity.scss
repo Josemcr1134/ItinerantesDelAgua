@@ -117,7 +117,7 @@
 }
 
 .join {
-  --ui-button-color: var(--color-accent);
+  --ui-button-color: var(--color-primary);
   --ui-button-on-color: #fff;
   --ui-button-border-width: 3px;
 
@@ -133,6 +133,6 @@
 }
 
 .card__link {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-weight: 700;
 }

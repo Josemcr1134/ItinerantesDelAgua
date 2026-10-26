@@ -23,7 +23,7 @@
 .formations__all {
   display: inline-block;
   margin-top: 12px;
-  color: #2a5af4;
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -35,7 +35,7 @@
 
   a {
     margin-left: 6px;
-    color: #2a5af4;
+    color: var(--color-primary);
     font-weight: 600;
   }
 }
@@ -67,12 +67,12 @@
 
   &:focus-visible {
     border-radius: 54px;
-    outline: 3px solid var(--color-accent);
+    outline: 3px solid var(--color-primary);
     outline-offset: 2px;
   }
 
   &:hover .row__action {
-    background-color: #2a5af4;
+    background-color: #2e4033;
   }
 }
 
@@ -81,9 +81,9 @@
   min-width: 0;
   overflow: hidden;
   padding: 0 14px;
-  border: 1px solid #2a5af4;
+  border: 1px solid var(--color-primary);
   border-radius: 54px;
-  color: #2a5af4;
+  color: var(--color-primary);
   line-height: 33px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -96,7 +96,7 @@
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background-color: #0067ff;
+  background-color: var(--color-primary);
   color: #fff;
 
   @media (prefers-reduced-motion: no-preference) {
@@ -113,7 +113,7 @@
   text-decoration: none;
 
   &:focus-visible {
-    outline: 3px solid var(--color-accent);
+    outline: 3px solid var(--color-primary);
     outline-offset: 2px;
   }
 }
@@ -128,10 +128,10 @@
   button {
     margin-left: 8px;
     padding: 4px 14px;
-    border: 1px solid #2a5af4;
+    border: 1px solid var(--color-primary);
     border-radius: 54px;
     background: none;
-    color: #2a5af4;
+    color: var(--color-primary);
     font: inherit;
     cursor: pointer;
   }
