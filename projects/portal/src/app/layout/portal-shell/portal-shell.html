@@ -193,6 +193,23 @@
       @if (heading.subtitle) {
         <p class="header__subtitle">{{ heading.subtitle }}</p>
       }
+      @if (heading.breadcrumb?.length) {
+        <nav class="crumbs" aria-label="Ruta">
+          <ol>
+            @for (crumb of heading.breadcrumb; track $index) {
+              <li>
+                @if (crumb.link) {
+                  <a [routerLink]="crumb.link" [queryParams]="crumb.queryParams">{{
+                    crumb.label
+                  }}</a>
+                } @else {
+                  <span aria-current="page">{{ crumb.label }}</span>
+                }
+              </li>
+            }
+          </ol>
+        </nav>
+      }
     </div>
     <div class="greeting account">
       <p class="greeting__text">Hola, {{ shortName() }} <span aria-hidden="true">👋</span></p>

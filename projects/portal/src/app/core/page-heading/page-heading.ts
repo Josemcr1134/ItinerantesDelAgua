@@ -1,8 +1,17 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 
+/** Paso de la ruta de migas: con `link`, enlaza; sin él, es la página actual. */
+export interface Crumb {
+  readonly label: string;
+  readonly link?: string;
+  readonly queryParams?: Readonly<Record<string, string>>;
+}
+
 export interface Heading {
   readonly title: string;
   readonly subtitle?: string | null;
+  /** Migas bajo el título (Figma: "Becas › Becas disponibles › …"). */
+  readonly breadcrumb?: readonly Crumb[];
 }
 
 /** Título del encabezado si la página no pone el suyo (Figma HU-06). */
