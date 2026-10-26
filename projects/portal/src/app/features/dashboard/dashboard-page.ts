@@ -3,9 +3,8 @@ import { Component, computed, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { SessionStore } from 'auth';
-import { DashboardApi, DashboardBlock, LibraryApi, LibraryItemDto, toApiError } from 'data-access';
-import { firstValueFrom } from 'rxjs';
-import { AlertService } from 'ui-kit';
+import { DashboardApi, DashboardBlock, toApiError } from 'data-access';
+import { resourceOpener } from '../library/open-resource';
 import { APPLICATION_STATUS_LABELS, browserTimezone } from './dashboard-format';
 import { FALLBACK_COVERS, FormationCard } from './formation-card/formation-card';
 import { NextActivity } from './next-activity/next-activity';
@@ -25,9 +24,9 @@ import { DashboardWidget } from './widget/dashboard-widget';
 })
 export default class DashboardPage {
   private readonly api = inject(DashboardApi);
-  private readonly library = inject(LibraryApi);
-  private readonly alerts = inject(AlertService);
   private readonly user = inject(SessionStore).user;
+  /** Abre un recurso recomendado en otra pestaña (URL firmada). */
+  protected readonly openResource = resourceOpener();
 
   protected readonly dashboard = rxResource({ stream: () => this.api.get() });
   protected readonly statusLabels = APPLICATION_STATUS_LABELS;
@@ -49,25 +48,5 @@ export default class DashboardPage {
 
   protected reload(): void {
     this.dashboard.reload();
-  }
-
-  /**
-   * Abre un recurso de la biblioteca en otra pestaña. La pestaña se abre
-   * antes de pedir la URL firmada para que el navegador no la bloquee.
-   */
-  protected async openResource(item: LibraryItemDto): Promise<void> {
-    const tab = window.open('', '_blank');
-    try {
-      const access = await firstValueFrom(this.library.access(item.id));
-      if (tab) {
-        tab.opener = null;
-        tab.location.href = access.url;
-      } else {
-        window.location.href = access.url;
-      }
-    } catch (error) {
-      tab?.close();
-      await this.alerts.error('No se pudo abrir el recurso', toApiError(error).message);
-    }
   }
 }

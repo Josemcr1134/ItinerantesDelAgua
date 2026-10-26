@@ -1,0 +1,96 @@
+// Figma HU-09: chips de tipo (Todos lleno) y tarjetas de recursos en rejilla.
+
+:host {
+  display: block;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -6px 0 36px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 35px;
+  padding: 0 16px;
+  border: 2px solid var(--color-primary);
+  border-radius: 54px;
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.chip--active {
+  background-color: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+
+  &:hover {
+    background-color: var(--color-primary);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 22px 19px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    display: grid;
+  }
+}
+
+.more {
+  display: block;
+  margin: 32px auto 0;
+  padding: 8px 28px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.notice {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: var(--space-4);
+  border-radius: 25px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+}
+
+.notice__action {
+  padding: 4px 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}

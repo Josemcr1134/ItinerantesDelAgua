@@ -1,0 +1,63 @@
+<nav class="filters" aria-label="Filtrar por tipo">
+  <a
+    class="chip"
+    [class.chip--active]="!active()"
+    routerLink="."
+    [queryParams]="{ tipo: null }"
+    [attr.aria-current]="!active() ? 'page' : null"
+  >
+    Todos
+  </a>
+  @for (filter of filters; track filter.slug) {
+    <a
+      class="chip"
+      [class.chip--active]="active()?.slug === filter.slug"
+      routerLink="."
+      [queryParams]="{ tipo: filter.slug }"
+      [attr.aria-current]="active()?.slug === filter.slug ? 'page' : null"
+    >
+      <portal-resource-icon [type]="filter.type" [size]="16" />
+      {{ labels[filter.type] }}
+    </a>
+  }
+</nav>
+
+@if (loadError(); as message) {
+  <div class="notice" role="alert">
+    <p>{{ message }}</p>
+    <button type="button" class="notice__action" (click)="resources.reload()">Reintentar</button>
+  </div>
+} @else if (resources.hasValue()) {
+  @if (items().length) {
+    <ul class="grid">
+      @for (resource of items(); track resource.id; let i = $index) {
+        <li>
+          <portal-resource-card
+            [resource]="resource"
+            [fallbackCover]="covers[i % covers.length]"
+            (opened)="open($event)"
+          />
+        </li>
+      }
+    </ul>
+    @if (hasMore()) {
+      <button type="button" class="more" [disabled]="resources.isLoading()" (click)="showMore()">
+        Ver más
+      </button>
+    }
+  } @else {
+    <div class="notice" role="status">
+      <!-- TODO(contenido): confirmar el estado vacío. -->
+      <p>
+        {{
+          active()
+            ? 'No hay recursos de este tipo por ahora.'
+            : 'Aún no hay recursos en la biblioteca.'
+        }}
+      </p>
+      @if (active()) {
+        <a class="notice__action" routerLink="." [queryParams]="{ tipo: null }">Limpiar filtros</a>
+      }
+    </div>
+  }
+}
