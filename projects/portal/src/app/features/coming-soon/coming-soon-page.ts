@@ -1,5 +1,6 @@
-import { Component, input } from '@angular/core';
+import { Component, effect, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { usePageHeading } from '../../core/page-heading/page-heading';
 
 /** Secciones del menú que aún no tienen pantalla (se reemplazan al diseñarlas). */
 @Component({
@@ -7,7 +8,6 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <section class="soon">
-      <h1 class="soon__title">{{ section() }}</h1>
       <!-- TODO(contenido): texto provisional mientras se construye la sección. -->
       <p>Esta sección está en desarrollo.</p>
       <a routerLink="/">Volver al Dashboard</a>
@@ -23,11 +23,6 @@ import { RouterLink } from '@angular/router';
       background-color: #fff;
       box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.15);
     }
-    .soon__title {
-      color: var(--color-primary);
-      font-size: 1.75rem;
-      font-weight: 600;
-    }
     a {
       color: var(--color-primary);
       font-weight: 600;
@@ -37,4 +32,9 @@ import { RouterLink } from '@angular/router';
 export default class ComingSoonPage {
   /** Nombre de la sección (de `data.section` de la ruta). */
   readonly section = input('');
+
+  constructor() {
+    const heading = usePageHeading();
+    effect(() => heading.set({ title: this.section() }));
+  }
 }

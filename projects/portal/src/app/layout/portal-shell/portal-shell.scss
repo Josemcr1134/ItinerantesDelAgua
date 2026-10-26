@@ -101,18 +101,25 @@ $edge: clamp(16px, 3.4vw, 49px);
   margin-bottom: 25px;
 }
 
+.header__text {
+  min-width: 0;
+}
+
 .header__title {
-  display: none;
-  color: $ink;
+  color: var(--color-primary);
   font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
   font-weight: 600;
   font-feature-settings:
     'lnum' 1,
     'pnum' 1;
+  line-height: 1.2;
+}
 
-  @include bp.up(md) {
-    display: block;
-  }
+.header__subtitle {
+  margin-top: 4px;
+  color: var(--color-primary);
+  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
+  font-weight: 500;
 }
 
 .content {

@@ -14,9 +14,10 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { AuthService, SessionStore } from 'auth';
 import { filter } from 'rxjs';
 import { AlertService } from 'ui-kit';
+import { PageHeading } from '../../core/page-heading/page-heading';
 import { Avatar } from '../../shared/avatar/avatar';
 import { MenuIcon } from './menu-icon';
-import { NAV_ITEMS } from './navigation';
+import { NAV_ITEMS, NavItem } from './navigation';
 
 const COLLAPSED_KEY = 'portal.sidebar.collapsed';
 
@@ -49,6 +50,7 @@ export default class PortalShell {
   private readonly auth = inject(AuthService);
   private readonly alerts = inject(AlertService);
   protected readonly navItems = NAV_ITEMS;
+  protected readonly pageHeading = inject(PageHeading);
 
   private readonly user = inject(SessionStore).user;
   protected readonly fullName = computed(() => this.user()?.fullName ?? '');
@@ -62,20 +64,44 @@ export default class PortalShell {
   protected readonly drawerOpen = signal(false);
   /** Menú de la cuenta: desde el saludo (arriba) o desde el pie del menú lateral. */
   protected readonly accountMenu = signal<'header' | 'sidebar' | null>(null);
+  private readonly router = inject(Router);
+  /** Ruta actual (sin query) para marcar el ítem desplegable activo. */
+  private readonly url = signal(this.router.url);
+  /** Desplegables abiertos o cerrados a mano; sin elección, abierto si está activo. */
+  private readonly groups = signal<Readonly<Record<string, boolean>>>({});
   private readonly drawerToggle = viewChild<ElementRef<HTMLButtonElement>>('drawerToggle');
   private readonly sidebar = viewChild.required<ElementRef<HTMLElement>>('sidebar');
   private readonly injector = inject(Injector);
 
   constructor() {
-    inject(Router)
-      .events.pipe(
+    this.router.events
+      .pipe(
         filter((event) => event instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
-      .subscribe(() => {
+      .subscribe((event) => {
+        this.url.set(event.urlAfterRedirects);
         this.drawerOpen.set(false);
         this.accountMenu.set(null);
       });
+  }
+
+  protected isActive(item: NavItem): boolean {
+    const path = this.url().split(/[?#]/)[0];
+    return path === item.path || path.startsWith(item.path + '/');
+  }
+
+  protected isOpen(item: NavItem): boolean {
+    return this.groups()[item.path] ?? this.isActive(item);
+  }
+
+  /** Abre o cierra el desplegable; con el menú contraído, va a su primera sección. */
+  protected toggleGroup(item: NavItem): void {
+    if (this.collapsed() && !this.drawerOpen()) {
+      void this.router.navigateByUrl(item.children?.[0]?.path ?? item.path);
+      return;
+    }
+    this.groups.update((groups) => ({ ...groups, [item.path]: !this.isOpen(item) }));
   }
 
   protected toggleCollapsed(): void {

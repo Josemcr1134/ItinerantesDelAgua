@@ -1,0 +1,41 @@
+<nav class="tabs" aria-label="Filtrar por estado">
+  @for (option of phases; track option[0]) {
+    <a
+      class="tab"
+      [class.tab--active]="phase() === option[0]"
+      [routerLink]="[]"
+      [queryParams]="{ estado: option[0] === 'activos' ? null : option[0] }"
+      [attr.aria-current]="phase() === option[0] ? 'page' : null"
+    >
+      {{ option[1].label }}
+    </a>
+  }
+</nav>
+
+@if (loadError(); as message) {
+  <div class="notice" role="alert">
+    <p>{{ message }}</p>
+    <button type="button" class="notice__retry" (click)="formations.reload()">Reintentar</button>
+  </div>
+} @else if (formations.hasValue()) {
+  @if (items().length) {
+    <ul class="grid">
+      @for (formation of items(); track formation.enrollmentId; let i = $index) {
+        <li>
+          <portal-formation-tile
+            [formation]="formation"
+            [fallbackCover]="covers[i % covers.length]"
+          />
+        </li>
+      }
+    </ul>
+    @if (hasMore()) {
+      <button type="button" class="more" [disabled]="formations.isLoading()" (click)="showMore()">
+        Ver más
+      </button>
+    }
+  } @else {
+    <!-- TODO(contenido): confirmar el estado vacío (la API sugiere enlazar al catálogo). -->
+    <p class="empty" role="status">{{ emptyText() }}</p>
+  }
+}

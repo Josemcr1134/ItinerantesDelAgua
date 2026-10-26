@@ -171,6 +171,71 @@ $gold: #eaa700; // íconos y barra del activo
   }
 }
 
+// Desplegable (Formación): flecha a la derecha y sub-ítems de 32 px.
+button.nav__link {
+  width: calc(100% - 20px);
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+
+  &.nav__link--active {
+    background-color: $fresh;
+  }
+}
+
+.nav__chevron {
+  flex: none;
+  margin-left: auto;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: rotate 0.2s ease;
+  }
+}
+
+.nav__chevron--open {
+  rotate: 180deg;
+}
+
+.subnav {
+  display: grid;
+  gap: 2px;
+  margin: 2px 0 0 44px;
+  padding: 0;
+  list-style: none;
+}
+
+.subnav__link {
+  display: block;
+  width: 192px;
+  max-width: calc(100% - 8px);
+  padding: 8px 16px;
+  border-radius: 10px;
+  color: rgb(255 255 255 / 0.75);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 16px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: color-mix(in srgb, #{$fresh} 25%, transparent);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $gold;
+    outline-offset: -3px;
+  }
+}
+
+.subnav__link--active {
+  background-color: rgb(57 159 113 / 0.5);
+  color: #fff;
+}
+
 // --- Contraído (solo escritorio): íconos, logo reducido y avatar ------------
 :host(.shell--collapsed) {
   @include bp.up(lg) {
@@ -184,6 +249,7 @@ $gold: #eaa700; // íconos y barra del activo
 
     .sidebar__logo,
     .nav__label,
+    .nav__chevron,
     .profile__label,
     .profile__chevron {
       display: none;

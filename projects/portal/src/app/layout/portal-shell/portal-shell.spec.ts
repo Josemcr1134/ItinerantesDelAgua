@@ -76,4 +76,23 @@ describe('PortalShell', () => {
     await fixture.whenStable();
     expect(host.querySelector('#account-menu-header')).toBeNull();
   });
+
+  it('Formación se despliega con Diplomados, Cursos y Talleres', async () => {
+    const { fixture, host } = await render();
+    const group = [...host.querySelectorAll<HTMLButtonElement>('button.nav__link')].find((b) =>
+      b.textContent?.includes('Formación'),
+    )!;
+    expect(group.getAttribute('aria-expanded')).toBe('false');
+    expect(host.querySelector('.subnav')).toBeNull();
+
+    group.click();
+    await fixture.whenStable();
+    expect(group.getAttribute('aria-expanded')).toBe('true');
+    const links = [...host.querySelectorAll<HTMLAnchorElement>('.subnav__link')];
+    expect(links.map((l) => [l.textContent?.trim(), l.getAttribute('href')])).toEqual([
+      ['Diplomados', '/formacion/diplomados'],
+      ['Cursos', '/formacion/cursos'],
+      ['Talleres', '/formacion/talleres'],
+    ]);
+  });
 });

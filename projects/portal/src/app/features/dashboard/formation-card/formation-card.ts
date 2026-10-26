@@ -1,6 +1,7 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormationCardDto } from 'data-access';
+import { formationPath } from '../../formation/formation-options';
 
 /** Ilustraciones del Figma para las ofertas que aún no tienen portada. */
 export const FALLBACK_COVERS = [
@@ -17,7 +18,7 @@ export const FALLBACK_COVERS = [
     @let f = formation();
     <a
       class="card"
-      routerLink="/formacion"
+      [routerLink]="link()"
       [attr.aria-label]="f.offer.name + ', progreso ' + f.progress.percent + '%'"
     >
       <img
@@ -47,4 +48,10 @@ export const FALLBACK_COVERS = [
 export class FormationCard {
   readonly formation = input.required<FormationCardDto>();
   readonly fallbackCover = input<string>(FALLBACK_COVERS[0]);
+
+  /** Al aula si puede continuar; si no, a su sección de "Formación". */
+  protected readonly link = computed(() => {
+    const f = this.formation();
+    return f.canContinue ? ['/formacion/aula', f.offer.id] : [formationPath(f.offer.type)];
+  });
 }

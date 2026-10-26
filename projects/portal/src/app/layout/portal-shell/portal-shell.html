@@ -87,17 +87,64 @@
     <ul class="nav__list">
       @for (item of navItems; track item.path) {
         <li>
-          <a
-            class="nav__link"
-            [routerLink]="item.path"
-            routerLinkActive="nav__link--active"
-            ariaCurrentWhenActive="page"
-            [routerLinkActiveOptions]="{ exact: !!item.exact }"
-            [attr.title]="collapsed() ? item.label : null"
-          >
-            <portal-menu-icon [name]="item.icon" />
-            <span class="nav__label">{{ item.label }}</span>
-          </a>
+          @if (item.children; as children) {
+            <!-- Ítem desplegable: en el menú contraído lleva a su primera sección. -->
+            <button
+              type="button"
+              class="nav__link"
+              [class.nav__link--active]="isActive(item)"
+              [attr.aria-expanded]="collapsed() ? null : isOpen(item)"
+              [attr.aria-controls]="collapsed() ? null : 'subnav-' + item.icon"
+              [attr.title]="collapsed() ? item.label : null"
+              (click)="toggleGroup(item)"
+            >
+              <portal-menu-icon [name]="item.icon" />
+              <span class="nav__label">{{ item.label }}</span>
+              <svg
+                class="nav__chevron"
+                [class.nav__chevron--open]="isOpen(item)"
+                aria-hidden="true"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            @if (isOpen(item) && !collapsed()) {
+              <ul class="subnav" [id]="'subnav-' + item.icon">
+                @for (child of children; track child.path) {
+                  <li>
+                    <a
+                      class="subnav__link"
+                      [routerLink]="child.path"
+                      routerLinkActive="subnav__link--active"
+                      ariaCurrentWhenActive="page"
+                    >
+                      {{ child.label }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            }
+          } @else {
+            <a
+              class="nav__link"
+              [routerLink]="item.path"
+              routerLinkActive="nav__link--active"
+              ariaCurrentWhenActive="page"
+              [routerLinkActiveOptions]="{ exact: !!item.exact }"
+              [attr.title]="collapsed() ? item.label : null"
+            >
+              <portal-menu-icon [name]="item.icon" />
+              <span class="nav__label">{{ item.label }}</span>
+            </a>
+          }
         </li>
       }
     </ul>
@@ -140,7 +187,13 @@
 
 <div class="main">
   <header class="header">
-    <p class="header__title">Escuela Itinerante del Agua</p>
+    @let heading = pageHeading.current();
+    <div class="header__text">
+      <h1 class="header__title">{{ heading.title }}</h1>
+      @if (heading.subtitle) {
+        <p class="header__subtitle">{{ heading.subtitle }}</p>
+      }
+    </div>
     <div class="greeting account">
       <p class="greeting__text">Hola, {{ shortName() }} <span aria-hidden="true">👋</span></p>
       <button

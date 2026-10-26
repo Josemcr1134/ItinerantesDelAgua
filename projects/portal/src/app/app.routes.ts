@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { authGuard, authRoutes, guestGuard } from 'auth';
 import { PageSeo } from './core/seo/portal-seo';
+import { formationTypeMatch } from './features/formation/formation-options';
 
 // TODO(contenido): confirmar las descripciones para buscadores.
 /** Secciones del menú aún sin pantalla: [ruta, nombre]. */
 const SECTIONS: readonly (readonly [string, string])[] = [
-  ['formacion', 'Formación'],
   ['biblioteca', 'Biblioteca'],
   ['calendario', 'Calendario'],
   ['convocatorias', 'Convocatorias'],
@@ -55,6 +55,24 @@ export const routes: Routes = [
         path: '',
         title: 'Dashboard · Portal',
         loadComponent: () => import('./features/dashboard/dashboard-page'),
+      },
+      {
+        path: 'formacion',
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'diplomados' },
+          {
+            path: 'aula/:offerId',
+            title: 'Aula · Portal',
+            data: { section: 'Aula' },
+            loadComponent: () => import('./features/coming-soon/coming-soon-page'),
+          },
+          {
+            path: ':tipo',
+            title: 'Formación · Portal',
+            canMatch: [formationTypeMatch],
+            loadComponent: () => import('./features/formation/formation-page'),
+          },
+        ],
       },
       // TODO: cada sección reemplaza este marcador al tener su pantalla.
       ...SECTIONS.map(([path, section]) => ({
