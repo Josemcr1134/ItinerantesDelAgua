@@ -25,8 +25,8 @@ import { APPLICATION_STATUS_LABELS } from '../../shared/applications/application
 import { browserTimezone } from '../dashboard/dashboard-format';
 import { ApplicationForm } from './application-form/application-form';
 import { ApplicationSummary } from './application-summary/application-summary';
-import { dateTimeIn } from './open-call-format';
-import { OpportunityCard } from './opportunity-card/opportunity-card';
+import { dateTimeIn } from '../../shared/applications/application-format';
+import { OpportunityCard } from '../../shared/applications/opportunity-card/opportunity-card';
 
 /**
  * Convocatorias (HU-20 / HU-21, Figma): convocatorias abiertas con

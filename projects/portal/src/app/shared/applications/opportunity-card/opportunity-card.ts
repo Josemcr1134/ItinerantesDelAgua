@@ -5,13 +5,13 @@ import {
   APPLICATION_STATUS_LABELS,
   MODALITY_LABELS,
   WINDOW_REASON_LABELS,
-} from '../../../shared/applications/application-labels';
-import { dateRange, dateTimeIn, formatMoney } from '../open-call-format';
+} from '../application-labels';
+import { dateRange, dateTimeIn, formatMoney, percentLabel } from '../application-format';
 
 /**
- * Tarjeta de una convocatoria (Figma HU-20): modalidad y elegibilidad,
- * nombre, fechas y sede, cierre en la zona de la persona y [Ver y postular]
- * (o [Ver mi postulación] si ya existe).
+ * Tarjeta de una convocatoria o beca (Figma HU-20): modalidad, rango de beca
+ * y elegibilidad, nombre, fechas y sede, cierre en la zona de la persona y
+ * [Ver y postular] (o [Ver mi postulación] si ya existe).
  */
 @Component({
   selector: 'portal-opportunity-card',
@@ -25,6 +25,9 @@ import { dateRange, dateTimeIn, formatMoney } from '../open-call-format';
     >
       <p class="card__pills">
         <span class="pill">{{ modality() }}</span>
+        @if (scholarshipRange(); as range) {
+          <span class="pill pill--scholarship">Beca {{ range }}</span>
+        }
         @if (o.eligibility?.text; as text) {
           <!-- Recortada para no saltar de fila; el texto completo, en el tooltip. -->
           <span
@@ -72,7 +75,7 @@ import { dateRange, dateTimeIn, formatMoney } from '../open-call-format';
           </button>
         } @else if (o.canApply) {
           <button type="button" class="card__action" [disabled]="busy()" (click)="apply.emit(o)">
-            Ver y postular
+            {{ applyLabel() }}
           </button>
         } @else if (o.enrolled) {
           <span class="card__state">Ya tienes inscripción</span>
@@ -90,6 +93,7 @@ export class OpportunityCard {
   readonly timezone = input.required<string>();
   readonly selected = input(false);
   readonly busy = input(false);
+  readonly applyLabel = input('Ver y postular');
   readonly apply = output<ApplicationOpportunityDto>();
   readonly selectedApplication = output<string>();
 
@@ -99,6 +103,15 @@ export class OpportunityCard {
   protected readonly statuses = APPLICATION_STATUS_LABELS;
   protected readonly money = formatMoney;
   protected readonly modality = computed(() => MODALITY_LABELS[this.opportunity().offer.modality]);
+  /** Becas: del menor al mayor porcentaje de sus tipos ("10%–80%"). */
+  protected readonly scholarshipRange = computed(() => {
+    const types = this.opportunity().scholarshipTypes.map((t) => t.scholarshipType);
+    if (!types.length) return null;
+    return percentLabel({
+      minPercent: Math.min(...types.map((t) => t.minPercent)),
+      maxPercent: Math.max(...types.map((t) => t.maxPercent)),
+    });
+  });
   protected readonly when = computed(() => {
     const offer = this.opportunity().offer;
     return dateRange(offer.startsAt, offer.endsAt, this.timezone()) ?? 'Fechas por definir';

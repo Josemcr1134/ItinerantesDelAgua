@@ -158,101 +158,17 @@
         <span class="field__label" id="app-evidence">
           Fotos, videos o enlaces de tu trabajo (opcional)
         </span>
-        @if (a.editable) {
-          <label
-            class="drop"
-            [class.drop--busy]="!!uploading()"
-            (dragover)="$event.preventDefault()"
-            (drop)="$event.preventDefault(); upload($event.dataTransfer?.files ?? null)"
-          >
-            <input
-              class="visually-hidden"
-              type="file"
-              multiple
-              [accept]="accept()"
-              [disabled]="!!uploading() || a.documents.length >= limits().maxFiles"
-              (change)="upload($any($event.target).files); $any($event.target).value = ''"
-              aria-describedby="app-evidence"
-            />
-            <svg
-              aria-hidden="true"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 16V4M6 10l6-6 6 6M4 20h16" />
-            </svg>
-            @if (uploading(); as name) {
-              <span>Subiendo {{ name }}…</span>
-            } @else {
-              <span>Arrastra aquí o <strong class="drop__link">Seleccionar</strong></span>
-              <span class="drop__hint"
-                >Imágenes hasta 10 MB · videos hasta 100 MB · máx. {{ limits().maxFiles }}</span
-              >
-            }
-          </label>
+        <portal-application-evidence
+          [application]="a"
+          [(links)]="links"
+          [(busy)]="uploading"
+          describedBy="app-evidence"
+          (changed)="changed.emit($event)"
+          (failed)="showError($event)"
+        />
+        @if (issue('evidenceLinks') ?? issue('documents'); as message) {
+          <p class="field__error">{{ message }}</p>
         }
-        @if (a.documents.length) {
-          <ul class="files">
-            @for (doc of a.documents; track doc.id) {
-              <li class="files__item">
-                <span class="files__name">{{ doc.fileName }}</span>
-                <span class="files__size">{{ size(doc.sizeBytes) }}</span>
-                @if (a.editable) {
-                  <button
-                    type="button"
-                    class="files__remove"
-                    [attr.aria-label]="'Quitar ' + doc.fileName"
-                    (click)="removeDocument(doc.id)"
-                  >
-                    ×
-                  </button>
-                }
-              </li>
-            }
-          </ul>
-        }
-        <div class="links">
-          @for (link of links(); track $index; let i = $index) {
-            <p class="links__item">
-              <span class="links__url">{{ link }}</span>
-              @if (a.editable) {
-                <button
-                  type="button"
-                  class="files__remove"
-                  [attr.aria-label]="'Quitar ' + link"
-                  (click)="removeLink(i)"
-                >
-                  ×
-                </button>
-              }
-            </p>
-          }
-          @if (a.editable && links().length < limits().maxLinks) {
-            <div class="links__add">
-              <label class="visually-hidden" for="app-link">Enlace (YouTube, Drive, redes)</label>
-              <input
-                id="app-link"
-                class="field__input"
-                type="url"
-                inputmode="url"
-                placeholder="https://… (YouTube, Drive, redes)"
-                [value]="newLink()"
-                (input)="newLink.set($any($event.target).value)"
-                (keydown.enter)="$event.preventDefault(); addLink()"
-              />
-              <button type="button" class="links__button" (click)="addLink()">Agregar</button>
-            </div>
-          }
-          @if (issue('evidenceLinks') ?? issue('documents'); as message) {
-            <p class="field__error">{{ message }}</p>
-          }
-        </div>
       </div>
     </div>
 
@@ -265,7 +181,7 @@
         <button type="button" class="button button--outline" [disabled]="saving()" (click)="save()">
           Guardar borrador
         </button>
-        <button type="submit" class="button" [disabled]="saving() || !!uploading()">
+        <button type="submit" class="button" [disabled]="saving() || uploading()">
           Enviar postulación
         </button>
         <p class="actions__note">

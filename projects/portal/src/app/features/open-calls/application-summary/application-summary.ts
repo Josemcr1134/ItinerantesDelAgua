@@ -11,7 +11,8 @@ import {
 } from '../../../shared/applications/application-labels';
 import { timeIn } from '../../calendar/calendar-time';
 import { ApplicationSteps } from '../application-steps/application-steps';
-import { dateTimeIn } from '../open-call-format';
+import { dateTimeIn } from '../../../shared/applications/application-format';
+import { documentOpener } from '../../../shared/applications/open-document';
 
 /**
  * "Ver mi postulación" (HU-21): estado y folio, línea de tiempo, entrevista,
@@ -37,6 +38,7 @@ export class ApplicationSummary {
   protected readonly actions = ACTION_LABELS;
   protected readonly reasons = ACTION_REASON_LABELS;
   protected readonly busy = signal(false);
+  private readonly openFile = documentOpener();
 
   protected readonly interviewTime = computed(() => {
     const interview = this.application().interview;
@@ -61,20 +63,7 @@ export class ApplicationSummary {
     }
   }
 
-  /** Abre un archivo propio con su URL temporal. */
-  protected async openDocument(documentId: string): Promise<void> {
-    const tab = window.open('', '_blank');
-    try {
-      const access = await firstValueFrom(
-        this.api.downloadDocument(this.application().id, documentId),
-      );
-      if (tab) {
-        tab.opener = null;
-        tab.location.href = access.url;
-      }
-    } catch (error) {
-      tab?.close();
-      await this.alerts.error('No se pudo abrir el archivo', toApiError(error).message);
-    }
+  protected openDocument(documentId: string): Promise<void> {
+    return this.openFile(this.application().id, documentId);
   }
 }

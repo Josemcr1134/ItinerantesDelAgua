@@ -18,6 +18,7 @@ import {
 } from 'data-access';
 import { firstValueFrom } from 'rxjs';
 import { AlertService } from 'ui-kit';
+import { ApplicationEvidence } from '../../../shared/applications/application-evidence/application-evidence';
 import { ApplicationSteps } from '../application-steps/application-steps';
 import { timeIn } from '../../calendar/calendar-time';
 
@@ -40,9 +41,9 @@ type Field =
  */
 @Component({
   selector: 'portal-application-form',
-  imports: [ReactiveFormsModule, ApplicationSteps],
+  imports: [ReactiveFormsModule, ApplicationSteps, ApplicationEvidence],
   templateUrl: './application-form.html',
-  styleUrls: ['./application-form.scss', './application-evidence.scss'],
+  styleUrl: './application-form.scss',
 })
 export class ApplicationForm {
   private readonly api = inject(ApplicationsApi);
@@ -64,10 +65,9 @@ export class ApplicationForm {
     termsAccepted: [false],
   });
   protected readonly links = signal<readonly string[]>([]);
-  protected readonly newLink = signal('');
 
   protected readonly saving = signal(false);
-  protected readonly uploading = signal<string | null>(null);
+  protected readonly uploading = signal(false);
   /** Pendientes o errores por campo (del último guardado o envío). */
   protected readonly issues = signal<Partial<Record<Field, string>>>({});
   protected readonly error = signal<string | null>(null);
@@ -76,9 +76,6 @@ export class ApplicationForm {
   protected readonly eligibility = computed(() => this.application().form.eligibility);
   protected readonly savedAt = computed(() =>
     timeIn(this.application().updatedAt, this.timezone()),
-  );
-  protected readonly accept = computed(() =>
-    [...this.limits().image.mimeTypes, ...this.limits().video.mimeTypes].join(','),
   );
   protected readonly experienceLength = signal(0);
   protected readonly motivationLength = signal(0);
@@ -155,50 +152,6 @@ export class ApplicationForm {
     }
   }
 
-  // --- Evidencias ---------------------------------------------------------------
-
-  protected async upload(files: FileList | null): Promise<void> {
-    if (!files?.length) return;
-    const id = this.application().id;
-    for (const file of Array.from(files)) {
-      this.uploading.set(file.name);
-      try {
-        await firstValueFrom(this.api.uploadDocument(id, file));
-      } catch (error) {
-        this.showError(toApiError(error));
-        break;
-      }
-    }
-    this.uploading.set(null);
-    await this.refresh();
-  }
-
-  protected async removeDocument(documentId: string): Promise<void> {
-    try {
-      await firstValueFrom(this.api.deleteDocument(this.application().id, documentId));
-      await this.refresh();
-    } catch (error) {
-      this.showError(toApiError(error));
-    }
-  }
-
-  protected addLink(): void {
-    const url = this.newLink().trim();
-    if (!url || this.links().length >= this.limits().maxLinks) return;
-    this.links.update((list) => [...list, url]);
-    this.newLink.set('');
-  }
-
-  protected removeLink(index: number): void {
-    this.links.update((list) => list.filter((_, i) => i !== index));
-  }
-
-  protected size(bytes: number): string {
-    return bytes >= 1_048_576
-      ? `${(bytes / 1_048_576).toFixed(1)} MB`
-      : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  }
-
   // --- Internos -----------------------------------------------------------------
 
   private reset(_id: string): void {
@@ -234,16 +187,7 @@ export class ApplicationForm {
     };
   }
 
-  /** Vuelve a pedir la postulación (archivos nuevos o quitados). */
-  private async refresh(): Promise<void> {
-    try {
-      this.changed.emit(await firstValueFrom(this.api.get(this.application().id)));
-    } catch (error) {
-      this.showError(toApiError(error));
-    }
-  }
-
-  private showError(error: ApiError): void {
+  protected showError(error: ApiError): void {
     const issues: Partial<Record<Field, string>> = {};
     for (const detail of error.details) {
       const field = detail.field.split('.')[0] as Field;

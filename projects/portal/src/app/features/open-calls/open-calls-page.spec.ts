@@ -9,6 +9,7 @@ import OpenCallsPage from './open-calls-page';
 const API = 'https://api.test/api/v1';
 const opportunity = (id: string, name: string, extra: object = {}) => ({
   kind: 'OPEN_CALL',
+  scholarshipTypes: [],
   offer: {
     id,
     name,

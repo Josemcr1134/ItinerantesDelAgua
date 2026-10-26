@@ -1,6 +1,10 @@
 // Evidencias: zona para soltar archivos (borde punteado verde, Figma), lista
 // de archivos y enlaces.
 
+:host {
+  display: block;
+}
+
 .drop {
   display: grid;
   justify-items: center;
@@ -83,6 +87,22 @@
 .links__add {
   display: flex;
   gap: 8px;
+}
+
+.links__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 12px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+  font: inherit;
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
 }
 
 .links__button {
