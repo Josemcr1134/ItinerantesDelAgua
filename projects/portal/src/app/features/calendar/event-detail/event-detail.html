@@ -1,0 +1,98 @@
+<ui-dialog [open]="!!event()" (openChange)="onOpenChange($event)" [title]="event()?.title ?? ''">
+  @if (event(); as e) {
+    <div class="detail">
+      <p class="detail__tags">
+        <span class="tag" [style.--tag]="category()?.color">{{ category()?.label }}</span>
+        <span class="detail__kind">{{ kinds[e.kind] }}</span>
+        @if (e.status === 'CANCELLED') {
+          <span class="tag tag--cancelled">Cancelada</span>
+        }
+      </p>
+
+      <dl class="detail__facts">
+        <div>
+          <dt>Cuándo</dt>
+          <dd>
+            {{ when() }}
+            @if (cdmx(); as official) {
+              <span class="detail__muted">· {{ official }}</span>
+            }
+          </dd>
+        </div>
+        @if (e.offer) {
+          <div>
+            <dt>Formación</dt>
+            <dd>
+              {{ e.offer.name }}
+              @if (e.module) {
+                <span class="detail__muted"
+                  >· Módulo {{ e.module.number }}: {{ e.module.title }}</span
+                >
+              }
+            </dd>
+          </div>
+        }
+        @if (e.venue; as venue) {
+          <div>
+            <dt>Lugar</dt>
+            <dd>
+              {{ venue.name }}
+              @if (venue.address || venue.city) {
+                <span class="detail__muted"
+                  >· {{ venue.address ?? '' }} {{ venue.city ?? '' }}</span
+                >
+              }
+              @if (venue.mapsUrl) {
+                <a class="detail__link" target="_blank" rel="noopener" [href]="venue.mapsUrl"
+                  >Cómo llegar</a
+                >
+              }
+            </dd>
+          </div>
+        } @else if (e.location) {
+          <div>
+            <dt>Lugar</dt>
+            <dd>{{ e.location }}</dd>
+          </div>
+        }
+        @if (e.description) {
+          <div>
+            <dt>Descripción</dt>
+            <dd>{{ e.description }}</dd>
+          </div>
+        }
+      </dl>
+
+      @if (e.status !== 'CANCELLED') {
+        <div class="detail__actions">
+          @switch (e.join?.state) {
+            @case ('OPEN') {
+              <a uiButton class="action" target="_blank" rel="noopener" [href]="e.join!.url">
+                Entrar a Sesión
+              </a>
+            }
+            @case ('NOT_YET') {
+              <button uiButton class="action" type="button" disabled>Entrar a Sesión</button>
+              <span class="detail__muted">Disponible a las {{ opensAt() }}</span>
+            }
+            @case ('LINK_PENDING') {
+              <button uiButton class="action" type="button" disabled>Entrar a Sesión</button>
+              <span class="detail__muted">Enlace aún no disponible</span>
+            }
+          }
+          @if (e.link.kind === 'CLASSROOM' && e.link.offerId) {
+            <a
+              uiButton
+              variant="secondary"
+              class="action"
+              [routerLink]="['/formacion/aula', e.link.offerId]"
+              (click)="closed.emit()"
+            >
+              Ir al aula
+            </a>
+          }
+        </div>
+      }
+    </div>
+  }
+</ui-dialog>

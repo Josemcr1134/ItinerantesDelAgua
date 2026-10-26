@@ -1,0 +1,289 @@
+@use 'breakpoints' as bp;
+
+// Figma HU-10: cuadrícula del mes en tarjeta blanca, encabezado verde con
+// bordes dorados, días de 24 px y actividades del color de su categoría. En
+// móvil, los días se achican y las actividades pasan a ser barras de color.
+
+$line: #dce0e5;
+$today: #399f71;
+
+// --- Mes ---------------------------------------------------------------------
+.month {
+  overflow: hidden;
+  border-radius: 20px 20px 25px 25px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.15);
+}
+
+.month__head,
+.month__days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.month__weekday {
+  padding: 10px 8px;
+  border: 1px solid #eaa700;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+
+  @include bp.up(md) {
+    padding: 9px 12px;
+  }
+}
+
+.month__weekday-long {
+  display: none;
+
+  @include bp.up(md) {
+    display: inline;
+  }
+}
+
+.month__weekday-short {
+  @include bp.up(md) {
+    display: none;
+  }
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 6px;
+  border: 1px solid $line;
+
+  @include bp.up(md) {
+    min-height: 120px;
+    padding: 12px;
+  }
+}
+
+.day__number {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #14181f;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+
+  @include bp.up(md) {
+    font-size: 1.5rem;
+  }
+
+  &:focus-visible {
+    border-radius: 6px;
+    outline: 3px solid var(--color-primary);
+  }
+}
+
+.day--out .day__number {
+  color: rgb(20 24 31 / 0.25);
+}
+
+// Hoy: celda rellena (Figma, en el verde claro de la paleta).
+.day--today {
+  border-color: $today;
+  border-radius: 20px;
+  background-color: $today;
+
+  .day__number {
+    color: #fff;
+  }
+}
+
+.day__events {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pill {
+  display: block;
+  width: 100%;
+  height: 6px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 6px;
+  background-color: var(--cat);
+  color: #fff;
+  font: inherit;
+  font-size: 0;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+
+  @include bp.up(md) {
+    height: 30px;
+    padding: 4px 6px;
+    font-size: 0.875rem;
+    line-height: 22px;
+  }
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-raisin-black);
+    outline-offset: 1px;
+  }
+}
+
+.pill--cancelled {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.day__more {
+  display: none;
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  @include bp.up(md) {
+    display: block;
+  }
+}
+
+.day--today .day__more {
+  color: #fff;
+}
+
+// --- Semana ------------------------------------------------------------------
+.week {
+  display: grid;
+  gap: 10px;
+
+  @include bp.up(lg) {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .pill {
+    height: auto;
+    padding: 4px 6px;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    white-space: normal;
+  }
+}
+
+.week__day {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 14px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.1);
+}
+
+.week__day--today {
+  box-shadow: inset 0 0 0 2px $today;
+}
+
+.week__title button {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  strong {
+    font-size: 1.25rem;
+  }
+}
+
+.week__events {
+  display: grid;
+  gap: 4px;
+}
+
+.week__empty {
+  color: color-mix(in srgb, var(--color-raisin-black) 45%, transparent);
+  font-size: 0.8125rem;
+}
+
+// --- Día y lista ------------------------------------------------------------
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.list__day {
+  margin-top: 10px;
+  color: var(--color-primary);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.list__day--today::after {
+  content: ' · Hoy';
+  color: $today;
+}
+
+// Fila con la franja del color de la categoría a la izquierda.
+.row {
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px;
+  border: 0;
+  border-left: 6px solid var(--cat);
+  border-radius: 12px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--cat) 6%, #fff);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.row--cancelled .row__title {
+  text-decoration: line-through;
+}
+
+.row__time {
+  color: var(--cat);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.row__title {
+  font-weight: 500;
+}
+
+.row__meta {
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.875rem;
+}

@@ -1,0 +1,146 @@
+@use 'breakpoints' as bp;
+
+// Figma HU-10: chips de categoría con su color, barra con el periodo y el
+// selector de vista (Mes, Semana, Día, Lista).
+
+:host {
+  display: block;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -6px 0 22px;
+}
+
+// Contorno del color de la categoría; marcada, rellena.
+.chip {
+  height: 35px;
+  padding: 0 18px;
+  border: 1px solid var(--cat);
+  border-radius: 54px;
+  background: none;
+  color: var(--cat);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--cat) 10%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--cat);
+    outline-offset: 2px;
+  }
+
+  @include bp.up(sm) {
+    min-width: 130px;
+  }
+}
+
+.chip--on,
+.chip--on:hover {
+  background-color: var(--cat);
+  color: #fff;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.period {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.period__title {
+  min-width: 0;
+  color: var(--color-primary);
+  font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
+  font-weight: 600;
+  font-stretch: 87.5%;
+}
+
+.period__nav,
+.period__today {
+  display: grid;
+  place-items: center;
+  min-width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+}
+
+.period__today {
+  margin-left: 6px;
+  padding: 0 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  font-weight: 600;
+}
+
+// Selector segmentado (Figma: fondo blanco, opción activa verde).
+.views {
+  display: flex;
+  padding: 2px 1px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.views__item {
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: #525e6f;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: -3px;
+  }
+}
+
+.views__item--on {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.notice,
+.empty {
+  padding: var(--space-4);
+  border-radius: 25px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+}
+
+.notice__retry {
+  margin-top: 8px;
+  padding: 4px 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  cursor: pointer;
+}

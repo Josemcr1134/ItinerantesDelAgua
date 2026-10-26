@@ -1,0 +1,209 @@
+<!-- Píldora de una actividad (mes y semana). -->
+<ng-template #pill let-item>
+  <button
+    type="button"
+    class="pill"
+    [class.pill--cancelled]="item.status === 'CANCELLED'"
+    [style.--cat]="color(item)"
+    [attr.title]="item.title"
+    (click)="opened.set(item)"
+  >
+    {{ pillText(item) }}
+  </button>
+</ng-template>
+
+<!-- Fila de una actividad (día y lista). -->
+<ng-template #row let-item>
+  <button
+    type="button"
+    class="row"
+    [class.row--cancelled]="item.status === 'CANCELLED'"
+    [style.--cat]="color(item)"
+    (click)="opened.set(item)"
+  >
+    <span class="row__time">{{ timeRange(item) }}</span>
+    <span class="row__title">{{ item.title }}</span>
+    @if (item.offer) {
+      <span class="row__meta">{{ item.offer.name }}</span>
+    }
+    @if (item.status === 'CANCELLED') {
+      <span class="row__meta">Cancelada</span>
+    }
+  </button>
+</ng-template>
+
+<div class="chips" role="group" aria-label="Filtrar por categoría">
+  @for (category of categories; track category.value) {
+    <button
+      type="button"
+      class="chip"
+      [class.chip--on]="selected().has(category.value)"
+      [style.--cat]="category.color"
+      [attr.aria-pressed]="selected().has(category.value)"
+      (click)="toggleCategory(category.value)"
+    >
+      {{ category.label }}
+    </button>
+  }
+</div>
+
+<div class="toolbar">
+  <div class="period">
+    <button type="button" class="period__nav" aria-label="Anterior" (click)="shift(-1)">
+      <svg
+        aria-hidden="true"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m15 6-6 6 6 6" />
+      </svg>
+    </button>
+    <h2 class="period__title" aria-live="polite">{{ periodTitle() }}</h2>
+    <button type="button" class="period__nav" aria-label="Siguiente" (click)="shift(1)">
+      <svg
+        aria-hidden="true"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+    </button>
+    <button type="button" class="period__today" (click)="goToday()">Hoy</button>
+  </div>
+
+  <nav class="views" aria-label="Vista del calendario">
+    @for (option of views; track option.value) {
+      <a
+        class="views__item"
+        [class.views__item--on]="view() === option.value"
+        [routerLink]="[]"
+        [queryParams]="{ vista: option.value === 'mes' ? null : option.value }"
+        queryParamsHandling="merge"
+        [attr.aria-current]="view() === option.value ? 'page' : null"
+      >
+        {{ option.label }}
+      </a>
+    }
+  </nav>
+</div>
+
+@if (loadError(); as message) {
+  <div class="notice" role="alert">
+    <p>{{ message }}</p>
+    <button type="button" class="notice__retry" (click)="calendar.reload()">Reintentar</button>
+  </div>
+} @else {
+  @switch (view()) {
+    @case ('mes') {
+      <div class="month" role="grid" [attr.aria-label]="periodTitle()">
+        <div class="month__head" role="row">
+          @for (weekday of weekdays; track weekday) {
+            <span class="month__weekday" role="columnheader">
+              <span class="month__weekday-long">{{ weekday }}</span>
+              <span class="month__weekday-short" aria-hidden="true">{{ weekday.slice(0, 3) }}</span>
+            </span>
+          }
+        </div>
+        <div class="month__days">
+          @for (day of grid(); track day.key) {
+            @let events = eventsOf(day.key);
+            <div
+              class="day"
+              role="gridcell"
+              [class.day--out]="!day.inMonth"
+              [class.day--today]="day.key === today()"
+            >
+              <button
+                type="button"
+                class="day__number"
+                [attr.aria-label]="
+                  dayTitle(day.key) + (events.length ? ', ' + events.length + ' actividades' : '')
+                "
+                (click)="openDay(day.key)"
+              >
+                {{ day.day }}
+              </button>
+              <div class="day__events">
+                @for (item of events.slice(0, maxPerCell); track item.id) {
+                  <ng-container
+                    [ngTemplateOutlet]="pill"
+                    [ngTemplateOutletContext]="{ $implicit: item }"
+                  />
+                }
+                @if (events.length > maxPerCell) {
+                  <button type="button" class="day__more" (click)="openDay(day.key)">
+                    +{{ events.length - maxPerCell }} más
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+    @case ('semana') {
+      <div class="week">
+        @for (key of weekDays(); track key; let i = $index) {
+          <section class="week__day" [class.week__day--today]="key === today()">
+            <h3 class="week__title">
+              <button type="button" (click)="openDay(key)">
+                <span>{{ weekdays[i] }}</span>
+                <strong>{{ +key.slice(8) }}</strong>
+              </button>
+            </h3>
+            <div class="week__events">
+              @for (item of eventsOf(key); track item.id) {
+                <ng-container
+                  [ngTemplateOutlet]="pill"
+                  [ngTemplateOutletContext]="{ $implicit: item }"
+                />
+              } @empty {
+                <p class="week__empty">Sin actividades</p>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    }
+    @case ('dia') {
+      <section class="list">
+        @for (item of eventsOf(anchor()); track item.id) {
+          <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ $implicit: item }" />
+        } @empty {
+          <p class="empty">No tienes actividades este día.</p>
+        }
+      </section>
+    }
+    @case ('lista') {
+      <section class="list">
+        @for (entry of agenda(); track entry[0]) {
+          <h3 class="list__day" [class.list__day--today]="entry[0] === today()">
+            {{ dayTitle(entry[0]) }}
+          </h3>
+          @for (item of entry[1]; track item.id) {
+            <ng-container
+              [ngTemplateOutlet]="row"
+              [ngTemplateOutletContext]="{ $implicit: item }"
+            />
+          }
+        } @empty {
+          <p class="empty">No tienes actividades este mes.</p>
+        }
+      </section>
+    }
+  }
+}
+
+<portal-event-detail [event]="opened()" [timezone]="timezone()" (closed)="opened.set(null)" />

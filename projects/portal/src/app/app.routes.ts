@@ -6,7 +6,6 @@ import { formationTypeMatch } from './features/formation/formation-options';
 // TODO(contenido): confirmar las descripciones para buscadores.
 /** Secciones del menú aún sin pantalla: [ruta, nombre]. */
 const SECTIONS: readonly (readonly [string, string])[] = [
-  ['calendario', 'Calendario'],
   ['convocatorias', 'Convocatorias'],
   ['becas', 'Becas'],
   ['perfil', 'Mi perfil'],
@@ -54,6 +53,11 @@ export const routes: Routes = [
         path: '',
         title: 'Dashboard · Portal',
         loadComponent: () => import('./features/dashboard/dashboard-page'),
+      },
+      {
+        path: 'calendario',
+        title: 'Calendario · Portal',
+        loadComponent: () => import('./features/calendar/calendar-page'),
       },
       {
         path: 'biblioteca',
