@@ -74,10 +74,15 @@ export default class OpenCallsPage {
     stream: ({ params }) => this.api.get(params),
   });
 
-  protected readonly openCount = computed(
-    () => this.opportunities.value().filter((o) => o.window.state === 'OPEN').length,
+  protected readonly openCount = computed(() =>
+    this.opportunities.hasValue()
+      ? this.opportunities.value().filter((o) => o.window.state === 'OPEN').length
+      : 0,
   );
-  protected readonly selectedOffer = computed(() => this.application.value()?.offer.id ?? null);
+  // `value()` lanza si la petición falló: se lee solo con valor.
+  protected readonly selectedOffer = computed(() =>
+    this.application.hasValue() ? this.application.value().offer.id : null,
+  );
   protected readonly error = computed(() => {
     const error = this.opportunities.error() ?? this.mine.error() ?? this.application.error();
     return error ? toApiError(error).message : null;

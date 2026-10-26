@@ -86,7 +86,8 @@
 }
 
 <div #panel class="panel">
-  @if (application.value(); as current) {
+  @if (application.hasValue()) {
+    @let current = application.value();
     @if (current.status === 'DRAFT') {
       <portal-application-form
         [application]="current"

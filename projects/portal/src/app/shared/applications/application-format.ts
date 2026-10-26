@@ -58,6 +58,7 @@ function amount(cents: number, currency: string): string {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
     currency,
+    currencyDisplay: 'narrowSymbol',
     minimumFractionDigits: cents % 100 ? 2 : 0,
     maximumFractionDigits: 2,
   }).format(cents / 100);
