@@ -67,18 +67,18 @@ portal-session-join {
 .whatsapp {
   display: inline-flex;
   justify-self: stretch;
-  justify-content: center;
-  padding-block: 8px;
-  text-align: center;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   min-height: 42px;
   margin-top: 6px;
-  padding: 0 18px;
+  padding: 8px 14px;
   border-radius: 100px;
   background-color: #399f71;
   color: #fff;
+  font-size: 0.9375rem;
   font-weight: 700;
+  text-align: center;
   text-decoration: none;
 
   svg {
