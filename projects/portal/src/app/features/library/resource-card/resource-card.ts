@@ -17,7 +17,7 @@ import { ResourceIcon } from '../resource-icon';
         class="card__cover"
         [src]="r.thumbnailUrl ?? fallbackCover()"
         alt=""
-        width="135"
+        width="120"
         height="142"
         loading="lazy"
       />
@@ -29,7 +29,7 @@ import { ResourceIcon } from '../resource-icon';
           <span class="card__note">{{ r.author }}</span>
         }
         <span class="card__type" aria-hidden="true">
-          <span class="card__icon"><portal-resource-icon [type]="r.type" /></span>
+          <span class="card__icon"><portal-resource-icon [type]="r.type" [size]="16" /></span>
           <span class="card__pill">{{ typeLabel() }}</span>
         </span>
       </span>
