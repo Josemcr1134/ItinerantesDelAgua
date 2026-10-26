@@ -35,22 +35,6 @@ export const ATTENDANCE_LABELS: Readonly<Record<AttendanceStatus, string>> = {
   NOT_APPLICABLE: 'Sin registro de asistencia',
 };
 
-/**
- * Estado de asistencia de una sesión del participante. El esquema publicado
- * de `SessionCardDto.attendance` quedó con el de administración (mismo
- * nombre en la API); se lee `status` solo si llega con la forma esperada.
- */
-export function attendanceOf(session: SessionCardDto): AttendanceStatus | null {
-  const attendance: unknown = session.attendance;
-  if (typeof attendance !== 'object' || attendance === null || !('status' in attendance)) {
-    return null;
-  }
-  const status = attendance.status;
-  return typeof status === 'string' && status in ATTENDANCE_LABELS
-    ? (status as AttendanceStatus)
-    : null;
-}
-
 /** "jue 29 oct 2026 · 18:00–20:00" en la zona de la persona. */
 export function sessionWhen(session: Pick<SessionCardDto, 'startsAt' | 'endsAt'>, zone: string) {
   return `${weekdayDateIn(session.startsAt, zone)} · ${timeIn(session.startsAt, zone)}–${timeIn(session.endsAt, zone)}`;

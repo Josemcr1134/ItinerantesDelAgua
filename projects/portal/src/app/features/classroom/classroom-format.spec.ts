@@ -1,16 +1,6 @@
-import { SessionCardDto } from 'data-access';
-import { attendanceOf, cdmxTime, dayParts, fileSize, sessionWhen } from './classroom-format';
-
-const session = (attendance: unknown) => ({ attendance }) as unknown as SessionCardDto;
+import { cdmxTime, dayParts, fileSize, sessionWhen } from './classroom-format';
 
 describe('classroom-format', () => {
-  it('lee la asistencia solo si llega con la forma esperada', () => {
-    expect(attendanceOf(session({ status: 'REGISTERED' }))).toBe('REGISTERED');
-    expect(attendanceOf(session({ status: 'OTRO' }))).toBeNull();
-    expect(attendanceOf(session({ summary: {}, rows: [] }))).toBeNull();
-    expect(attendanceOf(session(null))).toBeNull();
-  });
-
   it('da la sesión en la zona de la persona y la referencia CDMX', () => {
     const s = { startsAt: '2026-10-29T23:00:00.000Z', endsAt: '2026-10-30T01:00:00.000Z' };
     expect(sessionWhen(s, 'America/Bogota')).toBe('jue 29 oct 2026 · 18:00–20:00');

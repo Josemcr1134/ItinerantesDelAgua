@@ -1,11 +1,10 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { ClassroomsApi, SessionCardDto, toApiError } from 'data-access';
+import { ClassroomsApi, participantAttendance, SessionCardDto, toApiError } from 'data-access';
 import { map } from 'rxjs';
 import {
   ATTENDANCE_LABELS,
-  attendanceOf,
   cdmxTime,
   dayParts,
   RECORDING_LABELS,
@@ -33,7 +32,7 @@ export class ClassroomSessions {
 
   protected readonly recordings = RECORDING_LABELS;
   protected readonly attendanceLabels = ATTENDANCE_LABELS;
-  protected readonly attendance = attendanceOf;
+  protected readonly attendance = participantAttendance;
 
   protected readonly upcoming = rxResource({
     params: () => this.offerId(),

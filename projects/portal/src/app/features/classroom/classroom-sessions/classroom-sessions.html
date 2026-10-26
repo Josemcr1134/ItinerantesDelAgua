@@ -58,15 +58,19 @@
                   } @else if (s.recording.state !== 'NOT_APPLICABLE') {
                     <span class="session__state">{{ recordings[s.recording.state] }}</span>
                   }
-                  @if (attendance(s); as status) {
-                    @if (status === 'PENDING') {
+                  @if (attendance(s); as a) {
+                    @if (a.canRegister) {
                       <a class="chip chip--pending" [routerLink]="['/asistencia', s.id]">
                         Registrar asistencia
                       </a>
-                    } @else {
-                      <span class="chip" [attr.data-status]="status">{{
-                        attendanceLabels[status]
-                      }}</span>
+                    } @else if (a.status !== 'NOT_APPLICABLE') {
+                      <a
+                        class="chip"
+                        [attr.data-status]="a.status"
+                        [routerLink]="['/asistencia', s.id]"
+                      >
+                        {{ attendanceLabels[a.status] }}
+                      </a>
                     }
                   }
                 }

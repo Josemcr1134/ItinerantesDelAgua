@@ -89,9 +89,8 @@ export const routes: Routes = [
       },
       {
         path: 'asistencia/:sessionId',
-        title: 'Asistencia · Portal',
-        data: { section: 'Asistencia' },
-        loadComponent: () => import('./features/coming-soon/coming-soon-page'),
+        title: 'Registro de asistencia · Portal',
+        loadComponent: () => import('./features/attendance/attendance-page'),
       },
       {
         path: 'calendario',

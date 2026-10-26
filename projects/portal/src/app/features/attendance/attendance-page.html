@@ -1,0 +1,233 @@
+@if (current(); as s) {
+  @let a = attendance();
+  @let d = day(s.startsAt);
+  <article class="card" aria-labelledby="attendance-title">
+    <!-- Panel ilustrado: hojas de fondo y la fecha de la sesión. -->
+    <div class="card__art" aria-hidden="true">
+      <img class="card__leaves" src="assets/access/leaves.webp" alt="" width="700" height="890" />
+      <span class="card__date">
+        <strong>{{ d.day }}</strong>
+        {{ d.month }}
+      </span>
+    </div>
+
+    <div class="card__body">
+      <p class="card__offer">{{ s.offer.name }}</p>
+      <h2 id="attendance-title" class="card__title">{{ title(s) }}</h2>
+      <p class="card__when">
+        {{ when(s) }}
+        @if (cdmx(s.startsAt); as reference) {
+          <span class="card__muted">· {{ reference }}</span>
+        }
+      </p>
+      @if (s.teacherNames.length) {
+        <p class="card__muted">{{ s.teacherNames.join(', ') }}</p>
+      }
+
+      @if (notice(); as message) {
+        <p class="notice" role="status">{{ message }}</p>
+      }
+
+      @switch (view()) {
+        @case ('form') {
+          <form class="form" novalidate (submit)="$event.preventDefault(); register()">
+            <label class="attend" [class.attend--invalid]="!!formError()">
+              <input
+                type="checkbox"
+                [checked]="attended()"
+                (change)="attended.set($any($event.target).checked); formError.set(null)"
+                [attr.aria-invalid]="!!formError()"
+                aria-describedby="attendance-error"
+              />
+              <span>
+                <strong>Asistí a la sesión *</strong>
+                <small>Confirmo que estuve presente en esta sesión.</small>
+              </span>
+            </label>
+
+            <div class="field">
+              <label class="field__label" for="attendance-comment">
+                ¿Qué te llevas de esta sesión? <span class="field__optional">(opcional)</span>
+              </label>
+              <textarea
+                id="attendance-comment"
+                class="field__input"
+                rows="4"
+                [attr.maxlength]="commentMax"
+                [value]="comment()"
+                (input)="comment.set($any($event.target).value)"
+                aria-describedby="attendance-count"
+              ></textarea>
+              <span id="attendance-count" class="field__count">
+                {{ comment().length }} / {{ commentMax }}
+              </span>
+            </div>
+
+            @if (a) {
+              <p class="window">
+                Puedes registrar hasta el <strong>{{ date(a.closesAt) }}</strong>
+                @if (remaining(a.closesAt); as left) {
+                  · cierra en {{ left }}
+                }
+              </p>
+            }
+            @if (formError(); as message) {
+              <p id="attendance-error" class="form__error" role="alert">{{ message }}</p>
+            }
+            <button type="submit" class="button" [disabled]="sending()">
+              {{ sending() ? 'Registrando…' : 'Registrar asistencia' }}
+            </button>
+          </form>
+        }
+
+        @case ('registered') {
+          <div class="state state--ok" role="status">
+            <span class="state__icon" aria-hidden="true">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12.5l4.5 4.5L19 7.5" />
+              </svg>
+            </span>
+            <div class="state__text">
+              <h3 class="state__title">Asistencia registrada</h3>
+              @if (a?.registeredAt; as at) {
+                <p>
+                  {{ a?.source === 'MANUAL' ? 'La registró el equipo el' : 'Registrada el' }}
+                  {{ date(at) }}.
+                </p>
+              }
+              @if (a?.comment; as text) {
+                <blockquote class="state__quote">«{{ text }}»</blockquote>
+              }
+              @if (result()?.progress; as p) {
+                <p class="state__progress">
+                  Tu asistencia en el aula: <strong>{{ p.percent }}%</strong> ({{
+                    p.attendedSessions
+                  }}
+                  de {{ p.scheduledSessions }} sesiones)
+                </p>
+              }
+            </div>
+          </div>
+        }
+
+        @case ('closed') {
+          <div class="state state--closed">
+            <span class="state__icon" aria-hidden="true">
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="4" y="11" width="16" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+              </svg>
+            </span>
+            <div class="state__text">
+              <h3 class="state__title">El registro de asistencia está cerrado</h3>
+              @if (a) {
+                <p>Cerró el {{ date(a.closesAt) }} ({{ a.windowHours }} h después de la sesión).</p>
+              }
+              <!-- TODO(contenido): confirmar cómo se pide la corrección (HU-30). -->
+              <p>Si asististe, pide la corrección al equipo de la Escuela.</p>
+            </div>
+          </div>
+        }
+
+        @case ('not-open') {
+          <div class="state state--waiting">
+            <span class="state__icon" aria-hidden="true">
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
+              </svg>
+            </span>
+            <div class="state__text">
+              <h3 class="state__title">El registro abre al terminar la sesión</h3>
+              <p>
+                Podrás registrar tu asistencia desde el {{ date(a?.opensAt ?? s.endsAt) }}
+                @if (a) {
+                  y durante {{ a.windowHours }} h.
+                }
+              </p>
+              <portal-session-join [join]="s.join" [venue]="s.venue" [timezone]="timezone()" />
+            </div>
+          </div>
+        }
+
+        @case ('cancelled') {
+          <div class="state state--closed">
+            <span class="state__icon" aria-hidden="true">×</span>
+            <div class="state__text">
+              <h3 class="state__title">Esta sesión fue cancelada</h3>
+              <p>
+                No hay asistencia que registrar.
+                @if (s.changeReason) {
+                  Motivo: {{ s.changeReason }}.
+                }
+              </p>
+            </div>
+          </div>
+        }
+      }
+
+      <a
+        class="back"
+        [routerLink]="['/formacion/aula', s.offer.id]"
+        [queryParams]="{ seccion: 'sesiones' }"
+      >
+        <span aria-hidden="true">←</span> Volver a las sesiones del aula
+      </a>
+    </div>
+  </article>
+
+  @if (others().length) {
+    <section class="others" aria-labelledby="others-title">
+      <h2 id="others-title" class="others__title">También puedes registrar</h2>
+      <ul class="others__list">
+        @for (other of others(); track other.id) {
+          <li>
+            <a class="other" [routerLink]="['/asistencia', other.id]">
+              <span class="other__info">
+                <span class="other__title">{{ title(other) }}</span>
+                <span class="other__meta">{{ other.offer.name }} · {{ when(other) }}</span>
+              </span>
+              <span class="other__action">Registrar</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+} @else if (pageError(); as message) {
+  <section class="denied">
+    <img src="assets/access/woman.webp" alt="" width="160" height="161" aria-hidden="true" />
+    <div>
+      <h2 class="denied__title">No pudimos abrir esta sesión</h2>
+      <p>{{ message }}</p>
+      <a class="button button--outline" routerLink="/formacion">Ver mi formación</a>
+    </div>
+  </section>
+}

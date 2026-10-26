@@ -1,0 +1,214 @@
+// Formulario y estados del registro: casilla grande "Asistí a la sesión",
+// comentario con contador, ventana con cuenta regresiva y los avisos
+// (registrada en verde, cerrada en gris cálido, por abrir en amarillo).
+
+$muted: #5a6b60;
+$error: #b5452b;
+
+.form {
+  display: grid;
+  justify-self: stretch;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.attend {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid #c8d2c9;
+  border-radius: 16px;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin: 1px 0 0;
+    accent-color: #399f71;
+  }
+
+  span {
+    display: grid;
+    gap: 2px;
+  }
+
+  small {
+    color: $muted;
+    font-size: 0.8125rem;
+  }
+
+  &:has(input:checked) {
+    border-color: #399f71;
+    background-color: #eef6f1;
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+
+.attend--invalid {
+  border-color: $error;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field__label {
+  color: $muted;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.field__optional {
+  font-weight: 500;
+}
+
+.field__input {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 14px;
+  color: var(--color-raisin-black);
+  font: inherit;
+  resize: vertical;
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+
+.field__count {
+  justify-self: end;
+  color: $muted;
+  font-size: 0.75rem;
+}
+
+.window {
+  color: $muted;
+  font-size: 0.875rem;
+
+  strong {
+    color: var(--color-primary);
+  }
+}
+
+.form__error {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: color-mix(in srgb, #{$error} 10%, #fff);
+  color: $error;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.button {
+  justify-self: start;
+  min-height: 50px;
+  padding: 0 28px;
+  border: 2px solid var(--color-primary);
+  border-radius: 100px;
+  background-color: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+}
+
+.button--outline {
+  display: inline-grid;
+  place-items: center;
+  min-height: 44px;
+  background-color: transparent;
+  color: var(--color-primary);
+  font-size: 1rem;
+}
+
+.state {
+  display: flex;
+  justify-self: stretch;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background-color: #f4f6f1;
+}
+
+.state--ok {
+  background-color: #eef6f1;
+}
+
+.state--closed {
+  background-color: #f6f1ee;
+}
+
+.state--waiting {
+  background-color: #fffaf0;
+}
+
+.state__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #c8d2c9;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+
+  .state--ok & {
+    background-color: #399f71;
+  }
+
+  .state--closed & {
+    background-color: #b9a69d;
+  }
+
+  .state--waiting & {
+    background-color: #eaa700;
+  }
+}
+
+.state__text {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  color: var(--color-raisin-black);
+}
+
+.state__title {
+  color: var(--color-primary);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.state__quote {
+  margin: 4px 0 0;
+  padding-left: 12px;
+  border-left: 3px solid #399f71;
+  color: $muted;
+  font-style: italic;
+}
+
+.state__progress strong {
+  color: var(--color-primary);
+}
