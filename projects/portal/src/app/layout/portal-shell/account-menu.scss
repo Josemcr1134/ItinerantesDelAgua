@@ -101,17 +101,25 @@ $edge: clamp(16px, 3.4vw, 49px);
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
   height: 74px;
   margin-left: auto;
-  padding: 0 13px 0 34px;
+  padding: 0 13px 0 20px;
+
+  @include bp.up(md) {
+    padding-left: 34px;
+  }
   border-radius: 100px;
   background: linear-gradient(90deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.55));
   backdrop-filter: blur(22.5px);
 }
 
 .greeting__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--color-raisin-black);
-  font-size: clamp(1.125rem, 0.9rem + 0.6vw, 1.5rem);
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.5rem);
   line-height: 32px;
   white-space: nowrap;
 }

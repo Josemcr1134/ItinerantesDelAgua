@@ -211,36 +211,39 @@
         </nav>
       }
     </div>
-    <div class="greeting account">
-      <p class="greeting__text">Hola, {{ shortName() }} <span aria-hidden="true">👋</span></p>
-      <button
-        type="button"
-        class="greeting__button"
-        aria-haspopup="menu"
-        [attr.aria-expanded]="accountMenu() === 'header'"
-        aria-controls="account-menu-header"
-        [attr.aria-label]="'Cuenta de ' + fullName()"
-        (click)="toggleAccountMenu('header')"
-      >
-        <svg
-          aria-hidden="true"
-          class="greeting__chevron"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
+    <div class="header__end">
+      <portal-notification-bell [timezone]="timezone()" />
+      <div class="greeting account">
+        <p class="greeting__text">Hola, {{ shortName() }} <span aria-hidden="true">👋</span></p>
+        <button
+          type="button"
+          class="greeting__button"
+          aria-haspopup="menu"
+          [attr.aria-expanded]="accountMenu() === 'header'"
+          aria-controls="account-menu-header"
+          [attr.aria-label]="'Cuenta de ' + fullName()"
+          (click)="toggleAccountMenu('header')"
         >
-          <path
-            fill="currentColor"
-            d="M12 14.54 6.72 9.29a1 1 0 0 0-1.43 0 1 1 0 0 0 0 1.42l6 5.95a1 1 0 0 0 1.42 0l6-5.95a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0Z"
-          />
-        </svg>
-        <portal-avatar [name]="fullName()" [size]="42" />
-      </button>
-      @if (accountMenu() === 'header') {
-        <div id="account-menu-header" class="account__menu" role="menu">
-          <ng-container [ngTemplateOutlet]="accountItems" />
-        </div>
-      }
+          <svg
+            aria-hidden="true"
+            class="greeting__chevron"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill="currentColor"
+              d="M12 14.54 6.72 9.29a1 1 0 0 0-1.43 0 1 1 0 0 0 0 1.42l6 5.95a1 1 0 0 0 1.42 0l6-5.95a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0Z"
+            />
+          </svg>
+          <portal-avatar [name]="fullName()" [size]="42" />
+        </button>
+        @if (accountMenu() === 'header') {
+          <div id="account-menu-header" class="account__menu" role="menu">
+            <ng-container [ngTemplateOutlet]="accountItems" />
+          </div>
+        }
+      </div>
     </div>
   </header>
 

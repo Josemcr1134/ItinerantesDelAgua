@@ -1,0 +1,69 @@
+<button
+  type="button"
+  class="bell"
+  aria-haspopup="dialog"
+  aria-controls="notifications-panel"
+  [attr.aria-expanded]="open()"
+  [attr.aria-label]="label()"
+  (click)="toggle()"
+>
+  <svg
+    aria-hidden="true"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+  </svg>
+  @if (unread()) {
+    <span class="bell__count" aria-hidden="true">{{ badge() }}</span>
+  }
+</button>
+
+@if (open()) {
+  <section
+    id="notifications-panel"
+    class="panel"
+    role="dialog"
+    aria-labelledby="notifications-panel-title"
+  >
+    <header class="panel__head">
+      <h2 id="notifications-panel-title" class="panel__title">Notificaciones</h2>
+      <button type="button" class="panel__mark" [disabled]="!unread()" (click)="markAllRead()">
+        Marcar todas como leídas
+      </button>
+    </header>
+
+    @if (items().length) {
+      <ul class="panel__list">
+        @for (notification of items(); track notification.id) {
+          <li>
+            <portal-notification-item
+              [notification]="notification"
+              [timezone]="timezone()"
+              [compact]="true"
+              (opened)="openItem($event)"
+              (markRead)="markRead($event)"
+            />
+          </li>
+        }
+      </ul>
+    } @else if (loaded()) {
+      <div class="panel__empty">
+        <img src="assets/access/leaves.webp" alt="" width="64" height="81" />
+        <p><strong>Todo en calma.</strong> No tienes notificaciones.</p>
+      </div>
+    } @else if (failed()) {
+      <p class="panel__note" role="alert">No pudimos cargar tus notificaciones.</p>
+    } @else {
+      <p class="panel__note" role="status">Cargando…</p>
+    }
+
+    <a class="panel__all" routerLink="/notificaciones">Ver todas las notificaciones</a>
+  </section>
+}

@@ -101,6 +101,16 @@ $edge: clamp(16px, 3.4vw, 49px);
   margin-bottom: 25px;
 }
 
+.header__end {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  margin-left: auto;
+}
+
 .header__text {
   min-width: 0;
 }

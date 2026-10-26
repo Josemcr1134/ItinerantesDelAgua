@@ -1,0 +1,122 @@
+@let unread = center.unread();
+<section class="hero" aria-labelledby="notifications-summary">
+  <div class="hero__text">
+    <h2 id="notifications-summary" class="hero__title">
+      @if (unread) {
+        Tienes {{ unread }} {{ unread === 1 ? 'aviso sin leer' : 'avisos sin leer' }}
+      } @else {
+        Estás al día
+      }
+    </h2>
+    <!-- TODO(contenido): confirmar el texto del resumen. -->
+    <p class="hero__lead">
+      Aquí llegan los avisos de tu formación, tus postulaciones y becas, y tus pagos.
+    </p>
+    <button
+      type="button"
+      class="hero__button"
+      [disabled]="!unread || markingAll()"
+      (click)="markAllRead()"
+    >
+      Marcar todas como leídas
+    </button>
+  </div>
+  <img
+    class="hero__art"
+    src="assets/dashboard/next-activity.webp"
+    alt=""
+    width="300"
+    height="160"
+    aria-hidden="true"
+  />
+</section>
+
+<div class="filters">
+  <nav class="chips" aria-label="Grupos de notificaciones">
+    <a
+      class="chip"
+      [class.chip--on]="!category()"
+      routerLink="."
+      [queryParams]="{ categoria: null }"
+      queryParamsHandling="merge"
+      [attr.aria-current]="!category() ? 'page' : null"
+    >
+      Todas
+    </a>
+    @for (option of categories; track option.value) {
+      <a
+        class="chip"
+        [class.chip--on]="category() === option.value"
+        routerLink="."
+        [queryParams]="{ categoria: option.slug }"
+        queryParamsHandling="merge"
+        [attr.aria-current]="category() === option.value ? 'page' : null"
+      >
+        {{ option.label }}
+      </a>
+    }
+  </nav>
+  <a
+    class="switch"
+    role="switch"
+    [attr.aria-checked]="unreadOnly()"
+    routerLink="."
+    [queryParams]="{ estado: unreadOnly() ? null : 'no-leidas' }"
+    queryParamsHandling="merge"
+  >
+    <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+    Solo sin leer
+  </a>
+</div>
+
+@if (error(); as message) {
+  <p class="notice" role="alert">{{ message }}</p>
+}
+
+@if (groups().length) {
+  @for (group of groups(); track group.key) {
+    <section class="group" [attr.aria-labelledby]="'group-' + group.key">
+      <h2 class="group__title" [id]="'group-' + group.key">{{ group.label }}</h2>
+      <ul class="list">
+        @for (notification of group.items; track notification.id) {
+          <li>
+            <portal-notification-item
+              [notification]="notification"
+              [timezone]="timezone()"
+              [timeOnly]="group.key !== 'pinned'"
+              (opened)="open($event)"
+              (markRead)="markRead($event)"
+            />
+          </li>
+        }
+      </ul>
+    </section>
+  }
+  @if (hasMore()) {
+    <button type="button" class="more" [disabled]="list.isLoading()" (click)="loadMore()">
+      {{ list.isLoading() ? 'Cargando…' : 'Cargar más' }}
+    </button>
+  }
+} @else if (list.hasValue()) {
+  <div class="empty">
+    <img
+      class="empty__art"
+      src="assets/access/leaves.webp"
+      alt=""
+      width="110"
+      height="140"
+      aria-hidden="true"
+    />
+    <p class="empty__title">
+      @if (unreadOnly()) {
+        No tienes avisos sin leer
+      } @else if (categoryLabel(); as label) {
+        Aún no hay avisos de {{ label }}
+      } @else {
+        Todo en calma
+      }
+    </p>
+    <!-- TODO(contenido): confirmar el texto sin notificaciones. -->
+    <p class="empty__text">Cuando haya novedades, te avisaremos aquí y en tu correo.</p>
+  </div>
+}

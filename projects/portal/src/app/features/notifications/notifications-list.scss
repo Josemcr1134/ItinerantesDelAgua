@@ -1,0 +1,73 @@
+// Lista por día, "Cargar más" y el estado vacío con la rama de hojas.
+
+.group + .group {
+  margin-top: 22px;
+}
+
+.group__title {
+  margin-bottom: 10px;
+  color: #5a6b60;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.more {
+  display: block;
+  min-height: 44px;
+  margin: 24px auto 0;
+  padding: 0 28px;
+  border: 2px solid var(--color-primary);
+  border-radius: 100px;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 32px 20px 40px;
+  border-radius: 25px;
+  background-color: #fff;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.empty__art {
+  width: 110px;
+  height: auto;
+  margin-bottom: 8px;
+}
+
+.empty__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.empty__text {
+  max-width: 40ch;
+  color: #5a6b60;
+}

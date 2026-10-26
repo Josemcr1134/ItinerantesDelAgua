@@ -14,9 +14,12 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { AuthService, SessionStore } from 'auth';
 import { filter } from 'rxjs';
 import { AlertService } from 'ui-kit';
+import { NotificationCenter } from '../../core/notifications/notification-center';
 import { PageHeading } from '../../core/page-heading/page-heading';
+import { browserTimezone } from '../../features/dashboard/dashboard-format';
 import { Avatar } from '../../shared/avatar/avatar';
 import { MenuIcon } from './menu-icon';
+import { NotificationBell } from './notification-bell/notification-bell';
 import { NAV_ITEMS, NavItem } from './navigation';
 
 const COLLAPSED_KEY = 'portal.sidebar.collapsed';
@@ -37,7 +40,15 @@ function readCollapsed(): boolean {
  */
 @Component({
   selector: 'portal-shell',
-  imports: [NgTemplateOutlet, RouterOutlet, RouterLink, RouterLinkActive, MenuIcon, Avatar],
+  imports: [
+    NgTemplateOutlet,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    MenuIcon,
+    Avatar,
+    NotificationBell,
+  ],
   templateUrl: './portal-shell.html',
   styleUrls: ['./portal-shell.scss', './portal-sidebar.scss', './account-menu.scss'],
   host: {
@@ -54,6 +65,8 @@ export default class PortalShell {
 
   private readonly user = inject(SessionStore).user;
   protected readonly fullName = computed(() => this.user()?.fullName ?? '');
+  protected readonly timezone = computed(() => this.user()?.timezone ?? browserTimezone());
+  private readonly notifications = inject(NotificationCenter);
   /** "Hola, Jesús Pérez": nombre y primer apellido (o los dos primeros nombres). */
   protected readonly shortName = computed(() =>
     this.fullName().trim().split(/\s+/).slice(0, 2).join(' '),
@@ -74,6 +87,9 @@ export default class PortalShell {
   private readonly injector = inject(Injector);
 
   constructor() {
+    // Contador de la campana: al entrar, al navegar y cada minuto.
+    this.notifications.refresh();
+    this.notifications.startPolling();
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -81,6 +97,7 @@ export default class PortalShell {
       )
       .subscribe((event) => {
         this.url.set(event.urlAfterRedirects);
+        this.notifications.refresh();
         this.drawerOpen.set(false);
         this.accountMenu.set(null);
       });

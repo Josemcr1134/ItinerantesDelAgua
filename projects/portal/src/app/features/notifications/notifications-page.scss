@@ -1,0 +1,183 @@
+@use 'breakpoints' as bp;
+
+// Notificaciones (línea gráfica del portal): resumen en verde claro con la
+// ilustración de la mujer sembrando, filtros tipo pastilla y un interruptor.
+
+:host {
+  display: block;
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  margin-bottom: 22px;
+  padding: 24px clamp(18px, 3vw, 34px);
+  border-radius: 25px;
+  background: linear-gradient(110deg, #fff 30%, #e3f1e9);
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.12);
+  color: var(--color-primary);
+
+  @include bp.up(md) {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    align-items: end;
+    min-height: 190px;
+    padding-block: 28px;
+  }
+}
+
+.hero__text {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 8px;
+  align-self: center;
+}
+
+.hero__title {
+  font-size: clamp(1.25rem, 1rem + 0.8vw, 1.625rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero__lead {
+  max-width: 46ch;
+  color: #5a6b60;
+}
+
+.hero__button {
+  margin-top: 8px;
+  min-height: 44px;
+  padding: 0 22px;
+  border: 2px solid var(--color-primary);
+  border-radius: 100px;
+  background-color: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    border-color: #c8d2c9;
+    background-color: transparent;
+    color: #5a6b60;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+}
+
+// Ilustración anclada abajo a la derecha (en móvil, solo un detalle).
+.hero__art {
+  position: absolute;
+  right: -40px;
+  bottom: -18px;
+  width: 170px;
+  height: auto;
+  opacity: 0.35;
+  pointer-events: none;
+
+  @include bp.up(md) {
+    right: 0;
+    bottom: -8px;
+    width: 300px;
+    opacity: 1;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 18px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-grid;
+  place-items: center;
+  height: 35px;
+  padding: 0 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  color: var(--color-primary);
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.chip--on {
+  background-color: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+}
+
+.switch__track {
+  display: flex;
+  align-items: center;
+  width: 42px;
+  height: 24px;
+  padding: 3px;
+  border-radius: 54px;
+  background-color: #c8d2c9;
+  transition: background-color 0.2s ease;
+
+  [aria-checked='true'] > & {
+    background-color: #399f71;
+  }
+}
+
+.switch__thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  transition: transform 0.2s ease;
+
+  [aria-checked='true'] & {
+    transform: translateX(18px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.notice {
+  margin-bottom: 16px;
+  padding: var(--space-4);
+  border-radius: 25px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+}

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard, authRoutes, guestGuard } from 'auth';
 import { PageSeo } from './core/seo/portal-seo';
 import { formationTypeMatch } from './features/formation/formation-options';
+import { applicationRedirect } from './shared/applications/application-redirect';
 
 // TODO(contenido): confirmar las descripciones para buscadores.
 /** Secciones del menú aún sin pantalla: [ruta, nombre]. */
@@ -69,6 +70,28 @@ export const routes: Routes = [
             loadComponent: () => import('./features/scholarships/scholarship-application-page'),
           },
         ],
+      },
+      {
+        path: 'notificaciones',
+        title: 'Notificaciones · Portal',
+        loadComponent: () => import('./features/notifications/notifications-page'),
+      },
+      // Enlaces de notificaciones y correos (`/portal/postulaciones/{id}[/pago]`).
+      {
+        path: 'postulaciones/:id',
+        canActivate: [applicationRedirect],
+        children: [],
+      },
+      {
+        path: 'postulaciones/:id/pago',
+        canActivate: [applicationRedirect],
+        children: [],
+      },
+      {
+        path: 'asistencia/:sessionId',
+        title: 'Asistencia · Portal',
+        data: { section: 'Asistencia' },
+        loadComponent: () => import('./features/coming-soon/coming-soon-page'),
       },
       {
         path: 'calendario',
