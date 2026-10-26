@@ -3,6 +3,16 @@ import { authGuard, authRoutes, guestGuard } from 'auth';
 import { PageSeo } from './core/seo/portal-seo';
 
 // TODO(contenido): confirmar las descripciones para buscadores.
+/** Secciones del menú aún sin pantalla: [ruta, nombre]. */
+const SECTIONS: readonly (readonly [string, string])[] = [
+  ['formacion', 'Formación'],
+  ['biblioteca', 'Biblioteca'],
+  ['calendario', 'Calendario'],
+  ['convocatorias', 'Convocatorias'],
+  ['becas', 'Becas'],
+  ['perfil', 'Mi perfil'],
+];
+
 const LOGIN_SEO: PageSeo = {
   description: 'Ingresa al Portal de la Escuela Itinerante del Agua con tu correo y contraseña.',
   index: true,
@@ -38,9 +48,22 @@ export const routes: Routes = [
   },
   {
     path: '',
-    title: 'Inicio · Portal',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/home/home-page'),
+    loadComponent: () => import('./layout/portal-shell/portal-shell'),
+    children: [
+      {
+        path: '',
+        title: 'Dashboard · Portal',
+        loadComponent: () => import('./features/dashboard/dashboard-page'),
+      },
+      // TODO: cada sección reemplaza este marcador al tener su pantalla.
+      ...SECTIONS.map(([path, section]) => ({
+        path,
+        title: `${section} · Portal`,
+        data: { section },
+        loadComponent: () => import('./features/coming-soon/coming-soon-page'),
+      })),
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

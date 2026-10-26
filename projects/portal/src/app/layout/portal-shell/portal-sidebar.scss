@@ -1,0 +1,209 @@
+@use 'breakpoints' as bp;
+
+$ink: var(--color-primary);
+$active: #0067ff;
+$active-bg: #f5f8ff;
+$edge: clamp(16px, 3.4vw, 49px);
+
+// Menú lateral (Figma HU-06): 244 px expandido, 74 px contraído; en móvil,
+// panel desplegable.
+
+// --- Menú lateral ------------------------------------------------------------
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: min(280px, 85vw);
+  background-color: #fffefb;
+  translate: -100% 0;
+  visibility: hidden;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      translate 0.25s ease,
+      visibility 0.25s;
+  }
+
+  @include bp.up(lg) {
+    position: sticky;
+    top: $edge;
+    width: auto;
+    height: calc(100dvh - 2 * #{$edge});
+    border-radius: 25px;
+    translate: none;
+    visibility: visible;
+  }
+}
+
+.sidebar--open {
+  translate: 0 0;
+  visibility: visible;
+
+  // Al abrir se hace visible de inmediato (para poder enfocar el menú); al
+  // cerrar, se oculta cuando termina de deslizarse.
+  @media (prefers-reduced-motion: no-preference) {
+    transition: translate 0.25s ease;
+  }
+}
+
+.sidebar__head {
+  position: relative;
+  flex: none;
+  height: 88px;
+  padding: 13px 25px;
+  border-bottom: 1px solid color-mix(in srgb, #{$ink} 12%, transparent);
+}
+
+.sidebar__brand {
+  display: inline-block;
+}
+
+.sidebar__logo {
+  display: block;
+  width: 89px;
+  height: auto;
+}
+
+.sidebar__mark {
+  display: none;
+  width: 36px;
+  height: auto;
+}
+
+// Botón redondo sobre la línea divisoria (solo escritorio).
+.sidebar__collapse {
+  display: none;
+  position: absolute;
+  right: -12px;
+  bottom: -12px;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: $ink;
+  color: #fff;
+  cursor: pointer;
+
+  svg {
+    rotate: 90deg;
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition: rotate 0.3s ease;
+    }
+  }
+
+  @include bp.up(lg) {
+    display: grid;
+  }
+}
+
+.nav {
+  flex: 1;
+  padding-top: 30px;
+  overflow-y: auto;
+}
+
+.nav__list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  margin: 0 8px 0 12px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: $ink;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: color-mix(in srgb, #{$active-bg} 60%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 3px solid $active;
+    outline-offset: -3px;
+  }
+}
+
+// Activo: fondo azul claro y barra azul en el borde del menú.
+.nav__link--active {
+  background-color: $active-bg;
+  color: $active;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: -12px;
+    width: 4px;
+    height: 36px;
+    border-radius: 25px;
+    background-color: $active;
+  }
+}
+
+// --- Contraído (solo escritorio): íconos, logo reducido y avatar ------------
+:host(.shell--collapsed) {
+  @include bp.up(lg) {
+    .sidebar {
+      border-radius: 37px;
+    }
+
+    .sidebar__head {
+      padding: 13px 19px;
+    }
+
+    .sidebar__logo,
+    .nav__label,
+    .profile__label,
+    .profile__chevron {
+      display: none;
+    }
+
+    .sidebar__mark {
+      display: block;
+    }
+
+    .sidebar__collapse svg {
+      rotate: -90deg;
+    }
+
+    .nav__link {
+      justify-content: center;
+      margin: 0 9px 0 13px;
+      padding: 0;
+    }
+
+    .account--sidebar {
+      display: flex;
+      justify-content: center;
+    }
+
+    .profile {
+      width: auto;
+      padding: 0;
+      border: 0;
+      background: none;
+    }
+
+    .account__menu--up {
+      right: auto;
+      left: 0;
+    }
+  }
+}

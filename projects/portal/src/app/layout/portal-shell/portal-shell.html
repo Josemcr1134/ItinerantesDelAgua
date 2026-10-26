@@ -1,0 +1,174 @@
+<!-- Menú de la cuenta (el mismo desde el saludo y desde el pie del menú lateral). -->
+<ng-template #accountItems>
+  <a class="account__item" role="menuitem" routerLink="/perfil">Mi perfil</a>
+  <button type="button" class="account__item" role="menuitem" (click)="logout()">
+    Cerrar sesión
+  </button>
+</ng-template>
+
+<!-- Barra superior (móvil) -->
+<header class="topbar">
+  <a class="topbar__brand" routerLink="/">
+    <img
+      src="assets/access/logo-escuela.webp"
+      alt="Escuela Itinerante del Agua"
+      width="89"
+      height="62"
+    />
+  </a>
+  <button
+    #drawerToggle
+    type="button"
+    class="topbar__toggle"
+    aria-controls="portal-sidebar"
+    [attr.aria-expanded]="drawerOpen()"
+    [attr.aria-label]="drawerOpen() ? 'Cerrar menú' : 'Abrir menú'"
+    (click)="toggleDrawer()"
+  >
+    <svg
+      aria-hidden="true"
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+    >
+      @if (drawerOpen()) {
+        <path d="M6 6l12 12M18 6L6 18" />
+      } @else {
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      }
+    </svg>
+  </button>
+</header>
+
+@if (drawerOpen()) {
+  <div class="backdrop" aria-hidden="true" (click)="toggleDrawer()"></div>
+}
+
+<aside #sidebar id="portal-sidebar" class="sidebar" [class.sidebar--open]="drawerOpen()">
+  <div class="sidebar__head">
+    <a class="sidebar__brand" routerLink="/" aria-label="Escuela Itinerante del Agua, ir al inicio">
+      <img
+        class="sidebar__logo"
+        src="assets/access/logo-escuela.webp"
+        alt=""
+        width="89"
+        height="62"
+      />
+      <img class="sidebar__mark" src="assets/shell/logo-mark.webp" alt="" width="36" height="62" />
+    </a>
+    <button
+      type="button"
+      class="sidebar__collapse"
+      aria-controls="portal-sidebar"
+      [attr.aria-expanded]="!collapsed()"
+      [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Contraer menú'"
+      (click)="toggleCollapsed()"
+    >
+      <svg aria-hidden="true" width="19" height="19" viewBox="0 0 19 19">
+        <path
+          fill="currentColor"
+          d="M14.81 6.5a.79.79 0 0 0-1.12 0l-3.63 3.63a.79.79 0 0 1-1.12 0L5.31 6.5a.79.79 0 0 0-1.12 1.12l3.63 3.63a2.38 2.38 0 0 0 3.36 0l3.63-3.63a.79.79 0 0 0 0-1.12Z"
+        />
+      </svg>
+    </button>
+  </div>
+
+  <nav class="nav" aria-label="Menú principal">
+    <ul class="nav__list">
+      @for (item of navItems; track item.path) {
+        <li>
+          <a
+            class="nav__link"
+            [routerLink]="item.path"
+            routerLinkActive="nav__link--active"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: !!item.exact }"
+            [attr.title]="collapsed() ? item.label : null"
+          >
+            <portal-menu-icon [name]="item.icon" />
+            <span class="nav__label">{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <div class="account account--sidebar">
+    <button
+      type="button"
+      class="profile"
+      aria-haspopup="menu"
+      [attr.aria-expanded]="accountMenu() === 'sidebar'"
+      aria-controls="account-menu-sidebar"
+      [attr.aria-label]="'Cuenta de ' + fullName()"
+      (click)="toggleAccountMenu('sidebar')"
+    >
+      <portal-avatar [name]="fullName()" [size]="28" />
+      <span class="profile__label">Perfil</span>
+      <span class="profile__chevron" aria-hidden="true">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M5 12.5 10 7.5l5 5" />
+        </svg>
+      </span>
+    </button>
+    @if (accountMenu() === 'sidebar') {
+      <div id="account-menu-sidebar" class="account__menu account__menu--up" role="menu">
+        <ng-container [ngTemplateOutlet]="accountItems" />
+      </div>
+    }
+  </div>
+</aside>
+
+<div class="main">
+  <header class="header">
+    <p class="header__title">Escuela Itinerante del Agua</p>
+    <div class="greeting account">
+      <p class="greeting__text">Hola, {{ shortName() }} <span aria-hidden="true">👋</span></p>
+      <button
+        type="button"
+        class="greeting__button"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="accountMenu() === 'header'"
+        aria-controls="account-menu-header"
+        [attr.aria-label]="'Cuenta de ' + fullName()"
+        (click)="toggleAccountMenu('header')"
+      >
+        <svg
+          aria-hidden="true"
+          class="greeting__chevron"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            d="M12 14.54 6.72 9.29a1 1 0 0 0-1.43 0 1 1 0 0 0 0 1.42l6 5.95a1 1 0 0 0 1.42 0l6-5.95a1 1 0 0 0 0-1.42 1 1 0 0 0-1.42 0Z"
+          />
+        </svg>
+        <portal-avatar [name]="fullName()" [size]="42" />
+      </button>
+      @if (accountMenu() === 'header') {
+        <div id="account-menu-header" class="account__menu" role="menu">
+          <ng-container [ngTemplateOutlet]="accountItems" />
+        </div>
+      }
+    </div>
+  </header>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

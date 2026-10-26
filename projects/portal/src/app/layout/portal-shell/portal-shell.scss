@@ -1,0 +1,122 @@
+@use 'breakpoints' as bp;
+
+// Figma HU-06 (1440 px): menú de 244 px (74 px contraído) a 49 px de los
+// bordes, 40 px hasta el contenido (68 px contraído). En móvil, barra
+// superior y menú desplegable.
+
+$ink: var(--color-primary);
+$active: #0067ff;
+$active-bg: #f5f8ff;
+$edge: clamp(16px, 3.4vw, 49px);
+
+:host {
+  --sidebar-w: 244px;
+  --sidebar-gap: 40px;
+
+  display: block;
+  min-height: 100dvh;
+  background-color: var(--color-surface);
+
+  @include bp.up(lg) {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+    column-gap: var(--sidebar-gap);
+    padding: $edge;
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition:
+        grid-template-columns 0.3s ease,
+        column-gap 0.3s ease;
+    }
+  }
+}
+
+:host(.shell--collapsed) {
+  @include bp.up(lg) {
+    --sidebar-w: 74px;
+    --sidebar-gap: 68px;
+  }
+}
+
+// --- Barra superior (móvil) ------------------------------------------------
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background-color: #fffefb;
+  box-shadow: 0 1px 0 color-mix(in srgb, #{$ink} 12%, transparent);
+
+  @include bp.up(lg) {
+    display: none;
+  }
+
+  img {
+    display: block;
+    width: 72px;
+    height: auto;
+  }
+}
+
+.topbar__toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: $ink;
+  cursor: pointer;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background-color: rgb(27 30 48 / 0.35);
+
+  @include bp.up(lg) {
+    display: none;
+  }
+}
+
+// --- Encabezado y contenido -------------------------------------------------
+.main {
+  min-width: 0;
+  padding: var(--space-3);
+
+  @include bp.up(lg) {
+    padding: 0;
+  }
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 25px;
+}
+
+.header__title {
+  display: none;
+  color: $ink;
+  font-size: clamp(1.5rem, 1rem + 1vw, 2rem);
+  font-weight: 600;
+  font-feature-settings:
+    'lnum' 1,
+    'pnum' 1;
+
+  @include bp.up(md) {
+    display: block;
+  }
+}
+
+.content {
+  display: block;
+}
