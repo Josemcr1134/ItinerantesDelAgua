@@ -10,6 +10,8 @@ import {
   OfferModality,
   OfferOrigin,
   OfferType,
+  MySessionAttendanceDto,
+  participantAttendance,
   PortalVenueDto,
   SessionAttendanceDto,
   SessionCardDto,
@@ -37,7 +39,7 @@ const cdmxAt = (days: number, hour: number, minute = 0) => {
 /** Origen de las URLs "firmadas" de prueba (archivos del propio portal). */
 const asset = (path: string) => `${location.origin}/assets/${path}`;
 
-interface MockOffer {
+export interface MockOffer {
   readonly id: string;
   readonly name: string;
   readonly type: OfferType;
@@ -141,6 +143,91 @@ export const MOCK_OFFERS: readonly MockOffer[] = [
 
 // --- Sesiones ------------------------------------------------------------------
 
+/** Asistencias registradas en esta pestaña (POST …/attendance). */
+const registrations = new Map<string, { at: string; comment: string | null }>();
+
+export function registerMockAttendance(sessionId: string, comment: string | null): void {
+  registrations.set(sessionId, { at: iso(Date.now()), comment });
+}
+
+/** Ventana de registro (HU-18): abre al terminar la sesión y dura 24 h. */
+function attendanceOf(
+  sessionId: string,
+  end: number,
+  cancelled: boolean,
+  attended: boolean,
+  inPerson: boolean,
+): MySessionAttendanceDto {
+  const now = Date.now();
+  const closes = end + DAY;
+  const window = { opensAt: iso(end), closesAt: iso(closes), windowHours: 24 };
+  const registered = registrations.get(sessionId);
+  if (cancelled) {
+    return {
+      ...window,
+      status: 'NOT_APPLICABLE',
+      windowState: 'NOT_APPLICABLE',
+      canRegister: false,
+      registeredAt: null,
+      source: null,
+      comment: null,
+    };
+  }
+  if (registered) {
+    return {
+      ...window,
+      status: 'REGISTERED',
+      windowState: now < closes ? 'OPEN' : 'CLOSED',
+      canRegister: false,
+      registeredAt: registered.at,
+      source: 'PARTICIPANT',
+      comment: registered.comment,
+    };
+  }
+  if (now < end) {
+    return {
+      ...window,
+      status: 'PENDING',
+      windowState: 'NOT_OPEN_YET',
+      canRegister: false,
+      registeredAt: null,
+      source: null,
+      comment: null,
+    };
+  }
+  if (now < closes) {
+    return {
+      ...window,
+      status: 'PENDING',
+      windowState: 'OPEN',
+      canRegister: true,
+      registeredAt: null,
+      source: null,
+      comment: null,
+    };
+  }
+  return attended
+    ? {
+        ...window,
+        status: 'REGISTERED',
+        windowState: 'CLOSED',
+        canRegister: false,
+        registeredAt: iso(end + 2 * 60 * MINUTE),
+        // En sitio, el equipo pasa lista.
+        source: inPerson ? 'MANUAL' : 'PARTICIPANT',
+        comment: inPerson ? null : 'Me llevo cómo dimensionar un humedal para una vivienda.',
+      }
+    : {
+        ...window,
+        status: 'NOT_REGISTERED',
+        windowState: 'CLOSED',
+        canRegister: false,
+        registeredAt: null,
+        source: null,
+        comment: null,
+      };
+}
+
 /** Una sesión por módulo y semana (los talleres, cada día). */
 function sessionsOf(offer: MockOffer): SessionCardDto[] {
   const step = offer.type === 'WORKSHOP' ? 1 : 7;
@@ -154,10 +241,12 @@ function sessionsOf(offer: MockOffer): SessionCardDto[] {
       start: cdmxAt(firstDay + (index * 2 + half) * step, offer.sessionHour),
     })),
   );
-  // La sesión "en vivo": la primera que no ha terminado empieza en 5 minutos.
+  // La sesión "en vivo": la primera que no ha terminado empieza en 5 minutos,
+  // y la anterior terminó hace 3 h (su registro de asistencia sigue abierto).
   if (offer.liveNow) {
-    const live = slots.find((slot) => slot.start + 2 * 60 * MINUTE > now);
-    if (live) live.start = now + 5 * MINUTE;
+    const live = slots.findIndex((slot) => slot.start + 2 * 60 * MINUTE > now);
+    if (live >= 0) slots[live].start = now + 5 * MINUTE;
+    if (live > 0) slots[live - 1].start = now - 5 * 60 * MINUTE;
   }
   return slots.map(({ title, index, half, start }) => {
     const number = index + 1;
@@ -179,15 +268,7 @@ function sessionsOf(offer: MockOffer): SessionCardDto[] {
               }
             : { state: 'NOT_YET', opensAt: iso(start - 10 * MINUTE), url: null };
     const attended = past && !cancelled && (index + half) % 3 !== 2;
-    const attendance = cancelled
-      ? 'NOT_APPLICABLE'
-      : !past
-        ? 'NOT_APPLICABLE'
-        : end > now - 8 * DAY
-          ? 'PENDING'
-          : attended
-            ? 'REGISTERED'
-            : 'NOT_REGISTERED';
+    const attendance = attendanceOf(id, end, cancelled, attended, offer.modality === 'IN_PERSON');
     return {
       id,
       offer: {
@@ -219,14 +300,14 @@ function sessionsOf(offer: MockOffer): SessionCardDto[] {
             ? 'NOT_APPLICABLE'
             : !past
               ? 'AFTER_SESSION'
-              : end > now - 8 * DAY
+              : end > now - DAY
                 ? 'PENDING'
                 : 'AVAILABLE',
-        url: past && end <= now - 8 * DAY ? 'https://vimeo.com/76979871' : null,
+        url: past && end <= now - DAY ? 'https://vimeo.com/76979871' : null,
       },
       // El esquema publicado de `attendance` quedó con el de administración
-      // (mismo nombre en la API): se manda la forma que usa el portal.
-      attendance: { status: attendance } as unknown as SessionAttendanceDto,
+      // (mismo nombre en la API): se manda la forma que devuelve /me/….
+      attendance: attendance as unknown as SessionAttendanceDto,
     } satisfies SessionCardDto;
   });
 }
@@ -236,7 +317,7 @@ function sessionsOf(offer: MockOffer): SessionCardDto[] {
 function progressOf(sessions: readonly SessionCardDto[]) {
   const scheduled = sessions.filter((s) => s.status !== 'CANCELLED');
   const attended = scheduled.filter(
-    (s) => (s.attendance as unknown as { status: string }).status === 'REGISTERED',
+    (s) => participantAttendance(s)?.status === 'REGISTERED',
   ).length;
   const percent = scheduled.length ? Math.round((attended / scheduled.length) * 100) : 0;
   return { attendedSessions: attended, scheduledSessions: scheduled.length, percent };
@@ -249,6 +330,10 @@ function nextOf(sessions: readonly SessionCardDto[]): SessionCardDto | null {
       .filter((s) => s.status !== 'CANCELLED' && new Date(s.endsAt).getTime() > now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null
   );
+}
+
+export function mockProgress(offer: MockOffer) {
+  return mockFormation(offer).progress;
 }
 
 export function mockFormation(offer: MockOffer): FormationCardDto {
@@ -528,3 +613,24 @@ export function mockNextActivity(): CalendarItemDto | null {
 
 /** Archivo que se abre al "descargar" un material o la entrega de prueba. */
 export const mockFileUrl = () => asset('images/og-image.png');
+
+/** Sesiones en línea de las formaciones activas (GET /me/sessions). */
+export function mockMySessions(scope: 'UPCOMING' | 'PAST', offerId?: string): SessionCardDto[] {
+  const offers = MOCK_OFFERS.filter(
+    (o) =>
+      !o.suspended && (offerId ? o.id === offerId : o.modality === 'ONLINE_LIVE' && !o.finished),
+  );
+  const all = offers.flatMap((offer) => mockSessions(offer, scope));
+  return all.sort((a, b) =>
+    scope === 'PAST' ? b.startsAt.localeCompare(a.startsAt) : a.startsAt.localeCompare(b.startsAt),
+  );
+}
+
+/** Una sesión por id con su oferta (GET /me/sessions/{id}). */
+export function mockSessionById(id: string): { offer: MockOffer; session: SessionCardDto } | null {
+  for (const offer of MOCK_OFFERS) {
+    const session = sessionsOf(offer).find((s) => s.id === id);
+    if (session) return { offer, session };
+  }
+  return null;
+}

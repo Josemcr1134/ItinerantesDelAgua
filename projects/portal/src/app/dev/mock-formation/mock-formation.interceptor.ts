@@ -5,7 +5,7 @@ import {
   HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
-import { DashboardDto, FormationCardDto } from 'data-access';
+import { DashboardDto, FormationCardDto, participantAttendance } from 'data-access';
 import { delay, map, Observable, of, throwError } from 'rxjs';
 import {
   MOCK_OFFERS,
@@ -14,7 +14,11 @@ import {
   mockFormation,
   mockMaterials,
   mockNextActivity,
+  mockMySessions,
+  mockProgress,
+  mockSessionById,
   mockSessions,
+  registerMockAttendance,
   setMockSubmission,
 } from './mock-formation.data';
 
@@ -40,8 +44,9 @@ let announced = false;
 /**
  * SOLO DESARROLLO (lo registra `environment.development.ts`; producción no
  * lo incluye). Con el interruptor activo responde con datos de prueba
- * "Mi formación" (`/me/enrollments`), el aula (`/me/classrooms/…`) y el
- * bloque de formaciones del dashboard; todo lo demás va a la API real.
+ * "Mi formación" (`/me/enrollments`), el aula (`/me/classrooms/…`), las
+ * sesiones y la asistencia (`/me/sessions/…`) y el bloque de formaciones del
+ * dashboard; todo lo demás va a la API real.
  */
 export const mockFormationInterceptor: HttpInterceptorFn = (req, next) => {
   if (!mockFormationEnabled()) return next(req);
@@ -66,6 +71,9 @@ export const mockFormationInterceptor: HttpInterceptorFn = (req, next) => {
 
   const match = path.match(/\/api\/v1\/me\/classrooms\/([^/]+)(\/.*)?$/);
   if (match) return classroom(req, match[1], match[2] ?? '');
+
+  const session = path.match(/\/api\/v1\/me\/sessions(?:\/([^/]+)(\/attendance)?)?$/);
+  if (session) return sessions(req, session[1], !!session[2]);
 
   return next(req);
 };
@@ -161,4 +169,62 @@ function classroom(req: HttpRequest<unknown>, offerId: string, rest: string) {
     return reply(req, mockClassroom(offer).finalProject);
   }
   return fail(req, 404, 'NOT_FOUND', 'No existe');
+}
+
+function sessions(req: HttpRequest<unknown>, id: string | undefined, attendance: boolean) {
+  if (!id) {
+    const scope = req.params.get('scope') === 'PAST' ? 'PAST' : 'UPCOMING';
+    const data = mockMySessions(scope, req.params.get('offerId') ?? undefined);
+    return reply(req, {
+      data,
+      meta: { page: 1, pageSize: data.length, total: data.length, totalPages: 1 },
+    });
+  }
+  const found = mockSessionById(id);
+  if (!found) return fail(req, 404, 'NOT_FOUND', 'No encontramos esta sesión.');
+  if (found.offer.suspended) {
+    return fail(
+      req,
+      403,
+      'ENROLLMENT_SUSPENDED',
+      'Tu acceso está suspendido por un pago pendiente.',
+    );
+  }
+  if (!attendance) return reply(req, found.session);
+  if (req.method !== 'POST') return fail(req, 404, 'NOT_FOUND', 'No existe');
+
+  // Registro (HU-18): solo dentro de la ventana, una vez.
+  const a = participantAttendance(found.session);
+  const meta = { opensAt: a?.opensAt, closesAt: a?.closesAt, registeredAt: a?.registeredAt };
+  const error = (status: number, code: string, message: string) =>
+    throwError(
+      () =>
+        new HttpErrorResponse({
+          status,
+          url: req.url,
+          error: { statusCode: status, code, message, details: [], meta, requestId: 'mock' },
+        }),
+    ).pipe(delay(250));
+  if (found.session.status === 'CANCELLED')
+    return error(422, 'SESSION_CANCELLED', 'La sesión fue cancelada.');
+  if (a?.status === 'REGISTERED') {
+    return error(409, 'ATTENDANCE_ALREADY_REGISTERED', 'Tu asistencia ya estaba registrada.');
+  }
+  if (a?.windowState === 'NOT_OPEN_YET') {
+    return error(422, 'ATTENDANCE_NOT_OPEN_YET', 'El registro abre al terminar la sesión.');
+  }
+  if (!a?.canRegister) {
+    return error(
+      422,
+      'ATTENDANCE_WINDOW_CLOSED',
+      'El registro de asistencia para esta sesión está cerrado.',
+    );
+  }
+  const body = req.body as { attended?: boolean; comment?: string };
+  if (body.attended !== true) {
+    return error(400, 'VALIDATION_ERROR', 'Marca «Asistí a la sesión» para registrarla.');
+  }
+  registerMockAttendance(id, body.comment?.trim() || null);
+  const updated = mockSessionById(id)!;
+  return reply(req, { session: updated.session, progress: mockProgress(updated.offer) }, 201);
 }
