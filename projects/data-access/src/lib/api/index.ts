@@ -22,6 +22,7 @@ export * from './services/classrooms.api';
 export * from './services/calendar.api';
 export * from './services/library.api';
 export * from './services/dashboard.api';
+export * from './services/applications.api';
 export * from './services/site.api';
 export * from './services/admin-users.api';
 export * from './services/admin-offers.api';
