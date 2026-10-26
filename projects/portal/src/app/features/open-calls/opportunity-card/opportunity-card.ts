@@ -1,3 +1,4 @@
+import { SlicePipe } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
 import { ApplicationOpportunityDto } from 'data-access';
 import {
@@ -14,6 +15,7 @@ import { dateRange, dateTimeIn, formatMoney } from '../open-call-format';
  */
 @Component({
   selector: 'portal-opportunity-card',
+  imports: [SlicePipe],
   template: `
     @let o = opportunity();
     <article
@@ -24,7 +26,17 @@ import { dateRange, dateTimeIn, formatMoney } from '../open-call-format';
       <p class="card__pills">
         <span class="pill">{{ modality() }}</span>
         @if (o.eligibility?.text; as text) {
-          <span class="pill pill--eligibility">{{ text }}</span>
+          <!-- Recortada para no saltar de fila; el texto completo, en el tooltip. -->
+          <span
+            class="pill pill--eligibility"
+            tabindex="0"
+            [attr.aria-label]="'Elegibilidad: ' + text"
+          >
+            {{ text.length > maxChip ? (text | slice: 0 : maxChip).trimEnd() + '…' : text }}
+            @if (text.length > maxChip) {
+              <span class="tooltip" role="tooltip" aria-hidden="true">{{ text }}</span>
+            }
+          </span>
         }
       </p>
       <h2 class="card__title" [id]="'call-' + o.offer.id">{{ o.offer.name }}</h2>
@@ -81,6 +93,8 @@ export class OpportunityCard {
   readonly apply = output<ApplicationOpportunityDto>();
   readonly selectedApplication = output<string>();
 
+  /** Caracteres visibles de la pastilla de elegibilidad. */
+  protected readonly maxChip = 32;
   protected readonly reasons = WINDOW_REASON_LABELS;
   protected readonly statuses = APPLICATION_STATUS_LABELS;
   protected readonly money = formatMoney;
