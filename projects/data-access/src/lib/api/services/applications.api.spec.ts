@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideApi } from '../api-config';
+import { SKIP_GLOBAL_LOADER } from '../http-context';
 import { ApplicationsApi } from './applications.api';
 
 const API = 'https://api.test/api/v1';
@@ -89,5 +90,15 @@ describe('ApplicationsApi', () => {
     expect(confirm.request.body).toEqual({ key: 'k1', fileName: 'foto.png' });
     confirm.flush({ id: 'd1' });
     expect(confirmed).toEqual({ id: 'd1' });
+  });
+
+  it('el autoguardado no muestra el loader general', () => {
+    const api = TestBed.inject(ApplicationsApi);
+    const http = TestBed.inject(HttpTestingController);
+    api.update('a1', { age: 30 }, { silent: true }).subscribe();
+    api.update('a1', { age: 31 }).subscribe();
+    const [silent, normal] = http.match(`${API}/me/applications/a1`);
+    expect(silent.request.context.get(SKIP_GLOBAL_LOADER)).toBe(true);
+    expect(normal.request.context.get(SKIP_GLOBAL_LOADER)).toBe(false);
   });
 });

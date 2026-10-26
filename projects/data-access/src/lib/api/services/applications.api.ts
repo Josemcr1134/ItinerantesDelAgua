@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, switchMap } from 'rxjs';
 import { ApiClient, commaList } from '../api-client';
+import { silentRequest } from '../http-context';
 import { Uuid } from '../models.generated';
 import { ApiBody, ApiQuery, ApiResponse } from '../operations.generated';
 import { uploadToSignedUrl } from './admin-offers.api';
@@ -43,9 +44,16 @@ export class ApplicationsApi {
     return this.api.get<ApiResponse<'Applications_get'>>(this.path(id));
   }
 
-  /** Guarda el borrador (solo los campos enviados; `null` borra). */
-  update(id: Uuid, body: ApiBody<'Applications_update'>) {
-    return this.api.patch<ApiResponse<'Applications_update'>>(this.path(id), body);
+  /**
+   * Guarda el borrador (solo los campos enviados; `null` borra). `silent`:
+   * autoguardado en segundo plano, sin el loader general.
+   */
+  update(id: Uuid, body: ApiBody<'Applications_update'>, options: { silent?: boolean } = {}) {
+    return this.api.patch<ApiResponse<'Applications_update'>>(
+      this.path(id),
+      body,
+      options.silent ? { context: silentRequest() } : {},
+    );
   }
 
   /** Descarta el borrador. */
