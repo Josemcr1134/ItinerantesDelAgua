@@ -43,7 +43,7 @@ type Field =
   selector: 'portal-application-form',
   imports: [ReactiveFormsModule, ApplicationSteps, ApplicationEvidence],
   templateUrl: './application-form.html',
-  styleUrl: './application-form.scss',
+  styleUrls: ['./application-form.scss', '../../../shared/applications/application-fields.scss'],
 })
 export class ApplicationForm {
   private readonly api = inject(ApplicationsApi);
