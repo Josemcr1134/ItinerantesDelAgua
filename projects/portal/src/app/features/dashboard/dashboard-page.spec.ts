@@ -123,4 +123,23 @@ describe('DashboardPage', () => {
     );
     expect(text(host, '.widget__number')).toEqual(['3', '1', '1']);
   });
+
+  it('sin cursos, actividades, convocatorias, becas ni materiales: todo en 0', async () => {
+    const empty = { latest: null, openCount: 0, newCount: 0, actionRequired: 0 };
+    const host = await render(
+      dashboard({
+        nextActivity: null,
+        formations: { items: [], total: 0 },
+        upcomingEvents: [],
+        recommendedResources: [],
+        scholarships: empty,
+        openCalls: empty,
+      }),
+    );
+    expect(text(host, '.widget__number')).toEqual(['0', '0', '0', '0']);
+    expect(host.querySelectorAll('.row')).toHaveLength(0);
+    expect(host.querySelector('.formations__empty')).not.toBeNull();
+    expect(host.querySelector('.join')).toBeNull();
+    expect(host.textContent).not.toContain('No se pudo cargar');
+  });
 });
