@@ -1,0 +1,142 @@
+<h1 class="visually-hidden">Dashboard</h1>
+
+@if (loadError(); as message) {
+  <div class="load-error" role="alert">
+    <p>{{ message }}</p>
+    <button type="button" class="load-error__retry" (click)="reload()">Reintentar</button>
+  </div>
+} @else if (dashboard.value(); as d) {
+  <div class="dashboard">
+    @if (isFailed('nextActivity')) {
+      <p class="block-error" role="status">
+        No se pudo cargar tu próxima actividad.
+        <button type="button" (click)="reload()">Reintentar</button>
+      </p>
+    } @else {
+      <portal-next-activity
+        [activity]="d.nextActivity"
+        [timezone]="timezone()"
+        (expired)="reload()"
+      />
+    }
+
+    <!-- Mi formación (máx. 3 activas). -->
+    <section class="formations" aria-labelledby="formations-title">
+      <h2 id="formations-title" class="visually-hidden">Mi formación</h2>
+      @if (isFailed('formations') || !d.formations) {
+        <p class="block-error" role="status">
+          No se pudo cargar tu formación.
+          <button type="button" (click)="reload()">Reintentar</button>
+        </p>
+      } @else if (d.formations.items.length) {
+        <ul class="formations__list">
+          @for (formation of d.formations.items; track formation.enrollmentId; let i = $index) {
+            <li>
+              <portal-formation-card
+                [formation]="formation"
+                [fallbackCover]="covers[i % covers.length]"
+              />
+            </li>
+          }
+        </ul>
+        @if (d.formations.total > d.formations.items.length) {
+          <a class="formations__all" routerLink="/formacion">
+            Ver toda mi formación ({{ d.formations.total }})
+          </a>
+        }
+      } @else {
+        <!-- TODO(contenido): confirmar el texto sin formación activa. -->
+        <p class="formations__empty">
+          Aún no tienes formación activa.
+          <a routerLink="/convocatorias">Explora las convocatorias</a>
+        </p>
+      }
+    </section>
+
+    <div class="widgets">
+      <portal-dashboard-widget
+        headingId="widget-calendar"
+        title="Calendario"
+        icon="assets/dashboard/widget-calendar.svg"
+        caption="Actividades programadas"
+        [value]="d.upcomingEvents?.length ?? 0"
+        [failed]="isFailed('upcomingEvents') || !d.upcomingEvents"
+        (retry)="reload()"
+      >
+        @for (event of d.upcomingEvents ?? []; track event.id) {
+          <a class="row" routerLink="/calendario" [attr.aria-label]="'Ver ' + event.title">
+            <span class="row__label">{{ event.title }}</span>
+            <span class="row__action" aria-hidden="true">Ver</span>
+          </a>
+        }
+      </portal-dashboard-widget>
+
+      <portal-dashboard-widget
+        headingId="widget-calls"
+        title="Convocatorias"
+        icon="assets/dashboard/widget-calls.svg"
+        caption="Nuevas oportunidades"
+        [value]="d.openCalls?.newCount ?? 0"
+        [failed]="isFailed('openCalls') || !d.openCalls"
+        (retry)="reload()"
+      >
+        @if (d.openCalls?.latest; as latest) {
+          <a
+            class="row"
+            routerLink="/convocatorias"
+            [attr.aria-label]="'Ver mi postulación a ' + latest.offer.name"
+            [attr.title]="latest.offer.name"
+          >
+            <span class="row__label">{{ statusLabels[latest.status] }}</span>
+            <span class="row__action" aria-hidden="true">Ver</span>
+          </a>
+        }
+      </portal-dashboard-widget>
+
+      <portal-dashboard-widget
+        headingId="widget-scholarships"
+        title="Becas"
+        icon="assets/dashboard/widget-scholarships.svg"
+        caption="Becas disponibles"
+        [value]="d.scholarships?.openCount ?? 0"
+        [failed]="isFailed('scholarships') || !d.scholarships"
+        (retry)="reload()"
+      >
+        @if (d.scholarships?.latest; as latest) {
+          <a
+            class="row"
+            routerLink="/becas"
+            [attr.aria-label]="'Ver mi postulación a ' + latest.offer.name"
+            [attr.title]="latest.offer.name"
+          >
+            <span class="row__label">{{ statusLabels[latest.status] }}</span>
+            <span class="row__action" aria-hidden="true">Ver</span>
+          </a>
+        }
+      </portal-dashboard-widget>
+
+      <portal-dashboard-widget
+        headingId="widget-library"
+        title="Biblioteca"
+        icon="assets/dashboard/widget-library.svg"
+        caption="Material recomendado"
+        [value]="d.recommendedResources?.length ?? 0"
+        [failed]="isFailed('recommendedResources') || !d.recommendedResources"
+        (retry)="reload()"
+      >
+        @for (item of d.recommendedResources ?? []; track item.id) {
+          <button
+            type="button"
+            class="row"
+            [attr.aria-label]="'Abrir ' + item.title"
+            (click)="openResource(item)"
+          >
+            <span class="row__label">{{ item.title }}</span>
+            <span class="row__action" aria-hidden="true">Ver</span>
+          </button>
+        }
+        <a widgetFooter class="widget-link" routerLink="/biblioteca">Ir a Biblioteca</a>
+      </portal-dashboard-widget>
+    </div>
+  </div>
+}

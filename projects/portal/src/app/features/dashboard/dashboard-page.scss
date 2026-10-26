@@ -1,0 +1,131 @@
+@use 'breakpoints' as bp;
+
+// Figma HU-06: próxima actividad, fila de tres formaciones y cuatro accesos.
+
+:host {
+  display: block;
+}
+
+.dashboard {
+  display: grid;
+  gap: 25px;
+}
+
+.formations__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 19px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.formations__all {
+  display: inline-block;
+  margin-top: 12px;
+  color: #2a5af4;
+  font-weight: 600;
+}
+
+.formations__empty {
+  padding: var(--space-4);
+  border-radius: 12px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+
+  a {
+    margin-left: 6px;
+    color: #2a5af4;
+    font-weight: 600;
+  }
+}
+
+.widgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 20px clamp(16px, 2.4vw, 34px);
+  margin-top: 6px;
+
+  @include bp.up(xl) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+// Fila: pastilla con el nombre (contorno) y "Ver" (relleno) pegado a la derecha.
+.row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    border-radius: 54px;
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  &:hover .row__action {
+    background-color: #2a5af4;
+  }
+}
+
+.row__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 14px;
+  border: 1px solid #2a5af4;
+  border-radius: 54px;
+  color: #2a5af4;
+  line-height: 33px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row__action {
+  flex: none;
+  width: 54px;
+  margin-left: -2px;
+  border-radius: 54px;
+  background-color: #0067ff;
+  color: #fff;
+  line-height: 35px;
+}
+
+.widget-link {
+  margin-top: auto;
+  border-radius: 54px;
+  background-color: var(--color-primary);
+  color: #fff;
+  line-height: 35px;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+.block-error,
+.load-error {
+  padding: var(--space-3);
+  border-radius: 12px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+
+  button {
+    margin-left: 8px;
+    padding: 4px 14px;
+    border: 1px solid #2a5af4;
+    border-radius: 54px;
+    background: none;
+    color: #2a5af4;
+    font: inherit;
+    cursor: pointer;
+  }
+}

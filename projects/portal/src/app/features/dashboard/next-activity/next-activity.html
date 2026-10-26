@@ -1,0 +1,67 @@
+<section class="frame" aria-labelledby="next-activity-title">
+  <div class="card">
+    <img
+      class="card__art"
+      src="assets/dashboard/next-activity.webp"
+      alt=""
+      width="268"
+      height="143"
+    />
+    <div class="card__body">
+      <h2 id="next-activity-title" class="card__label">Próxima Actividad</h2>
+      @if (activity(); as item) {
+        <p class="card__title">{{ item.offer?.name ?? item.title }}</p>
+        @if (item.offer && item.title !== item.offer.name) {
+          <p class="card__detail">{{ item.title }}</p>
+        }
+      } @else {
+        <!-- TODO(contenido): confirmar el mensaje sin actividades próximas. -->
+        <p class="card__title">No tienes actividades en los próximos días.</p>
+      }
+    </div>
+
+    @if (activity(); as item) {
+      <p class="card__when">
+        <time [attr.datetime]="item.startsAt">{{ when() }}</time>
+      </p>
+      <div class="card__action">
+        @switch (join()?.state) {
+          @case ('OPEN') {
+            <a
+              uiButton
+              variant="secondary"
+              class="join"
+              target="_blank"
+              rel="noopener"
+              [href]="join()!.url"
+            >
+              Entrar a Sesión
+            </a>
+          }
+          @case ('NOT_YET') {
+            <button uiButton variant="secondary" class="join" type="button" disabled>
+              Entrar a Sesión
+            </button>
+            <p class="card__hint">Disponible a las {{ opensAt() }}</p>
+          }
+          @case ('LINK_PENDING') {
+            <button uiButton variant="secondary" class="join" type="button" disabled>
+              Entrar a Sesión
+            </button>
+            <p class="card__hint">Enlace aún no disponible</p>
+          }
+          @case ('IN_PERSON') {
+            @if (item.venue; as venue) {
+              <p class="card__hint">Presencial · {{ venue.name }}</p>
+              @if (venue.mapsUrl) {
+                <a class="card__link" target="_blank" rel="noopener" [href]="venue.mapsUrl">
+                  Cómo llegar
+                </a>
+              }
+            }
+          }
+        }
+      </div>
+    }
+  </div>
+</section>

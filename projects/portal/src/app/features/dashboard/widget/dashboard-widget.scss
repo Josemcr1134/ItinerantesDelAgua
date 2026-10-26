@@ -1,0 +1,87 @@
+@use 'breakpoints' as bp;
+
+// Figma HU-06: tarjeta blanca (radio 12 px) con el ícono de 73 px montado
+// sobre el borde superior, línea azul bajo el título y cifra de 64 px.
+
+:host {
+  display: block;
+  padding-top: 37px; // mitad del ícono que sobresale
+}
+
+.widget {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 50px 14px 20px;
+
+  // Escritorio: las cuatro a la misma altura del Figma.
+  @include bp.up(xl) {
+    min-height: 377px;
+  }
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.15);
+  text-align: center;
+}
+
+.widget__icon {
+  position: absolute;
+  top: -37px;
+  left: 50%;
+  width: 73px;
+  height: 73px;
+  translate: -50% 0;
+}
+
+.widget__title {
+  padding-bottom: 13px;
+  border-bottom: 1px solid #2a5af4;
+  color: var(--color-raisin-black);
+  font-size: 1.28rem;
+  font-weight: 600;
+  line-height: 26.7px;
+}
+
+.widget__value {
+  display: grid;
+  margin: 2px 0 16px;
+}
+
+.widget__number {
+  color: #2a5af4;
+  font-size: 4rem;
+  font-weight: 400;
+  font-feature-settings:
+    'lnum' 1,
+    'pnum' 1;
+  line-height: 86px;
+}
+
+.widget__caption {
+  color: var(--color-raisin-black);
+  font-weight: 500;
+  line-height: 26.7px;
+}
+
+.widget__rows {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.widget__failed {
+  margin: 24px 0 12px;
+  color: color-mix(in srgb, var(--color-raisin-black) 70%, transparent);
+}
+
+.widget__retry {
+  align-self: center;
+  padding: 6px 18px;
+  border: 1px solid #2a5af4;
+  border-radius: 54px;
+  background: none;
+  color: #2a5af4;
+  font: inherit;
+  cursor: pointer;
+}

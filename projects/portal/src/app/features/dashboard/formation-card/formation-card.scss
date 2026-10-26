@@ -1,0 +1,87 @@
+// Figma HU-06: tarjeta blanca de 142 px con la portada (135 px) a la izquierda.
+
+:host {
+  display: block;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 135px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+  min-height: 142px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.15);
+  color: var(--color-raisin-black);
+  text-decoration: none;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: translate 0.2s ease;
+  }
+
+  &:hover {
+    translate: 0 -2px;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+}
+
+.card__cover {
+  width: 135px;
+  height: 100%;
+  min-height: 142px;
+  border-radius: 12px 0 0 12px;
+  object-fit: cover;
+}
+
+.card__body {
+  display: grid;
+  gap: 8px;
+  padding: 16px 16px 16px 0;
+}
+
+.card__title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: clamp(1.125rem, 0.95rem + 0.5vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card__note {
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+}
+
+.card__progress {
+  display: flex;
+}
+
+// Pastillas "Progreso" (contorno) y "60%" (relleno), una junto a la otra.
+.pill {
+  display: inline-grid;
+  place-items: center;
+  height: 35px;
+  padding: 0 14px;
+  border: 1px solid #2a5af4;
+  border-radius: 54px;
+  color: #2a5af4;
+  font-size: 1rem;
+  font-feature-settings:
+    'lnum' 1,
+    'pnum' 1;
+}
+
+.pill--filled {
+  margin-left: -2px;
+  padding: 0 10px;
+  background-color: #0067ff;
+  color: #fff;
+}
