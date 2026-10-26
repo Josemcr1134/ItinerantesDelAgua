@@ -1,0 +1,164 @@
+@let a = application();
+<article class="tracker" [attr.aria-labelledby]="'scholarship-' + a.id">
+  <header class="tracker__head">
+    <h2 class="tracker__title" [id]="'scholarship-' + a.id">
+      {{ a.offer.name }}
+      @if (a.offer.cohortLabel) {
+        · {{ a.offer.cohortLabel }}
+      }
+    </h2>
+    <span class="badge" [attr.data-tone]="tones[a.status]">{{ statuses[a.status] }}</span>
+  </header>
+  <p class="tracker__meta">
+    {{ requested() }}
+    @if (a.status !== 'DRAFT' && a.folio) {
+      · Folio {{ a.folio }}
+    }
+    · {{ a.submittedAt ? 'Enviada el ' + date(a.submittedAt) : 'Guardada el ' + date(a.updatedAt) }}
+  </p>
+
+  @if (steps().length) {
+    <ol class="stepper" aria-label="Avance de la postulación">
+      @for (step of steps(); track step.key) {
+        <li
+          class="stepper__step"
+          [attr.data-state]="step.state"
+          [attr.aria-current]="step.state === 'CURRENT' ? 'step' : null"
+        >
+          <span class="stepper__dot" aria-hidden="true">
+            @if (step.state === 'DONE') {
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12.5l4.5 4.5L19 7.5" />
+              </svg>
+            } @else if (step.state === 'FAILED') {
+              ×
+            }
+          </span>
+          <span class="stepper__label">
+            {{ labels[step.key]
+            }}<span class="visually-hidden">: {{ stateLabels[step.state] }}</span>
+          </span>
+        </li>
+      }
+    </ol>
+  }
+
+  @if (result(); as r) {
+    <div class="box">
+      <dl class="figures">
+        @if (r.originalAmount) {
+          <div>
+            <dt>Monto original</dt>
+            <dd>{{ money(r.originalAmount) }}</dd>
+          </div>
+        }
+        <div>
+          <dt>Nivel solicitado / asignado</dt>
+          <dd>{{ r.requestedPercent }} / {{ r.assignedPercent }}%</dd>
+        </div>
+        @if (r.discount) {
+          <div>
+            <dt>Descuento</dt>
+            <dd>−{{ money(r.discount) }}</dd>
+          </div>
+        }
+        <div>
+          <dt>Saldo a pagar</dt>
+          <dd class="figures__balance">{{ money(r.balance) }}</dd>
+        </div>
+      </dl>
+      @if (r.showDue && r.dueAt) {
+        <p class="box__note">
+          <strong>Fecha límite de pago: {{ date(r.dueAt) }}</strong>
+          (7 días desde la aprobación · {{ daysLeft(r.dueAt) }})
+        </p>
+      }
+    </div>
+  }
+
+  @if (interview(); as i) {
+    <div class="box">
+      <p>
+        <strong>Entrevista por Zoom:</strong> {{ i.date }} · {{ i.own }}
+        @if (i.cdmx) {
+          (tu zona: {{ i.zone }}) — {{ i.cdmx }} CDMX
+        } @else {
+          CDMX
+        }
+      </p>
+      <p class="box__note">
+        <a routerLink="/calendario" [queryParams]="{ vista: 'dia', fecha: i.day }">
+          Agregada a tu calendario
+        </a>
+        <!-- TODO(contenido): «¿No puedes asistir? Solicitar otro horario» cuando la API lo permita. -->
+      </p>
+    </div>
+  }
+
+  @if (a.response; as response) {
+    @if (response.kind === 'CONFIRMATION' && response.dueAt) {
+      <p class="box">
+        Confirma tu participación antes del {{ date(response.dueAt) }} ({{
+          daysLeft(response.dueAt)
+        }}).
+      </p>
+    }
+  }
+
+  <footer class="tracker__actions">
+    @switch (a.action.type) {
+      @case ('CONTINUE_DRAFT') {
+        <a class="action" [routerLink]="['/becas', a.id]">{{ actions[a.action.type] }}</a>
+      }
+      @case ('JOIN_INTERVIEW') {
+        @if (interview()?.url; as url) {
+          <a class="action action--outline" [href]="url" target="_blank" rel="noopener">
+            Entrar a la Entrevista
+          </a>
+        } @else {
+          <button type="button" class="action action--outline" disabled>
+            Entrar a la Entrevista
+          </button>
+        }
+      }
+      @case ('CONFIRM_PARTICIPATION') {
+        <button
+          type="button"
+          class="action"
+          [disabled]="busy() || !a.action.enabled"
+          (click)="confirm()"
+        >
+          {{ actions[a.action.type] }}
+        </button>
+      }
+      @case ('GO_TO_CLASSROOM') {
+        <a class="action" [routerLink]="['/formacion/aula', a.offer.id]">
+          {{ actions[a.action.type] }}
+        </a>
+      }
+      @case ('VIEW') {}
+      @default {
+        <!-- Pagos (Fase 05): todavía no hay pantalla. -->
+        <button type="button" class="action" disabled>{{ actions[a.action.type] }}</button>
+      }
+    }
+    @if (!detail() && a.status !== 'DRAFT') {
+      <a class="action action--outline" [routerLink]="['/becas', a.id]">Ver postulación</a>
+    }
+    @if (!a.action.enabled && a.action.reason) {
+      <p class="tracker__reason">{{ reasons[a.action.reason] }}</p>
+    } @else if (payment()) {
+      <!-- TODO(contenido): confirmar el aviso mientras no hay pagos en línea. -->
+      <p class="tracker__reason">Pagos en línea: próximamente.</p>
+    }
+  </footer>
+</article>

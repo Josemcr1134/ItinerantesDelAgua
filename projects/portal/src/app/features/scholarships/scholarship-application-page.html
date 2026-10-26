@@ -1,0 +1,77 @@
+@if (error(); as message) {
+  <p class="notice" role="alert">
+    {{ message }}
+    <a routerLink="/becas" [queryParams]="{ pestana: 'postulaciones' }">Ver mis postulaciones</a>
+  </p>
+}
+
+@if (current(); as a) {
+  @if (a.status === 'DRAFT') {
+    <portal-scholarship-form
+      [application]="a"
+      [schedule]="schedule.value()"
+      [timezone]="timezone()"
+      (changed)="onChanged($event)"
+    />
+  } @else {
+    <div class="detail">
+      <portal-scholarship-tracker
+        [application]="a"
+        [timezone]="timezone()"
+        [detail]="true"
+        (changed)="onChanged($event)"
+      />
+
+      <section class="sent" aria-labelledby="sent-title">
+        <h2 id="sent-title" class="sent__title">Lo que enviaste</h2>
+        <dl class="sent__list">
+          @if (a.answers.requestedScholarshipType; as type) {
+            <div>
+              <dt>Nivel de beca solicitado</dt>
+              <dd>{{ type.name }} ({{ percent(type) }})</dd>
+            </div>
+          }
+          @if (a.answers.age !== null) {
+            <div>
+              <dt>Edad</dt>
+              <dd>{{ a.answers.age }}</dd>
+            </div>
+          }
+          <div>
+            <dt>WhatsApp</dt>
+            <dd>{{ a.applicant.phone.countryCode }} {{ a.applicant.phone.number }}</dd>
+          </div>
+          @if (a.answers.intentLetter) {
+            <div class="sent__wide">
+              <dt>Carta de intención</dt>
+              <dd class="sent__letter">{{ a.answers.intentLetter }}</dd>
+            </div>
+          }
+          @if (a.documents.length || a.answers.evidenceLinks.length) {
+            <div class="sent__wide">
+              <dt>Evidencia territorial</dt>
+              <dd>
+                <ul class="evidence">
+                  @for (doc of a.documents; track doc.id) {
+                    <li>
+                      <button type="button" class="evidence__link" (click)="openDocument(doc.id)">
+                        {{ doc.fileName }}
+                      </button>
+                    </li>
+                  }
+                  @for (link of a.answers.evidenceLinks; track link) {
+                    <li>
+                      <a class="evidence__link" [href]="link" target="_blank" rel="noopener">{{
+                        link
+                      }}</a>
+                    </li>
+                  }
+                </ul>
+              </dd>
+            </div>
+          }
+        </dl>
+      </section>
+    </div>
+  }
+}

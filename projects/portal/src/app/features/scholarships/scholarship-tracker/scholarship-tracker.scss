@@ -1,0 +1,126 @@
+@use 'breakpoints' as bp;
+
+// Figma "Mis postulaciones" (becas): tarjeta blanca de 25 px de radio, pastilla
+// de estado a la derecha y avance horizontal con puntos unidos por una línea
+// (verde lo hecho, gris lo pendiente; vertical en móvil).
+
+$muted: #5a6b60;
+$fresh: #399f71;
+$line: #d5ddd6;
+
+:host {
+  display: block;
+}
+
+.tracker {
+  display: grid;
+  gap: 14px;
+  padding: 22px clamp(16px, 2.5vw, 30px) 24px;
+  border-radius: 25px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.12);
+  color: var(--color-primary);
+}
+
+.tracker__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.tracker__title {
+  flex: 1 1 260px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.tracker__meta {
+  margin-top: -8px;
+  color: $muted;
+  font-size: 0.875rem;
+}
+
+.stepper {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+
+  @include bp.up(md) {
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 0;
+  }
+}
+
+.stepper__step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $muted;
+  font-size: 0.8125rem;
+
+  @include bp.up(md) {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+
+    // Línea hacia el paso anterior (verde si este ya se alcanzó).
+    & + &::before {
+      content: '';
+      position: absolute;
+      top: 13px;
+      right: calc(50% + 18px);
+      left: calc(-50% + 18px);
+      height: 2px;
+      background-color: $line;
+    }
+
+    &:is([data-state='DONE'], [data-state='CURRENT'], [data-state='FAILED'])::before {
+      background-color: $fresh;
+    }
+  }
+}
+
+.stepper__dot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid $line;
+  border-radius: 50%;
+  background-color: #fff;
+  font-weight: 700;
+
+  [data-state='DONE'] > & {
+    border-color: $fresh;
+    background-color: $fresh;
+    color: #fff;
+  }
+
+  [data-state='CURRENT'] > & {
+    border-color: $fresh;
+    box-shadow: inset 0 0 0 5px #fff;
+    background-color: $fresh;
+  }
+
+  [data-state='FAILED'] > & {
+    border-color: #b5452b;
+    color: #b5452b;
+  }
+}
+
+.stepper__step:is([data-state='DONE'], [data-state='CURRENT']) {
+  color: var(--color-primary);
+}
+
+.stepper__step[data-state='CURRENT'] {
+  font-weight: 700;
+}

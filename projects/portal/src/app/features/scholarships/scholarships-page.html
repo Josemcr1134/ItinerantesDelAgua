@@ -1,0 +1,145 @@
+<div class="toolbar">
+  <nav class="tabs" aria-label="Becas">
+    <a
+      class="tab"
+      [class.tab--on]="tab() === 'open'"
+      routerLink="."
+      [queryParams]="{ pestana: null, estado: null }"
+      queryParamsHandling="merge"
+      [attr.aria-current]="tab() === 'open' ? 'page' : null"
+    >
+      Becas disponibles
+    </a>
+    <a
+      class="tab"
+      [class.tab--on]="tab() === 'mine'"
+      routerLink="."
+      [queryParams]="{ pestana: 'postulaciones' }"
+      queryParamsHandling="merge"
+      [attr.aria-current]="tab() === 'mine' ? 'page' : null"
+    >
+      Mis postulaciones ({{ mineCount() }})
+    </a>
+  </nav>
+
+  @if (tab() === 'mine' && filterOptions().length > 1) {
+    <label class="filter">
+      <span class="filter__label">Filtrar:</span>
+      <span class="filter__select">
+        <select [value]="filter()" (change)="setFilter($any($event.target).value)">
+          <option value="">Todas</option>
+          @for (status of filterOptions(); track status) {
+            <option [value]="status">{{ statuses[status] }}</option>
+          }
+        </select>
+        <svg
+          aria-hidden="true"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </span>
+    </label>
+  }
+</div>
+
+@if (error(); as message) {
+  <p class="notice" role="alert">{{ message }}</p>
+}
+
+@if (tab() === 'open') {
+  @if (available(); as response) {
+    @if (response.data.length) {
+      <ul class="cards">
+        @for (opportunity of response.data; track opportunity.offer.id) {
+          <li>
+            <portal-opportunity-card
+              [opportunity]="opportunity"
+              [timezone]="timezone()"
+              [busy]="creating() === opportunity.offer.id"
+              applyLabel="Postularme"
+              (apply)="apply($event)"
+              (selectedApplication)="open($event)"
+            />
+          </li>
+        }
+      </ul>
+    } @else {
+      <!-- TODO(contenido): confirmar el texto sin becas abiertas. -->
+      <p class="notice">
+        Por ahora no hay becas abiertas. Te avisaremos cuando abra una convocatoria.
+      </p>
+    }
+  }
+} @else if (mineResponse()) {
+  @if (active().length) {
+    <ul class="trackers">
+      @for (application of active(); track application.id) {
+        <li>
+          <portal-scholarship-tracker
+            [application]="application"
+            [timezone]="timezone()"
+            (changed)="onChanged()"
+          />
+        </li>
+      }
+    </ul>
+  } @else if (!closed().length) {
+    <p class="notice">
+      @if (filter()) {
+        No tienes postulaciones con este estado.
+      } @else {
+        Aún no te has postulado a ninguna beca.
+        <a routerLink="." [queryParams]="{ pestana: null }" queryParamsHandling="merge">
+          Ver becas disponibles
+        </a>
+      }
+    </p>
+  }
+
+  @if (closed().length) {
+    <section class="history" aria-labelledby="history-title">
+      <h2 id="history-title" class="history__title">Postulaciones anteriores</h2>
+      <table class="history__table">
+        <thead>
+          <tr>
+            <th scope="col">Postulación</th>
+            <th scope="col">Folio</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (application of closed(); track application.id) {
+            <tr>
+              <td data-label="Postulación">
+                {{ application.offer.name }}
+                @if (application.offer.cohortLabel) {
+                  · {{ application.offer.cohortLabel }}
+                }
+              </td>
+              <td data-label="Folio">{{ application.folio }}</td>
+              <td data-label="Estado">
+                <span class="badge" [attr.data-tone]="tones[application.status]">
+                  {{ statuses[application.status] }}
+                </span>
+              </td>
+              <td data-label="Acción">
+                <a class="history__link" [routerLink]="['/becas', application.id]">
+                  Ver postulación
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+}

@@ -1,0 +1,183 @@
+@use 'breakpoints' as bp;
+
+// Figma "Postulación a beca": tarjeta blanca con secciones numeradas y, a la
+// derecha (escritorio), el resumen de la oferta.
+
+$muted: #5a6b60;
+$error: #b5452b;
+
+:host {
+  display: block;
+}
+
+.layout {
+  display: grid;
+  gap: 22px;
+
+  @include bp.up(xl) {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+}
+
+.panel {
+  display: grid;
+  gap: 26px;
+  padding: 24px clamp(16px, 2.5vw, 32px) 28px;
+  border: 1.5px solid #399f71;
+  border-radius: 25px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.12);
+  color: var(--color-primary);
+}
+
+.aside {
+  @include bp.up(xl) {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.note {
+  color: $muted;
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+// La leyenda de un fieldset no respeta el `gap`.
+legend.section__title {
+  margin-bottom: 12px;
+}
+
+.section__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+}
+
+.section__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.section__number {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 0.8125rem;
+}
+
+.section__hint {
+  color: $muted;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.grid--3 {
+  @include bp.up(lg) {
+    grid-template-columns: 1.6fr 1fr 0.6fr;
+  }
+}
+
+.phone {
+  display: flex;
+  border: 1px solid var(--color-primary);
+  border-radius: 12px;
+  background-color: #fff;
+
+  &:focus-within {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+
+.phone--invalid {
+  border-color: $error;
+}
+
+.phone__code,
+.phone__number {
+  min-height: 42px;
+  border: 0;
+  background: none;
+  color: var(--color-raisin-black);
+  font: inherit;
+  outline: 0;
+}
+
+.phone__code {
+  padding: 0 4px 0 12px;
+  border-right: 1px solid #d5ddd6;
+}
+
+.phone__number {
+  flex: 1;
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.counter,
+.hint {
+  color: $muted;
+  font-size: 0.75rem;
+}
+
+.hint {
+  margin-top: -6px;
+}
+
+.terms {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+  padding-top: 18px;
+  border-top: 1px solid #e6ebe6;
+}
+
+.actions__saved {
+  color: $muted;
+  font-size: 0.8125rem;
+}
+
+.actions__discard {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $error;
+  font: inherit;
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  cursor: pointer;
+}

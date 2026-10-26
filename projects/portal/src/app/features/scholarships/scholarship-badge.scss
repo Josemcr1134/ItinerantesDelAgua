@@ -1,0 +1,34 @@
+// Pastilla de estado de una postulación (tarjeta de seguimiento y tabla):
+// amarilla si hay que actuar, verde si va bien, roja si venció.
+.badge {
+  flex: none;
+  padding: 4px 12px;
+  border: 1px solid currentcolor;
+  border-radius: 54px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+
+  &[data-tone='action'] {
+    border-color: #eaa700;
+    background-color: #fdf1cf;
+    color: #5c4000;
+  }
+
+  &[data-tone='ok'] {
+    border-color: #399f71;
+    background-color: #e3f1e9;
+    color: #1f5c40;
+  }
+}
+
+.badge[data-tone='muted'] {
+  border-color: #c9d0ca;
+  background-color: #eef0ee;
+  color: #4d5650;
+}
+
+.badge[data-tone='danger'] {
+  border-color: #e2a596;
+  background-color: #fbe9e4;
+  color: #9a3a22;
+}

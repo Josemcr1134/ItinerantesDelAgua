@@ -1,0 +1,214 @@
+@let a = application();
+@let applicant = a.applicant;
+<div class="layout">
+  <form class="panel" novalidate [formGroup]="form" (ngSubmit)="submit()">
+    @if (!a.editable) {
+      <p class="note" role="status">
+        La convocatoria de becas cerró: el borrador queda en solo lectura.
+      </p>
+    }
+
+    <!-- 1. Datos de contacto (precargados del perfil). -->
+    <fieldset class="section">
+      <legend class="section__title">
+        <span class="section__number" aria-hidden="true">1</span>
+        Datos de contacto
+        <span class="section__hint">Precargados de tu perfil</span>
+      </legend>
+      <div class="grid grid--2">
+        <div class="field">
+          <label class="field__label" for="sch-name">Nombre completo *</label>
+          <input id="sch-name" class="field__input" [value]="applicant.fullName" readonly />
+        </div>
+        <div class="field">
+          <label class="field__label" for="sch-email">Correo electrónico *</label>
+          <input id="sch-email" class="field__input" [value]="applicant.email" readonly />
+        </div>
+      </div>
+      <div class="grid grid--3">
+        <div class="field">
+          <label class="field__label" for="sch-phone">WhatsApp (con código de país) *</label>
+          <div class="phone" [class.phone--invalid]="!!issue('phone')">
+            <select
+              class="phone__code"
+              formControlName="phoneCode"
+              aria-label="Código de país del WhatsApp"
+            >
+              @for (code of phoneCodes(); track code) {
+                <option [value]="code">{{ code }}</option>
+              }
+            </select>
+            <input
+              id="sch-phone"
+              class="phone__number"
+              type="tel"
+              inputmode="tel"
+              autocomplete="tel-national"
+              maxlength="20"
+              formControlName="phoneNumber"
+              [attr.aria-invalid]="!!issue('phone')"
+            />
+          </div>
+          @if (issue('phone'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+        <div class="field">
+          <label class="field__label" for="sch-country">País *</label>
+          <input id="sch-country" class="field__input" [value]="applicant.countryName" readonly />
+        </div>
+        <div class="field">
+          <label class="field__label" for="sch-age">Edad *</label>
+          <input
+            id="sch-age"
+            class="field__input"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="120"
+            step="1"
+            formControlName="age"
+            [attr.aria-invalid]="!!issue('age')"
+          />
+          @if (issue('age'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- 2. Nivel de beca (tarjetas de opción). -->
+    <fieldset class="section">
+      <legend class="section__title">
+        <span class="section__number" aria-hidden="true">2</span>
+        Nivel de beca solicitado *
+      </legend>
+      <div class="levels">
+        @for (option of types(); track option.scholarshipTypeId) {
+          <label class="level" [class.level--full]="option.isFull">
+            <input
+              type="radio"
+              formControlName="requestedScholarshipTypeId"
+              [value]="option.scholarshipTypeId"
+              [attr.disabled]="option.isFull || !a.editable ? '' : null"
+            />
+            <span class="level__name">{{ option.scholarshipType.name }}</span>
+            <span class="level__percent">{{ percent(option.scholarshipType) }}</span>
+            @if (option.isFull) {
+              <span class="level__tag">Agotado</span>
+            }
+          </label>
+        }
+      </div>
+      @for (option of interviewTypes(); track option.scholarshipTypeId) {
+        <p class="warning">
+          <strong>Aviso:</strong> la {{ option.scholarshipType.name }} ({{
+            percent(option.scholarshipType)
+          }}) requiere una entrevista por Zoom con el equipo.
+        </p>
+      }
+      @if (issue('requestedScholarshipTypeId'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </fieldset>
+
+    <!-- 3. Carta de intención. -->
+    <div class="section">
+      <div class="section__row">
+        <label class="section__title" for="sch-letter">
+          <span class="section__number" aria-hidden="true">3</span>
+          Carta de intención *
+        </label>
+        <span id="sch-letter-count" class="counter">
+          {{ letterLength() }} / {{ limits().letterMaxLength }} caracteres (mín.
+          {{ limits().letterMinLength }})
+        </span>
+      </div>
+      <textarea
+        id="sch-letter"
+        class="field__input field__input--area"
+        rows="9"
+        [attr.maxlength]="limits().letterMaxLength"
+        formControlName="intentLetter"
+        aria-describedby="sch-letter-count sch-letter-note"
+        [attr.aria-invalid]="!!issue('intentLetter')"
+      ></textarea>
+      <p id="sch-letter-note" class="hint">
+        Escrita por ti: no se aceptan cartas generadas con IA.
+      </p>
+      @if (issue('intentLetter'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <!-- 4. Evidencia territorial. -->
+    <div class="section">
+      <p class="section__title" id="sch-evidence">
+        <span class="section__number" aria-hidden="true">4</span>
+        Evidencia de experiencia territorial {{ limits().minFiles ? '*' : '' }}
+      </p>
+      <portal-application-evidence
+        idPrefix="sch"
+        dropPrefix="Fotos o videos:"
+        linkPlaceholder="…o agrega un enlace (YouTube, Vimeo, Drive, redes)"
+        describedBy="sch-evidence"
+        [application]="a"
+        [links]="links()"
+        (linksChange)="setLinks($event)"
+        [(busy)]="uploading"
+        (changed)="changed.emit($event)"
+        (failed)="showError($event)"
+      />
+      @if (issue('evidenceLinks') ?? issue('documents'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <label class="check terms">
+      <input type="checkbox" formControlName="termsAccepted" />
+      Acepto los términos de la beca y declaro que la información es verídica *
+    </label>
+    @if (issue('termsAccepted'); as message) {
+      <p class="field__error">{{ message }}</p>
+    }
+
+    @if (error(); as message) {
+      <p class="form__error" role="alert">{{ message }}</p>
+    }
+
+    @if (a.editable) {
+      <footer class="actions">
+        <button type="button" class="button button--outline" [disabled]="saving()" (click)="save()">
+          Guardar borrador
+        </button>
+        <button type="submit" class="button" [disabled]="saving() || uploading()">
+          Postularme
+        </button>
+        <p class="actions__saved" aria-live="polite">
+          @switch (autosave()) {
+            @case ('saving') {
+              Guardando borrador…
+            }
+            @case ('error') {
+              No se pudo guardar automáticamente. Usa «Guardar borrador».
+            }
+            @default {
+              Borrador guardado automáticamente · {{ savedAt() }}
+            }
+          }
+        </p>
+        <button type="button" class="actions__discard" (click)="discard()">
+          Descartar borrador
+        </button>
+      </footer>
+    }
+  </form>
+
+  <portal-offer-summary
+    class="aside"
+    [application]="a"
+    [schedule]="schedule()"
+    [selectedTypeId]="selectedType()"
+    [timezone]="timezone()"
+  />
+</div>

@@ -1,0 +1,75 @@
+// Figma: niveles de beca en tarjetas de opción (nombre y porcentaje grande);
+// la elegida en verde claro con el punto dorado. Aviso de entrevista en
+// amarillo.
+
+.levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 128px), 1fr));
+  gap: 10px;
+}
+
+.level {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 14px 14px 14px 42px;
+  border: 1px solid #c8d2c9;
+  border-radius: 14px;
+  background-color: #fff;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    top: 16px;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #eaa700;
+  }
+
+  &:has(input:checked) {
+    border-color: var(--color-primary);
+    background-color: #eef4ee;
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+}
+
+.level--full {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.level__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.level__percent {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.level__tag {
+  justify-self: start;
+  margin-top: 4px;
+  padding: 1px 8px;
+  border-radius: 54px;
+  background-color: #eef0ee;
+  color: #4d5650;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.warning {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: #fdf1cf;
+  color: #5c4000;
+  font-size: 0.875rem;
+}

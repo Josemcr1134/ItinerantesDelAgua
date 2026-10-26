@@ -5,10 +5,7 @@ import { formationTypeMatch } from './features/formation/formation-options';
 
 // TODO(contenido): confirmar las descripciones para buscadores.
 /** Secciones del menú aún sin pantalla: [ruta, nombre]. */
-const SECTIONS: readonly (readonly [string, string])[] = [
-  ['becas', 'Becas'],
-  ['perfil', 'Mi perfil'],
-];
+const SECTIONS: readonly (readonly [string, string])[] = [['perfil', 'Mi perfil']];
 
 const LOGIN_SEO: PageSeo = {
   description: 'Ingresa al Portal de la Escuela Itinerante del Agua con tu correo y contraseña.',
@@ -57,6 +54,21 @@ export const routes: Routes = [
         path: 'convocatorias',
         title: 'Convocatorias · Portal',
         loadComponent: () => import('./features/open-calls/open-calls-page'),
+      },
+      {
+        path: 'becas',
+        children: [
+          {
+            path: '',
+            title: 'Becas · Portal',
+            loadComponent: () => import('./features/scholarships/scholarships-page'),
+          },
+          {
+            path: ':id',
+            title: 'Postulación a beca · Portal',
+            loadComponent: () => import('./features/scholarships/scholarship-application-page'),
+          },
+        ],
       },
       {
         path: 'calendario',

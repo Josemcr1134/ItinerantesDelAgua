@@ -1,0 +1,89 @@
+@use 'breakpoints' as bp;
+
+// Postulación enviada: el seguimiento arriba y, debajo, lo que se envió.
+
+:host {
+  display: block;
+}
+
+.detail {
+  display: grid;
+  gap: 20px;
+}
+
+.notice {
+  padding: var(--space-4);
+  border-radius: 25px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+
+  a {
+    margin-left: 6px;
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+}
+
+.sent {
+  padding: 22px clamp(16px, 2.5vw, 30px) 24px;
+  border-radius: 25px;
+  background-color: #fff;
+  color: var(--color-primary);
+}
+
+.sent__title {
+  margin-bottom: 14px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sent__list {
+  display: grid;
+  gap: 14px 24px;
+  margin: 0;
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  dt {
+    color: #5a6b60;
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 4px 0 0;
+    color: var(--color-raisin-black);
+  }
+}
+
+.sent__wide {
+  grid-column: 1 / -1;
+}
+
+.sent__letter {
+  white-space: pre-line;
+}
+
+.evidence {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evidence__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
