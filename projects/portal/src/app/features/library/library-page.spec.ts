@@ -53,6 +53,8 @@ describe('LibraryPage', () => {
     expect(host.querySelector('.chip--active')?.textContent?.trim()).toBe('Todos');
     const labels = [...host.querySelectorAll('.card')].map((c) => c.getAttribute('aria-label'));
     expect(labels).toEqual(['Abrir Manual de captación (PDF)', 'Abrir Agua libre (Libro)']);
+    const notes = [...host.querySelectorAll('.card__note')].map((n) => n.textContent?.trim());
+    expect(notes).toEqual(['Sin autor', 'Sin autor']);
   });
 
   it('filtra por tipo y, sin resultados, ofrece limpiar el filtro', async () => {

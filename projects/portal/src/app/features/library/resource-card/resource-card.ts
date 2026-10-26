@@ -23,10 +23,9 @@ import { ResourceIcon } from '../resource-icon';
       />
       <span class="card__body">
         <span class="card__title">{{ r.title }}</span>
+        <span class="card__note">{{ r.author || 'Sin autor' }}</span>
         @if (r.audience === 'OFFER_ENROLLED' && r.offer) {
           <span class="card__note">Exclusivo de {{ r.offer.name }}</span>
-        } @else if (r.author) {
-          <span class="card__note">{{ r.author }}</span>
         }
         <span class="card__type" aria-hidden="true">
           <span class="card__icon"><portal-resource-icon [type]="r.type" [size]="16" /></span>
