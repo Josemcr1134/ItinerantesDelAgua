@@ -9,9 +9,11 @@ import { ApiQuery, ApiResponse } from '../operations.generated';
 export class NotificationsApi {
   private readonly api = inject(ApiClient);
 
-  list(query: ApiQuery<'Notifications_list'> = {}) {
+  /** `silent`: panel de la campana, sin el loader general. */
+  list(query: ApiQuery<'Notifications_list'> = {}, options: { silent?: boolean } = {}) {
     return this.api.get<ApiResponse<'Notifications_list'>>('/api/v1/me/notifications', {
       query: { ...query },
+      ...(options.silent ? { context: silentRequest() } : {}),
     });
   }
 
