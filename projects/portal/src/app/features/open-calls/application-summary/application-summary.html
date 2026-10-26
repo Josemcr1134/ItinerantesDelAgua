@@ -1,0 +1,134 @@
+@let a = application();
+<section class="panel" aria-labelledby="summary-title">
+  <header class="panel__head">
+    <h2 id="summary-title" class="panel__title">Postulación — {{ a.offer.name }}</h2>
+    <portal-application-steps [status]="a.status" />
+  </header>
+
+  <div class="status">
+    <p class="status__badge">{{ statuses[a.status] }}</p>
+    <p class="status__meta">
+      Folio <strong>{{ a.folio }}</strong>
+      @if (a.submittedAt) {
+        · Enviada el {{ format(a.submittedAt) }}
+      }
+    </p>
+  </div>
+
+  @if (a.timeline.length) {
+    <ol class="timeline" aria-label="Línea de tiempo">
+      @for (step of a.timeline; track step.key) {
+        <li class="timeline__step" [attr.data-state]="step.state">
+          <span class="timeline__label">{{ steps[step.key] }}</span>
+          @if (step.at) {
+            <span class="timeline__at">{{ format(step.at) }}</span>
+          }
+        </li>
+      }
+    </ol>
+  }
+
+  @if (a.interview && interviewTime(); as when) {
+    <p class="box"><strong>Entrevista por Zoom:</strong> {{ when }}</p>
+  }
+
+  @if (a.response; as response) {
+    @if (response.kind === 'CONFIRMATION' && response.dueAt) {
+      <p class="box">Confirma tu participación antes del {{ format(response.dueAt) }}.</p>
+    }
+  }
+
+  <div class="actions">
+    @switch (a.action.type) {
+      @case ('CONFIRM_PARTICIPATION') {
+        <button
+          type="button"
+          class="button"
+          [disabled]="busy() || !a.action.enabled"
+          (click)="confirm()"
+        >
+          {{ actions[a.action.type] }}
+        </button>
+      }
+      @case ('JOIN_INTERVIEW') {
+        @if (a.action.enabled && a.interview?.join?.url) {
+          <a class="button" target="_blank" rel="noopener" [href]="a.interview!.join.url">
+            {{ actions[a.action.type] }}
+          </a>
+        } @else {
+          <button type="button" class="button" disabled>{{ actions[a.action.type] }}</button>
+        }
+      }
+      @case ('GO_TO_CLASSROOM') {
+        <a class="button" [routerLink]="['/formacion/aula', a.offer.id]">{{
+          actions[a.action.type]
+        }}</a>
+      }
+      @case ('VIEW') {}
+      @case ('CONTINUE_DRAFT') {}
+      @default {
+        <!-- Pagos (Fase 05): todavía no hay pantalla. -->
+        <button type="button" class="button" disabled>{{ actions[a.action.type] }}</button>
+      }
+    }
+    @if (!a.action.enabled && a.action.reason) {
+      <p class="actions__reason">{{ reasons[a.action.reason] }}</p>
+    }
+  </div>
+
+  <dl class="answers">
+    @if (a.answers.organization) {
+      <div>
+        <dt>Organización o colectivo</dt>
+        <dd>{{ a.answers.organization }}</dd>
+      </div>
+    }
+    @if (a.answers.organizationRole) {
+      <div>
+        <dt>Tu rol</dt>
+        <dd>{{ a.answers.organizationRole }}</dd>
+      </div>
+    }
+    @if (a.answers.experience) {
+      <div class="answers__wide">
+        <dt>Experiencia</dt>
+        <dd>{{ a.answers.experience }}</dd>
+      </div>
+    }
+    @if (a.answers.motivation) {
+      <div class="answers__wide">
+        <dt>Motivación</dt>
+        <dd>{{ a.answers.motivation }}</dd>
+      </div>
+    }
+    @if (a.answers.canTravel !== null) {
+      <div>
+        <dt>Puede viajar</dt>
+        <dd>{{ a.answers.canTravel ? 'Sí' : 'No' }}</dd>
+      </div>
+    }
+    @if (a.answers.evidenceLinks.length || a.documents.length) {
+      <div class="answers__wide">
+        <dt>Evidencias</dt>
+        <dd>
+          <ul class="evidence">
+            @for (doc of a.documents; track doc.id) {
+              <li>
+                <button type="button" class="evidence__link" (click)="openDocument(doc.id)">
+                  {{ doc.fileName }}
+                </button>
+              </li>
+            }
+            @for (link of a.answers.evidenceLinks; track link) {
+              <li>
+                <a class="evidence__link" [href]="link" target="_blank" rel="noopener">{{
+                  link
+                }}</a>
+              </li>
+            }
+          </ul>
+        </dd>
+      </div>
+    }
+  </dl>
+</section>

@@ -1,0 +1,104 @@
+<nav class="tabs" aria-label="Convocatorias">
+  <a
+    class="tab"
+    [class.tab--on]="tab() === 'open'"
+    routerLink="."
+    [queryParams]="{ pestana: null }"
+    queryParamsHandling="merge"
+    [attr.aria-current]="tab() === 'open' ? 'page' : null"
+  >
+    Convocatorias abiertas ({{ openCount() }})
+  </a>
+  <a
+    class="tab"
+    [class.tab--on]="tab() === 'mine'"
+    routerLink="."
+    [queryParams]="{ pestana: 'postulaciones' }"
+    queryParamsHandling="merge"
+    [attr.aria-current]="tab() === 'mine' ? 'page' : null"
+  >
+    Mis Postulaciones
+  </a>
+</nav>
+
+@if (error(); as message) {
+  <p class="notice" role="alert">{{ message }}</p>
+}
+
+@if (tab() === 'open') {
+  @if (opportunities.hasValue()) {
+    @if (opportunities.value().length) {
+      <ul class="cards">
+        @for (opportunity of opportunities.value(); track opportunity.offer.id) {
+          <li>
+            <portal-opportunity-card
+              [opportunity]="opportunity"
+              [timezone]="timezone()"
+              [selected]="selectedOffer() === opportunity.offer.id"
+              [busy]="creating() === opportunity.offer.id"
+              (apply)="apply($event)"
+              (selectedApplication)="open($event)"
+            />
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="notice">Por ahora no hay convocatorias abiertas. Te avisaremos cuando abra una.</p>
+    }
+  }
+} @else {
+  @if (mine.hasValue()) {
+    @if (mine.value().length) {
+      <ul class="mine">
+        @for (item of mine.value(); track item.id) {
+          <li class="mine__item" [class.mine__item--on]="postulacion() === item.id">
+            <div class="mine__info">
+              <p class="mine__name">{{ item.offer.name }}</p>
+              <p class="mine__meta">
+                @if (item.folio) {
+                  Folio {{ item.folio }} ·
+                }
+                {{
+                  item.submittedAt
+                    ? 'Enviada el ' + format(item.submittedAt)
+                    : 'Guardada el ' + format(item.updatedAt)
+                }}
+              </p>
+            </div>
+            <span class="mine__status" [class.mine__status--action]="item.requiresAction">
+              {{ statuses[item.status] }}
+            </span>
+            <button type="button" class="mine__open" (click)="open(item.id)">
+              {{ item.status === 'DRAFT' ? 'Continuar' : 'Ver' }}
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="notice">
+        Aún no te has postulado a ninguna convocatoria.
+        <a routerLink="." [queryParams]="{ pestana: null }" queryParamsHandling="merge">
+          Ver convocatorias abiertas
+        </a>
+      </p>
+    }
+  }
+}
+
+<div #panel class="panel">
+  @if (application.value(); as current) {
+    @if (current.status === 'DRAFT') {
+      <portal-application-form
+        [application]="current"
+        [timezone]="timezone()"
+        (changed)="onChanged($event)"
+      />
+    } @else {
+      <portal-application-summary
+        [application]="current"
+        [timezone]="timezone()"
+        (changed)="onChanged($event)"
+      />
+    }
+  }
+</div>

@@ -1,0 +1,112 @@
+// Figma HU-20: tarjeta blanca (radio 25 px); la elegida, en verde claro con
+// borde. Pastillas de modalidad (verde) y elegibilidad (amarilla).
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 18px 24px 22px;
+  border: 1px solid transparent;
+  border-radius: 25px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.15);
+  color: var(--color-primary);
+}
+
+.card--selected {
+  border-color: var(--color-primary);
+  background-color: #f4f6f1;
+}
+
+.card__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.pill {
+  padding: 3px 9px;
+  border: 1px solid var(--color-primary);
+  border-radius: 54px;
+  background-color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.pill--eligibility {
+  border-color: #eaa700;
+  background-color: #fdf1cf;
+  color: #5c4000;
+}
+
+.card__title {
+  margin-bottom: 8px;
+  font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.card__line {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.card__close {
+  color: #5a6b60;
+  font-size: 0.875rem;
+}
+
+// Botón relleno verde de 44 px (Figma "Ver y postular").
+.card__action {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 100px;
+  background-color: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #2e4033;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.card__state,
+.card__mine {
+  color: #5a6b60;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.card__mine {
+  margin-top: 8px;
+}

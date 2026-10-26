@@ -1,0 +1,283 @@
+@let a = application();
+@let applicant = a.applicant;
+<section class="panel" aria-labelledby="application-title">
+  <header class="panel__head">
+    <h2 id="application-title" class="panel__title">Postulación — {{ a.offer.name }}</h2>
+    <portal-application-steps [status]="a.status" />
+  </header>
+
+  @if (!a.editable) {
+    <p class="note" role="status">La convocatoria cerró: el borrador queda en solo lectura.</p>
+  }
+
+  <form class="form" novalidate [formGroup]="form" (ngSubmit)="submit()">
+    <!-- Elegibilidad (Figma: recuadro amarillo). -->
+    <div class="eligibility" [class.eligibility--issue]="issue('eligibilityConfirmed')">
+      <p class="eligibility__text">
+        Criterio de elegibilidad:
+        {{ eligibility()?.text ?? 'cumplo con los requisitos de la convocatoria.' }}
+      </p>
+      <label class="check">
+        <input type="checkbox" formControlName="eligibilityConfirmed" />
+        Confirmo que cumplo con este criterio *
+      </label>
+      @if (issue('eligibilityConfirmed'); as message) {
+        <p class="field__error">{{ message }}</p>
+      }
+    </div>
+
+    <!-- Datos del perfil (no se editan aquí). -->
+    <div class="grid grid--3">
+      <div class="field">
+        <label class="field__label" for="app-name">Nombre completo *</label>
+        <input id="app-name" class="field__input" [value]="applicant.fullName" readonly />
+      </div>
+      <div class="field">
+        <label class="field__label" for="app-country">País *</label>
+        <input id="app-country" class="field__input" [value]="applicant.countryName" readonly />
+      </div>
+      <div class="field">
+        <label class="field__label" for="app-territory">Territorio / comunidad *</label>
+        <input
+          id="app-territory"
+          class="field__input"
+          [value]="applicant.municipalityName + ', ' + applicant.divisionName"
+          readonly
+        />
+      </div>
+    </div>
+    <p class="hint">Se toman de tu perfil.</p>
+
+    <div class="grid grid--2">
+      <div class="field">
+        <label class="field__label" for="app-org">Organización o colectivo *</label>
+        <input
+          id="app-org"
+          class="field__input"
+          maxlength="150"
+          formControlName="organization"
+          [attr.aria-invalid]="!!issue('organization')"
+        />
+        @if (issue('organization'); as message) {
+          <p class="field__error">{{ message }}</p>
+        }
+      </div>
+      <div class="field">
+        <label class="field__label" for="app-role">Tu rol en la organización / comunidad *</label>
+        <input
+          id="app-role"
+          class="field__input"
+          maxlength="120"
+          formControlName="organizationRole"
+          [attr.aria-invalid]="!!issue('organizationRole')"
+        />
+        @if (issue('organizationRole'); as message) {
+          <p class="field__error">{{ message }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="grid grid--2">
+      <div class="field">
+        <label class="field__label" for="app-experience">
+          Experiencia en el cuidado del agua y el territorio *
+        </label>
+        <textarea
+          id="app-experience"
+          class="field__input field__input--area"
+          rows="6"
+          [attr.maxlength]="limits().answerMaxLength"
+          formControlName="experience"
+          aria-describedby="app-experience-count"
+          [attr.aria-invalid]="!!issue('experience')"
+        ></textarea>
+        <p id="app-experience-count" class="counter">
+          {{ experienceLength() }} / {{ limits().answerMaxLength }} caracteres (mín.
+          {{ limits().answerMinLength }})
+        </p>
+        @if (issue('experience'); as message) {
+          <p class="field__error">{{ message }}</p>
+        }
+      </div>
+      <div class="field">
+        <label class="field__label" for="app-motivation">
+          Motivación: ¿por qué quieres participar? *
+        </label>
+        <textarea
+          id="app-motivation"
+          class="field__input field__input--area"
+          rows="6"
+          [attr.maxlength]="limits().answerMaxLength"
+          formControlName="motivation"
+          aria-describedby="app-motivation-count"
+          [attr.aria-invalid]="!!issue('motivation')"
+        ></textarea>
+        <p id="app-motivation-count" class="counter">
+          {{ motivationLength() }} / {{ limits().answerMaxLength }} caracteres (mín.
+          {{ limits().answerMinLength }})
+        </p>
+        @if (issue('motivation'); as message) {
+          <p class="field__error">{{ message }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="grid grid--2">
+      <div class="stack">
+        @if (eligibility()?.requiresTravel) {
+          <fieldset class="choice">
+            <legend class="field__label">
+              ¿Puedes viajar y asistir a las fechas completas del programa? *
+            </legend>
+            <div class="choice__options">
+              <label class="option">
+                <input type="radio" formControlName="canTravel" [value]="true" />
+                Sí
+              </label>
+              <label class="option">
+                <input type="radio" formControlName="canTravel" [value]="false" />
+                No
+              </label>
+            </div>
+            @if (issue('canTravel'); as message) {
+              <p class="field__error">{{ message }}</p>
+            }
+          </fieldset>
+        }
+        <label class="check">
+          <input type="checkbox" formControlName="termsAccepted" />
+          Acepto los términos y el tratamiento de mis datos *
+        </label>
+        @if (issue('termsAccepted'); as message) {
+          <p class="field__error">{{ message }}</p>
+        }
+      </div>
+
+      <!-- Evidencias: archivos (subida directa) y enlaces. -->
+      <div class="field">
+        <span class="field__label" id="app-evidence">
+          Fotos, videos o enlaces de tu trabajo (opcional)
+        </span>
+        @if (a.editable) {
+          <label
+            class="drop"
+            [class.drop--busy]="!!uploading()"
+            (dragover)="$event.preventDefault()"
+            (drop)="$event.preventDefault(); upload($event.dataTransfer?.files ?? null)"
+          >
+            <input
+              class="visually-hidden"
+              type="file"
+              multiple
+              [accept]="accept()"
+              [disabled]="!!uploading() || a.documents.length >= limits().maxFiles"
+              (change)="upload($any($event.target).files); $any($event.target).value = ''"
+              aria-describedby="app-evidence"
+            />
+            <svg
+              aria-hidden="true"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 16V4M6 10l6-6 6 6M4 20h16" />
+            </svg>
+            @if (uploading(); as name) {
+              <span>Subiendo {{ name }}…</span>
+            } @else {
+              <span>Arrastra aquí o <strong class="drop__link">Seleccionar</strong></span>
+              <span class="drop__hint"
+                >Imágenes hasta 10 MB · videos hasta 100 MB · máx. {{ limits().maxFiles }}</span
+              >
+            }
+          </label>
+        }
+        @if (a.documents.length) {
+          <ul class="files">
+            @for (doc of a.documents; track doc.id) {
+              <li class="files__item">
+                <span class="files__name">{{ doc.fileName }}</span>
+                <span class="files__size">{{ size(doc.sizeBytes) }}</span>
+                @if (a.editable) {
+                  <button
+                    type="button"
+                    class="files__remove"
+                    [attr.aria-label]="'Quitar ' + doc.fileName"
+                    (click)="removeDocument(doc.id)"
+                  >
+                    ×
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        }
+        <div class="links">
+          @for (link of links(); track $index; let i = $index) {
+            <p class="links__item">
+              <span class="links__url">{{ link }}</span>
+              @if (a.editable) {
+                <button
+                  type="button"
+                  class="files__remove"
+                  [attr.aria-label]="'Quitar ' + link"
+                  (click)="removeLink(i)"
+                >
+                  ×
+                </button>
+              }
+            </p>
+          }
+          @if (a.editable && links().length < limits().maxLinks) {
+            <div class="links__add">
+              <label class="visually-hidden" for="app-link">Enlace (YouTube, Drive, redes)</label>
+              <input
+                id="app-link"
+                class="field__input"
+                type="url"
+                inputmode="url"
+                placeholder="https://… (YouTube, Drive, redes)"
+                [value]="newLink()"
+                (input)="newLink.set($any($event.target).value)"
+                (keydown.enter)="$event.preventDefault(); addLink()"
+              />
+              <button type="button" class="links__button" (click)="addLink()">Agregar</button>
+            </div>
+          }
+          @if (issue('evidenceLinks') ?? issue('documents'); as message) {
+            <p class="field__error">{{ message }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (error(); as message) {
+      <p class="form__error" role="alert">{{ message }}</p>
+    }
+
+    @if (a.editable) {
+      <footer class="actions">
+        <button type="button" class="button button--outline" [disabled]="saving()" (click)="save()">
+          Guardar borrador
+        </button>
+        <button type="submit" class="button" [disabled]="saving() || !!uploading()">
+          Enviar postulación
+        </button>
+        <p class="actions__note">
+          @if (a.form.interviewNotice) {
+            El proceso incluye una entrevista por Zoom con el equipo.
+          }
+          <span class="actions__saved">Borrador guardado · {{ savedAt() }}</span>
+        </p>
+        <button type="button" class="actions__discard" (click)="discard()">
+          Descartar borrador
+        </button>
+      </footer>
+    }
+  </form>
+</section>

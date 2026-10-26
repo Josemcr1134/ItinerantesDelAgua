@@ -1,5 +1,3 @@
-import { ApplicationStatus } from 'data-access';
-
 /** Zona del navegador; la del perfil manda cuando existe (HU-11). */
 export function browserTimezone(): string {
   try {
@@ -54,16 +52,3 @@ export function timeLabel(iso: string, timeZone: string): string {
     hourCycle: 'h23',
   }).format(new Date(iso));
 }
-
-/** Estado de una postulación (mismos textos que "Mis postulaciones"). */
-export const APPLICATION_STATUS_LABELS: Readonly<Record<ApplicationStatus, string>> = {
-  DRAFT: 'Borrador',
-  SUBMITTED: 'Enviada',
-  IN_REVIEW: 'En revisión',
-  INTERVIEW_SCHEDULED: 'Entrevista agendada',
-  APPROVED_PENDING_PAYMENT: 'Aprobada – pendiente de pago',
-  APPROVED_PENDING_CONFIRMATION: 'Aprobada – pendiente de confirmación',
-  ENROLLED: 'Inscrita',
-  NOT_SELECTED: 'No seleccionada',
-  EXPIRED: 'Vencida',
-};

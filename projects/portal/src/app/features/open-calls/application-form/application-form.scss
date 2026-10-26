@@ -1,0 +1,260 @@
+@use 'breakpoints' as bp;
+
+// Figma HU-20: panel blanco con los pasos, recuadro amarillo de elegibilidad
+// y campos de 12 px de radio con borde verde.
+
+$muted: #5a6b60;
+$error: #b5452b;
+
+:host {
+  display: block;
+}
+
+.panel {
+  padding: 22px clamp(16px, 2.5vw, 33px) 28px;
+  border-radius: 25px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.15);
+  color: var(--color-primary);
+}
+
+.panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  margin-bottom: 18px;
+}
+
+.panel__title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.note {
+  margin-bottom: 14px;
+  color: $muted;
+}
+
+.form {
+  display: grid;
+  gap: 18px;
+}
+
+.eligibility {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background-color: #fdf1cf;
+  color: #5c4000;
+}
+
+.eligibility--issue {
+  box-shadow: inset 0 0 0 2px $error;
+}
+
+.eligibility__text {
+  font-weight: 700;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--color-primary);
+  }
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.grid--3 {
+  @include bp.up(lg) {
+    grid-template-columns: 2fr 1.6fr 2fr;
+  }
+}
+
+.hint,
+.counter {
+  margin-top: -10px;
+  color: $muted;
+  font-size: 0.75rem;
+}
+
+.counter {
+  margin-top: 4px;
+  text-align: right;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.field__label {
+  margin-bottom: 6px;
+  color: $muted;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.field__input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 12px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+  font: inherit;
+
+  &[readonly] {
+    border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+    background-color: #f7f8f5;
+  }
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    outline-offset: 0;
+  }
+
+  &[aria-invalid='true'] {
+    border-color: $error;
+  }
+
+  &:disabled {
+    background-color: #f7f8f5;
+  }
+}
+
+.field__input--area {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.field__error,
+.form__error {
+  margin-top: 4px;
+  color: $error;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.form__error {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: color-mix(in srgb, #{$error} 10%, #fff);
+}
+
+.stack {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.choice {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice__options {
+  display: flex;
+  gap: 8px;
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 64px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #c8d2c9;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:has(input:checked) {
+    border-color: var(--color-primary);
+    background-color: #e3ebe3;
+    font-weight: 700;
+  }
+
+  input {
+    margin: 0;
+    accent-color: #eaa700;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+  padding-top: 18px;
+  border-top: 1px solid #e6ebe6;
+}
+
+// Botones del Figma: contorno y relleno verde, 57 px de alto.
+.button {
+  min-height: 52px;
+  padding: 0 24px;
+  border: 3px solid var(--color-primary);
+  border-radius: 100px;
+  background-color: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+}
+
+.button--outline {
+  background: none;
+  color: var(--color-primary);
+}
+
+.actions__note {
+  display: grid;
+  color: $muted;
+  font-size: 0.8125rem;
+}
+
+.actions__discard {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $error;
+  font: inherit;
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
