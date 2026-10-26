@@ -4,11 +4,72 @@
   display: block;
 }
 
+.search {
+  position: relative;
+  max-width: 480px;
+  margin: -6px 0 16px;
+}
+
+.search__icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  color: var(--color-primary);
+  translate: 0 -50%;
+  pointer-events: none;
+}
+
+// Pastilla con el borde verde de los chips.
+.search__input {
+  width: 100%;
+  height: 44px;
+  padding: 0 44px;
+  border: 2px solid var(--color-primary);
+  border-radius: 54px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+  font: inherit;
+
+  &::placeholder {
+    color: color-mix(in srgb, var(--color-primary) 60%, transparent);
+  }
+
+  &::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    outline-offset: 0;
+  }
+}
+
+.search__clear {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-primary);
+  translate: 0 -50%;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: -6px 0 36px;
+  margin-bottom: 36px;
 }
 
 .chip {

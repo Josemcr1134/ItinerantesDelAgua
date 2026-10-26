@@ -1,7 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideAuth } from 'auth';
 import { apiErrorInterceptor, provideApi } from 'data-access';
 import { PageHeading } from '../../core/page-heading/page-heading';
@@ -86,5 +86,43 @@ describe('LibraryPage', () => {
     await fixture.whenStable();
     expect(tab.location.href).toBe('https://files.test/r1.pdf');
     expect(tab.opener).toBeNull();
+  });
+
+  it('busca con ?q= al dejar de escribir y la API recibe el texto', async () => {
+    const { fixture, http, host } = await render();
+    http
+      .expectOne((r) => r.url === `${API}/library`)
+      .flush({ data: [], meta: { page: 1, pageSize: 18, total: 0, totalPages: 0 } });
+    await fixture.whenStable();
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const input = host.querySelector<HTMLInputElement>('#library-search')!;
+
+    // Solo la escritura con reloj simulado (whenStable necesita el real).
+    vi.useFakeTimers();
+    try {
+      for (const value of ['hu', 'hum', ' humedal ']) {
+        input.value = value;
+        input.dispatchEvent(new Event('input'));
+        vi.advanceTimersByTime(100);
+      }
+      expect(navigate).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(400);
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(navigate).toHaveBeenCalledTimes(1);
+    expect(navigate.mock.calls[0][1]).toMatchObject({
+      queryParams: { q: 'humedal' },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+
+    fixture.componentRef.setInput('q', 'humedal');
+    TestBed.tick();
+    const request = http.expectOne((r) => r.url === `${API}/library`);
+    expect(request.request.params.get('q')).toBe('humedal');
+    request.flush({ data: [], meta: { page: 1, pageSize: 18, total: 0, totalPages: 0 } });
+    await fixture.whenStable();
+    expect(host.textContent).toContain('No encontramos recursos para «humedal».');
   });
 });
