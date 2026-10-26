@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -18,7 +19,7 @@ import { DashboardWidget } from './widget/dashboard-widget';
  */
 @Component({
   selector: 'portal-dashboard-page',
-  imports: [RouterLink, NextActivity, FormationCard, DashboardWidget],
+  imports: [NgTemplateOutlet, RouterLink, NextActivity, FormationCard, DashboardWidget],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss',
 })

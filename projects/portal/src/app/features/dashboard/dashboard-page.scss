@@ -51,9 +51,11 @@
   }
 }
 
-// Fila: pastilla con el nombre (contorno) y "Ver" (relleno) pegado a la derecha.
+// Fila: pastilla con el nombre (contorno) y, separado, el botón redondo con
+// el ojo (relleno).
 .row {
   display: flex;
+  gap: 8px;
   width: 100%;
   min-width: 0;
   padding: 0;
@@ -88,13 +90,18 @@
 }
 
 .row__action {
+  display: grid;
   flex: none;
-  width: 54px;
-  margin-left: -2px;
-  border-radius: 54px;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
   background-color: #0067ff;
   color: #fff;
-  line-height: 35px;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: background-color 0.2s ease;
+  }
 }
 
 .widget-link {

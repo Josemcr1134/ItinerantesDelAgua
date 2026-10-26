@@ -1,5 +1,22 @@
 <h1 class="visually-hidden">Dashboard</h1>
 
+<!-- Ícono "ver" de las filas (el nombre accesible lo da cada enlace). -->
+<ng-template #viewIcon>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+</ng-template>
+
 @if (loadError(); as message) {
   <div class="load-error" role="alert">
     <p>{{ message }}</p>
@@ -66,7 +83,9 @@
         @for (event of d.upcomingEvents ?? []; track event.id) {
           <a class="row" routerLink="/calendario" [attr.aria-label]="'Ver ' + event.title">
             <span class="row__label">{{ event.title }}</span>
-            <span class="row__action" aria-hidden="true">Ver</span>
+            <span class="row__action" aria-hidden="true"
+              ><ng-container [ngTemplateOutlet]="viewIcon"
+            /></span>
           </a>
         }
       </portal-dashboard-widget>
@@ -88,7 +107,9 @@
             [attr.title]="latest.offer.name"
           >
             <span class="row__label">{{ statusLabels[latest.status] }}</span>
-            <span class="row__action" aria-hidden="true">Ver</span>
+            <span class="row__action" aria-hidden="true"
+              ><ng-container [ngTemplateOutlet]="viewIcon"
+            /></span>
           </a>
         }
       </portal-dashboard-widget>
@@ -110,7 +131,9 @@
             [attr.title]="latest.offer.name"
           >
             <span class="row__label">{{ statusLabels[latest.status] }}</span>
-            <span class="row__action" aria-hidden="true">Ver</span>
+            <span class="row__action" aria-hidden="true"
+              ><ng-container [ngTemplateOutlet]="viewIcon"
+            /></span>
           </a>
         }
       </portal-dashboard-widget>
@@ -132,7 +155,9 @@
             (click)="openResource(item)"
           >
             <span class="row__label">{{ item.title }}</span>
-            <span class="row__action" aria-hidden="true">Ver</span>
+            <span class="row__action" aria-hidden="true"
+              ><ng-container [ngTemplateOutlet]="viewIcon"
+            /></span>
           </button>
         }
         <a widgetFooter class="widget-link" routerLink="/biblioteca">Ir a Biblioteca</a>
