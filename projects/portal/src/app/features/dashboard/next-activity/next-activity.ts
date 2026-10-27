@@ -1,11 +1,12 @@
 import { Component, computed, effect, input, output } from '@angular/core';
 import { CalendarItemDto } from 'data-access';
 import { Button } from 'ui-kit';
-import { dayTimeLabel, timeLabel } from '../dashboard-format';
+import { cdmxTimeLabel, dayTimeLabel, timeLabel } from '../dashboard-format';
 
 /**
  * "Próxima actividad" (HU-06 con el acceso de HU-12): la siguiente sesión o
- * evento con su hora en la zona de la persona y el botón para entrar.
+ * evento con su hora en la zona de la persona (y la de CDMX si está en otra,
+ * HU-11) y el botón para entrar.
  */
 @Component({
   selector: 'portal-next-activity',
@@ -23,6 +24,11 @@ export class NextActivity {
   protected readonly when = computed(() => {
     const activity = this.activity();
     return activity ? dayTimeLabel(activity.startsAt, this.timezone()) : '';
+  });
+  /** "18:00 hora CDMX" si la persona está en otra zona. */
+  protected readonly cdmx = computed(() => {
+    const activity = this.activity();
+    return activity && !activity.allDay ? cdmxTimeLabel(activity.startsAt, this.timezone()) : null;
   });
   protected readonly join = computed(() => this.activity()?.join ?? null);
   protected readonly opensAt = computed(() => {

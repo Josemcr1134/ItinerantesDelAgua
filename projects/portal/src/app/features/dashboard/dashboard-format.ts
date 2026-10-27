@@ -52,3 +52,15 @@ export function timeLabel(iso: string, timeZone: string): string {
     hourCycle: 'h23',
   }).format(new Date(iso));
 }
+
+const CDMX = 'America/Mexico_City';
+
+/**
+ * "18:00 hora CDMX", la hora oficial de la Escuela (HU-11), para quien está
+ * en otra zona; `null` si está en CDMX o la hora coincide.
+ */
+export function cdmxTimeLabel(iso: string, timeZone: string): string | null {
+  if (timeZone === CDMX) return null;
+  const official = timeLabel(iso, CDMX);
+  return official === timeLabel(iso, timeZone) ? null : `${official} hora CDMX`;
+}

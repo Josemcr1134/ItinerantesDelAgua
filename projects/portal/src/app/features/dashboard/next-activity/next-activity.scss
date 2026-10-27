@@ -82,6 +82,14 @@
   color: color-mix(in srgb, #423f41 75%, transparent);
 }
 
+// Hora oficial de la Escuela (HU-11) para quien está en otra zona.
+.card__cdmx {
+  margin-top: 4px;
+  color: #5a6b60;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 // Pestaña verde pegada al borde superior del marco.
 .card__when {
   position: absolute;

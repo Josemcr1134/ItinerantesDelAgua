@@ -14,6 +14,9 @@
         @if (item.offer && item.title !== item.offer.name) {
           <p class="card__detail">{{ item.title }}</p>
         }
+        @if (cdmx(); as official) {
+          <p class="card__cdmx">{{ official }}</p>
+        }
       } @else {
         <!-- TODO(contenido): confirmar el mensaje sin actividades próximas. -->
         <p class="card__title">No tienes actividades en los próximos días.</p>
