@@ -124,6 +124,49 @@ describe('DashboardPage', () => {
     expect(text(host, '.widget__number')).toEqual(['3', '1', '1']);
   });
 
+  it('avisos de pago: cobro fallido destacado y el próximo cobro, hacia Mis pagos', async () => {
+    const offerRef = { id: 'o1', slug: 'eco', name: 'Diplomado en Ecotecnologías' };
+    const usd = (cents: number) => ({ amountCents: cents, currency: 'USD' });
+    const host = await render(
+      dashboard({
+        payments: {
+          alerts: [
+            {
+              type: 'INSTALLMENT_FAILED',
+              offer: offerRef,
+              amount: usd(19500),
+              date: '2026-10-20T18:00:00.000Z',
+              planId: 'pl1',
+              paymentId: null,
+              applicationId: null,
+              card: null,
+            },
+          ],
+          upcomingInstallments: [
+            {
+              type: 'INSTALLMENT_UPCOMING',
+              offer: offerRef,
+              amount: usd(19500),
+              date: '2026-10-30T18:00:00.000Z',
+              planId: 'pl1',
+              paymentId: null,
+              applicationId: null,
+              card: { brand: 'Visa', last4: '4242' },
+            },
+          ],
+        },
+      }),
+    );
+    const notices = [...host.querySelectorAll('.notice')].map((n) =>
+      n.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+    expect(notices[0]).toContain('Cobro fallido: Diplomado en Ecotecnologías · $195 USD');
+    expect(notices[1]).toContain(
+      'Próximo cobro automático: $195 USD el 30 oct 2026 con Visa •••• 4242.',
+    );
+    expect(host.querySelector('.notice a')?.getAttribute('href')).toBe('/perfil?pestana=pagos');
+  });
+
   it('sin cursos, actividades, convocatorias, becas ni materiales: todo en 0', async () => {
     const empty = { latest: null, openCount: 0, newCount: 0, actionRequired: 0 };
     const host = await render(

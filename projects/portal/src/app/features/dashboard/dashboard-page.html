@@ -22,6 +22,15 @@
   </div>
 } @else if (dashboard.value(); as d) {
   <div class="dashboard">
+    <!-- Pagos (HU-26): cobro fallido, mora o comprobante rechazado arriba; próximo cobro. -->
+    @if (isFailed('payments')) {
+      <p class="block-error" role="status">
+        No se pudieron cargar tus avisos de pago.
+        <button type="button" (click)="reload()">Reintentar</button>
+      </p>
+    } @else {
+      <portal-payment-notices [payments]="d.payments" [timezone]="timezone()" />
+    }
     @if (isFailed('nextActivity')) {
       <p class="block-error" role="status">
         No se pudo cargar tu próxima actividad.

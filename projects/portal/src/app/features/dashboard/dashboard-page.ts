@@ -9,17 +9,25 @@ import { APPLICATION_STATUS_LABELS } from '../../shared/applications/application
 import { browserTimezone } from './dashboard-format';
 import { FALLBACK_COVERS, FormationCard } from './formation-card/formation-card';
 import { NextActivity } from './next-activity/next-activity';
+import { PaymentNotices } from './payment-notices/payment-notices';
 import { DashboardWidget } from './widget/dashboard-widget';
 
 /**
  * Dashboard del participante (HU-06, Figma): próxima actividad, formación
  * activa con su progreso y accesos a Calendario, Convocatorias, Becas y
- * Biblioteca. Cada bloque es independiente: el que no llega muestra su
+ * Biblioteca, con los avisos de pago arriba. Cada bloque es independiente: el que no llega muestra su
  * aviso con "Reintentar" y los demás se ven igual.
  */
 @Component({
   selector: 'portal-dashboard-page',
-  imports: [NgTemplateOutlet, RouterLink, NextActivity, FormationCard, DashboardWidget],
+  imports: [
+    NgTemplateOutlet,
+    RouterLink,
+    NextActivity,
+    FormationCard,
+    DashboardWidget,
+    PaymentNotices,
+  ],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss',
 })

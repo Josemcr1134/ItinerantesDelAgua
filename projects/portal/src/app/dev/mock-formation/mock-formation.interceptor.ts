@@ -129,7 +129,13 @@ function withMockFormations(response: HttpResponse<unknown>): HttpResponse<unkno
       ...body,
       nextActivity: mockNextActivity() ?? body.nextActivity,
       formations: { items: active.slice(0, 3), total: active.length },
-      failedBlocks: body.failedBlocks.filter((b) => b !== 'formations' && b !== 'nextActivity'),
+      payments: {
+        alerts: mockSummary().alerts.filter((a) => a.type !== 'INSTALLMENT_UPCOMING'),
+        upcomingInstallments: mockSummary().alerts.filter((a) => a.type === 'INSTALLMENT_UPCOMING'),
+      },
+      failedBlocks: body.failedBlocks.filter(
+        (b) => b !== 'formations' && b !== 'nextActivity' && b !== 'payments',
+      ),
     } satisfies DashboardDto,
   });
 }

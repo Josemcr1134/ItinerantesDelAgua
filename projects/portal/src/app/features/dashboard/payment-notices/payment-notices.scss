@@ -1,0 +1,57 @@
+// Avisos de pago del dashboard: banner terracota (cobro fallido, mora,
+// comprobante rechazado), amarillo (en validación) o verde claro (próximo
+// cobro), con el enlace a Mis pagos a la derecha.
+
+:host {
+  display: block;
+}
+
+.notices {
+  display: grid;
+  gap: 10px;
+}
+
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 14px 18px;
+  border: 1px solid #e2a596;
+  border-radius: 18px;
+  background-color: #fdf4f1;
+  color: #9a3a22;
+  font-size: 0.9375rem;
+
+  &[data-type='TRANSFER_PENDING'] {
+    border-color: #eaa700;
+    background-color: #fffaf0;
+    color: #5c4000;
+  }
+}
+
+.notice--info {
+  border-color: #b9d8c4;
+  background-color: #eef6f1;
+  color: #1f5c40;
+}
+
+.notice__text {
+  flex: 1 1 280px;
+}
+
+.notice__action {
+  flex: none;
+  padding: 6px 16px;
+  border: 1.5px solid currentcolor;
+  border-radius: 100px;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    background-color: rgb(255 255 255 / 0.6);
+  }
+}
