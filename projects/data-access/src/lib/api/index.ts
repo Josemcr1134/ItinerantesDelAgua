@@ -38,3 +38,4 @@ export * from './services/admin-moodle.api';
 export * from './services/admin-audit.api';
 export * from './services/scholarship-types.api';
 export * from './services/payments.api';
+export * from './services/moodle-access.api';
