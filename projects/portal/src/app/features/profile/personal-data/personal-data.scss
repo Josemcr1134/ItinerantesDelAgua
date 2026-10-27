@@ -1,0 +1,70 @@
+@use 'breakpoints' as bp;
+
+// Datos personales (Figma): foto a la izquierda y nombre, usuario y correo a
+// la derecha; debajo, una línea y la ubicación y el teléfono en dos columnas.
+
+.identity {
+  display: grid;
+  gap: 20px;
+
+  @include bp.up(md) {
+    grid-template-columns: 140px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.identity__photo {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.identity__fields {
+  display: grid;
+  gap: 14px;
+  max-width: 740px;
+}
+
+// Solo lectura: el candado y su leyenda a la derecha del campo.
+.field--locked {
+  @include bp.up(md) {
+    grid-template-columns: minmax(0, 1fr) 120px;
+    column-gap: 14px;
+
+    .field__label {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #5a6b60;
+  font-size: 0.75rem;
+}
+
+.divider {
+  width: 100%;
+  max-width: 900px;
+  margin: 4px 0;
+  border: 0;
+  border-top: 1px solid #e6ebe6;
+}
+
+.grid {
+  display: grid;
+  gap: 16px 18px;
+  max-width: 740px;
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.phone {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 10px;
+}

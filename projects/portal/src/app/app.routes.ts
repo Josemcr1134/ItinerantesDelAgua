@@ -5,9 +5,6 @@ import { formationTypeMatch } from './features/formation/formation-options';
 import { applicationRedirect } from './shared/applications/application-redirect';
 
 // TODO(contenido): confirmar las descripciones para buscadores.
-/** Secciones del menú aún sin pantalla: [ruta, nombre]. */
-const SECTIONS: readonly (readonly [string, string])[] = [['perfil', 'Mi perfil']];
-
 const LOGIN_SEO: PageSeo = {
   description: 'Ingresa al Portal de la Escuela Itinerante del Agua con tu correo y contraseña.',
   index: true,
@@ -78,6 +75,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/offer-action/offer-action-page'),
       },
       {
+        path: 'perfil',
+        title: 'Mi perfil · Portal',
+        loadComponent: () => import('./features/profile/profile-page'),
+      },
+      {
         path: 'notificaciones',
         title: 'Notificaciones · Portal',
         loadComponent: () => import('./features/notifications/notifications-page'),
@@ -125,13 +127,6 @@ export const routes: Routes = [
           },
         ],
       },
-      // TODO: cada sección reemplaza este marcador al tener su pantalla.
-      ...SECTIONS.map(([path, section]) => ({
-        path,
-        title: `${section} · Portal`,
-        data: { section },
-        loadComponent: () => import('./features/coming-soon/coming-soon-page'),
-      })),
     ],
   },
   { path: '**', redirectTo: '' },

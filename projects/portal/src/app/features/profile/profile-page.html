@@ -1,0 +1,39 @@
+<nav class="tabs" [attr.aria-label]="t.title">
+  @for (key of tabs; track key) {
+    <a
+      class="tab"
+      [class.tab--on]="tab() === key"
+      routerLink="."
+      [queryParams]="{ pestana: key === 'datos' ? null : key }"
+      [attr.aria-current]="tab() === key ? 'page' : null"
+    >
+      {{ t.tabs[key] }}
+    </a>
+  }
+</nav>
+
+@if (error(); as message) {
+  <p class="notice" role="alert">
+    {{ message }}
+    <button type="button" class="notice__retry" (click)="profile.reload()">Reintentar</button>
+  </p>
+} @else if (current(); as p) {
+  @switch (tab()) {
+    @case ('zona') {
+      <portal-timezone-form [profile]="p" (saved)="onSaved($event)" />
+    }
+    @case ('seguridad') {
+      <portal-security-form />
+    }
+    @case ('pagos') {
+      <!-- HU-26 (Fase 05): Mis pagos aún sin pantalla. -->
+      <section class="soon">
+        <h2 class="soon__title">{{ t.payments.title }}</h2>
+        <p>{{ t.payments.text }}</p>
+      </section>
+    }
+    @default {
+      <portal-personal-data [profile]="p" (saved)="onSaved($event)" />
+    }
+  }
+}

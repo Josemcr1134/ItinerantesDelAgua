@@ -1,0 +1,207 @@
+@let p = profile();
+@let loc = location;
+<form class="panel" novalidate [formGroup]="form" (ngSubmit)="save()">
+  <div class="identity">
+    <div class="identity__photo">
+      <portal-avatar [name]="p.fullName" [size]="108" />
+      <!-- TODO(diseño/API): «Cambiar foto» cuando la API guarde foto de perfil. -->
+    </div>
+    <div class="identity__fields">
+      <div class="field">
+        <label class="field__label" for="profile-name">{{ t.fullName }}</label>
+        <input
+          id="profile-name"
+          class="field__input"
+          autocomplete="name"
+          maxlength="120"
+          formControlName="fullName"
+          [attr.aria-invalid]="showError('fullName')"
+          [attr.aria-describedby]="showError('fullName') ? 'profile-name-error' : null"
+        />
+        @if (showError('fullName')) {
+          <p id="profile-name-error" class="field__error">{{ errorFor('fullName') }}</p>
+        }
+      </div>
+      <div class="field field--locked">
+        <label class="field__label" for="profile-username">{{ t.username }}</label>
+        <input
+          id="profile-username"
+          class="field__input"
+          [value]="p.username"
+          readonly
+          aria-describedby="profile-username-lock"
+        />
+        <span id="profile-username-lock" class="lock">
+          <svg
+            aria-hidden="true"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+          {{ t.readOnly }}
+        </span>
+      </div>
+      <div class="field field--locked">
+        <label class="field__label" for="profile-email">{{ t.email }}</label>
+        <input
+          id="profile-email"
+          class="field__input"
+          [value]="p.email"
+          readonly
+          aria-describedby="profile-email-lock"
+        />
+        <span id="profile-email-lock" class="lock">
+          <svg
+            aria-hidden="true"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+          {{ t.notEditable }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  @if (loc.catalogFailed()) {
+    <p class="notice" role="alert">{{ t.catalogError }}</p>
+  }
+
+  <div class="grid">
+    <div class="field">
+      <label class="field__label" for="profile-country">{{ t.country }}</label>
+      <span class="select">
+        <select
+          id="profile-country"
+          class="field__input"
+          autocomplete="country"
+          formControlName="country"
+        >
+          @for (country of loc.countries.value(); track country.code) {
+            <option [value]="country.code">{{ country.name }}</option>
+          } @empty {
+            <option [value]="p.location.countryCode">{{ p.location.countryName }}</option>
+          }
+        </select>
+      </span>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="profile-division">{{ t.division }}</label>
+      @if (loc.divisionMode() === 'text') {
+        <input
+          id="profile-division"
+          class="field__input"
+          autocomplete="address-level1"
+          maxlength="120"
+          formControlName="divisionName"
+          [attr.aria-invalid]="showError('divisionName')"
+        />
+        @if (showError('divisionName')) {
+          <p class="field__error">{{ errorFor('divisionName') }}</p>
+        }
+      } @else {
+        <span class="select">
+          <select
+            id="profile-division"
+            class="field__input"
+            formControlName="divisionId"
+            [attr.aria-busy]="loc.divisionMode() === 'waiting'"
+            [attr.aria-invalid]="showError('divisionId')"
+          >
+            <option value="" disabled>{{ t.select }}</option>
+            @for (division of loc.divisions.value(); track division.id) {
+              <option [value]="division.id">{{ division.name }}</option>
+            }
+          </select>
+        </span>
+        @if (showError('divisionId')) {
+          <p class="field__error">{{ errorFor('divisionId') }}</p>
+        }
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="profile-municipality">{{ t.municipality }}</label>
+      @if (loc.municipalityMode() === 'text') {
+        <input
+          id="profile-municipality"
+          class="field__input"
+          autocomplete="address-level2"
+          maxlength="120"
+          formControlName="municipalityName"
+          [attr.aria-invalid]="showError('municipalityName')"
+        />
+        @if (showError('municipalityName')) {
+          <p class="field__error">{{ errorFor('municipalityName') }}</p>
+        }
+      } @else {
+        <span class="select">
+          <select
+            id="profile-municipality"
+            class="field__input"
+            formControlName="municipalityId"
+            [attr.aria-busy]="loc.municipalityMode() === 'waiting'"
+            [attr.aria-invalid]="showError('municipalityId')"
+          >
+            <option value="" disabled>{{ t.select }}</option>
+            @for (municipality of loc.municipalities.value(); track municipality.id) {
+              <option [value]="municipality.id">{{ municipality.name }}</option>
+            }
+          </select>
+        </span>
+        @if (showError('municipalityId')) {
+          <p class="field__error">{{ errorFor('municipalityId') }}</p>
+        }
+      }
+    </div>
+
+    <div class="field field--phone">
+      <label class="field__label" for="profile-phone">{{ t.phone }}</label>
+      <div class="phone">
+        <span class="select select--code">
+          <select class="field__input" formControlName="phoneCode" [attr.aria-label]="t.phoneCode">
+            @for (code of loc.phoneCodes(); track code) {
+              <option [value]="code">{{ code }}</option>
+            }
+          </select>
+        </span>
+        <input
+          id="profile-phone"
+          class="field__input"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel-national"
+          formControlName="phoneNumber"
+          [attr.aria-invalid]="showError('phoneNumber')"
+          [attr.aria-describedby]="showError('phoneNumber') ? 'profile-phone-error' : null"
+        />
+      </div>
+      @if (showError('phoneNumber')) {
+        <p id="profile-phone-error" class="field__error">{{ errorFor('phoneNumber') }}</p>
+      }
+    </div>
+  </div>
+
+  @if (error(); as message) {
+    <p class="notice" role="alert">{{ message }}</p>
+  }
+
+  <button type="submit" class="button" [disabled]="saving()">
+    {{ saving() ? t.saving : t.save }}
+  </button>
+</form>

@@ -1,0 +1,70 @@
+// Mi perfil (Figma): pestañas tipo pastilla (la activa rellena en verde) y,
+// debajo, la tarjeta de la pestaña elegida.
+
+:host {
+  display: grid;
+  gap: 22px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: -6px;
+}
+
+.tab {
+  display: inline-grid;
+  place-items: center;
+  min-height: 40px;
+  padding: 0 22px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 54px;
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.tab--on {
+  background-color: var(--color-primary);
+  box-shadow: 0 10px 20px -10px rgb(63 86 68 / 0.6);
+  color: #fff;
+  font-weight: 600;
+}
+
+.notice,
+.soon {
+  padding: var(--space-4);
+  border-radius: 25px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+}
+
+.notice__retry {
+  margin-left: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.soon {
+  display: grid;
+  gap: 6px;
+  max-width: 640px;
+}
+
+.soon__title {
+  color: var(--color-primary);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
