@@ -1,0 +1,46 @@
+@let o = offer();
+<article class="card" [attr.aria-labelledby]="'offer-' + o.id">
+  <div class="card__media">
+    <img class="card__image" [src]="image()" alt="" loading="lazy" width="280" height="150" />
+    <span class="card__status" [attr.data-availability]="o.availability">
+      <span class="card__dot" aria-hidden="true"></span>
+      {{ t.availabilityLabels[o.availability] }}
+    </span>
+  </div>
+
+  <div class="card__body">
+    <p class="card__type">{{ t.typeLabels[o.type] }}</p>
+    <h3 class="card__title" [id]="'offer-' + o.id">{{ o.name }}</h3>
+
+    <p class="card__line">{{ dates() }}</p>
+    @if (schedule(); as s) {
+      <p class="card__line">
+        {{ s.cdmx }} {{ t.cdmx }}
+        @if (s.local; as local) {
+          <span class="card__muted">{{ local.time }} {{ t.yourTime }} ({{ local.zone }})</span>
+        }
+      </p>
+    }
+    @if (venue(); as place) {
+      <p class="card__line">{{ t.inPerson }} · {{ place }}</p>
+    }
+
+    <p class="card__price">
+      {{ price().amount }}
+      @if (price().extra; as extra) {
+        <span class="card__muted">{{ extra }}</span>
+      }
+    </p>
+    @if (scholarship(); as badge) {
+      <p class="card__badge">{{ badge }}</p>
+    }
+    @if (note(); as text) {
+      <p class="card__note">{{ text }}</p>
+    }
+
+    <span class="card__spacer" aria-hidden="true"></span>
+    <a uiButton variant="secondary" class="card__action" [routerLink]="detailLink()">
+      {{ t.viewDetail }}<span class="visually-hidden">: {{ o.name }}</span>
+    </a>
+  </div>
+</article>

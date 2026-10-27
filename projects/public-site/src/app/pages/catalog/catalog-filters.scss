@@ -1,0 +1,186 @@
+@use 'breakpoints' as bp;
+
+// Filtros del catálogo: pastillas de tipo (la activa en verde) y la fila de
+// modalidad, estado, beca y búsqueda con etiquetas pequeñas encima.
+
+.types {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.type {
+  display: inline-grid;
+  place-items: center;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  font-size: 0.9375rem;
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+    }
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.type--on {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: var(--font-weight-bold);
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-primary);
+    }
+  }
+}
+
+.filters {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  margin-top: 28px;
+  text-align: left;
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include bp.up(xl) {
+    grid-template-columns: 290px 290px auto minmax(0, 1fr);
+    align-items: end;
+    gap: 18px;
+  }
+}
+
+.filter {
+  display: grid;
+  gap: 6px;
+}
+
+// Figma: etiqueta pequeña en verde y negrita sobre cada campo.
+.filter__label {
+  color: var(--color-primary);
+  font-size: 0.8125rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.filter__hint {
+  color: #6a716b;
+  font-size: 0.75rem;
+}
+
+.select {
+  position: relative;
+
+  // Flecha del select: chevron verde de trazo fino.
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    width: 9px;
+    height: 9px;
+    border-right: 1.5px solid var(--color-primary);
+    border-bottom: 1.5px solid var(--color-primary);
+    pointer-events: none;
+    translate: 0 -70%;
+    rotate: 45deg;
+  }
+}
+
+// Campos blancos con borde verde claro de 1px y 8px de radio (Figma).
+select,
+.search {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid #b7c4b8;
+  border-radius: 8px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+  font: inherit;
+  font-size: 1rem;
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+    outline-offset: 0;
+  }
+}
+
+.search::placeholder {
+  color: var(--color-raisin-black);
+  opacity: 0.85;
+}
+
+select {
+  padding-right: 44px;
+  appearance: none;
+  cursor: pointer;
+}
+
+// "Con beca disponible": casilla redonda de contorno verde (Figma); marcada,
+// con un punto verde dentro.
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  color: var(--color-raisin-black);
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  cursor: pointer;
+
+  input {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 1.5px solid var(--color-primary);
+    border-radius: 50%;
+    background-color: #fff;
+    appearance: none;
+    cursor: pointer;
+
+    &::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      scale: 0;
+    }
+
+    &:checked::after {
+      scale: 1;
+    }
+
+    &:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.filter--search {
+  @include bp.up(md) {
+    grid-column: 1 / -1;
+  }
+
+  @include bp.up(xl) {
+    grid-column: auto;
+  }
+}

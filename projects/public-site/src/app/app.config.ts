@@ -1,6 +1,6 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { apiErrorInterceptor, cacheInterceptor, provideApi } from 'data-access';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
@@ -10,7 +10,14 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     // `anchorScrolling` hace scroll a la sección si la URL trae un ancla al
     // cargar (p. ej. "/#trayectoria" pegado en una pestaña nueva).
-    provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled' })),
+    // `scrollPositionRestoration`: cada página nueva empieza arriba y "Atrás"
+    // vuelve a donde estaba.
+    provideRouter(
+      routes,
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
+      // Filtros del catálogo (`?tipo=`, `?q=`…) como inputs de la página.
+      withComponentInputBinding(),
+    ),
     // La landing solo usa rutas públicas: sin sesión ni loader general. El
     // caché evita repetir llamadas a datos que casi no cambian (cifras).
     provideHttpClient(withFetch(), withInterceptors([cacheInterceptor, apiErrorInterceptor])),
