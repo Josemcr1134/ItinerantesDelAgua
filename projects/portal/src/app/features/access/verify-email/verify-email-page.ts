@@ -1,4 +1,12 @@
-import { afterNextRender, Component, computed, inject, Injector, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  inject,
+  Injector,
+  input,
+  signal,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AUTH_CONFIG, AUTH_TEXTS, countdown, formatTime } from 'auth';
@@ -7,7 +15,8 @@ import { firstValueFrom } from 'rxjs';
 import { AlertService, Button } from 'ui-kit';
 import { AccessLayout } from '../access-layout/access-layout';
 import { CodeInput } from '../code-input/code-input';
-import { VerifyEmailState } from './verify-email-state';
+import { returnParams } from '../return-url';
+import { maskEmail, VerifyEmailState } from './verify-email-state';
 import { formatClock, VERIFY_TEXTS } from './verify-email-texts';
 
 /**
@@ -22,6 +31,10 @@ import { formatClock, VERIFY_TEXTS } from './verify-email-texts';
   styleUrls: ['../access-form.scss', './verify-email-page.scss'],
 })
 export default class VerifyEmailPage {
+  /** Destino tras verificar e iniciar sesión (`?returnUrl=`, viene del registro). */
+  readonly returnUrl = input<string>();
+  protected readonly back = computed(() => returnParams(this.returnUrl()));
+
   private readonly api = inject(AuthApi);
   private readonly alerts = inject(AlertService);
   private readonly router = inject(Router);
@@ -49,6 +62,13 @@ export default class VerifyEmailPage {
   });
 
   protected readonly codeLength = computed(() => this.delivery()?.codeLength ?? 6);
+  protected readonly subtitle = computed(() => {
+    const delivery = this.delivery();
+    if (delivery) return this.texts.sent(delivery.maskedEmail);
+    return this.knownEmail
+      ? this.texts.unverified(maskEmail(this.knownEmail))
+      : this.texts.askEmail;
+  });
 
   protected readonly errorMessage = computed(() => {
     const error = this.request.error() ?? this.resendError();
@@ -104,7 +124,7 @@ export default class VerifyEmailPage {
     await this.alerts.success(done.title, done.message, {
       confirmLabel: this.authTexts.forgot.done.confirm,
     });
-    await this.router.navigateByUrl(this.config.loginUrl);
+    await this.router.navigate([this.config.loginUrl], { queryParams: this.back() });
   }
 
   protected async resendCode(): Promise<void> {

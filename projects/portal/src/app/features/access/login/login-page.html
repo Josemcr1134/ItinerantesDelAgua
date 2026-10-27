@@ -43,9 +43,14 @@
   </div>
 
   <h1 id="login-title" class="title">Ingresar al Portal</h1>
-  <auth-login-form appearance="portal" [showRememberMe]="false" [returnUrl]="returnUrl()" />
+  <auth-login-form
+    appearance="portal"
+    [showRememberMe]="false"
+    [returnUrl]="returnUrl()"
+    (emailNotVerified)="verifyEmail($event)"
+  />
   <p class="switch">
     ¿No tienes una Cuenta?
-    <a routerLink="/registro">Regístrate Aquí</a>
+    <a routerLink="/registro" [queryParams]="back()">Regístrate Aquí</a>
   </p>
 </portal-access-layout>

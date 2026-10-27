@@ -317,6 +317,6 @@
 
   <p class="switch">
     {{ t.haveAccount }}
-    <a routerLink="/login">{{ t.login }}</a>
+    <a routerLink="/login" [queryParams]="back()">{{ t.login }}</a>
   </p>
 </portal-access-layout>

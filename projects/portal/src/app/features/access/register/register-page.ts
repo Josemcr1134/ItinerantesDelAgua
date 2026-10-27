@@ -6,6 +6,7 @@ import {
   ElementRef,
   inject,
   Injector,
+  input,
   signal,
   untracked,
 } from '@angular/core';
@@ -32,6 +33,7 @@ import {
 import { catchError, map, of } from 'rxjs';
 import { Button } from 'ui-kit';
 import { AccessLayout } from '../access-layout/access-layout';
+import { returnParams } from '../return-url';
 import { VerifyEmailState } from '../verify-email/verify-email-state';
 import { REGISTER_TEXTS } from './register-texts';
 
@@ -94,6 +96,10 @@ function detectTimezone(): string {
   styleUrls: ['../access-form.scss', './register-page.scss'],
 })
 export default class RegisterPage {
+  /** Destino tras registrarse, verificar el correo e iniciar sesión (`?returnUrl=`). */
+  readonly returnUrl = input<string>();
+  protected readonly back = computed(() => returnParams(this.returnUrl()));
+
   private readonly authApi = inject(AuthApi);
   private readonly catalogs = inject(CatalogsApi);
   private readonly router = inject(Router);
@@ -296,7 +302,7 @@ export default class RegisterPage {
     const response = await this.request.run(this.authApi.register(this.body()));
     if (response) {
       const state: VerifyEmailState = { email: response.email, otp: response.otp };
-      await this.router.navigateByUrl('/verificar-correo', { state });
+      await this.router.navigate(['/verificar-correo'], { state, queryParams: this.back() });
       return;
     }
     const error = this.request.error();

@@ -16,7 +16,7 @@
 
   <h1 id="verify-title" class="title">{{ t.title }}</h1>
   <p class="subtitle">
-    {{ delivery() ? t.sent(delivery()!.maskedEmail) : t.askEmail }}
+    {{ subtitle() }}
   </p>
 
   <form class="form" novalidate [formGroup]="form" (ngSubmit)="verify()">
@@ -96,6 +96,6 @@
 
   <p class="switch">
     {{ t.notYourEmail }}
-    <a routerLink="/registro">{{ t.backToRegister }}</a>
+    <a routerLink="/registro" [queryParams]="back()">{{ t.backToRegister }}</a>
   </p>
 </portal-access-layout>

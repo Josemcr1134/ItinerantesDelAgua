@@ -6,6 +6,9 @@ export const VERIFY_TEXTS = {
   sent: (email: string) => `Enviamos un código a ${email}`,
   /** Sin el estado del registro (p. ej. al recargar) se pide el correo. */
   askEmail: 'Escribe tu correo y el código que te enviamos.',
+  // TODO(contenido): confirmar (login de una cuenta sin verificar, sin código nuevo).
+  unverified: (email: string) =>
+    `Tu cuenta aún no está verificada. Escribe el código que enviamos a ${email} o pide uno nuevo.`,
   codeLabel: AUTH_TEXTS.forgot.code.label,
   resendIn: 'Reenviar código en',
   resend: AUTH_TEXTS.forgot.code.resend,

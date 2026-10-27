@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideAuth } from 'auth';
 import { provideApi } from 'data-access';
 import LoginPage from './login-page';
@@ -29,7 +29,10 @@ describe('LoginPage (portal)', () => {
     const form = host.querySelector('auth-login-form');
     expect(form?.classList).toContain('login-form--portal');
     expect(form?.querySelector('input[type="checkbox"]')).toBeNull();
-    expect(host.querySelector('.switch a')?.getAttribute('href')).toBe('/registro');
+    // Quien se registra desde aquí vuelve al mismo destino.
+    expect(host.querySelector('.switch a')?.getAttribute('href')).toBe(
+      '/registro?returnUrl=%2Fmis-cursos',
+    );
   });
 
   it('la ilustración es decorativa (oculta a lectores de pantalla)', async () => {
@@ -38,5 +41,33 @@ describe('LoginPage (portal)', () => {
       expect(img.getAttribute('alt')).toBe('');
       expect(img.closest('[aria-hidden="true"]')).not.toBeNull();
     }
+  });
+
+  it('cuenta sin verificar: va a validar el correo conservando el destino', async () => {
+    await render();
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const fixture = TestBed.createComponent(LoginPage);
+    fixture.componentRef.setInput('returnUrl', '/inscripcion/eco?accion=APPLY_SCHOLARSHIP');
+    await fixture.whenStable();
+    fixture.debugElement
+      .query((el) => el.name === 'auth-login-form')
+      .triggerEventHandler('emailNotVerified', {
+        email: 'ana@correo.com',
+        otpSent: true,
+        expiresAt: '2026-10-27T00:10:00.000Z',
+        resendAvailableAt: '2026-10-27T00:00:30.000Z',
+      });
+    expect(navigate).toHaveBeenCalledWith(['/verificar-correo'], {
+      state: {
+        email: 'ana@correo.com',
+        otp: {
+          maskedEmail: 'a***@correo.com',
+          codeLength: 6,
+          expiresAt: '2026-10-27T00:10:00.000Z',
+          resendAvailableAt: '2026-10-27T00:00:30.000Z',
+        },
+      },
+      queryParams: { returnUrl: '/inscripcion/eco?accion=APPLY_SCHOLARSHIP' },
+    });
   });
 });

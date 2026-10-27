@@ -71,6 +71,12 @@ export const routes: Routes = [
           },
         ],
       },
+      // Acciones de la ficha de la landing (postular, inscribirse, pagar…).
+      {
+        path: 'inscripcion/:slug',
+        title: 'Inscripción · Portal',
+        loadComponent: () => import('./features/offer-action/offer-action-page'),
+      },
       {
         path: 'notificaciones',
         title: 'Notificaciones · Portal',

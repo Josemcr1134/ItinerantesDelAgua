@@ -1,0 +1,41 @@
+@let v = view();
+<section class="card" [attr.data-kind]="v.kind" aria-live="polite">
+  <img
+    class="card__art"
+    src="assets/dashboard/next-activity.webp"
+    alt=""
+    width="300"
+    height="160"
+    aria-hidden="true"
+  />
+  <div class="card__body">
+    @switch (v.kind) {
+      @case ('working') {
+        <span class="spinner" aria-hidden="true"></span>
+        <p class="card__title">{{ v.text }}</p>
+      }
+      @case ('pending') {
+        <h2 class="card__title">{{ text.pendingTitle }}</h2>
+        <p class="card__text">{{ v.text }}</p>
+      }
+      @case ('unavailable') {
+        <h2 class="card__title">{{ text.unavailableTitle }}</h2>
+        <p class="card__text">{{ v.text }}</p>
+      }
+      @case ('error') {
+        <h2 class="card__title">{{ text.errorTitle }}</h2>
+        <p class="card__text" role="alert">{{ v.text }}</p>
+      }
+    }
+
+    @if (v.kind !== 'working') {
+      <div class="card__actions">
+        @if (v.kind === 'error') {
+          <button type="button" class="button" (click)="retry()">{{ text.retry }}</button>
+        }
+        <a class="button button--outline" [href]="offerUrl()">{{ text.backToOffer }}</a>
+        <a class="link" routerLink="/formacion">{{ text.myFormation }}</a>
+      </div>
+    }
+  </div>
+</section>

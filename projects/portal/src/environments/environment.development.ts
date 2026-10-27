@@ -9,6 +9,8 @@ export const environment = {
   apiBaseUrl: 'https://itinerantes-backend-production.up.railway.app',
   /** La URL canónica apunta siempre al dominio de producción. */
   siteUrl: 'https://portal.itinerantesdelagua.com',
+  /** Landing (catálogo y fichas de la oferta), en local con `ng serve public-site`. */
+  landingUrl: 'http://localhost:4200',
   /**
    * Solo desarrollo: datos de prueba de "Formación" y el aula, con
    * `?mock=formacion` (se recuerda en el navegador; `?mock=off` lo apaga).

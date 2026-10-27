@@ -1,4 +1,13 @@
-import { Component, computed, ElementRef, inject, input, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { requestState, UserProfileDto } from 'data-access';
@@ -17,6 +26,18 @@ export type LoginFormAppearance = 'default' | 'portal';
  * plataformas: valida, inicia la sesión, muestra los errores de la API (con
  * el bloqueo por intentos) y vuelve a `returnUrl` o al inicio de la app.
  */
+/**
+ * Contraseña correcta pero cuenta sin verificar (`AUTH_EMAIL_NOT_VERIFIED`):
+ * la app puede llevar a validar el correo (HU-03). `otpSent`: la API reenvió
+ * el código (si el tiempo de espera lo permitía).
+ */
+export interface UnverifiedLogin {
+  readonly email: string;
+  readonly otpSent: boolean;
+  readonly expiresAt: string | null;
+  readonly resendAvailableAt: string | null;
+}
+
 @Component({
   selector: 'auth-login-form',
   imports: [ReactiveFormsModule, RouterLink, Button, PasswordToggle],
@@ -33,6 +54,8 @@ export class LoginForm {
   /** Casilla "Recordarme" (sin ella, la sesión es la normal). */
   readonly showRememberMe = input(true);
   readonly appearance = input<LoginFormAppearance>('default');
+  /** La cuenta no está verificada (si nadie lo atiende, se muestra el error). */
+  readonly emailNotVerified = output<UnverifiedLogin>();
 
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -102,9 +125,18 @@ export class LoginForm {
     this.failed.set(!user);
     if (user) {
       await this.router.navigateByUrl(this.safeReturnUrl());
-    } else {
-      this.form.controls.password.reset();
+      return;
     }
+    const error = this.request.error();
+    if (error?.code === 'AUTH_EMAIL_NOT_VERIFIED') {
+      this.emailNotVerified.emit({
+        email: email.trim().toLowerCase(),
+        otpSent: error.meta['otpSent'] === true,
+        expiresAt: error.metaString('expiresAt'),
+        resendAvailableAt: error.metaString('resendAvailableAt'),
+      });
+    }
+    this.form.controls.password.reset();
   }
 
   /** Solo rutas internas, para evitar redirecciones abiertas. */

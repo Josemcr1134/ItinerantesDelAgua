@@ -123,4 +123,33 @@ describe('LoginForm', () => {
       expect(input.getAttribute('aria-describedby')).toContain('login-error');
     }
   });
+
+  it('cuenta sin verificar: avisa con el correo y el código reenviado', async () => {
+    const { fixture, host, type, http } = await setup({ appearance: 'portal' });
+    const unverified = vi.fn();
+    fixture.componentInstance.emailNotVerified.subscribe(unverified);
+    type('#login-email', 'Ana@Correo.com');
+    type('#login-password', 'secreta123');
+    host.querySelector<HTMLButtonElement>('.submit')!.click();
+    http.expectOne(`${API}/auth/login`).flush(
+      {
+        statusCode: 403,
+        code: 'AUTH_EMAIL_NOT_VERIFIED',
+        message: 'Verifica tu correo.',
+        meta: {
+          otpSent: true,
+          expiresAt: '2026-10-27T00:10:00.000Z',
+          resendAvailableAt: '2026-10-27T00:00:30.000Z',
+        },
+      },
+      { status: 403, statusText: 'Forbidden' },
+    );
+    await new Promise((r) => setTimeout(r));
+    expect(unverified).toHaveBeenCalledWith({
+      email: 'ana@correo.com',
+      otpSent: true,
+      expiresAt: '2026-10-27T00:10:00.000Z',
+      resendAvailableAt: '2026-10-27T00:00:30.000Z',
+    });
+  });
 });

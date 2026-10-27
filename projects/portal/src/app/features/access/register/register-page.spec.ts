@@ -97,7 +97,7 @@ describe('RegisterPage', () => {
 
   it('crea la cuenta con los datos normalizados y pasa a verificar el correo', async () => {
     const { http, settle, $, type, pick } = await setup();
-    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate');
     pick('#reg-division', 'd1');
     await settle();
     http.expectOne(`${API}/locations/divisions/d1/municipalities`).flush({ data: MUNICIPALITIES });
@@ -136,8 +136,9 @@ describe('RegisterPage', () => {
     };
     request.flush({ userId: 'u1', email: 'maria@correo.com', status: 'PENDING_VERIFICATION', otp });
     await settle();
-    expect(navigate).toHaveBeenCalledWith('/verificar-correo', {
+    expect(navigate).toHaveBeenCalledWith(['/verificar-correo'], {
       state: { email: 'maria@correo.com', otp },
+      queryParams: {},
     });
   });
 
