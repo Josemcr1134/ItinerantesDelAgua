@@ -9,6 +9,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 import { Button } from 'ui-kit';
 import { AnchorLink } from '../../shared/anchor-link/anchor-link';
 import { NavbarContent } from './navbar-content';
@@ -41,10 +44,20 @@ export class Navbar {
   protected readonly scrolled = signal(false);
   private readonly toggleButton = viewChild.required<ElementRef<HTMLButtonElement>>('toggle');
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly router = inject(Router);
+  /** Ruta actual (sin query ni ancla), para marcar la página en el menú. */
+  private readonly path = signal(this.router.url.split(/[?#]/)[0]);
 
   constructor() {
     const view = inject(DOCUMENT).defaultView;
     const destroyRef = inject(DestroyRef);
+
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe((event) => this.path.set(event.urlAfterRedirects.split(/[?#]/)[0]));
 
     // Solo en navegador (afterNextRender no corre al prerenderizar).
     afterNextRender(() => {
@@ -62,6 +75,13 @@ export class Navbar {
       desktop.addEventListener('change', onDesktopChange);
       destroyRef.onDestroy(() => desktop.removeEventListener('change', onDesktopChange));
     });
+  }
+
+  /** Enlace a una página (no a un ancla) y es la actual o una de sus subpáginas. */
+  protected isCurrent(href: string): boolean {
+    if (href.includes('#')) return false;
+    const path = this.path();
+    return path === href || path.startsWith(`${href}/`);
   }
 
   /** Un clic fuera del header cierra el menú. */

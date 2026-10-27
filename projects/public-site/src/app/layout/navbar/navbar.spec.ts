@@ -17,7 +17,13 @@ describe('Navbar', () => {
     const hrefs = Array.from(host.querySelectorAll('.navbar__link')).map((a) =>
       a.getAttribute('href'),
     );
-    expect(hrefs).toEqual(['#objetivos', '#trayectoria', '#itinerantes', '#contacto']);
+    expect(hrefs).toEqual([
+      '/#objetivos',
+      '/#trayectoria',
+      '/#itinerantes',
+      '/escuela/oferta',
+      '#contacto',
+    ]);
     expect(host.querySelector('.navbar__cta')?.textContent?.trim()).toBe('Regístrate');
   });
 

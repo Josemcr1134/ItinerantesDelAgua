@@ -315,6 +315,15 @@
       color: var(--color-primary);
     }
   }
+
+  // Página actual (p. ej. Catálogo): verde y subrayada.
+  &[aria-current='page'] {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-bold);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
 }
 
 // "Regístrate": compacto en móvil (16px); en escritorio Acumin 700, 20px,
