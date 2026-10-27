@@ -25,6 +25,15 @@ const notification = (id: string, extra: object = {}) => ({
 });
 
 describe('NotificationsPage', () => {
+  // A mediodía (hora local): "hace 5 min" siempre cae en "Hoy", aunque las
+  // pruebas corran justo después de medianoche. Solo se congela la fecha.
+  beforeEach(() => {
+    const noon = new Date();
+    noon.setHours(12, 0, 0, 0);
+    vi.useFakeTimers({ toFake: ['Date'], now: noon });
+  });
+  afterEach(() => vi.useRealTimers());
+
   async function render(inputs: Record<string, string> = {}) {
     TestBed.configureTestingModule({
       providers: [
