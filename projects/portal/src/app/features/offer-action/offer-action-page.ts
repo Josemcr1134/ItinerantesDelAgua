@@ -14,15 +14,8 @@ import { environment } from '../../../environments/environment';
 import { usePageHeading } from '../../core/page-heading/page-heading';
 import { browserTimezone } from '../dashboard/dashboard-format';
 
-/** Acciones que el Portal todavía no puede completar (Fase 05: pagos; Moodle). */
-const PENDING: readonly OfferActionType[] = [
-  'ENROLL_AND_PAY',
-  'PAY_IN_INSTALLMENTS',
-  'CONTINUE_PAYMENT',
-  'PAYMENT_IN_VALIDATION',
-  'REGULARIZE_PAYMENT',
-  'ACTIVATE_MOODLE_ACCESS',
-];
+/** Acciones que el Portal todavía no puede completar (Moodle, HU-25). */
+const PENDING: readonly OfferActionType[] = ['ACTIVATE_MOODLE_ACCESS'];
 
 // TODO(contenido): confirmar los textos de esta pantalla.
 const TEXT = {
@@ -34,11 +27,6 @@ const TEXT = {
   generic: 'Un momento…',
   pendingTitle: 'Muy pronto podrás completar este paso aquí',
   pending: {
-    ENROLL_AND_PAY: 'El pago en línea de la inscripción estará disponible muy pronto.',
-    PAY_IN_INSTALLMENTS: 'El pago en cuotas estará disponible muy pronto.',
-    CONTINUE_PAYMENT: 'Podrás continuar tu pago muy pronto.',
-    PAYMENT_IN_VALIDATION: 'Tu comprobante de pago está en validación.',
-    REGULARIZE_PAYMENT: 'Podrás regularizar tu pago muy pronto desde Mis pagos.',
     ACTIVATE_MOODLE_ACCESS: 'La activación del acceso en Moodle estará disponible muy pronto.',
   } as Partial<Record<OfferActionType, string>>,
   unavailableTitle: 'Esta acción no está disponible',
@@ -69,7 +57,7 @@ type View =
  * Continúa en el Portal una acción de la ficha de la landing
  * (`/inscripcion/:slug?accion=…`, con sesión): postular a beca o convocatoria
  * (crea el borrador y abre el formulario), inscribirse gratis (y al aula) o
- * ver la postulación / el aula. Los pagos (Fase 05) quedan avisados.
+ * ver la postulación / el aula, pagar (pantalla de pago) o ir a Mis pagos.
  */
 @Component({
   selector: 'portal-offer-action-page',
@@ -157,10 +145,22 @@ export default class OfferActionPage {
         case 'GO_TO_CLASSROOM':
           return this.go(['/formacion/aula', offerId]);
         case 'VIEW_APPLICATION':
-        case 'PAY_BALANCE':
           return action.applicationId
             ? this.go(['/postulaciones', action.applicationId])
             : this.outcome.set({ kind: 'unavailable', text: TEXT.noAction });
+        // Pagos (Fase 05): a la pantalla de pago (o a Mis pagos).
+        case 'ENROLL_AND_PAY':
+        case 'CONTINUE_PAYMENT':
+          return this.go(['/pago'], { oferta: offerId });
+        case 'PAY_IN_INSTALLMENTS':
+          return this.go(['/pago'], { oferta: offerId, cuotas: '1' });
+        case 'PAY_BALANCE':
+          return action.applicationId
+            ? this.go(['/pago'], { postulacion: action.applicationId })
+            : this.outcome.set({ kind: 'unavailable', text: TEXT.noAction });
+        case 'REGULARIZE_PAYMENT':
+        case 'PAYMENT_IN_VALIDATION':
+          return this.go(['/perfil'], { pestana: 'pagos' });
         default:
           this.outcome.set({
             kind: PENDING.includes(action.type) ? 'pending' : 'unavailable',
@@ -207,7 +207,10 @@ export default class OfferActionPage {
     this.go(['/formacion/aula', offerId]);
   }
 
-  private go(commands: unknown[]): void {
-    void this.router.navigate(commands, { replaceUrl: true });
+  private go(commands: unknown[], queryParams?: Record<string, string>): void {
+    void this.router.navigate(commands, {
+      replaceUrl: true,
+      ...(queryParams ? { queryParams } : {}),
+    });
   }
 }

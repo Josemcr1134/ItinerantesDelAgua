@@ -92,6 +92,11 @@
             Reintentar
           </button>
         }
+        @if (d.suspended) {
+          <a class="denied__button" routerLink="/perfil" [queryParams]="{ pestana: 'pagos' }">
+            Regularizar pago
+          </a>
+        }
         <a class="denied__button denied__button--outline" [routerLink]="backLink()">
           Ver mi formación
         </a>

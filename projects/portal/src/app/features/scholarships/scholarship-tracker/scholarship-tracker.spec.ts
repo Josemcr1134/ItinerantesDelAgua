@@ -70,7 +70,7 @@ describe('ScholarshipTracker', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('aprobada: avance sin los pasos omitidos, saldo con descuento y pago deshabilitado', async () => {
+  it('aprobada: avance sin los pasos omitidos, saldo con descuento y [Pagar saldo]', async () => {
     const host = await render(approved);
     const steps = [...host.querySelectorAll('.stepper__step')];
     expect(steps.map((s) => s.getAttribute('data-state'))).toEqual([
@@ -84,9 +84,10 @@ describe('ScholarshipTracker', () => {
     const figures = [...host.querySelectorAll('.figures dd')].map((d) => d.textContent?.trim());
     expect(figures).toEqual(['$585 USD', '50% / 50%', '−$292.50 USD', '$292.50 USD']);
     expect(host.textContent).toContain('Fecha límite de pago: 27 dic 2026');
-    const pay = host.querySelector<HTMLButtonElement>('.action:not(.action--outline)')!;
+    // Pagar saldo (HU-23) lleva a la pantalla de pago de esta postulación.
+    const pay = host.querySelector<HTMLAnchorElement>('a.action:not(.action--outline)')!;
     expect(pay.textContent?.trim()).toBe('Pagar saldo');
-    expect(pay.disabled).toBe(true);
+    expect(pay.getAttribute('href')).toBe('/pago?postulacion=a1');
     expect(host.querySelector('.action--outline')?.textContent?.trim()).toBe('Ver postulación');
   });
 

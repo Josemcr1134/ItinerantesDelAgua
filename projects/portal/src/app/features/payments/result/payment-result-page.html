@@ -1,0 +1,75 @@
+@let p = payment();
+<section class="card" [attr.data-view]="view()" aria-live="polite">
+  <img
+    class="card__art"
+    src="assets/dashboard/next-activity.webp"
+    alt=""
+    width="300"
+    height="160"
+    aria-hidden="true"
+  />
+  <div class="card__body">
+    @switch (view()) {
+      @case ('processing') {
+        <span class="spinner" aria-hidden="true"></span>
+        <h2 class="card__title">{{ t.processing }}</h2>
+        <p class="card__text">{{ t.processingHint }}</p>
+      }
+      @case ('paid') {
+        <span class="check" aria-hidden="true">✓</span>
+        <h2 class="card__title">{{ t.paid }}</h2>
+        @if (p) {
+          <p class="card__text">{{ t.paidHint(p.conceptLabel) }}</p>
+          <div class="card__actions">
+            <a class="button" [routerLink]="['/formacion/aula', p.offer.id]">{{
+              texts.goToClassroom
+            }}</a>
+            @if (p.receiptAvailable) {
+              <button type="button" class="button button--outline" (click)="downloadReceipt()">
+                {{ t.receipt }}
+              </button>
+            }
+          </div>
+        }
+      }
+      @case ('cancelled') {
+        <h2 class="card__title">{{ t.cancelled }}</h2>
+        <p class="card__text">{{ t.cancelledHint }}</p>
+      }
+      @case ('failed') {
+        <h2 class="card__title">{{ t.failed }}</h2>
+        <p class="card__text">{{ p?.failureMessage ?? t.cancelledHint }}</p>
+      }
+      @case ('slow') {
+        <h2 class="card__title">{{ t.processing }}</h2>
+        <p class="card__text">{{ t.slow }}</p>
+      }
+      @default {
+        <h2 class="card__title">{{ t.failed }}</h2>
+        @if (error(); as message) {
+          <p class="card__text" role="alert">{{ message }}</p>
+        }
+      }
+    }
+
+    @if (view() === 'cancelled' || view() === 'failed') {
+      <div class="card__actions">
+        @if (retryLink(); as params) {
+          <a class="button" routerLink="/pago" [queryParams]="params">{{ t.retry }}</a>
+        }
+        <a class="link" routerLink="/perfil" [queryParams]="{ pestana: 'pagos' }">{{
+          texts.myPayments
+        }}</a>
+      </div>
+    } @else if (view() === 'slow' || view() === 'error') {
+      <div class="card__actions">
+        <a class="link" routerLink="/perfil" [queryParams]="{ pestana: 'pagos' }">{{
+          texts.myPayments
+        }}</a>
+      </div>
+    }
+    @if (view() === 'paid' && error(); as message) {
+      <p class="card__text" role="alert">{{ message }}</p>
+    }
+  </div>
+</section>

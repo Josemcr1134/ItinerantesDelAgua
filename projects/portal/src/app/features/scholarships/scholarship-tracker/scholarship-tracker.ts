@@ -1,7 +1,6 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
-  ApplicationActionType,
   ApplicationCardDto,
   ApplicationDetailDto,
   ApplicationsApi,
@@ -25,13 +24,6 @@ import {
   weekdayDateIn,
   zoneName,
 } from '../scholarship-format';
-
-const PAYMENT_ACTIONS: readonly ApplicationActionType[] = [
-  'PAY_BALANCE',
-  'CONTINUE_PAYMENT',
-  'UPLOAD_TRANSFER_PROOF',
-  'PAYMENT_IN_VALIDATION',
-];
 
 const STATE_LABELS: Readonly<Record<TimelineStepState, string>> = {
   DONE: 'completado',
@@ -75,10 +67,6 @@ export class ScholarshipTracker {
   protected readonly money = formatMoney;
   protected readonly busy = signal(false);
 
-  /** Acciones de pago (Fase 05): todavía sin pantalla, se muestran deshabilitadas. */
-  protected readonly payment = computed(() =>
-    PAYMENT_ACTIONS.includes(this.application().action.type),
-  );
   protected readonly steps = computed(() =>
     this.application().timeline.filter((step) => step.state !== 'SKIPPED'),
   );

@@ -37,8 +37,7 @@
   font-weight: 600;
 }
 
-.notice,
-.soon {
+.notice {
   padding: var(--space-4);
   border-radius: 25px;
   background-color: #fff;
@@ -55,16 +54,4 @@
   font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
-}
-
-.soon {
-  display: grid;
-  gap: 6px;
-  max-width: 640px;
-}
-
-.soon__title {
-  color: var(--color-primary);
-  font-size: 1.125rem;
-  font-weight: 700;
 }

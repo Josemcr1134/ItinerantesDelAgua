@@ -1,0 +1,196 @@
+@if (notice(); as message) {
+  <p class="notice notice--ok" role="status">{{ message }}</p>
+}
+@if (error(); as message) {
+  <p class="notice" role="alert">{{ message }}</p>
+}
+
+@if (summaryValue(); as s) {
+  @if (s.alerts.length) {
+    <section class="block" aria-labelledby="pay-alerts">
+      <h2 id="pay-alerts" class="block__title">{{ t.alerts }}</h2>
+      <ul class="alerts">
+        @for (alert of s.alerts; track $index) {
+          <li class="alert" [attr.data-type]="alert.type">
+            <div class="alert__info">
+              <p class="alert__label">{{ alertLabels[alert.type] }}</p>
+              <p class="alert__text">
+                {{ alert.offer.name }} · {{ money(alert.amount) }}
+                @if (alert.date) {
+                  · {{ date(alert.date) }}
+                }
+              </p>
+            </div>
+            <div class="alert__actions">
+              @switch (alert.type) {
+                @case ('TRANSFER_REJECTED') {
+                  @if (alert.applicationId) {
+                    <a
+                      class="action"
+                      routerLink="/pago"
+                      [queryParams]="{ postulacion: alert.applicationId }"
+                    >
+                      {{ t.uploadProof }}
+                    </a>
+                  }
+                }
+                @case ('INSTALLMENT_FAILED') {
+                  @if (alert.planId) {
+                    <button
+                      type="button"
+                      class="action"
+                      [disabled]="busy() === alert.planId"
+                      (click)="payNow(alert.planId)"
+                    >
+                      {{ t.payNow }}
+                    </button>
+                    <button
+                      type="button"
+                      class="action action--outline"
+                      [disabled]="busy() === alert.planId"
+                      (click)="updateCard(alert.planId)"
+                    >
+                      {{ t.updateCard }}
+                    </button>
+                  }
+                }
+                @case ('PLAN_DELINQUENT') {
+                  @if (alert.planId) {
+                    <button
+                      type="button"
+                      class="action"
+                      [disabled]="busy() === alert.planId"
+                      (click)="payNow(alert.planId)"
+                    >
+                      {{ t.payNow }}
+                    </button>
+                    <button
+                      type="button"
+                      class="action action--outline"
+                      [disabled]="busy() === alert.planId"
+                      (click)="updateCard(alert.planId)"
+                    >
+                      {{ t.updateCard }}
+                    </button>
+                  }
+                }
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+}
+
+@if (plans.value().length) {
+  <section class="block" aria-labelledby="pay-plans">
+    <h2 id="pay-plans" class="block__title">{{ t.plans }}</h2>
+    @for (plan of plans.value(); track plan.id) {
+      <article class="plan" [attr.data-status]="plan.status">
+        <header class="plan__head">
+          <h3 class="plan__name">{{ plan.offer.name }}</h3>
+          <span class="chip" [attr.data-status]="plan.status">{{ planStatuses[plan.status] }}</span>
+        </header>
+        <p class="plan__meta">
+          {{ t.paid(plan.paidCount, plan.installmentCount) }} · {{ money(plan.paidAmount) }} de
+          {{ money(plan.total) }}
+          @if (card(plan); as c) {
+            · {{ c }}
+          }
+        </p>
+        <div
+          class="bar"
+          role="img"
+          [attr.aria-label]="t.paid(plan.paidCount, plan.installmentCount)"
+        >
+          <span [style.width.%]="(plan.paidCount / plan.installmentCount) * 100"></span>
+        </div>
+        @if (plan.nextCharge; as next) {
+          <p class="plan__meta">{{ t.nextCharge(money(next.amount), date(next.dueAt)) }}</p>
+        }
+        @if (plan.accessSuspended) {
+          <p class="plan__warn">{{ t.suspended }}</p>
+        }
+        <ol class="installments">
+          @for (item of plan.installments; track item.id) {
+            <li [attr.data-status]="item.status">
+              <span>Cuota {{ item.sequence }}</span>
+              <span>{{ date(item.paidAt ?? item.dueAt) }}</span>
+              <span>{{ money(item.amount) }}</span>
+              <span class="installments__status">{{ installmentStatuses[item.status] }}</span>
+            </li>
+          }
+        </ol>
+        @if (plan.canPayNow || plan.canUpdateCard) {
+          <div class="plan__actions">
+            @if (plan.canPayNow) {
+              <button
+                type="button"
+                class="action"
+                [disabled]="busy() === plan.id"
+                (click)="payNow(plan.id)"
+              >
+                {{ t.payNow }}
+              </button>
+            }
+            @if (plan.canUpdateCard) {
+              <button
+                type="button"
+                class="action action--outline"
+                [disabled]="busy() === plan.id"
+                (click)="updateCard(plan.id)"
+              >
+                {{ t.updateCard }}
+              </button>
+            }
+          </div>
+        }
+      </article>
+    }
+  </section>
+}
+
+<section class="block" aria-labelledby="pay-history">
+  <h2 id="pay-history" class="block__title">{{ t.history }}</h2>
+  @if (history.value().length) {
+    <ul class="history">
+      @for (payment of history.value(); track payment.id) {
+        <li class="payment">
+          <div class="payment__info">
+            <p class="payment__concept">{{ payment.conceptLabel }}</p>
+            <p class="payment__meta">
+              {{ payment.offer.name }} · {{ date(payment.paidAt ?? payment.createdAt) }} ·
+              {{ payment.method === 'CARD' ? 'Tarjeta' : 'Transferencia' }}
+              @if (payment.folio) {
+                · Folio {{ payment.folio }}
+              }
+            </p>
+            @if (payment.failureMessage) {
+              <p class="payment__fail">{{ payment.failureMessage }}</p>
+            }
+          </div>
+          <span class="payment__amount">{{ money(payment.amount) }}</span>
+          <span class="chip" [attr.data-status]="payment.status">{{
+            statuses[payment.status]
+          }}</span>
+          <div class="payment__actions">
+            @if (payment.receiptAvailable) {
+              <button type="button" class="link" (click)="receipt(payment)">{{ t.receipt }}</button>
+            }
+            @if (payment.method === 'BANK_TRANSFER' && payment.transfer?.proofFileName) {
+              <button type="button" class="link" (click)="proof(payment)">{{ t.proof }}</button>
+            }
+            @if (payment.checkout) {
+              <button type="button" class="link" (click)="continueCheckout(payment)">
+                Continuar pago
+              </button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  } @else if (history.hasValue()) {
+    <p class="empty">{{ summaryValue()?.moodleOnly ? t.moodleOnly : t.empty }}</p>
+  }
+</section>

@@ -49,10 +49,6 @@ export const PROFILE_TEXTS = {
     saved: 'Contraseña actualizada',
     savedText: 'Cerramos tus otras sesiones; esta sigue activa.',
   },
-  payments: {
-    title: 'Mis pagos',
-    text: 'Aquí verás tus pagos, cuotas y comprobantes muy pronto.',
-  },
   errors: REGISTER_TEXTS.errors,
   authErrors: AUTH_TEXTS.errors,
 } as const;

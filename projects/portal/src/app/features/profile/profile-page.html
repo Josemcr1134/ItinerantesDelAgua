@@ -26,11 +26,7 @@
       <portal-security-form />
     }
     @case ('pagos') {
-      <!-- HU-26 (Fase 05): Mis pagos aún sin pantalla. -->
-      <section class="soon">
-        <h2 class="soon__title">{{ t.payments.title }}</h2>
-        <p>{{ t.payments.text }}</p>
-      </section>
+      <portal-my-payments [cardUpdate]="cardUpdate()" />
     }
     @default {
       <portal-personal-data [profile]="p" (saved)="onSaved($event)" />

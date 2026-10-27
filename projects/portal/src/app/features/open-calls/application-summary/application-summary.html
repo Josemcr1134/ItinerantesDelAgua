@@ -66,9 +66,14 @@
       }
       @case ('VIEW') {}
       @case ('CONTINUE_DRAFT') {}
-      @default {
-        <!-- Pagos (Fase 05): todavía no hay pantalla. -->
+      @case ('PAYMENT_IN_VALIDATION') {
         <button type="button" class="button" disabled>{{ actions[a.action.type] }}</button>
+      }
+      @default {
+        <!-- Pago de la convocatoria, continuar el pago o subir comprobante (HU-23). -->
+        <a class="button" routerLink="/pago" [queryParams]="{ postulacion: a.id }">
+          {{ actions[a.action.type] }}
+        </a>
       }
     }
     @if (!a.action.enabled && a.action.reason) {

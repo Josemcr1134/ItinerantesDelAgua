@@ -1,0 +1,118 @@
+@use 'breakpoints' as bp;
+
+// Historial de pagos: filas blancas con concepto, monto, estado (pastilla) y
+// los enlaces al comprobante.
+
+.history {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.payment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background-color: #fff;
+  color: var(--color-primary);
+
+  @include bp.up(md) {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+  }
+}
+
+.payment__info {
+  grid-column: 1 / -1;
+  min-width: 0;
+
+  @include bp.up(md) {
+    grid-column: auto;
+  }
+}
+
+.payment__concept {
+  font-weight: 700;
+}
+
+.payment__meta {
+  color: #5a6b60;
+  font-size: 0.8125rem;
+}
+
+.payment__fail {
+  color: #9a3a22;
+  font-size: 0.8125rem;
+}
+
+.payment__amount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.payment__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.chip {
+  justify-self: start;
+  padding: 2px 10px;
+  border: 1px solid #c9d0ca;
+  border-radius: 54px;
+  background-color: #eef0ee;
+  color: #4d5650;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &[data-status='PAID'],
+  &[data-status='VALIDATED'],
+  &[data-status='CURRENT'],
+  &[data-status='COMPLETED'] {
+    border-color: #399f71;
+    background-color: #e3f1e9;
+    color: #1f5c40;
+  }
+
+  &[data-status='PENDING'],
+  &[data-status='PENDING_VALIDATION'],
+  &[data-status='PENDING_ACTIVATION'] {
+    border-color: #eaa700;
+    background-color: #fdf1cf;
+    color: #5c4000;
+  }
+
+  &[data-status='FAILED'],
+  &[data-status='REJECTED'],
+  &[data-status='PAST_DUE'],
+  &[data-status='DELINQUENT'] {
+    border-color: #e2a596;
+    background-color: #fbe9e4;
+    color: #9a3a22;
+  }
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.empty {
+  padding: var(--space-4);
+  border-radius: 22px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+}

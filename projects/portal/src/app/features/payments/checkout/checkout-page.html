@@ -1,0 +1,207 @@
+@if (loadError(); as message) {
+  <p class="notice" role="alert">
+    {{ message }}
+    <button type="button" class="notice__retry" (click)="quote.reload()">Reintentar</button>
+  </p>
+} @else if (current(); as q) {
+  <div class="layout">
+    <section class="panel" aria-labelledby="pay-how">
+      @if (q.openCheckout; as open) {
+        <div class="banner" role="status">
+          <p>{{ t.openCheckout }}</p>
+          <div class="banner__actions">
+            <button type="button" class="button button--small" (click)="continueCheckout(open)">
+              {{ t.continuePayment }}
+            </button>
+            <button type="button" class="link" (click)="cancelCheckout(open)">
+              {{ t.cancelPayment }}
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (blocker(); as reason) {
+        <div class="blocked" role="status">
+          <p class="blocked__title">{{ reason }}</p>
+          <div class="banner__actions">
+            @if (q.blocker?.code === 'ENROLLMENT_ALREADY_EXISTS') {
+              <a class="button button--small" [routerLink]="['/formacion/aula', q.offer.id]">
+                {{ t.goToClassroom }}
+              </a>
+            }
+            <a class="link" routerLink="/perfil" [queryParams]="{ pestana: 'pagos' }">{{
+              t.myPayments
+            }}</a>
+          </div>
+        </div>
+      } @else {
+        <h2 id="pay-how" class="panel__title">{{ t.how }}</h2>
+
+        <div class="options" role="radiogroup" [attr.aria-label]="t.how">
+          <label class="option" [class.option--on]="count() === 0">
+            <input
+              type="radio"
+              name="pay-count"
+              [checked]="count() === 0"
+              (change)="count.set(0)"
+            />
+            <span class="option__name">{{ t.single }}</span>
+            @if (q.amount) {
+              <span class="option__amount">{{ money(q.amount) }}</span>
+            }
+          </label>
+          @for (opt of q.installments?.options ?? []; track opt.count) {
+            <label
+              class="option"
+              [class.option--on]="count() === opt.count"
+              [class.option--off]="!opt.available"
+            >
+              <input
+                type="radio"
+                name="pay-count"
+                [checked]="count() === opt.count"
+                [disabled]="!opt.available"
+                (change)="count.set(opt.count)"
+              />
+              <span class="option__name">{{ t.installments(opt.count) }}</span>
+              <span class="option__amount">{{ t.perInstallment(money(opt.perInstallment)) }}</span>
+              @if (!opt.available) {
+                <span class="option__note">{{ t.installmentUnavailable }}</span>
+              }
+            </label>
+          }
+        </div>
+
+        @if (option(); as opt) {
+          <div class="schedule">
+            <h3 class="schedule__title">{{ t.schedule }}</h3>
+            <ol class="schedule__list">
+              @for (item of opt.schedule; track item.sequence; let first = $first) {
+                <li>
+                  <span>Cuota {{ item.sequence }}</span>
+                  <span class="schedule__date">{{ first ? t.firstCharge : date(item.dueAt) }}</span>
+                  <strong>{{ money(item.amount) }}</strong>
+                </li>
+              }
+            </ol>
+          </div>
+        }
+
+        @if (methods().length > 1 && !option()) {
+          <h3 class="panel__subtitle">{{ t.method }}</h3>
+          <div class="options options--methods" role="radiogroup" [attr.aria-label]="t.method">
+            @for (m of methods(); track m.method) {
+              <label
+                class="option"
+                [class.option--on]="method() === m.method"
+                [class.option--off]="!m.available"
+              >
+                <input
+                  type="radio"
+                  name="pay-method"
+                  [checked]="method() === m.method"
+                  [disabled]="!m.available"
+                  (change)="method.set(m.method)"
+                />
+                <span class="option__name">{{ m.method === 'CARD' ? t.card : t.transfer }}</span>
+                <span class="option__note">{{
+                  m.method === 'CARD' ? t.cardHint : t.transferHint
+                }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        @if (method() === 'BANK_TRANSFER' && !option() && q.bankTransfer && q.application) {
+          <portal-transfer-form
+            [applicationId]="q.application.id"
+            [bank]="q.bankTransfer"
+            [latest]="sentTransfer() ?? q.latestTransfer"
+            (sent)="onTransferSent($event)"
+          />
+        } @else {
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="terms()"
+              (change)="terms.set($any($event.target).checked)"
+            />
+            <span>{{ t.terms }}</span>
+          </label>
+          @if (option()) {
+            <label class="check">
+              <input
+                type="checkbox"
+                [checked]="autoDebit()"
+                (change)="autoDebit.set($any($event.target).checked)"
+              />
+              <span>{{ t.autoDebit }}</span>
+            </label>
+          }
+          @if (!cardAvailable()) {
+            <p class="error" role="status">{{ t.notConfigured }}</p>
+          }
+          @if (error(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+          }
+          @if (payNowAmount(); as amount) {
+            <button
+              type="button"
+              class="button"
+              [disabled]="!canPay() || paying()"
+              (click)="payByCard()"
+            >
+              {{
+                paying()
+                  ? t.redirecting
+                  : option()
+                    ? t.payFirst(money(amount))
+                    : t.payCard(money(amount))
+              }}
+            </button>
+          }
+          <p class="hint">{{ t.cardHint }}</p>
+        }
+      }
+    </section>
+
+    <aside class="summary" aria-labelledby="pay-summary">
+      <h2 id="pay-summary" class="summary__label">{{ t.summary }}</h2>
+      <p class="summary__name">{{ q.offer.name }}</p>
+      @if (q.offer.cohortLabel || dates()) {
+        <p class="summary__line">
+          {{ q.offer.cohortLabel ? 'Cohorte ' + q.offer.cohortLabel : '' }}
+          {{ q.offer.cohortLabel && dates() ? ' · ' : '' }}{{ dates() }}
+        </p>
+      }
+      @if (q.application; as app) {
+        <dl class="figures">
+          @if (app.originalAmount) {
+            <div>
+              <dt>{{ t.original }}</dt>
+              <dd>{{ money(app.originalAmount) }}</dd>
+            </div>
+          }
+          @if (app.assignedScholarshipType && app.assignedPercent !== null) {
+            <div>
+              <dt>{{ t.scholarship(app.assignedScholarshipType.name, app.assignedPercent) }}</dt>
+              <dd>−{{ app.assignedPercent }}%</dd>
+            </div>
+          }
+        </dl>
+      }
+      @if (q.amount) {
+        <p class="summary__total">
+          <span>{{ q.application ? t.balance : t.total }}</span>
+          <strong>{{ money(q.amount) }}</strong>
+        </p>
+      }
+      @if (dueAt(); as due) {
+        <p class="summary__due">{{ t.dueAt(due) }}</p>
+      }
+      @if (offerUrl(); as url) {
+        <a class="link" [href]="url">{{ t.backToOffer }}</a>
+      }
+    </aside>
+  </div>
+}

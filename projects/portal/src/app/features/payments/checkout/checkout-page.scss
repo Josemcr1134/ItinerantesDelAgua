@@ -1,0 +1,163 @@
+@use 'breakpoints' as bp;
+
+// Pago (línea gráfica del portal): tarjeta blanca con las opciones y, a la
+// derecha, el resumen con el total en verde.
+
+:host {
+  display: block;
+}
+
+.layout {
+  display: grid;
+  gap: 22px;
+
+  @include bp.up(xl) {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+}
+
+.panel,
+.summary,
+.notice {
+  border-radius: 25px;
+  background-color: #fff;
+  box-shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.12);
+}
+
+.panel {
+  display: grid;
+  gap: 16px;
+  padding: 24px clamp(18px, 3vw, 30px) 28px;
+  color: var(--color-raisin-black);
+}
+
+.panel__title,
+.panel__subtitle {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.panel__title {
+  font-size: 1.125rem;
+}
+
+.panel__subtitle {
+  margin-top: 4px;
+  font-size: 0.9375rem;
+}
+
+.summary {
+  display: grid;
+  gap: 6px;
+  padding: 22px;
+  color: var(--color-primary);
+
+  @include bp.up(xl) {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.summary__label {
+  color: #5a6b60;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.summary__name {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.summary__line,
+.summary__due {
+  color: #5a6b60;
+  font-size: 0.875rem;
+}
+
+.summary__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e6ebe6;
+
+  strong {
+    font-size: 1.5rem;
+  }
+}
+
+.figures {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.875rem;
+  }
+
+  dt {
+    color: #5a6b60;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 700;
+  }
+}
+
+.notice {
+  padding: var(--space-4);
+}
+
+.notice__retry,
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.notice__retry {
+  margin-left: 8px;
+}
+
+.banner,
+.blocked {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background-color: #fdf1cf;
+  color: #5c4000;
+}
+
+.blocked {
+  background-color: #eef4ee;
+  color: var(--color-primary);
+}
+
+.blocked__title {
+  font-weight: 700;
+}
+
+.banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}

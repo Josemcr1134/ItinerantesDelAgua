@@ -89,10 +89,20 @@ describe('OfferActionPage', () => {
     expect(navigate).toHaveBeenCalledWith(['/formacion/aula', 'o1'], { replaceUrl: true });
   });
 
-  it('pagar: avisa que el pago en línea llega pronto', async () => {
-    const { fixture, host } = await render('PAY_IN_INSTALLMENTS', [action('PAY_IN_INSTALLMENTS')]);
+  it('pagar en cuotas: va a la pantalla de pago con las cuotas preseleccionadas', async () => {
+    const { navigate } = await render('PAY_IN_INSTALLMENTS', [action('PAY_IN_INSTALLMENTS')]);
+    expect(navigate).toHaveBeenCalledWith(['/pago'], {
+      replaceUrl: true,
+      queryParams: { oferta: 'o1', cuotas: '1' },
+    });
+  });
+
+  it('Moodle: avisa que la activación llega pronto', async () => {
+    const { fixture, host } = await render('ACTIVATE_MOODLE_ACCESS', [
+      action('ACTIVATE_MOODLE_ACCESS'),
+    ]);
     await fixture.whenStable();
-    expect(host.querySelector('.card__text')?.textContent).toContain('pago en cuotas');
+    expect(host.querySelector('.card__text')?.textContent).toContain('Moodle');
     expect(host.querySelector('a[href*="/escuela/oferta/eco"]')).not.toBeNull();
   });
 

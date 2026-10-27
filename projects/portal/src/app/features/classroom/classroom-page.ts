@@ -88,6 +88,7 @@ export default class ClassroomPage {
         return {
           title: 'Tu acceso al aula está en pausa',
           text: 'Tienes un pago pendiente. Al regularizarlo, recuperas el acceso a sesiones y materiales.',
+          suspended: true,
         };
       case 'NOT_FOUND':
         return {

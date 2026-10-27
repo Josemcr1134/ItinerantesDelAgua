@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
 import { authGuard, authRoutes, guestGuard } from 'auth';
 import { PageSeo } from './core/seo/portal-seo';
 import { formationTypeMatch } from './features/formation/formation-options';
@@ -90,10 +91,29 @@ export const routes: Routes = [
         canActivate: [applicationRedirect],
         children: [],
       },
+      // Pagar saldo (ruta de la API): a la pantalla de pago de esa postulación.
       {
         path: 'postulaciones/:id/pago',
-        canActivate: [applicationRedirect],
-        children: [],
+        redirectTo: ({ params }) =>
+          inject(Router).createUrlTree(['/pago'], { queryParams: { postulacion: params['id'] } }),
+      },
+      // Pagos (Fase 05): resumen y pago, vuelta de Stripe y Mis pagos.
+      {
+        path: 'pago',
+        title: 'Pago · Portal',
+        loadComponent: () => import('./features/payments/checkout/checkout-page'),
+      },
+      {
+        path: 'pagos/resultado',
+        title: 'Pago · Portal',
+        loadComponent: () => import('./features/payments/result/payment-result-page'),
+      },
+      {
+        path: 'perfil/pagos',
+        redirectTo: ({ queryParams }) =>
+          inject(Router).createUrlTree(['/perfil'], {
+            queryParams: { ...queryParams, pestana: 'pagos' },
+          }),
       },
       {
         path: 'asistencia/:sessionId',

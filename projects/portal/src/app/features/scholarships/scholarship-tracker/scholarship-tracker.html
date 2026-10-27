@@ -146,9 +146,14 @@
         </a>
       }
       @case ('VIEW') {}
-      @default {
-        <!-- Pagos (Fase 05): todavía no hay pantalla. -->
+      @case ('PAYMENT_IN_VALIDATION') {
         <button type="button" class="action" disabled>{{ actions[a.action.type] }}</button>
+      }
+      @default {
+        <!-- Pagar saldo, continuar el pago o subir otro comprobante (HU-23). -->
+        <a class="action" routerLink="/pago" [queryParams]="{ postulacion: a.id }">
+          {{ actions[a.action.type] }}
+        </a>
       }
     }
     @if (!detail() && a.status !== 'DRAFT') {
@@ -156,9 +161,6 @@
     }
     @if (!a.action.enabled && a.action.reason) {
       <p class="tracker__reason">{{ reasons[a.action.reason] }}</p>
-    } @else if (payment()) {
-      <!-- TODO(contenido): confirmar el aviso mientras no hay pagos en línea. -->
-      <p class="tracker__reason">Pagos en línea: próximamente.</p>
     }
   </footer>
 </article>
