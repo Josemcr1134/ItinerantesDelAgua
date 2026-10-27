@@ -1,0 +1,48 @@
+@if (meta(); as m) {
+  <nav class="ui-pagination" [attr.aria-label]="label()">
+    <p class="ui-pagination__info">
+      {{ m.total }} {{ m.total === 1 ? noun()[0] : noun()[1] }} · Página {{ m.page }} de
+      {{ m.totalPages || 1 }}
+    </p>
+    <div class="ui-pagination__buttons">
+      <button
+        type="button"
+        class="ui-pagination__button"
+        [disabled]="m.page <= 1 || loading()"
+        (click)="go(m.page - 1)"
+      >
+        Anterior
+      </button>
+      @if (numbered()) {
+        <ol class="ui-pagination__pages">
+          @for (p of pages(); track $index) {
+            <li>
+              @if (p === gap) {
+                <span class="ui-pagination__gap" aria-hidden="true">…</span>
+              } @else {
+                <button
+                  type="button"
+                  class="ui-pagination__button ui-pagination__number"
+                  [attr.aria-current]="p === m.page ? 'page' : null"
+                  [attr.aria-label]="'Página ' + p"
+                  [disabled]="loading()"
+                  (click)="go(p)"
+                >
+                  {{ p }}
+                </button>
+              }
+            </li>
+          }
+        </ol>
+      }
+      <button
+        type="button"
+        class="ui-pagination__button"
+        [disabled]="m.page >= m.totalPages || loading()"
+        (click)="go(m.page + 1)"
+      >
+        Siguiente
+      </button>
+    </div>
+  </nav>
+}

@@ -8,14 +8,13 @@ import {
   USER_STATUS_VALUES,
   UserStatus,
 } from 'data-access';
-import { Button } from 'ui-kit';
+import { Button, Pagination } from 'ui-kit';
 import { firstValueFrom } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
 import { FilterSelect, optionsFrom } from '../../shared/filters/filter-select';
 import { SearchField } from '../../shared/filters/search-field';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
-import { Pagination } from '../../shared/list/pagination';
 import { rowActions } from '../../shared/list/row-actions';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { Person } from '../../shared/person/person';

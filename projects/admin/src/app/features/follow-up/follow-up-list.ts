@@ -7,11 +7,11 @@ import { FilterOption, FilterSelect } from '../../shared/filters/filter-select';
 import { formatDateTime, formatMoney } from '../../shared/format/format';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
-import { Pagination } from '../../shared/list/pagination';
 import { Notice } from '../../shared/notice/notice';
 import { Person } from '../../shared/person/person';
 import { FOLLOW_UP_OUTCOME_LABELS } from '../applications/application-labels';
 import { FollowUpActions } from '../applications/follow-up-actions';
+import { Pagination } from 'ui-kit';
 
 type Started = 'true' | 'false';
 

@@ -20,7 +20,6 @@ import { SearchField } from '../../../shared/filters/search-field';
 import { formatDateTime, formatMoney } from '../../../shared/format/format';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
-import { Pagination } from '../../../shared/list/pagination';
 import { Person } from '../../../shared/person/person';
 import { dayEndIso, dayStartIso } from '../../../shared/format/date-range';
 import {
@@ -30,6 +29,7 @@ import {
   PAYMENT_STATUS_TONES,
   formatCard,
 } from '../payment-labels';
+import { Pagination } from 'ui-kit';
 
 /** Pestaña "Pagos": todos los cobros (sin checkouts abandonados, salvo que se filtren). */
 @Component({

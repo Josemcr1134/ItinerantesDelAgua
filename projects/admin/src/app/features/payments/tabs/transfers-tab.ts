@@ -8,7 +8,6 @@ import { SearchField } from '../../../shared/filters/search-field';
 import { formatDateTime, formatMoney } from '../../../shared/format/format';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
-import { Pagination } from '../../../shared/list/pagination';
 import { Person } from '../../../shared/person/person';
 import { formatOfferDate } from '../../offers/shared/zoned-time';
 import {
@@ -16,6 +15,7 @@ import {
   PAYMENT_STATUS_TONES,
   TRANSFER_STATUS_LABELS,
 } from '../payment-labels';
+import { Pagination } from 'ui-kit';
 
 /** Pestaña "Transferencias por conciliar": por defecto las pendientes, la más antigua primero. */
 @Component({

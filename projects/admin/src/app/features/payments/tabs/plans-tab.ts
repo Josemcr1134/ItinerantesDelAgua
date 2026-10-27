@@ -13,11 +13,11 @@ import { SearchField } from '../../../shared/filters/search-field';
 import { formatMoney } from '../../../shared/format/format';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
-import { Pagination } from '../../../shared/list/pagination';
 import { Person } from '../../../shared/person/person';
 import { formatOfferDate } from '../../offers/shared/zoned-time';
 import { PLAN_STATUS_LABELS, PLAN_STATUS_TONES } from '../payment-labels';
 import { InstallmentDots } from '../plan/installment-dots';
+import { Pagination } from 'ui-kit';
 
 /** Pestaña "Planes de cuotas": los que llevan más días con cobro fallido primero. */
 @Component({

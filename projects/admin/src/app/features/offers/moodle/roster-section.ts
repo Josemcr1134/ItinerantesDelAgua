@@ -8,9 +8,9 @@ import { SearchField } from '../../../shared/filters/search-field';
 import { formatDateTime } from '../../../shared/format/format';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
-import { Pagination } from '../../../shared/list/pagination';
 import { rowActions } from '../../../shared/list/row-actions';
 import { formatOfferDate } from '../shared/zoned-time';
+import { Pagination } from 'ui-kit';
 
 type Flag = 'true' | 'false';
 

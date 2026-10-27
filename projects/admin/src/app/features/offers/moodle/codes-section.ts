@@ -4,8 +4,8 @@ import { FilterOption, FilterSelect } from '../../../shared/filters/filter-selec
 import { formatDateTime } from '../../../shared/format/format';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
-import { Pagination } from '../../../shared/list/pagination';
 import { formatOfferDate } from '../shared/zoned-time';
+import { Pagination } from 'ui-kit';
 
 type Flag = 'true' | 'false';
 

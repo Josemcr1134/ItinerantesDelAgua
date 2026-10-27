@@ -15,12 +15,12 @@ import { offerOptions } from '../../shared/filters/offer-options';
 import { formatDateTime } from '../../shared/format/format';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
-import { Pagination } from '../../shared/list/pagination';
 import { rowActions } from '../../shared/list/row-actions';
 import { RowMenu } from '../../shared/row-menu/row-menu';
 import { CALENDAR_CATEGORY_LABELS } from '../offers/offer-labels';
 import { formatOfferDate } from '../offers/shared/zoned-time';
 import { AUDIENCE_LABELS, CALENDAR_KIND_LABELS, CATEGORY_CLASS } from './calendar-labels';
+import { Pagination } from 'ui-kit';
 
 type Status = 'SCHEDULED' | 'CANCELLED';
 

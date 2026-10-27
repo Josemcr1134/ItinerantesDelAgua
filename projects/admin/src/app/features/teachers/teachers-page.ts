@@ -1,12 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { AdminTeacherDto, AdminTeachersApi } from 'data-access';
-import { AlertService, Button } from 'ui-kit';
+import { AlertService, Button, Pagination } from 'ui-kit';
 import { firstValueFrom } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
 import { SearchField } from '../../shared/filters/search-field';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
-import { Pagination } from '../../shared/list/pagination';
 import { rowActions } from '../../shared/list/row-actions';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { Person } from '../../shared/person/person';

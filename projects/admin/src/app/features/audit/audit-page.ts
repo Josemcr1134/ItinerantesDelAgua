@@ -12,10 +12,10 @@ import { dayEndIso, dayStartIso } from '../../shared/format/date-range';
 import { formatDateTime } from '../../shared/format/format';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
-import { Pagination } from '../../shared/list/pagination';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { Person } from '../../shared/person/person';
 import { AuditChanges } from './audit-changes';
+import { Pagination } from 'ui-kit';
 
 /**
  * Auditoría: toda acción de escritura del panel, más reciente primero, con

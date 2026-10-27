@@ -12,7 +12,7 @@ import {
   SubmittedApplicationStatus,
 } from 'data-access';
 import { catchError, firstValueFrom, map, of } from 'rxjs';
-import { Button } from 'ui-kit';
+import { Button, Pagination } from 'ui-kit';
 import { AdminAccess } from '../../../core/access/admin-access';
 import { saveFile } from '../../../core/download';
 import { ErrorPresenter } from '../../../core/error-presenter';
@@ -22,7 +22,6 @@ import { offerOptions } from '../../../shared/filters/offer-options';
 import { SearchField } from '../../../shared/filters/search-field';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
-import { Pagination } from '../../../shared/list/pagination';
 import { PageHeader } from '../../../shared/page-header/page-header';
 import { Person } from '../../../shared/person/person';
 import { scholarshipTypeOptions } from '../../scholarship-types/scholarship-type-labels';

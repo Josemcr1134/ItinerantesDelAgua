@@ -13,9 +13,9 @@ import { offerOptions } from '../../../shared/filters/offer-options';
 import { formatDateTime, formatMoney } from '../../../shared/format/format';
 import { listController } from '../../../shared/list/list-controller';
 import { ListStates } from '../../../shared/list/list-states';
-import { Pagination } from '../../../shared/list/pagination';
 import { Person } from '../../../shared/person/person';
 import { REFUND_STATUS_LABELS, REFUND_STATUS_TONES } from '../payment-labels';
+import { Pagination } from 'ui-kit';
 
 /** Origen del reembolso: con tarjeta va por Stripe; con transferencia se registró (hecho fuera). */
 const REFUND_METHOD_LABELS: Readonly<Record<PaymentMethod, string>> = {
