@@ -66,6 +66,8 @@
 .results {
   width: 100%;
   margin-top: 28px;
+  // Al cambiar de página se sube aquí, bajo el navbar fijo.
+  scroll-margin-top: calc(var(--navbar-height) + 24px);
 }
 
 .grid {
@@ -98,11 +100,7 @@
   }
 }
 
-// "Cargar más": contorno azul de acento (Figma).
-.more {
-  --ui-button-color: var(--color-accent);
-
-  min-width: 200px;
+.pages {
   margin-top: 40px;
 }
 

@@ -51,7 +51,8 @@ export const CATALOG_CONTENT = {
   status: { label: 'Estado' },
   scholarship: 'Con beca disponible',
   search: { label: 'Buscar', placeholder: 'Nombre de la oferta o docente…' },
-  loadMore: 'Cargar más',
+  noun: ['oferta', 'ofertas'] as const,
+  paginationLabel: 'Páginas de la oferta formativa',
   // TODO(contenido): confirmar los textos sin resultados y de error.
   empty: 'No encontramos ofertas con estos filtros.',
   clearFilters: 'Limpiar filtros',

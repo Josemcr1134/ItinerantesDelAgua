@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideApi } from 'data-access';
 import CatalogPage from './catalog-page';
 
@@ -129,18 +129,32 @@ describe('CatalogPage', () => {
     expect(params.get('topic')).toBe('DRY_TOILETS');
   });
 
-  it('[Cargar más] suma la página siguiente', async () => {
+  it('paginación numerada: pide la página de la URL y cambia de página', async () => {
+    const { fixture, http, host } = await render({ pagina: '2' });
+    const request = http.expectOne((r) => r.url === API);
+    expect(request.request.params.get('page')).toBe('2');
+    request.flush(page([offer('i'), offer('j')], 18, 2));
+    await fixture.whenStable();
+
+    expect(host.querySelectorAll('pub-offer-card')).toHaveLength(2);
+    const numbers = [...host.querySelectorAll('.ui-pagination__number')].map((b) =>
+      b.textContent?.trim(),
+    );
+    expect(numbers).toEqual(['1', '2', '3']);
+    expect(host.querySelector('ui-pagination [aria-current="page"]')?.textContent?.trim()).toBe(
+      '2',
+    );
+
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    host.querySelector<HTMLButtonElement>('[aria-label="Página 3"]')!.click();
+    expect(navigate.mock.calls[0][1]).toMatchObject({ queryParams: { pagina: 3 } });
+  });
+
+  it('con una sola página no muestra la paginación', async () => {
     const { fixture, http, host } = await render();
-    http.expectOne((r) => r.url === API).flush(page([offer('a'), offer('b')], 3));
+    http.expectOne((r) => r.url === API).flush(page([offer('a')], 1));
     await fixture.whenStable();
-    host.querySelector<HTMLButtonElement>('.more')!.click();
-    TestBed.tick();
-    const next = http.expectOne((r) => r.url === API);
-    expect(next.request.params.get('page')).toBe('2');
-    next.flush(page([offer('c')], 3, 2));
-    await fixture.whenStable();
-    expect(host.querySelectorAll('pub-offer-card')).toHaveLength(3);
-    expect(host.querySelector('.more')).toBeNull();
+    expect(host.querySelector('ui-pagination')).toBeNull();
   });
 
   it('sin resultados con filtros ofrece limpiarlos', async () => {

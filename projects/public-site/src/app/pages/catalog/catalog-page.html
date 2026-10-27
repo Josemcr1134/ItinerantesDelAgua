@@ -11,7 +11,7 @@
       class="type"
       [class.type--on]="!type()"
       routerLink="."
-      [queryParams]="{ tipo: null }"
+      [queryParams]="{ tipo: null, pagina: null }"
       queryParamsHandling="merge"
       replaceUrl
       [attr.aria-current]="!type() ? 'page' : null"
@@ -23,7 +23,7 @@
         class="type"
         [class.type--on]="type()?.slug === option.slug"
         routerLink="."
-        [queryParams]="{ tipo: option.slug }"
+        [queryParams]="{ tipo: option.slug, pagina: null }"
         queryParamsHandling="merge"
         replaceUrl
         [attr.aria-current]="type()?.slug === option.slug ? 'page' : null"
@@ -94,7 +94,7 @@
     </label>
   </div>
 
-  <div class="results" [attr.aria-busy]="loading()">
+  <div #results class="results" [attr.aria-busy]="loading()">
     @if (items().length) {
       <ul class="grid">
         @for (offer of items(); track offer.id) {
@@ -103,17 +103,19 @@
           </li>
         }
       </ul>
-      @if (hasMore()) {
-        <button
-          uiButton
-          variant="secondary"
-          type="button"
-          class="more"
-          [disabled]="loading()"
-          (click)="loadMore()"
-        >
-          {{ c.loadMore }}
-        </button>
+      @if (meta(); as m) {
+        @if (m.totalPages > 1) {
+          <ui-pagination
+            class="pages"
+            [numbered]="true"
+            [meta]="m"
+            [page]="page()"
+            (pageChange)="goToPage($event)"
+            [loading]="loading()"
+            [noun]="c.noun"
+            [label]="c.paginationLabel"
+          />
+        }
       }
     } @else if (failed()) {
       <div class="empty" role="alert">

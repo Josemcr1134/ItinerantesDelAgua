@@ -4,20 +4,21 @@ import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from 
 import { apiErrorInterceptor, cacheInterceptor, provideApi } from 'data-access';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
+import { providePageScroll } from './shared/page-scroll/page-scroll';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    // `anchorScrolling` hace scroll a la sección si la URL trae un ancla al
-    // cargar (p. ej. "/#trayectoria" pegado en una pestaña nueva).
-    // `scrollPositionRestoration`: cada página nueva empieza arriba y "Atrás"
-    // vuelve a donde estaba.
+    // El scroll al navegar lo decide providePageScroll: anclas (también al
+    // cargar, p. ej. "/#trayectoria" pegado en una pestaña nueva), páginas
+    // nuevas y Atrás; `withInMemoryScrolling` solo emite los eventos.
     provideRouter(
       routes,
-      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
+      withInMemoryScrolling({ anchorScrolling: 'disabled', scrollPositionRestoration: 'disabled' }),
       // Filtros del catálogo (`?tipo=`, `?q=`…) como inputs de la página.
       withComponentInputBinding(),
     ),
+    providePageScroll(),
     // La landing solo usa rutas públicas: sin sesión ni loader general. El
     // caché evita repetir llamadas a datos que casi no cambian (cifras).
     provideHttpClient(withFetch(), withInterceptors([cacheInterceptor, apiErrorInterceptor])),

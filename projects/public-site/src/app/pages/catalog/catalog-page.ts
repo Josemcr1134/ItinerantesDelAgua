@@ -1,4 +1,12 @@
-import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  linkedSignal,
+  viewChild,
+} from '@angular/core';
 import { rxResource, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -11,7 +19,7 @@ import {
   OffersApi,
 } from 'data-access';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs';
-import { Button } from 'ui-kit';
+import { Button, Pagination } from 'ui-kit';
 import {
   CATALOG_CONTENT,
   CATALOG_MODALITIES,
@@ -23,6 +31,7 @@ import { ClosingCta } from '../../sections/closing-cta/closing-cta';
 import { browserTimezone } from './catalog-format';
 import { OfferCard } from './offer-card/offer-card';
 
+/** Dos filas de cuatro en escritorio. */
 const PAGE_SIZE = 8;
 /** La API busca desde 3 caracteres. */
 const MIN_SEARCH = 3;
@@ -33,11 +42,12 @@ type OffersPage = ApiResponse<'Offers_list'>;
  * Catálogo de oferta formativa (HU-15, Figma "Oferta formativa"): filtros por
  * tipo, modalidad, estado, beca y búsqueda (en la URL, para compartir o
  * llegar filtrado desde "Itinerantes del Agua" con `?topic=`), tarjetas en
- * rejilla con "Cargar más" y, al cierre, la sección de contacto de la home.
+ * rejilla con paginación numerada (`?pagina=`) y, al cierre, la sección de
+ * contacto de la home.
  */
 @Component({
   selector: 'pub-catalog-page',
-  imports: [RouterLink, Button, OfferCard, ClosingCta],
+  imports: [RouterLink, Button, Pagination, OfferCard, ClosingCta],
   templateUrl: './catalog-page.html',
   styleUrls: ['./catalog-page.scss', './catalog-filters.scss'],
 })
@@ -58,6 +68,8 @@ export default class CatalogPage {
   readonly q = input<string>();
   /** `?topic=` (HU-34): temática pública, desde "Itinerantes del Agua". */
   readonly topic = input<string>();
+  /** `?pagina=` (desde 1). */
+  readonly pagina = input<string>();
 
   protected readonly c = CATALOG_CONTENT;
   protected readonly types = CATALOG_TYPES;
@@ -109,8 +121,7 @@ export default class CatalogPage {
       !!this.searchValue(),
   );
 
-  /** Página pedida; vuelve a 1 al cambiar los filtros. */
-  private readonly page = linkedSignal({ source: this.filters, computation: () => 1 });
+  protected readonly page = computed(() => Math.max(1, Math.floor(Number(this.pagina())) || 1));
   protected readonly list = rxResource({
     params: () => ({ ...this.filters(), page: this.page(), pageSize: PAGE_SIZE }),
     stream: ({ params }) => this.offers.list(params),
@@ -118,22 +129,18 @@ export default class CatalogPage {
   private readonly response = computed(() =>
     this.list.hasValue() ? this.list.value() : undefined,
   );
-  /** Lo cargado hasta ahora ("Cargar más" suma la página siguiente). */
+  /** Ofertas de la página (mientras llega otra, se quedan las anteriores). */
   protected readonly items = linkedSignal<OffersPage | undefined, readonly OfferSummaryDto[]>({
     source: this.response,
-    computation: (response, previous) => {
-      if (!response) return previous?.value ?? [];
-      if (response.meta.page === 1) return response.data;
-      const seen = new Set(previous?.value.map((o) => o.id));
-      return [...(previous?.value ?? []), ...response.data.filter((o) => !seen.has(o.id))];
-    },
+    computation: (response, previous) => response?.data ?? previous?.value ?? [],
   });
-  protected readonly hasMore = computed(
-    () => this.items().length < (this.response()?.meta.total ?? 0),
-  );
+  protected readonly meta = linkedSignal<OffersPage | undefined, OffersPage['meta'] | null>({
+    source: this.response,
+    computation: (response, previous) => response?.meta ?? previous?.value ?? null,
+  });
   protected readonly loading = computed(() => this.list.isLoading());
   protected readonly failed = computed(() => !!this.list.error());
-  protected readonly loadingMore = signal(false);
+  private readonly results = viewChild.required<ElementRef<HTMLElement>>('results');
 
   constructor() {
     // TODO(contenido): confirmar la descripción para buscadores.
@@ -149,22 +156,38 @@ export default class CatalogPage {
       });
   }
 
+  /** Cambia un filtro (y vuelve a la primera página). */
   protected setParam(name: string, value: string | null): void {
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { [name]: value || null },
+      queryParams: { [name]: value || null, pagina: null },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
   }
 
+  /** Otra página: queda en el historial ("Atrás" vuelve) y sube al inicio de la lista. */
+  protected goToPage(page: number): void {
+    void this.router
+      .navigate([], {
+        relativeTo: this.route,
+        queryParams: { pagina: page > 1 ? page : null },
+        queryParamsHandling: 'merge',
+      })
+      .then(() => {
+        const reduceMotion =
+          typeof matchMedia !== 'function' ||
+          matchMedia('(prefers-reduced-motion: reduce)').matches;
+        this.results().nativeElement.scrollIntoView?.({
+          behavior: reduceMotion ? 'auto' : 'smooth',
+          block: 'start',
+        });
+      });
+  }
+
   protected clearFilters(): void {
     this.searchText.set('');
     void this.router.navigate([], { relativeTo: this.route, replaceUrl: true });
-  }
-
-  protected loadMore(): void {
-    this.page.update((page) => page + 1);
   }
 
   protected retry(): void {
