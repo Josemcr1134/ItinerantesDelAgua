@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ApiClient } from '../api-client';
+import { ApiClient, commaList } from '../api-client';
 import { cachedRequest, minutes } from '../cache/cache-options';
 import { ApiQuery, ApiResponse } from '../operations.generated';
 
@@ -8,8 +8,11 @@ import { ApiQuery, ApiResponse } from '../operations.generated';
 export class OffersApi {
   private readonly api = inject(ApiClient);
 
+  /** Catálogo (HU-15). Tipos y estados van separados por coma (`?status=A,B`). */
   list(query: ApiQuery<'Offers_list'> = {}) {
-    return this.api.get<ApiResponse<'Offers_list'>>('/api/v1/offers', { query: { ...query } });
+    return this.api.get<ApiResponse<'Offers_list'>>('/api/v1/offers', {
+      query: { ...query, type: commaList(query.type), status: commaList(query.status) },
+    });
   }
 
   /** Disponibilidad por temática (página Itinerantes del Agua). Caché de 15 min. */
