@@ -1,0 +1,128 @@
+@let o = offer();
+<aside class="summary" aria-labelledby="summary-title">
+  <h2 id="summary-title" class="summary__title">{{ t.summary.title }}</h2>
+
+  <div class="block">
+    <h3 class="block__label">{{ t.summary.dates }}</h3>
+    <p class="block__value">{{ dates() ?? '—' }}</p>
+    @if (enrollmentNote(); as note) {
+      <p class="block__note">{{ note }}</p>
+    }
+  </div>
+
+  @if (schedule(); as s) {
+    <div class="block">
+      <h3 class="block__label">{{ t.summary.schedule }}</h3>
+      <p class="block__value">{{ s.heading }} {{ t.summary.cdmx }}</p>
+      @if (s.rows.length) {
+        <table class="zones">
+          <caption class="visually-hidden">
+            {{
+              t.summary.schedule
+            }}
+          </caption>
+          <tbody>
+            @for (row of s.rows; track row.label) {
+              <tr [class.zones__mine]="row.mine">
+                <th scope="row">
+                  {{ row.label }}
+                  @if (row.mine && !row.extra) {
+                    {{ t.summary.yourZone }}
+                  }
+                </th>
+                <td>{{ row.time }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <p class="block__note">{{ t.summary.conversion }}</p>
+      }
+    </div>
+  }
+
+  @if (o.venue; as venue) {
+    <div class="block">
+      <h3 class="block__label">{{ t.summary.venue }}</h3>
+      <p class="block__value">{{ venue.name }}</p>
+      @if (venueLine(); as line) {
+        <p class="block__note">{{ line }}</p>
+      }
+      @if (venue.mapsUrl) {
+        <a class="block__link" [href]="venue.mapsUrl" target="_blank" rel="noopener">
+          {{ t.summary.howToGetThere }}
+        </a>
+      }
+    </div>
+  }
+
+  <div class="block">
+    <h3 class="block__label">{{ t.summary.cost }}</h3>
+    <p class="price">{{ price().amount }}</p>
+    @if (price().detail; as detail) {
+      <p class="block__note">{{ detail }}</p>
+    }
+    @if (o.moodleCourseUrl) {
+      <a class="block__link" [href]="o.moodleCourseUrl" target="_blank" rel="noopener">
+        {{ t.summary.moodle }}
+      </a>
+    }
+  </div>
+
+  @if (scholarship(); as b) {
+    <div class="grant">
+      <p class="grant__title">
+        {{ t.scholarship.title }}
+        @if (b.window) {
+          · {{ b.window }}
+        }
+      </p>
+      <p class="grant__types">
+        @for (type of b.types; track type.label; let last = $last) {
+          <span [class.grant__full]="type.full"
+            >{{ type.label }}{{ type.full ? ' (' + t.scholarship.full + ')' : '' }}</span
+          >{{ last ? '' : ' · ' }}
+        }
+      </p>
+      <p class="grant__line">{{ t.scholarship.requirements }}</p>
+      @if (b.interview) {
+        <p class="grant__note">{{ b.interview }}</p>
+      }
+      @if (scholarshipAction(); as action) {
+        @if (action.enabled) {
+          <a class="action action--grant" [href]="action.href">{{ action.label }}</a>
+        } @else {
+          <span class="action action--grant action--off" aria-disabled="true">{{
+            action.label
+          }}</span>
+          @if (action.note) {
+            <p class="grant__note">{{ action.note }}</p>
+          }
+        }
+      }
+    </div>
+  }
+
+  @if (actions().length) {
+    <div class="actions">
+      @for (action of actions(); track action.type) {
+        @if (action.enabled) {
+          <a class="action" [class.action--primary]="action.primary" [href]="action.href">
+            {{ action.label }}
+          </a>
+        } @else {
+          <span
+            class="action action--off"
+            [class.action--primary]="action.primary"
+            aria-disabled="true"
+          >
+            {{ action.label }}
+          </span>
+          @if (action.note) {
+            <p class="actions__note">{{ action.note }}</p>
+          }
+        }
+      }
+      <p class="actions__hint">{{ t.loginHint }}</p>
+    </div>
+  }
+</aside>

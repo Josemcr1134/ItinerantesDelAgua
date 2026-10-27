@@ -1,0 +1,95 @@
+// Bloque de beca (amarillo, Figma) y botones de acción: la principal rellena
+// en verde y las demás de contorno; deshabilitadas, atenuadas con su motivo.
+
+.grant {
+  display: grid;
+  gap: 6px;
+  padding: 14px 14px 16px;
+  border-radius: 14px;
+  background-color: #fdf1cf;
+  color: #5c4000;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.grant__title {
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.grant__full {
+  text-decoration: line-through;
+}
+
+.grant__note {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+}
+
+.action {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background-color: #fff;
+  color: var(--color-primary);
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:not(.action--off):hover {
+      background-color: color-mix(in srgb, var(--color-primary) 8%, #fff);
+    }
+  }
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+    outline-offset: 2px;
+  }
+}
+
+.action--primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+
+  @media (hover: hover) {
+    &:not(.action--off):hover {
+      background-color: color-mix(in srgb, var(--color-primary) 88%, #000);
+    }
+  }
+}
+
+// Dentro del bloque de beca: crema con borde dorado.
+.action--grant {
+  margin-top: 6px;
+  border-color: #c99a1c;
+  background-color: #fffaf0;
+  color: #5c4000;
+}
+
+.action--off {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.actions__note {
+  margin-top: -4px;
+  color: #6a716b;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.actions__hint {
+  color: #6a716b;
+  font-size: 0.75rem;
+  text-align: center;
+}

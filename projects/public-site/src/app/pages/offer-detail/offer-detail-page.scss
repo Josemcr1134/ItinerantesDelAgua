@@ -1,0 +1,169 @@
+@use 'breakpoints' as bp;
+
+// Ficha (Figma): migas arriba, columna principal (carrusel, título, secciones)
+// y el resumen fijo a la derecha en escritorio. Debajo, el contacto.
+
+:host {
+  display: block;
+  background-color: var(--color-surface);
+}
+
+// Por encima de las ilustraciones de la sección de cierre.
+.detail {
+  position: relative;
+  z-index: 1;
+  max-width: 1296px;
+  margin: 0 auto;
+  padding: calc(var(--navbar-height) + 28px) var(--space-3) 160px;
+  color: var(--color-primary);
+
+  // Espacio para la serpiente y el árbol de la sección de cierre, que suben.
+  @include bp.up(xl) {
+    padding-bottom: 280px;
+  }
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 14px;
+  font-size: 0.8125rem;
+}
+
+.crumbs__back {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.crumbs__path {
+  color: #6a716b;
+
+  a {
+    color: inherit;
+  }
+}
+
+.layout {
+  display: grid;
+  gap: 28px;
+
+  @include bp.up(lg) {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+
+  @include bp.up(xl) {
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 36px;
+  }
+}
+
+.main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.aside {
+  @include bp.up(lg) {
+    position: sticky;
+    top: calc(var(--navbar-height) + 16px);
+  }
+}
+
+.title {
+  margin-top: 10px;
+  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.12;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background-color: #e3ebe3;
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+
+  &[data-availability='ENROLLMENT_OPEN'] {
+    background-color: #dff1e4;
+  }
+
+  &[data-availability='UPCOMING'] {
+    background-color: #fbe6d2;
+    color: #8a4b0f;
+  }
+}
+
+.chip--grant {
+  background-color: #fdf1cf;
+  color: #5c4000;
+}
+
+.chip--off {
+  background-color: #eef0ee;
+  color: #4d5650;
+}
+
+.description {
+  color: var(--color-raisin-black);
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 48px 20px;
+  border-radius: 22px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+  text-align: center;
+}
+
+.ghost {
+  border-radius: 22px;
+  background: linear-gradient(100deg, #fff 30%, #f3efe4 50%, #fff 70%) 0 0 / 300% 100%;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: shimmer 1.4s linear infinite;
+  }
+}
+
+.ghost--media {
+  aspect-ratio: 760 / 300;
+}
+
+.ghost--title {
+  width: 60%;
+  height: 40px;
+}
+
+.ghost--text {
+  height: 160px;
+}
+
+.ghost--aside {
+  height: 520px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -300% 0;
+  }
+}

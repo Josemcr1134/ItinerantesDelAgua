@@ -1,0 +1,92 @@
+// Carrusel (Figma): 25px de radio, flechas blancas circulares a los lados y
+// puntos blancos sobre la imagen; el activo alargado en dorado.
+
+:host {
+  display: block;
+}
+
+.carousel {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 760 / 300;
+  border-radius: 25px;
+  background-color: #e9eef0;
+}
+
+.carousel__track {
+  display: flex;
+  height: 100%;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: translate 0.45s ease;
+  }
+}
+
+.carousel__image {
+  flex: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel__arrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+  color: var(--color-raisin-black);
+  cursor: pointer;
+  translate: 0 -50%;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-sun);
+    outline-offset: 2px;
+  }
+}
+
+.carousel__arrow--prev {
+  left: 14px;
+}
+
+.carousel__arrow--next {
+  right: 14px;
+}
+
+.carousel__dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  translate: -50% 0;
+}
+
+.carousel__dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: rgb(255 255 255 / 0.85);
+  cursor: pointer;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: width 0.25s ease;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
+.carousel__dot--on {
+  width: 22px;
+  background-color: var(--color-sun);
+}

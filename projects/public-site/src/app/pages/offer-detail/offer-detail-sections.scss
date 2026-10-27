@@ -1,0 +1,209 @@
+@use 'breakpoints' as bp;
+
+// Secciones de la ficha (Figma): títulos en mayúsculas pequeñas, viñetas
+// naranjas, módulos en verde claro con "+" y docentes con foto redonda.
+
+.section {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.section__title {
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.section__meta {
+  margin-top: -6px;
+  color: #6a716b;
+  font-size: 0.8125rem;
+}
+
+.text {
+  color: var(--color-raisin-black);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.outcomes {
+  display: grid;
+  gap: 8px 28px;
+  margin: 0;
+  padding: 0;
+  color: var(--color-raisin-black);
+  font-size: 0.9375rem;
+  list-style: none;
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  li {
+    position: relative;
+    padding-left: 20px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0.45em;
+      left: 2px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background-color: var(--color-sun);
+    }
+  }
+}
+
+.modules {
+  display: grid;
+  gap: 8px;
+}
+
+.module {
+  overflow: hidden;
+  border: 1px solid #dfe7df;
+  border-radius: 10px;
+  background-color: #e9efe8;
+}
+
+.module__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-bold);
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    outline-offset: -3px;
+  }
+}
+
+// "+" que pasa a "−" al abrir.
+.module__icon {
+  position: relative;
+  flex: none;
+  width: 12px;
+  height: 12px;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 12px;
+    height: 1.5px;
+    background-color: currentcolor;
+    translate: 0 -50%;
+  }
+
+  &::after {
+    rotate: 90deg;
+
+    [open] > .module__head & {
+      rotate: 0deg;
+    }
+  }
+}
+
+.module__body {
+  padding: 12px 14px 14px;
+  background-color: #fff;
+  color: var(--color-raisin-black);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.teachers {
+  display: grid;
+  gap: 18px 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include bp.up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.teacher {
+  display: flex;
+  gap: 14px;
+}
+
+.teacher__photo {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.teacher__photo--initials {
+  display: grid;
+  place-items: center;
+  background-color: var(--color-sun);
+  color: #2b2100;
+  font-size: 1.375rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher__info {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.teacher__name {
+  font-size: 0.9375rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher__bio {
+  color: #6a716b;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.teacher__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.teacher__button {
+  min-height: 28px;
+  padding: 0 14px;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background-color: #fff;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 25px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.teacher__button--fill {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}

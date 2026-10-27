@@ -51,7 +51,7 @@ export function weekdaysLabel(weekdays: readonly number[]): string {
   return text ? text[0].toUpperCase() + text.slice(1) : '';
 }
 
-const time = (iso: string, timeZone: string) =>
+export const time = (iso: string, timeZone: string) =>
   new Intl.DateTimeFormat('es', {
     timeZone,
     hour: '2-digit',
@@ -60,7 +60,8 @@ const time = (iso: string, timeZone: string) =>
   }).format(new Date(iso));
 
 /** Ciudad de la zona IANA ("America/Bogota" → "Bogota"). */
-const zoneName = (timeZone: string) => (timeZone.split('/').pop() ?? timeZone).replace(/_/g, ' ');
+export const zoneName = (timeZone: string) =>
+  (timeZone.split('/').pop() ?? timeZone).replace(/_/g, ' ');
 
 /**
  * Horario: "Sáb y dom · 10:00–13:00" (CDMX) y, si la persona está en otra
@@ -95,3 +96,11 @@ export function formatMoney(money: MoneyDto): string {
 /** "10%–80%" o "50%". */
 export const percentRange = (min: number, max: number) =>
   min === max ? `${min}%` : `${min}%–${max}%`;
+
+/** Diferencia con UTC (minutos) de una zona en una fecha: para comparar zonas. */
+export function utcOffset(iso: string, timeZone: string): number {
+  const date = new Date(iso);
+  const local = new Date(date.toLocaleString('en-US', { timeZone }));
+  const utc = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+  return Math.round((local.getTime() - utc.getTime()) / 60_000);
+}

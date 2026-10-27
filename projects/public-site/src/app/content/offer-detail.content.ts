@@ -1,0 +1,113 @@
+import { OfferActionReason, OfferActionType, OfferModality } from 'data-access';
+
+/** Zonas de la tabla de horario (Figma "Días y horario"), de oeste a este. */
+export const SCHEDULE_ZONES = [
+  { label: 'Ciudad de México', timeZone: 'America/Mexico_City' },
+  { label: 'Centroamérica', timeZone: 'America/Guatemala' },
+  { label: 'Bogotá / Lima', timeZone: 'America/Bogota' },
+  { label: 'Santiago / Buenos Aires', timeZone: 'America/Argentina/Buenos_Aires' },
+  { label: 'Madrid', timeZone: 'Europe/Madrid' },
+] as const;
+
+// Copy del Figma (Ficha de oferta) salvo lo marcado como TODO(contenido).
+export const OFFER_DETAIL_CONTENT = {
+  back: 'Volver al catálogo',
+  breadcrumbLabel: 'Ruta',
+  breadcrumbRoot: ['Escuela', 'Oferta formativa'],
+  carousel: {
+    label: 'Imágenes de la oferta',
+    previous: 'Imagen anterior',
+    next: 'Imagen siguiente',
+    goTo: (n: number) => `Ver imagen ${n}`,
+  },
+  modality: {
+    ONLINE_LIVE: 'En línea en vivo',
+    IN_PERSON: 'Presencial',
+  } satisfies Record<OfferModality, string>,
+  scholarshipChip: 'Beca disponible',
+  soldOut: 'Cupo agotado',
+  outcomesTitle: '¿Qué aprenderás?',
+  syllabusTitle: 'Temario',
+  syllabus: {
+    modules: (n: number) => (n === 1 ? '1 módulo' : `${n} módulos`),
+    hours: (h: number) => `${h} h`,
+    finalProject: '+ proyecto final',
+    months: (n: number) => (n === 1 ? 'aprox. 1 mes' : `aprox. ${n} meses`),
+    weeks: (n: number) => (n === 1 ? '1 semana' : `${n} semanas`),
+    module: (n: number) => `Módulo ${n}`,
+  },
+  // TODO(contenido): títulos de secciones que no están en el Figma.
+  requirementsTitle: 'Requisitos',
+  eligibilityTitle: 'Elegibilidad',
+  eligibility: {
+    countries: (list: string) => `Dirigida a personas de: ${list}.`,
+    travel: 'Requiere poder viajar y asistir de forma presencial a las fechas completas.',
+  },
+  teachersTitle: 'Docentes',
+  teacher: {
+    more: 'Ver más',
+    less: 'Ver menos',
+    cv: 'Ver CV',
+    bioFallback: 'Semblanza próximamente.',
+  },
+  summary: {
+    title: 'Resumen',
+    dates: 'Fechas',
+    enrollmentUntil: (date: string) => `Inscripciones abiertas hasta el ${date}`,
+    enrollmentFrom: (date: string) => `Inscripciones a partir del ${date}`,
+    schedule: 'Días y horario',
+    cdmx: 'hora CDMX',
+    yourZone: '(tu zona)',
+    otherZone: (city: string) => `Tu zona (${city})`,
+    conversion: 'Conversión automática a tu zona horaria.',
+    venue: 'Lugar',
+    howToGetThere: 'Cómo llegar',
+    cost: 'Costo',
+    free: 'Gratuito',
+    external: 'Inscripción externa (Moodle)',
+    toConfirm: 'Costo por confirmar',
+    perModule: (amount: string) => `Equivale a ${amount} por módulo`,
+    installments: (n: number) => `en ${n} cuotas mensuales sin recargo`,
+    moodle: 'Ver el curso en Moodle',
+  },
+  scholarship: {
+    title: 'Beca por confianza',
+    until: (date: string) => `hasta el ${date}`,
+    opens: (date: string) => `abre el ${date}`,
+    closed: 'convocatoria cerrada',
+    requirements: 'Carta de intención + fotos / videos territoriales',
+    interview: (names: string) => `* ${names}: entrevista por Zoom`,
+    full: 'Agotada',
+  },
+  actions: {
+    ENROLL_AND_PAY: 'Inscribirme y pagar',
+    PAY_IN_INSTALLMENTS: 'Pagar en cuotas',
+    ENROLL_FREE: 'Inscribirme',
+    APPLY_SCHOLARSHIP: 'Postular a beca',
+    APPLY_OPEN_CALL: 'Postularme',
+    ACTIVATE_MOODLE_ACCESS: 'Activar mi acceso en Moodle',
+    GO_TO_CLASSROOM: 'Ir a mi aula',
+    VIEW_APPLICATION: 'Ver mi postulación',
+    PAY_BALANCE: 'Pagar saldo',
+    CONTINUE_PAYMENT: 'Continuar pago',
+    PAYMENT_IN_VALIDATION: 'Pago en validación',
+    REGULARIZE_PAYMENT: 'Regularizar pago',
+  } satisfies Record<OfferActionType, string>,
+  // TODO(contenido): confirmar los motivos de un botón deshabilitado.
+  reasons: {
+    ENROLLMENT_NOT_OPEN_YET: 'Las inscripciones aún no abren',
+    ENROLLMENT_CLOSED: 'Inscripciones cerradas',
+    OFFER_FINISHED: 'Esta oferta ya terminó',
+    SOLD_OUT: 'Cupo agotado',
+    SCHOLARSHIP_NOT_OPEN_YET: 'La convocatoria de becas aún no abre',
+    SCHOLARSHIP_CLOSED: 'La convocatoria de becas cerró',
+    PRICE_NOT_AVAILABLE: 'Precio por confirmar',
+    TRANSFER_PENDING_VALIDATION: 'Tu comprobante está en validación',
+  } satisfies Record<OfferActionReason, string>,
+  availableFrom: (date: string) => `Disponible a partir del ${date}`,
+  loginHint: 'Te pediremos iniciar sesión o crear tu cuenta para continuar.',
+  // TODO(contenido): confirmar los textos de error.
+  notFound: 'Esta oferta no está disponible.',
+  error: 'No pudimos cargar la oferta.',
+  retry: 'Reintentar',
+} as const;

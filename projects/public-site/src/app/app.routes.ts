@@ -9,5 +9,11 @@ export const routes: Routes = [
     title: 'Oferta formativa · Itinerantes del Agua',
     loadComponent: () => import('./pages/catalog/catalog-page'),
   },
+  {
+    // El título lo pone la página con el nombre de la oferta.
+    path: 'escuela/oferta/:slug',
+    title: 'Oferta formativa · Itinerantes del Agua',
+    loadComponent: () => import('./pages/offer-detail/offer-detail-page'),
+  },
   { path: '**', redirectTo: '' },
 ];
