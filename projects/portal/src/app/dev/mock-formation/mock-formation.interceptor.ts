@@ -21,6 +21,14 @@ import {
   registerMockAttendance,
   setMockSubmission,
 } from './mock-formation.data';
+import {
+  mockCheckout,
+  mockHistory,
+  mockPaidPayment,
+  mockPlans,
+  mockQuote,
+  mockSummary,
+} from './mock-payments.data';
 
 /** Interruptor guardado en este navegador (`?mock=formacion` lo activa, `?mock=off` lo apaga). */
 const STORAGE_KEY = 'portal.mock.formacion';
@@ -45,8 +53,8 @@ let announced = false;
  * SOLO DESARROLLO (lo registra `environment.development.ts`; producción no
  * lo incluye). Con el interruptor activo responde con datos de prueba
  * "Mi formación" (`/me/enrollments`), el aula (`/me/classrooms/…`), las
- * sesiones y la asistencia (`/me/sessions/…`) y el bloque de formaciones del
- * dashboard; todo lo demás va a la API real.
+ * sesiones y la asistencia (`/me/sessions/…`), los pagos (`/me/payments/…`,
+ * con un "Stripe" simulado) y el bloque de formaciones del dashboard; todo lo demás va a la API real.
  */
 export const mockFormationInterceptor: HttpInterceptorFn = (req, next) => {
   if (!mockFormationEnabled()) return next(req);
@@ -71,6 +79,8 @@ export const mockFormationInterceptor: HttpInterceptorFn = (req, next) => {
 
   const match = path.match(/\/api\/v1\/me\/classrooms\/([^/]+)(\/.*)?$/);
   if (match) return classroom(req, match[1], match[2] ?? '');
+
+  if (path.includes('/api/v1/me/payments')) return payments(req, path);
 
   const session = path.match(/\/api\/v1\/me\/sessions(?:\/([^/]+)(\/attendance)?)?$/);
   if (session) return sessions(req, session[1], !!session[2]);
@@ -227,4 +237,80 @@ function sessions(req: HttpRequest<unknown>, id: string | undefined, attendance:
   registerMockAttendance(id, body.comment?.trim() || null);
   const updated = mockSessionById(id)!;
   return reply(req, { session: updated.session, progress: mockProgress(updated.offer) }, 201);
+}
+
+function payments(req: HttpRequest<unknown>, path: string) {
+  const rest = path.slice(path.indexOf('/api/v1/me/payments') + '/api/v1/me/payments'.length);
+  if (rest === '/quote') {
+    return reply(req, mockQuote(req.params.get('offerId'), req.params.get('applicationId')));
+  }
+  if (rest === '/checkout') {
+    return reply(
+      req,
+      mockCheckout(
+        req.body as { offerId?: string; applicationId?: string; installmentCount?: number },
+      ),
+      201,
+    );
+  }
+  if (rest === '/summary') return reply(req, mockSummary());
+  if (rest === '/plans') return reply(req, mockPlans());
+  if (rest === '') {
+    const data = mockHistory();
+    return reply(req, {
+      data,
+      meta: { page: 1, pageSize: data.length, total: data.length, totalPages: 1 },
+    });
+  }
+  if (rest.endsWith('/card-update')) {
+    return reply(
+      req,
+      {
+        checkoutUrl: `${location.origin}/perfil/pagos?cardUpdate=success`,
+        expiresAt: new Date().toISOString(),
+      },
+      201,
+    );
+  }
+  if (rest.endsWith('/pay-now')) return reply(req, mockPlans().data[0]);
+  if (rest === '/transfers/upload-url') {
+    return reply(
+      req,
+      {
+        uploadUrl: `${MOCK_STORAGE}transfer`,
+        method: 'PUT',
+        headers: { 'Content-Type': (req.body as { contentType: string }).contentType },
+        key: 'mock-transfer',
+        expiresAt: new Date().toISOString(),
+      },
+      201,
+    );
+  }
+  if (rest === '/transfers') {
+    const body = req.body as {
+      applicationId: string;
+      declaredAmountCents: number;
+      trackingKey: string;
+    };
+    return reply(
+      req,
+      {
+        ...mockPaidPayment('mock-transfer'),
+        status: 'PENDING_VALIDATION',
+        method: 'BANK_TRANSFER',
+        applicationId: body.applicationId,
+        receiptAvailable: false,
+      },
+      201,
+    );
+  }
+  if (rest.endsWith('/cancel')) return reply(req, null);
+  if (rest.endsWith('/receipt')) {
+    return reply(req, new Blob(['Comprobante de prueba'], { type: 'application/pdf' }));
+  }
+  if (rest.endsWith('/transfer-proof')) {
+    return reply(req, { kind: 'FILE', url: mockFileUrl(), expiresAt: null, fileName: 'spei.pdf' });
+  }
+  const id = rest.slice(1);
+  return reply(req, mockPaidPayment(id));
 }
