@@ -14,9 +14,9 @@
         <span class="spinner" aria-hidden="true"></span>
         <p class="card__title">{{ v.text }}</p>
       }
-      @case ('pending') {
-        <h2 class="card__title">{{ text.pendingTitle }}</h2>
-        <p class="card__text">{{ v.text }}</p>
+      @case ('moodle') {
+        <h2 class="card__title">{{ text.moodleTitle }}</h2>
+        <p class="card__text">{{ text.moodle }}</p>
       }
       @case ('unavailable') {
         <h2 class="card__title">{{ text.unavailableTitle }}</h2>
@@ -39,3 +39,11 @@
     }
   </div>
 </section>
+
+@if (v.kind === 'moodle') {
+  <portal-moodle-access
+    class="moodle-access"
+    [initial]="v.result"
+    (linked)="onMoodleLinked($event)"
+  />
+}

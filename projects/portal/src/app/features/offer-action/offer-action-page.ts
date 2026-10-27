@@ -4,6 +4,9 @@ import { Router, RouterLink } from '@angular/router';
 import {
   ApplicationsApi,
   EnrollmentsApi,
+  FormationCardDto,
+  MoodleAccessApi,
+  MoodleLinkResultDto,
   OfferActionDto,
   OfferActionType,
   OffersApi,
@@ -13,9 +16,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { usePageHeading } from '../../core/page-heading/page-heading';
 import { browserTimezone } from '../dashboard/dashboard-format';
-
-/** Acciones que el Portal todavía no puede completar (Moodle, HU-25). */
-const PENDING: readonly OfferActionType[] = ['ACTIVATE_MOODLE_ACCESS'];
+import { MoodleAccess } from '../moodle-access/moodle-access';
 
 // TODO(contenido): confirmar los textos de esta pantalla.
 const TEXT = {
@@ -23,12 +24,11 @@ const TEXT = {
     APPLY_SCHOLARSHIP: 'Preparando tu postulación a beca…',
     APPLY_OPEN_CALL: 'Preparando tu postulación…',
     ENROLL_FREE: 'Confirmando tu inscripción…',
+    ACTIVATE_MOODLE_ACCESS: 'Buscando tu inscripción de Moodle…',
   } as Partial<Record<OfferActionType, string>>,
   generic: 'Un momento…',
-  pendingTitle: 'Muy pronto podrás completar este paso aquí',
-  pending: {
-    ACTIVATE_MOODLE_ACCESS: 'La activación del acceso en Moodle estará disponible muy pronto.',
-  } as Partial<Record<OfferActionType, string>>,
+  moodleTitle: 'Activa tu acceso a esta formación',
+  moodle: 'Para entrar al aula vinculamos tu inscripción de Moodle a tu cuenta del Portal.',
   unavailableTitle: 'Esta acción no está disponible',
   reasons: {
     ENROLLMENT_NOT_OPEN_YET: 'Las inscripciones aún no abren.',
@@ -49,7 +49,7 @@ const TEXT = {
 
 type View =
   | { readonly kind: 'working'; readonly text: string }
-  | { readonly kind: 'pending'; readonly text: string }
+  | { readonly kind: 'moodle'; readonly result: MoodleLinkResultDto }
   | { readonly kind: 'unavailable'; readonly text: string }
   | { readonly kind: 'error'; readonly text: string };
 
@@ -58,10 +58,11 @@ type View =
  * (`/inscripcion/:slug?accion=…`, con sesión): postular a beca o convocatoria
  * (crea el borrador y abre el formulario), inscribirse gratis (y al aula) o
  * ver la postulación / el aula, pagar (pantalla de pago) o ir a Mis pagos.
+ * Quien estudia en Moodle activa su acceso (HU-25) y entra al aula.
  */
 @Component({
   selector: 'portal-offer-action-page',
-  imports: [RouterLink],
+  imports: [RouterLink, MoodleAccess],
   templateUrl: './offer-action-page.html',
   styleUrl: './offer-action-page.scss',
 })
@@ -69,6 +70,7 @@ export default class OfferActionPage {
   private readonly offers = inject(OffersApi);
   private readonly applications = inject(ApplicationsApi);
   private readonly enrollments = inject(EnrollmentsApi);
+  private readonly moodle = inject(MoodleAccessApi);
   private readonly router = inject(Router);
   private readonly heading = usePageHeading();
 
@@ -161,11 +163,10 @@ export default class OfferActionPage {
         case 'REGULARIZE_PAYMENT':
         case 'PAYMENT_IN_VALIDATION':
           return this.go(['/perfil'], { pestana: 'pagos' });
+        case 'ACTIVATE_MOODLE_ACCESS':
+          return await this.activateMoodle(offerId);
         default:
-          this.outcome.set({
-            kind: PENDING.includes(action.type) ? 'pending' : 'unavailable',
-            text: TEXT.pending[action.type] ?? TEXT.noAction,
-          });
+          this.outcome.set({ kind: 'unavailable', text: TEXT.noAction });
       }
     } catch (error) {
       this.outcome.set({ kind: 'error', text: toApiError(error).message });
@@ -205,6 +206,26 @@ export default class OfferActionPage {
       if (toApiError(error).code !== 'ENROLLMENT_ALREADY_EXISTS') throw error;
     }
     this.go(['/formacion/aula', offerId]);
+  }
+
+  /**
+   * Busca su correo en la lista de inscritos de Moodle: si esta formación
+   * quedó vinculada, al aula; si no, el código de acceso (o contacto).
+   */
+  private async activateMoodle(offerId: string): Promise<void> {
+    const result = await firstValueFrom(this.moodle.link());
+    if (this.includes(result.linked, offerId)) return this.go(['/formacion/aula', offerId]);
+    this.outcome.set({ kind: 'moodle', result });
+  }
+
+  /** Tras canjear el código: al aula si fue el de esta formación. */
+  protected onMoodleLinked(linked: readonly FormationCardDto[]): void {
+    const offerId = this.current()?.id;
+    if (offerId && this.includes(linked, offerId)) this.go(['/formacion/aula', offerId]);
+  }
+
+  private includes(linked: readonly FormationCardDto[], offerId: string): boolean {
+    return linked.some((f) => f.offer.id === offerId);
   }
 
   private go(commands: unknown[], queryParams?: Record<string, string>): void {

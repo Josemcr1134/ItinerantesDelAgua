@@ -1,0 +1,87 @@
+@let t = text;
+<section class="moodle" aria-labelledby="moodle-title">
+  <h2 id="moodle-title" class="moodle__title">{{ t.title }}</h2>
+  <p class="moodle__intro">{{ t.intro }}</p>
+
+  <div aria-live="polite">
+    @if (result(); as r) {
+      @if (r.linked.length) {
+        <div class="banner banner--ok">
+          <p>{{ t.linked(r.linked.length) }}</p>
+          <ul class="linked">
+            @for (f of r.linked; track f.enrollmentId) {
+              <li>
+                <span class="linked__name">{{ f.offer.name }}</span>
+                @if (f.canContinue) {
+                  <a class="linked__go" [routerLink]="['/formacion/aula', f.offer.id]">
+                    {{ t.goToClassroom }}
+                  </a>
+                } @else {
+                  <span class="linked__note">{{ t.suspended }}</span>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      } @else if (r.found) {
+        <p class="banner banner--info">{{ t.upToDate }}</p>
+      } @else {
+        <p class="banner banner--warn">
+          <strong>{{ t.notFound }}</strong>
+          {{ t.notFoundHelp }}
+          <a [href]="contactUrl">{{ t.contact }}</a
+          >.
+        </p>
+      }
+    }
+    @if (search.error(); as error) {
+      <p class="banner banner--warn" role="alert">{{ error.message }}</p>
+    }
+  </div>
+
+  @if (result()?.found !== false || !showCode()) {
+    <div class="moodle__actions">
+      <button type="button" class="button" [disabled]="search.loading()" (click)="searchByEmail()">
+        {{ search.loading() ? t.searching : t.search }}
+      </button>
+      @if (!showCode()) {
+        <button type="button" class="link" (click)="showCode.set(true)">{{ t.haveCode }}</button>
+      }
+    </div>
+  }
+
+  @if (showCode()) {
+    <form class="code" novalidate [formGroup]="codeForm" (ngSubmit)="submitCode()">
+      <label class="code__label" for="moodle-code">{{ t.codeLabel }}</label>
+      <div class="code__row">
+        <input
+          id="moodle-code"
+          class="code__input"
+          placeholder="XXXX-XXXX"
+          autocomplete="one-time-code"
+          autocapitalize="characters"
+          spellcheck="false"
+          maxlength="11"
+          formControlName="code"
+          [attr.aria-invalid]="showCodeInvalid() || !!codeError()"
+          aria-describedby="moodle-code-hint moodle-code-error"
+        />
+        <button type="submit" class="button" [disabled]="redeem.loading()">
+          {{ redeem.loading() ? t.activating : t.activate }}
+        </button>
+      </div>
+      <p id="moodle-code-hint" class="code__hint">{{ t.codeHint }}</p>
+      <div id="moodle-code-error" aria-live="polite">
+        @if (showCodeInvalid()) {
+          <p class="code__error">{{ t.codeInvalid }}</p>
+        } @else if (codeError(); as message) {
+          <p class="code__error" role="alert">{{ message }}</p>
+        } @else if (alreadyEnrolled()) {
+          <p class="code__error code__error--info">
+            {{ t.alreadyEnrolled }} <a routerLink="/formacion">{{ t.myFormation }}</a>
+          </p>
+        }
+      </div>
+    </form>
+  }
+</section>

@@ -97,13 +97,36 @@ describe('OfferActionPage', () => {
     });
   });
 
-  it('Moodle: avisa que la activación llega pronto', async () => {
-    const { fixture, host } = await render('ACTIVATE_MOODLE_ACCESS', [
+  it('Moodle: con el correo en la lista, vincula y entra al aula', async () => {
+    const { http, navigate } = await render('ACTIVATE_MOODLE_ACCESS', [
       action('ACTIVATE_MOODLE_ACCESS'),
     ]);
+    const link = http.expectOne(`${API}/me/moodle-access/link`);
+    expect(link.request.method).toBe('POST');
+    link.flush({ found: true, linked: [{ enrollmentId: 'e1', offer: { id: 'o1' } }] });
+    await new Promise((r) => setTimeout(r));
+    expect(navigate).toHaveBeenCalledWith(['/formacion/aula', 'o1'], { replaceUrl: true });
+  });
+
+  it('Moodle: sin el correo en la lista, pide el código y con él entra al aula', async () => {
+    const { fixture, http, navigate, host } = await render('ACTIVATE_MOODLE_ACCESS', [
+      action('ACTIVATE_MOODLE_ACCESS'),
+    ]);
+    http.expectOne(`${API}/me/moodle-access/link`).flush({ found: false, linked: [] });
+    await new Promise((r) => setTimeout(r));
     await fixture.whenStable();
-    expect(host.querySelector('.card__text')?.textContent).toContain('Moodle');
-    expect(host.querySelector('a[href*="/escuela/oferta/eco"]')).not.toBeNull();
+    expect(host.textContent).toContain('No encontramos una inscripción asociada a tu correo');
+    expect(navigate).not.toHaveBeenCalled();
+
+    const input = host.querySelector<HTMLInputElement>('#moodle-code')!;
+    input.value = 'k7qm 3xpa';
+    input.dispatchEvent(new Event('input'));
+    host.querySelector<HTMLFormElement>('form.code')!.dispatchEvent(new Event('submit'));
+    const redeem = http.expectOne(`${API}/me/moodle-access/redeem`);
+    expect(redeem.request.body).toEqual({ code: 'K7QM-3XPA' });
+    redeem.flush({ found: true, linked: [{ enrollmentId: 'e1', offer: { id: 'o1' } }] });
+    await new Promise((r) => setTimeout(r));
+    expect(navigate).toHaveBeenCalledWith(['/formacion/aula', 'o1'], { replaceUrl: true });
   });
 
   it('acción deshabilitada: explica el motivo', async () => {

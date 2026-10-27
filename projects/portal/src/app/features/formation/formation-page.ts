@@ -3,6 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { EnrollmentsApi, toApiError } from 'data-access';
 import { usePageHeading } from '../../core/page-heading/page-heading';
+import { MoodleAccess } from '../moodle-access/moodle-access';
 import {
   FORMATION_PHASES,
   FORMATION_TYPES,
@@ -18,10 +19,11 @@ const BATCH = 12;
 /**
  * Mi formación (HU-07, Figma): diplomados, cursos o talleres inscritos según
  * el sub-ítem del menú, con las pestañas Activos / Completados / Todos.
+ * Al final, "¿No ves tu formación?" para activar el acceso de Moodle (HU-25).
  */
 @Component({
   selector: 'portal-formation-page',
-  imports: [RouterLink, FormationTile],
+  imports: [RouterLink, FormationTile, MoodleAccess],
   templateUrl: './formation-page.html',
   styleUrl: './formation-page.scss',
 })
