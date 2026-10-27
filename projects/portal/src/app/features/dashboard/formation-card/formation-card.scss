@@ -64,9 +64,10 @@
 
 .card__progress {
   display: flex;
+  gap: 6px;
 }
 
-// Pastillas "Progreso" (contorno) y "60%" (relleno), una junto a la otra.
+// Pastillas "Progreso" (contorno) y "60%" (relleno), separadas.
 .pill {
   display: inline-grid;
   place-items: center;
@@ -82,7 +83,6 @@
 }
 
 .pill--filled {
-  margin-left: -2px;
   padding: 0 10px;
   background-color: var(--color-primary);
   color: #fff;
