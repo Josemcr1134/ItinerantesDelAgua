@@ -1162,7 +1162,7 @@ export interface CreateEnrollmentRequestDto {
 
 export interface NotificationActionDto {
   readonly label: string;
-  /** Ruta RELATIVA del frontend (los correos usan FRONTEND_URL + path). */
+  /** Ruta RELATIVA del frontend (los correos usan PORTAL_URL + path). */
   readonly path: string;
 }
 
@@ -1854,7 +1854,7 @@ export interface OfferViewerDto {
 }
 
 export interface OfferActionDto {
-  /** Fase 05: ENROLL_AND_PAY / PAY_IN_INSTALLMENTS → pantalla de pago (`GET /me/payments/quote?offerId=`), PAY_BALANCE → `/portal/postulaciones/{applicationId}/pago`, CONTINUE_PAYMENT [Continuar pago] (checkout abierto: `POST /me/payments/checkout` devuelve la misma sesión), PAYMENT_IN_VALIDATION "Pago en validación" (deshabilitado), REGULARIZE_PAYMENT [Regularizar pago] → Mis pagos (acceso suspendido por mora). */
+  /** Fase 05: ENROLL_AND_PAY / PAY_IN_INSTALLMENTS → pantalla de pago (`GET /me/payments/quote?offerId=`), PAY_BALANCE → `/postulaciones/{applicationId}/pago`, CONTINUE_PAYMENT [Continuar pago] (checkout abierto: `POST /me/payments/checkout` devuelve la misma sesión), PAYMENT_IN_VALIDATION "Pago en validación" (deshabilitado), REGULARIZE_PAYMENT [Regularizar pago] → Mis pagos (acceso suspendido por mora). */
   readonly type: OfferActionType;
   readonly enabled: boolean;
   /** Botón principal (máximo uno). */
@@ -1865,7 +1865,7 @@ export interface OfferActionDto {
   readonly reason: OfferActionReason | null;
   /** Para *_NOT_OPEN_YET: cuándo se habilita. */
   readonly availableFrom: IsoDateTime | null;
-  /** Fase 04: en `VIEW_APPLICATION` / `PAY_BALANCE`, id de mi postulación → `/portal/postulaciones/{applicationId}` (`GET /me/applications/{id}`). */
+  /** Fase 04: en `VIEW_APPLICATION` / `PAY_BALANCE`, id de mi postulación → `/postulaciones/{applicationId}` (`GET /me/applications/{id}`). */
   readonly applicationId: Uuid | null;
   /** Fase 04: estado de mi postulación (mismos textos que "Mis postulaciones"). */
   readonly applicationStatus: ApplicationStatus | null;
@@ -2586,7 +2586,7 @@ export interface ApplicationOpportunitiesDto {
 }
 
 export interface ApplicationActionDto {
-  /** CONTINUE_DRAFT [Continuar] · JOIN_INTERVIEW [Entrar a la entrevista] (abre `interview.join.url`) · PAY_BALANCE [Pagar saldo] (Fase 05: `/portal/postulaciones/{id}/pago`) · CONTINUE_PAYMENT [Continuar pago] (ya inició un pago: misma pantalla) · UPLOAD_TRANSFER_PROOF [Subir comprobante] (transferencia rechazada) · PAYMENT_IN_VALIDATION "Pago en validación" (deshabilitado, comprobante en revisión) · CONFIRM_PARTICIPATION [Confirmar mi participación] (`POST …/confirm`) · GO_TO_CLASSROOM [Ir a mi aula] · VIEW [Ver mi postulación]. */
+  /** CONTINUE_DRAFT [Continuar] · JOIN_INTERVIEW [Entrar a la entrevista] (abre `interview.join.url`) · PAY_BALANCE [Pagar saldo] (Fase 05: `/postulaciones/{id}/pago`) · CONTINUE_PAYMENT [Continuar pago] (ya inició un pago: misma pantalla) · UPLOAD_TRANSFER_PROOF [Subir comprobante] (transferencia rechazada) · PAYMENT_IN_VALIDATION "Pago en validación" (deshabilitado, comprobante en revisión) · CONFIRM_PARTICIPATION [Confirmar mi participación] (`POST …/confirm`) · GO_TO_CLASSROOM [Ir a mi aula] · VIEW [Ver mi postulación]. */
   readonly type: ApplicationActionType;
   readonly enabled: boolean;
   /** Si `enabled = false`: WINDOW_CLOSED (borrador en solo lectura), INTERVIEW_NOT_OPEN_YET ("Disponible 10 min antes"), INTERVIEW_LINK_PENDING, INTERVIEW_ENDED, TRANSFER_PENDING_VALIDATION ("El equipo valida tu comprobante en 1–2 días hábiles"). */
@@ -3908,7 +3908,7 @@ export interface ConfirmFinalProjectRequestDto {
 }
 
 export interface CalendarLinkDto {
-  /** `CLASSROOM` → Aula (`offerId`); `OFFER` → ficha `/escuela/oferta/{slug}`; `APPLICATION` (Fase 04, entrevistas) → mi postulación `/portal/postulaciones/{applicationId}`. */
+  /** `CLASSROOM` → Aula (`offerId`); `OFFER` → ficha `/escuela/oferta/{slug}`; `APPLICATION` (Fase 04, entrevistas) → mi postulación `/postulaciones/{applicationId}`. */
   readonly kind: CalendarLinkKind;
   readonly offerId: Uuid | null;
   readonly slug: string | null;
