@@ -9,6 +9,7 @@ export type NavIcon =
   | 'applications'
   | 'follow-up'
   | 'payments'
+  | 'contact'
   | 'users'
   | 'site'
   | 'audit';
@@ -21,6 +22,8 @@ export interface NavItem {
   readonly permission?: Permission;
   /** Activo solo con la ruta exacta. */
   readonly exact?: boolean;
+  /** Contador junto al nombre (p. ej. mensajes sin leer). */
+  readonly counter?: 'contact-unread';
 }
 
 /** Menú lateral del panel; cada módulo nuevo se agrega aquí con su permiso. */
@@ -43,6 +46,13 @@ export const NAV_ITEMS: readonly NavItem[] = [
     permission: 'followup.read',
   },
   { label: 'Pagos', path: '/pagos', icon: 'payments', permission: 'payments.read' },
+  {
+    label: 'Mensajes',
+    path: '/mensajes',
+    icon: 'contact',
+    permission: 'contact.read',
+    counter: 'contact-unread',
+  },
   { label: 'Administradores', path: '/administradores', icon: 'users', permission: 'users.manage' },
   { label: 'Página web', path: '/pagina-web', icon: 'site', permission: 'site.write' },
   { label: 'Auditoría', path: '/auditoria', icon: 'audit', permission: 'audit.read' },

@@ -156,6 +156,23 @@ $sidebar-width: 272px;
   flex: none;
 }
 
+// Contador (p. ej. mensajes sin leer), al final del enlace.
+.nav__count {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sun);
+  color: var(--color-raisin-black);
+  font-family: var(--font-family-numeric);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 .person {
   // Arriba: con los roles desplegados, el avatar queda junto al nombre.
   align-items: flex-start;

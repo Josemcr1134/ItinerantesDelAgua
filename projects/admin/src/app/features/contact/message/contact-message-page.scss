@@ -1,0 +1,21 @@
+// Además de los estilos del detalle de pagos (`../../payments/detail.scss`).
+.title--name {
+  font-family: inherit;
+  overflow-wrap: anywhere;
+}
+
+// Texto tal como lo escribió la persona (con sus saltos de línea).
+.message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.handled {
+  margin-bottom: var(--space-3);
+}
+
+.handling {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 40rem;
+}

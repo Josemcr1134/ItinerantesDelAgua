@@ -15,7 +15,8 @@ import { AlertService } from 'ui-kit';
 import { filter } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
 import { Person } from '../../shared/person/person';
-import { NAV_ITEMS } from '../../core/navigation';
+import { NAV_ITEMS, NavItem } from '../../core/navigation';
+import { ContactInbox } from '../../features/contact/contact-inbox';
 
 /**
  * Marco del panel: menú lateral según los permisos de la persona (fijo en
@@ -33,6 +34,7 @@ export default class AdminShell {
   private readonly auth = inject(AuthService);
   private readonly alerts = inject(AlertService);
   protected readonly access = inject(AdminAccess);
+  private readonly inbox = inject(ContactInbox);
 
   protected readonly menuOpen = signal(false);
   private readonly menuToggle = viewChild<ElementRef<HTMLButtonElement>>('menuToggle');
@@ -50,13 +52,22 @@ export default class AdminShell {
   protected readonly rolesOpen = signal(false);
 
   constructor() {
-    // Al navegar desde el menú móvil, se cierra.
+    // Al navegar desde el menú móvil, se cierra; y se actualizan los contadores.
+    this.inbox.refresh();
     inject(Router)
       .events.pipe(
         filter((event) => event instanceof NavigationEnd),
         takeUntilDestroyed(),
       )
-      .subscribe(() => this.menuOpen.set(false));
+      .subscribe(() => {
+        this.menuOpen.set(false);
+        this.inbox.refresh();
+      });
+  }
+
+  /** Contador del ítem del menú (0: no se muestra). */
+  protected count(item: NavItem): number {
+    return item.counter === 'contact-unread' ? this.inbox.unread() : 0;
   }
 
   protected toggleMenu(): void {

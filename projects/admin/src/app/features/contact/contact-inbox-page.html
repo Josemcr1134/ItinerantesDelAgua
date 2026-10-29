@@ -1,0 +1,115 @@
+<adm-page-header
+  title="Mensajes"
+  lead="Lo que escriben desde la página de Contacto y la landing. Abrir un mensaje no cambia su estado."
+/>
+
+<nav class="tabs" aria-label="Mensajes por estado">
+  @for (t of tabs(); track t.status) {
+    <a
+      class="tabs__tab"
+      [class.tabs__tab--active]="status() === t.status"
+      [attr.aria-current]="status() === t.status ? 'page' : null"
+      routerLink="."
+      [queryParams]="{ estado: t.status || null }"
+    >
+      {{ t.label }}
+      @if (t.count) {
+        <span class="tabs__count" [class.tabs__count--new]="t.status === 'NEW'"
+          >{{ t.count }}<span class="visually-hidden"> mensajes</span></span
+        >
+      }
+    </a>
+  }
+</nav>
+
+<adm-filter-bar
+  label="Filtrar mensajes"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="contact-search"
+    placeholder="Nombre, correo, organización o texto"
+    [(value)]="list.searchText"
+  />
+  <adm-filter-select
+    inputId="contact-subject"
+    label="Asunto"
+    allLabel="Todos"
+    [options]="options.subject"
+    [(value)]="subject"
+  />
+  <adm-filter-select
+    inputId="contact-origin"
+    label="Origen"
+    allLabel="Todos"
+    [options]="options.origin"
+    [(value)]="origin"
+  />
+  <adm-filter-date inputId="contact-from" label="Desde" [max]="to()" [(value)]="from" />
+  <adm-filter-date inputId="contact-to" label="Hasta" [min]="from()" [(value)]="to" />
+  <adm-filter-select
+    inputId="contact-sort"
+    label="Ordenar por"
+    [options]="options.sort"
+    [(value)]="sort"
+  />
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Mensajes"
+  headingId="contact-results"
+  loadingText="Cargando mensajes…"
+  emptyText="No hay mensajes en esta bandeja."
+  filteredText="No hay mensajes con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Persona</th>
+        <th scope="col">Asunto</th>
+        <th scope="col">Estado</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (m of list.items(); track m.id) {
+        <tr [class.row--new]="m.status === 'NEW'">
+          <td data-label="Persona">
+            <adm-person
+              [name]="m.name"
+              [detail]="m.organization ? m.email + ' · ' + m.organization : m.email"
+              [avatarSize]="36"
+            />
+          </td>
+          <td data-label="Asunto">
+            <p class="strong">{{ m.subjectLabel }}</p>
+            <p class="muted">{{ m.originLabel }} · {{ formatDateTime(m.createdAt) }}</p>
+            <p class="preview">{{ m.message }}</p>
+          </td>
+          <td data-label="Estado">
+            <span [class]="'adm-badge adm-badge--' + statusTones[m.status]">{{
+              m.statusLabel
+            }}</span>
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              <a class="adm-action" [routerLink]="['/mensajes', m.id]">
+                Ver<span class="visually-hidden"> el mensaje de {{ m.name }}</span>
+              </a>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <ui-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['mensaje', 'mensajes']"
+  />
+</adm-list-states>

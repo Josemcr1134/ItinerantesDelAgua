@@ -1,0 +1,154 @@
+<a class="back" routerLink="/mensajes">
+  <svg
+    aria-hidden="true"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+  Mensajes
+</a>
+
+<adm-request-state
+  [error]="message.error()"
+  [loaded]="message.data() !== null"
+  loadingText="Cargando el mensaje…"
+  (retry)="reload()"
+>
+  @if (message.data(); as m) {
+    <header class="head">
+      <p class="eyebrow">{{ m.subjectLabel }} · {{ m.originLabel }}</p>
+      <h1 class="title title--name">{{ m.name }}</h1>
+      <p class="status">
+        <span [class]="'adm-badge adm-badge--' + statusTones[m.status]">{{ m.statusLabel }}</span>
+        <span class="muted">Recibido el {{ formatDateTime(m.createdAt) }}</span>
+      </p>
+      <div class="actions">
+        <a uiButton [href]="mailto()">
+          Responder por correo<span class="visually-hidden"> a {{ m.email }}</span>
+        </a>
+      </div>
+    </header>
+
+    <adm-notice [(message)]="notice" />
+
+    <div class="layout">
+      <section class="adm-section" aria-labelledby="contact-data">
+        <h2 id="contact-data" class="adm-section__title">Datos de contacto</h2>
+        <dl class="facts">
+          <div>
+            <dt>Correo</dt>
+            <dd>
+              <a class="adm-link" [href]="'mailto:' + m.email">{{ m.email }}</a>
+            </dd>
+          </div>
+          <div>
+            <dt>Teléfono</dt>
+            <dd>
+              @if (m.phone; as phone) {
+                {{ phone.countryCode ? '+' + phone.countryCode + ' ' : '' }}{{ phone.number }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Organización</dt>
+            <dd>{{ m.organization ?? '—' }}</dd>
+          </div>
+          <div>
+            <dt>Asunto</dt>
+            <dd>{{ m.subjectLabel }}</dd>
+          </div>
+          <div>
+            <dt>Origen</dt>
+            <dd>{{ m.originLabel }}</dd>
+          </div>
+          @if (m.subject === 'DESIGN_CONSULTING') {
+            <div>
+              <dt>Tipo de proyecto</dt>
+              <dd>{{ m.projectType ? projectTypeLabels[m.projectType] : '—' }}</dd>
+            </div>
+            <div>
+              <dt>Ubicación del proyecto</dt>
+              <dd>{{ m.projectLocation ?? '—' }}</dd>
+            </div>
+            <div>
+              <dt>Servicio de interés</dt>
+              <dd>{{ m.service ? serviceLabels[m.service] : '—' }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+
+      <section class="adm-section" aria-labelledby="contact-message">
+        <h2 id="contact-message" class="adm-section__title">Mensaje</h2>
+        <p class="message">{{ m.message }}</p>
+      </section>
+
+      <section class="adm-section" aria-labelledby="contact-handling">
+        <h2 id="contact-handling" class="adm-section__title">Seguimiento interno</h2>
+        @if (m.handledAt) {
+          <p class="muted handled">
+            Último cambio: {{ m.handledBy?.fullName ?? m.handledBy?.email ?? '—' }} ·
+            {{ formatDateTime(m.handledAt) }}
+          </p>
+        }
+        @if (canManage()) {
+          <form class="handling" novalidate [formGroup]="form" (ngSubmit)="save()">
+            <div class="adm-field">
+              <label class="adm-field__label" for="contact-status">Estado</label>
+              <select id="contact-status" class="adm-field__input" formControlName="status">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="adm-field">
+              <label class="adm-field__label" for="contact-note">Nota interna</label>
+              <textarea
+                id="contact-note"
+                class="adm-field__input"
+                rows="4"
+                formControlName="internalNote"
+                aria-describedby="contact-note-hint"
+              ></textarea>
+              <p id="contact-note-hint" class="adm-field__hint">
+                Solo la ve el equipo. Déjala vacía para borrarla.
+              </p>
+            </div>
+            <div class="actions">
+              <button uiButton type="submit" [disabled]="saving()">
+                {{ saving() ? 'Guardando…' : 'Guardar cambios' }}
+              </button>
+              @if (m.internalNote) {
+                <button
+                  uiButton
+                  variant="secondary"
+                  type="button"
+                  [disabled]="saving()"
+                  (click)="clearNote()"
+                >
+                  Borrar nota
+                </button>
+              }
+            </div>
+          </form>
+        } @else {
+          <dl class="facts">
+            <div>
+              <dt>Nota interna</dt>
+              <dd class="message">{{ m.internalNote ?? '—' }}</dd>
+            </div>
+          </dl>
+        }
+      </section>
+    </div>
+  }
+</adm-request-state>
