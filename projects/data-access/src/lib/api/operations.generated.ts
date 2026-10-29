@@ -11,6 +11,7 @@ import type {
   AdminApplicationListItemDto,
   AdminCalendarDto,
   AdminCalendarEventDto,
+  AdminContactMessageDto,
   AdminMeDto,
   AdminModuleDto,
   AdminModulesDto,
@@ -61,13 +62,19 @@ import type {
   CompleteInterviewRequestDto,
   ConfirmDocumentRequestDto,
   ConfirmFinalProjectRequestDto,
+  ContactInboxSummaryDto,
   ContactMessageResponseDto,
+  ContactMessageSort,
+  ContactOrigin,
+  ContactStatus,
+  ContactSubject,
   CountryListResponseDto,
   CreateApplicationRequestDto,
   CreateCalendarEventRequestDto,
   CreateContactMessageRequestDto,
   CreateEnrollmentRequestDto,
   CreateFollowUpNoteRequestDto,
+  CreateMeetingRequestDto,
   CreateModuleRequestDto,
   CreateOfferRequestDto,
   CreateResourceRequestDto,
@@ -110,6 +117,9 @@ import type {
   MarkAttendanceRequestDto,
   MarkAttendanceResultDto,
   MaterialsDto,
+  MeetingDto,
+  MeetingHostUrlDto,
+  MeetingProvidersResponseDto,
   ModuleMutationDto,
   MoodleLinkResultDto,
   MunicipalityListResponseDto,
@@ -187,6 +197,7 @@ import type {
   UpdateApplicationRequestDto,
   UpdateAttendanceStepDto,
   UpdateCalendarEventRequestDto,
+  UpdateContactMessageRequestDto,
   UpdateContentStepDto,
   UpdateGeneralStepDto,
   UpdateModuleRequestDto,
@@ -237,12 +248,6 @@ export interface AdminUsersListQuery {
   readonly sort?: AdminUserSort;
 }
 
-/** Query de `GET /api/v1/auth/availability`. */
-export interface AuthAvailabilityQuery {
-  readonly email?: string;
-  readonly username?: string;
-}
-
 /** Query de `GET /api/v1/admin/offers/{id}/moodle/roster`. */
 export interface AdminMoodleRosterQuery {
   /** Página (desde 1). */
@@ -287,6 +292,31 @@ export interface NotificationsListQuery {
   readonly unread?: boolean;
   /** Grupo: Formación, Postulaciones y becas, Pagos o General. */
   readonly category?: NotificationCategory;
+}
+
+/** Query de `GET /api/v1/auth/availability`. */
+export interface AuthAvailabilityQuery {
+  readonly email?: string;
+  readonly username?: string;
+}
+
+/** Query de `GET /api/v1/admin/contact-messages`. */
+export interface AdminContactListQuery {
+  /** Página (desde 1). */
+  readonly page?: number;
+  /** Elementos por página. */
+  readonly pageSize?: number;
+  /** Busca en nombre, correo, organización y texto del mensaje. */
+  readonly q?: string;
+  readonly status?: ContactStatus;
+  readonly subject?: ContactSubject;
+  readonly origin?: ContactOrigin;
+  /** Desde (ISO 8601). */
+  readonly from?: string;
+  /** Hasta (ISO 8601). */
+  readonly to?: string;
+  /** Orden por fecha de recepción. */
+  readonly sort?: ContactMessageSort;
 }
 
 /** Query de `GET /api/v1/offers`. */
@@ -801,104 +831,14 @@ export interface ApiOperations {
     readonly body: UserStatusChangeRequestDto;
     readonly response: AdminUserDto;
   };
-  /** Registro */
-  readonly Auth_register: {
+  /** Marcar el correo de una cuenta como verificado */
+  readonly AdminUsers_verifyEmail: {
     readonly method: 'POST';
-    readonly path: '/api/v1/auth/register';
-    readonly pathParams: never;
+    readonly path: '/api/v1/admin/users/{id}/verify-email';
+    readonly pathParams: 'id';
     readonly query: never;
-    readonly body: RegisterRequestDto;
-    readonly response: RegisterResponseDto;
-  };
-  /** Disponibilidad de correo / username */
-  readonly Auth_availability: {
-    readonly method: 'GET';
-    readonly path: '/api/v1/auth/availability';
-    readonly pathParams: never;
-    readonly query: AuthAvailabilityQuery;
-    readonly body: never;
-    readonly response: AvailabilityResponseDto;
-  };
-  /** Verificar correo con OTP */
-  readonly Auth_verifyEmail: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/verify-email';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: VerifyEmailRequestDto;
-    readonly response: VerifyEmailResponseDto;
-  };
-  /** Reenviar código OTP */
-  readonly Auth_resendOtp: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/otp/resend';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: ResendOtpRequestDto;
-    readonly response: OtpDeliveryDto;
-  };
-  /** Iniciar sesión */
-  readonly Auth_login: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/login';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: LoginRequestDto;
-    readonly response: LoginResponseDto;
-  };
-  /** Renovar tokens */
-  readonly Auth_refresh: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/refresh';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: RefreshRequestDto;
-    readonly response: TokenPairDto;
-  };
-  /** Cerrar sesión */
-  readonly Auth_logout: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/logout';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: LogoutRequestDto;
-    readonly response: void;
-  };
-  /** Recuperar contraseña — paso 1 (enviar código) */
-  readonly Auth_forgotPassword: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/password/forgot';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: ForgotPasswordRequestDto;
-    readonly response: OtpDeliveryDto;
-  };
-  /** Recuperar contraseña — paso 2 (verificar código) */
-  readonly Auth_verifyResetOtp: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/password/verify-otp';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: VerifyResetOtpRequestDto;
-    readonly response: ResetTokenResponseDto;
-  };
-  /** Recuperar contraseña — paso 3 (nueva contraseña) */
-  readonly Auth_resetPassword: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/auth/password/reset';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: ResetPasswordRequestDto;
-    readonly response: void;
-  };
-  /** Cambiar mi contraseña */
-  readonly AccountSecurity_changePassword: {
-    readonly method: 'POST';
-    readonly path: '/api/v1/me/password';
-    readonly pathParams: never;
-    readonly query: never;
-    readonly body: ChangePasswordRequestDto;
-    readonly response: void;
+    readonly body: UserStatusChangeRequestDto;
+    readonly response: AdminUserDto;
   };
   /** ¿No ves tu formación? Buscar por mi correo */
   readonly Moodle_link: {
@@ -1017,6 +957,105 @@ export interface ApiOperations {
     readonly body: never;
     readonly response: NotificationDto;
   };
+  /** Registro */
+  readonly Auth_register: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/register';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: RegisterRequestDto;
+    readonly response: RegisterResponseDto;
+  };
+  /** Disponibilidad de correo / username */
+  readonly Auth_availability: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/auth/availability';
+    readonly pathParams: never;
+    readonly query: AuthAvailabilityQuery;
+    readonly body: never;
+    readonly response: AvailabilityResponseDto;
+  };
+  /** Verificar correo con OTP */
+  readonly Auth_verifyEmail: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/verify-email';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: VerifyEmailRequestDto;
+    readonly response: VerifyEmailResponseDto;
+  };
+  /** Reenviar código OTP */
+  readonly Auth_resendOtp: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/otp/resend';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: ResendOtpRequestDto;
+    readonly response: OtpDeliveryDto;
+  };
+  /** Iniciar sesión */
+  readonly Auth_login: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/login';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: LoginRequestDto;
+    readonly response: LoginResponseDto;
+  };
+  /** Renovar tokens */
+  readonly Auth_refresh: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/refresh';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: RefreshRequestDto;
+    readonly response: TokenPairDto;
+  };
+  /** Cerrar sesión */
+  readonly Auth_logout: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/logout';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: LogoutRequestDto;
+    readonly response: void;
+  };
+  /** Recuperar contraseña — paso 1 (enviar código) */
+  readonly Auth_forgotPassword: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/password/forgot';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: ForgotPasswordRequestDto;
+    readonly response: OtpDeliveryDto;
+  };
+  /** Recuperar contraseña — paso 2 (verificar código) */
+  readonly Auth_verifyResetOtp: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/password/verify-otp';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: VerifyResetOtpRequestDto;
+    readonly response: ResetTokenResponseDto;
+  };
+  /** Recuperar contraseña — paso 3 (nueva contraseña) */
+  readonly Auth_resetPassword: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/auth/password/reset';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: ResetPasswordRequestDto;
+    readonly response: void;
+  };
+  /** Cambiar mi contraseña */
+  readonly AccountSecurity_changePassword: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/me/password';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: ChangePasswordRequestDto;
+    readonly response: void;
+  };
   /** Enviar mensaje de Contacto */
   readonly Contact_create: {
     readonly method: 'POST';
@@ -1025,6 +1064,42 @@ export interface ApiOperations {
     readonly query: never;
     readonly body: CreateContactMessageRequestDto;
     readonly response: ContactMessageResponseDto;
+  };
+  /** Bandeja de mensajes de Contacto */
+  readonly AdminContact_list: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/contact-messages';
+    readonly pathParams: never;
+    readonly query: AdminContactListQuery;
+    readonly body: never;
+    readonly response: Paginated<AdminContactMessageDto>;
+  };
+  /** Contadores de la bandeja */
+  readonly AdminContact_summary: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/contact-messages/summary';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: never;
+    readonly response: ContactInboxSummaryDto;
+  };
+  /** Detalle de un mensaje de Contacto */
+  readonly AdminContact_get: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/contact-messages/{id}';
+    readonly pathParams: 'id';
+    readonly query: never;
+    readonly body: never;
+    readonly response: AdminContactMessageDto;
+  };
+  /** Cambiar estado o nota interna de un mensaje */
+  readonly AdminContact_update: {
+    readonly method: 'PATCH';
+    readonly path: '/api/v1/admin/contact-messages/{id}';
+    readonly pathParams: 'id';
+    readonly query: never;
+    readonly body: UpdateContactMessageRequestDto;
+    readonly response: AdminContactMessageDto;
   };
   /** Cifras de impacto de la landing */
   readonly SiteMetrics_list: {
@@ -2307,6 +2382,42 @@ export interface ApiOperations {
     readonly query: AdminAuditListQuery;
     readonly body: never;
     readonly response: Paginated<AuditLogDto>;
+  };
+  /** Proveedores de reuniones disponibles */
+  readonly AdminMeetings_providers: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/meetings/providers';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: never;
+    readonly response: MeetingProvidersResponseDto;
+  };
+  /** Generar reunión (Zoom / Google Meet) */
+  readonly AdminMeetings_create: {
+    readonly method: 'POST';
+    readonly path: '/api/v1/admin/meetings';
+    readonly pathParams: never;
+    readonly query: never;
+    readonly body: CreateMeetingRequestDto;
+    readonly response: MeetingDto;
+  };
+  /** Enlace de anfitrión vigente */
+  readonly AdminMeetings_hostUrl: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/meetings/{provider}/{externalId}/host-url';
+    readonly pathParams: 'provider' | 'externalId';
+    readonly query: never;
+    readonly body: never;
+    readonly response: MeetingHostUrlDto;
+  };
+  /** Cancelar reunión generada */
+  readonly AdminMeetings_cancel: {
+    readonly method: 'DELETE';
+    readonly path: '/api/v1/admin/meetings/{provider}/{externalId}';
+    readonly pathParams: 'provider' | 'externalId';
+    readonly query: never;
+    readonly body: never;
+    readonly response: void;
   };
 }
 

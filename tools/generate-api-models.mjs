@@ -96,7 +96,7 @@ const ENUM_NAMES = {
   'NOTE|REMINDER_SENT|WHATSAPP_CONTACT': 'FollowUpNoteKind',
   'PENDING|EXPIRED': 'FollowUpTab',
   // --- Panel: ofertas, contenido y sesiones ---
-  'admin.access|offers.read|offers.write|offers.publish|attendance.read|attendance.write|applications.read|applications.evaluate|applications.interview|applications.decide|followup.read|followup.manage|payments.read|payments.manage|users.manage|audit.read|site.write|scholarship_types.write':
+  'admin.access|offers.read|offers.write|offers.publish|attendance.read|attendance.write|applications.read|applications.evaluate|applications.interview|applications.decide|followup.read|followup.manage|payments.read|payments.manage|users.manage|audit.read|contact.read|contact.manage|site.write|scholarship_types.write|meetings.create':
     'Permission',
   'DRAFT|PUBLISHED|ARCHIVED': 'PublicationStatus',
   'DRAFT|PUBLISHED|ENROLLMENT_CLOSED|FINISHED|ARCHIVED': 'AdminOfferStatus',
@@ -120,6 +120,9 @@ const ENUM_NAMES = {
   'STARTS_AT_ASC|STARTS_AT_DESC': 'CalendarSort',
   'UPDATED_DESC|STARTS_AT_ASC|NAME_ASC': 'AdminOfferSort',
   'NAME_ASC|CREATED_DESC|LAST_LOGIN_DESC': 'AdminUserSort',
+  'ZOOM|GOOGLE_MEET': 'MeetingProvider',
+  // --- Panel: bandeja de contacto ---
+  'CREATED_DESC|CREATED_ASC': 'ContactMessageSort',
   // --- Pagos ---
   'INSTALLMENT_FAILED|PLAN_DELINQUENT|TRANSFER_REJECTED|TRANSFER_PENDING|INSTALLMENT_UPCOMING':
     'PaymentAlertType',

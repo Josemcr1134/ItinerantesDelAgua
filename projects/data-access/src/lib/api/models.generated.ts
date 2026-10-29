@@ -175,6 +175,9 @@ export type CalendarLinkKind = (typeof CALENDAR_LINK_KIND_VALUES)[number];
 export const CALENDAR_SORT_VALUES = ['STARTS_AT_ASC', 'STARTS_AT_DESC'] as const;
 export type CalendarSort = (typeof CALENDAR_SORT_VALUES)[number];
 
+export const CONTACT_MESSAGE_SORT_VALUES = ['CREATED_DESC', 'CREATED_ASC'] as const;
+export type ContactMessageSort = (typeof CONTACT_MESSAGE_SORT_VALUES)[number];
+
 export const CURRENCY_VALUES = ['MXN', 'USD'] as const;
 export type Currency = (typeof CURRENCY_VALUES)[number];
 
@@ -303,6 +306,8 @@ export const ERROR_CODE_VALUES = [
   'SCHOLARSHIP_TYPE_NOT_AVAILABLE',
   'ADMIN_LAST_SUPER_ADMIN',
   'ADMIN_SELF_ACTION',
+  'MEETING_PROVIDER_NOT_CONFIGURED',
+  'MEETING_PROVIDER_ERROR',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODE_VALUES)[number];
 
@@ -412,6 +417,9 @@ export type LibraryItemType = (typeof LIBRARY_ITEM_TYPE_VALUES)[number];
 export const MATERIAL_RESOURCE_TYPE_VALUES = ['PRESENTATION', 'PRE_READING', 'ACTIVITY'] as const;
 export type MaterialResourceType = (typeof MATERIAL_RESOURCE_TYPE_VALUES)[number];
 
+export const MEETING_PROVIDER_VALUES = ['ZOOM', 'GOOGLE_MEET'] as const;
+export type MeetingProvider = (typeof MEETING_PROVIDER_VALUES)[number];
+
 export const MODULE_STATUS_VALUES = ['UPCOMING', 'IN_PROGRESS', 'COMPLETED'] as const;
 export type ModuleStatus = (typeof MODULE_STATUS_VALUES)[number];
 
@@ -432,6 +440,7 @@ export const NOTIFICATION_TYPE_VALUES = [
   'WHATSAPP_GROUP_AVAILABLE',
   'MATERIAL_PUBLISHED',
   'RECORDING_PUBLISHED',
+  'SESSION_SCHEDULED',
   'SESSION_RESCHEDULED',
   'SESSION_CANCELLED',
   'MOODLE_ENROLLMENT_LINKED',
@@ -586,8 +595,11 @@ export const PERMISSION_VALUES = [
   'payments.manage',
   'users.manage',
   'audit.read',
+  'contact.read',
+  'contact.manage',
   'site.write',
   'scholarship_types.write',
+  'meetings.create',
 ] as const;
 export type Permission = (typeof PERMISSION_VALUES)[number];
 
@@ -1005,6 +1017,8 @@ export interface AdminUserDto {
   readonly permissions: Permission[];
   readonly status: UserStatus;
   readonly countryCode: string;
+  /** null = nunca verificó su correo (no puede iniciar sesión). */
+  readonly emailVerifiedAt: string | null;
   readonly lastLoginAt: string | null;
   readonly createdAt: string;
 }
@@ -1016,147 +1030,6 @@ export interface UpdateUserRolesRequestDto {
 
 export interface UserStatusChangeRequestDto {
   readonly reason?: string;
-}
-
-export interface RegisterRequestDto {
-  /** Solo letras (con tildes o ñ) y espacios. */
-  readonly fullName: string;
-  /** De 3 a 30 caracteres: letras, números, punto o guion bajo. Se guarda en minúsculas. Único y no editable. */
-  readonly username: string;
-  /** Se normaliza a minúsculas y sin espacios. */
-  readonly email: string;
-  /** Mínimo 8 caracteres, al menos una letra y un número. */
-  readonly password: string;
-  readonly phone: PhoneDto;
-  readonly location: LocationInputDto;
-  /** Zona horaria IANA (ver GET /timezones). Por defecto America/Mexico_City. */
-  readonly timezone: string;
-}
-
-export interface OtpDeliveryDto {
-  /** Correo de destino enmascarado. */
-  readonly maskedEmail: string;
-  /** Número de dígitos (casillas). */
-  readonly codeLength: number;
-  /** Vencimiento del código. */
-  readonly expiresAt: IsoDateTime;
-  /** Desde cuándo se puede pedir otro código ("Reenviar en 00:30"). */
-  readonly resendAvailableAt: IsoDateTime;
-}
-
-export interface RegisterResponseDto {
-  readonly userId: string;
-  readonly email: string;
-  readonly status: UserStatus;
-  readonly otp: OtpDeliveryDto;
-}
-
-export interface FieldAvailabilityDto {
-  /** Valor normalizado que se evaluó. */
-  readonly value: string;
-  /** Formato válido. */
-  readonly valid: boolean;
-  /** Formato válido y no registrado. */
-  readonly available: boolean;
-}
-
-export interface AvailabilityResponseDto {
-  readonly email?: FieldAvailabilityDto;
-  readonly username?: FieldAvailabilityDto;
-}
-
-export interface VerifyEmailRequestDto {
-  /** Se normaliza a minúsculas y sin espacios. */
-  readonly email: string;
-  /** Código de 6 dígitos recibido por correo. */
-  readonly code: string;
-}
-
-export interface VerifyEmailResponseDto {
-  readonly verified: boolean;
-  readonly email: string;
-}
-
-/** `EMAIL_VERIFICATION` (HU-03) o `PASSWORD_RESET` (HU-05). */
-export const OTP_PURPOSE_VALUES = ['EMAIL_VERIFICATION', 'PASSWORD_RESET'] as const;
-export type OtpPurpose = (typeof OTP_PURPOSE_VALUES)[number];
-
-export interface ResendOtpRequestDto {
-  /** Se normaliza a minúsculas y sin espacios. */
-  readonly email: string;
-  /** `EMAIL_VERIFICATION` (HU-03) o `PASSWORD_RESET` (HU-05). */
-  readonly purpose: OtpPurpose;
-}
-
-export interface LoginRequestDto {
-  readonly email: string;
-  readonly password: string;
-  /** "Recordarme": alarga la vida del refresh token en este dispositivo. */
-  readonly rememberMe?: boolean;
-}
-
-export interface LoginResponseDto {
-  readonly accessToken: string;
-  readonly tokenType: string;
-  /** Segundos de vida del accessToken. */
-  readonly expiresIn: number;
-  readonly accessTokenExpiresAt: IsoDateTime;
-  readonly refreshToken: string;
-  /** 7 días (30 con "Recordarme"). Cada refresh lo renueva. */
-  readonly refreshTokenExpiresAt: IsoDateTime;
-  readonly user: UserProfileDto;
-}
-
-export interface RefreshRequestDto {
-  readonly refreshToken: string;
-}
-
-export interface TokenPairDto {
-  readonly accessToken: string;
-  readonly tokenType: string;
-  /** Segundos de vida del accessToken. */
-  readonly expiresIn: number;
-  readonly accessTokenExpiresAt: IsoDateTime;
-  readonly refreshToken: string;
-  /** 7 días (30 con "Recordarme"). Cada refresh lo renueva. */
-  readonly refreshTokenExpiresAt: IsoDateTime;
-}
-
-export interface LogoutRequestDto {
-  readonly refreshToken: string;
-}
-
-export interface ForgotPasswordRequestDto {
-  /** Se normaliza a minúsculas y sin espacios. */
-  readonly email: string;
-}
-
-export interface VerifyResetOtpRequestDto {
-  /** Se normaliza a minúsculas y sin espacios. */
-  readonly email: string;
-  /** Código de 6 dígitos recibido por correo. */
-  readonly code: string;
-}
-
-export interface ResetTokenResponseDto {
-  /** Envíalo en POST /auth/password/reset. Un solo uso. */
-  readonly resetToken: string;
-  readonly expiresAt: IsoDateTime;
-}
-
-export interface ResetPasswordRequestDto {
-  /** Token devuelto por POST /auth/password/verify-otp (un solo uso, vida corta). */
-  readonly resetToken: string;
-  /** Mínimo 8 caracteres, al menos una letra y un número. */
-  readonly newPassword: string;
-  readonly confirmPassword: string;
-}
-
-export interface ChangePasswordRequestDto {
-  readonly currentPassword: string;
-  /** Mínimo 8 caracteres, al menos una letra y un número. */
-  readonly newPassword: string;
-  readonly confirmPassword: string;
 }
 
 export interface PortalVenueDto {
@@ -1325,6 +1198,153 @@ export interface MarkAllReadResponseDto {
   readonly updated: number;
 }
 
+export interface RegisterRequestDto {
+  /** Solo letras (con tildes o ñ) y espacios. */
+  readonly fullName: string;
+  /** De 3 a 30 caracteres: letras, números, punto o guion bajo. Se guarda en minúsculas. Único y no editable. */
+  readonly username: string;
+  /** Se normaliza a minúsculas y sin espacios. */
+  readonly email: string;
+  /** Mínimo 8 caracteres, al menos una letra y un número. */
+  readonly password: string;
+  readonly phone: PhoneDto;
+  readonly location: LocationInputDto;
+  /** Zona horaria IANA (ver GET /timezones). Por defecto America/Mexico_City. */
+  readonly timezone: string;
+}
+
+export interface OtpDeliveryDto {
+  /** Correo de destino enmascarado. */
+  readonly maskedEmail: string;
+  /** Número de dígitos (casillas). */
+  readonly codeLength: number;
+  /** Vencimiento del código. */
+  readonly expiresAt: IsoDateTime;
+  /** Desde cuándo se puede pedir otro código ("Reenviar en 00:30"). */
+  readonly resendAvailableAt: IsoDateTime;
+}
+
+export interface RegisterResponseDto {
+  readonly userId: string;
+  readonly email: string;
+  readonly status: UserStatus;
+  readonly otp: OtpDeliveryDto;
+}
+
+export interface FieldAvailabilityDto {
+  /** Valor normalizado que se evaluó. */
+  readonly value: string;
+  /** Formato válido. */
+  readonly valid: boolean;
+  /** Formato válido y no registrado. */
+  readonly available: boolean;
+}
+
+export interface AvailabilityResponseDto {
+  readonly email?: FieldAvailabilityDto;
+  readonly username?: FieldAvailabilityDto;
+}
+
+export interface VerifyEmailRequestDto {
+  /** Se normaliza a minúsculas y sin espacios. */
+  readonly email: string;
+  /** Código de 6 dígitos recibido por correo. */
+  readonly code: string;
+  /** true = inicia sesión al verificar (la respuesta trae `session`, igual que el login) y el frontend no tiene que pedir la contraseña otra vez. */
+  readonly startSession?: boolean;
+  /** "Recordarme" de la sesión que se inicia (solo con `startSession: true`). */
+  readonly rememberMe?: boolean;
+}
+
+export interface LoginResponseDto {
+  readonly accessToken: string;
+  readonly tokenType: string;
+  /** Segundos de vida del accessToken. */
+  readonly expiresIn: number;
+  readonly accessTokenExpiresAt: IsoDateTime;
+  readonly refreshToken: string;
+  /** 7 días (30 con "Recordarme"). Cada refresh lo renueva. */
+  readonly refreshTokenExpiresAt: IsoDateTime;
+  readonly user: UserProfileDto;
+}
+
+export interface VerifyEmailResponseDto {
+  readonly verified: boolean;
+  readonly email: string;
+  /** Solo si se pidió `startSession: true`: tokens y perfil, igual que POST /auth/login. */
+  readonly session?: LoginResponseDto;
+}
+
+/** `EMAIL_VERIFICATION` (HU-03) o `PASSWORD_RESET` (HU-05). */
+export const OTP_PURPOSE_VALUES = ['EMAIL_VERIFICATION', 'PASSWORD_RESET'] as const;
+export type OtpPurpose = (typeof OTP_PURPOSE_VALUES)[number];
+
+export interface ResendOtpRequestDto {
+  /** Se normaliza a minúsculas y sin espacios. */
+  readonly email: string;
+  /** `EMAIL_VERIFICATION` (HU-03) o `PASSWORD_RESET` (HU-05). */
+  readonly purpose: OtpPurpose;
+}
+
+export interface LoginRequestDto {
+  readonly email: string;
+  readonly password: string;
+  /** "Recordarme": alarga la vida del refresh token en este dispositivo. */
+  readonly rememberMe?: boolean;
+}
+
+export interface RefreshRequestDto {
+  readonly refreshToken: string;
+}
+
+export interface TokenPairDto {
+  readonly accessToken: string;
+  readonly tokenType: string;
+  /** Segundos de vida del accessToken. */
+  readonly expiresIn: number;
+  readonly accessTokenExpiresAt: IsoDateTime;
+  readonly refreshToken: string;
+  /** 7 días (30 con "Recordarme"). Cada refresh lo renueva. */
+  readonly refreshTokenExpiresAt: IsoDateTime;
+}
+
+export interface LogoutRequestDto {
+  readonly refreshToken: string;
+}
+
+export interface ForgotPasswordRequestDto {
+  /** Se normaliza a minúsculas y sin espacios. */
+  readonly email: string;
+}
+
+export interface VerifyResetOtpRequestDto {
+  /** Se normaliza a minúsculas y sin espacios. */
+  readonly email: string;
+  /** Código de 6 dígitos recibido por correo. */
+  readonly code: string;
+}
+
+export interface ResetTokenResponseDto {
+  /** Envíalo en POST /auth/password/reset. Un solo uso. */
+  readonly resetToken: string;
+  readonly expiresAt: IsoDateTime;
+}
+
+export interface ResetPasswordRequestDto {
+  /** Token devuelto por POST /auth/password/verify-otp (un solo uso, vida corta). */
+  readonly resetToken: string;
+  /** Mínimo 8 caracteres, al menos una letra y un número. */
+  readonly newPassword: string;
+  readonly confirmPassword: string;
+}
+
+export interface ChangePasswordRequestDto {
+  readonly currentPassword: string;
+  /** Mínimo 8 caracteres, al menos una letra y un número. */
+  readonly newPassword: string;
+  readonly confirmPassword: string;
+}
+
 export const CONTACT_SUBJECT_VALUES = [
   'SCHOOL',
   'DESIGN_CONSULTING',
@@ -1389,13 +1409,70 @@ export interface CreateContactMessageRequestDto {
   readonly captchaToken?: string;
 }
 
-export const CONTACT_STATUS_VALUES = ['NEW'] as const;
+export const CONTACT_STATUS_VALUES = ['NEW', 'IN_PROGRESS', 'ANSWERED', 'ARCHIVED'] as const;
 export type ContactStatus = (typeof CONTACT_STATUS_VALUES)[number];
 
 export interface ContactMessageResponseDto {
   readonly id: string;
   readonly status: ContactStatus;
   readonly createdAt: IsoDateTime;
+}
+
+export interface AdminContactPhoneDto {
+  readonly countryCode: string | null;
+  readonly number: string;
+}
+
+export interface ContactHandlerDto {
+  readonly id: Uuid;
+  readonly fullName: string | null;
+  readonly email: string;
+}
+
+export interface AdminContactMessageDto {
+  readonly id: Uuid;
+  readonly name: string;
+  readonly email: string;
+  readonly organization: string | null;
+  readonly phone: AdminContactPhoneDto | null;
+  readonly subject: ContactSubject;
+  /** Asunto en español. */
+  readonly subjectLabel: string;
+  readonly origin: ContactOrigin;
+  /** Origen en español. */
+  readonly originLabel: string;
+  /** Solo con subject = DESIGN_CONSULTING. */
+  readonly projectType: ContactProjectType | null;
+  readonly projectLocation: string | null;
+  readonly service: ContactService | null;
+  readonly message: string;
+  readonly status: ContactStatus;
+  /** Estado en español. */
+  readonly statusLabel: string;
+  readonly internalNote: string | null;
+  /** Último integrante que cambió el estado o la nota. */
+  readonly handledBy: ContactHandlerDto | null;
+  readonly handledAt: IsoDateTime | null;
+  readonly createdAt: IsoDateTime;
+}
+
+export interface ContactStatusCountDto {
+  readonly status: ContactStatus;
+  readonly label: string;
+  readonly count: number;
+}
+
+export interface ContactInboxSummaryDto {
+  /** Mensajes en NEW (para el contador del menú). */
+  readonly unread: number;
+  /** Un elemento por estado (incluye 0). */
+  readonly byStatus: ContactStatusCountDto[];
+}
+
+export interface UpdateContactMessageRequestDto {
+  readonly status?: ContactStatus;
+  /** Nota interna; `null` o "" la borra. */
+  readonly internalNote?: string | null;
 }
 
 export interface SiteMetricDto {
@@ -4557,4 +4634,53 @@ export interface AuditLogDto {
     readonly [key: string]: unknown;
   } | null;
   readonly createdAt: string;
+}
+
+export interface MeetingProviderInfoDto {
+  readonly provider: MeetingProvider;
+  /** Texto para la UI. */
+  readonly label: string;
+  /** `true` si el servidor tiene credenciales: muestra el botón "Generar enlace". */
+  readonly enabled: boolean;
+  /** Si sirve para entrevistas de postulación (HU-31 exige un enlace de zoom.us: solo Zoom). Ambos sirven para sesiones en vivo (HU-29). */
+  readonly usableForInterviews: boolean;
+}
+
+export interface MeetingProvidersResponseDto {
+  /** Todos los proveedores conocidos. */
+  readonly data: MeetingProviderInfoDto[];
+}
+
+export interface CreateMeetingRequestDto {
+  /** Proveedor. Debe estar habilitado (`GET /admin/meetings/providers`). Las entrevistas (HU-31) solo aceptan Zoom. */
+  readonly provider: MeetingProvider;
+  /** Título de la reunión (lo ven los participantes en Zoom / Google Calendar). */
+  readonly topic: string;
+  /** Inicio en ISO 8601 con zona (UTC `Z` u offset). Debe ser futuro. */
+  readonly startAt: IsoDateTime;
+  /** Duración en minutos. */
+  readonly durationMinutes: number;
+  /** Zona horaria IANA (ver GET /timezones). Por defecto America/Mexico_City. */
+  readonly timezone?: string;
+}
+
+export interface MeetingDto {
+  readonly provider: MeetingProvider;
+  /** Id de la reunión en el proveedor (Zoom: id numérico; Google: id del evento de Calendar). Guárdalo en el estado del formulario para pedir un enlace de anfitrión nuevo o cancelarla. */
+  readonly externalId: string;
+  /** Enlace de participantes → campo `joinUrl` de la sesión / entrevista. */
+  readonly joinUrl: string;
+  /** Enlace de anfitrión → campo `hostUrl` de la sesión (HU-29). Zoom: `start_url`, CADUCA (≈2 h): para iniciar la reunión más tarde pide uno nuevo con `GET …/host-url`. Google Meet: igual a `joinUrl` (el anfitrión es la cuenta organizadora del evento). */
+  readonly hostUrl: string;
+  /** Contraseña de la reunión (Zoom; ya va incluida en `joinUrl`). `null` en Meet. */
+  readonly password: string | null;
+  readonly startAt: IsoDateTime;
+  readonly durationMinutes: number;
+}
+
+export interface MeetingHostUrlDto {
+  readonly provider: MeetingProvider;
+  readonly externalId: string;
+  /** Enlace de anfitrión vigente (Zoom: `start_url` recién emitido). */
+  readonly hostUrl: string;
 }
