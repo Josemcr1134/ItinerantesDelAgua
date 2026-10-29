@@ -101,8 +101,12 @@ $edge: clamp(16px, 3.4vw, 49px);
   margin-bottom: 25px;
 }
 
+// Por encima del contenido: el saludo (con `backdrop-filter`) y la campana
+// apilan sus menús dentro de sí, y sin esto la página (p. ej. la pestaña de
+// fecha de la próxima actividad) los tapa. Debajo de la barra móvil (20).
 .header__end {
   position: relative;
+  z-index: 10;
   display: flex;
   align-items: center;
   gap: 10px;
