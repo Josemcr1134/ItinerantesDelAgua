@@ -1,8 +1,8 @@
 @use 'breakpoints' as bp;
 
-// Catálogo (Figma "Oferta formativa"): título Amatic con la onda azul debajo,
-// pastillas de tipo, fila de filtros y la rejilla de tarjetas (4 por fila en
-// escritorio). Debajo, la sección de contacto de la home.
+// Catálogo (Figma "Oferta formativa"): título Amatic con la onda azul debajo
+// y el catálogo compartido (`cat-offer-catalog`: filtros y tarjetas). Debajo,
+// la sección de contacto de la home.
 
 :host {
   display: block;
@@ -61,55 +61,4 @@
   font-size: 1.25rem;
   font-weight: var(--font-weight-regular);
   line-height: 1.75rem;
-}
-
-.results {
-  width: 100%;
-  margin-top: 28px;
-  // Al cambiar de página se sube aquí, bajo el navbar fijo.
-  scroll-margin-top: calc(var(--navbar-height) + 24px);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  gap: 22px;
-  margin: 0;
-  padding: 0;
-  text-align: left;
-  list-style: none;
-
-  @include bp.up(xl) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-.ghost {
-  height: 420px;
-  border-radius: 22px;
-  background: linear-gradient(100deg, #fff 30%, #f3efe4 50%, #fff 70%) 0 0 / 300% 100%;
-
-  @media (prefers-reduced-motion: no-preference) {
-    animation: shimmer 1.4s linear infinite;
-  }
-}
-
-@keyframes shimmer {
-  to {
-    background-position: -300% 0;
-  }
-}
-
-.pages {
-  margin-top: 40px;
-}
-
-.empty {
-  display: grid;
-  justify-items: center;
-  gap: 16px;
-  padding: 40px 20px;
-  border-radius: 22px;
-  background-color: #fff;
-  color: var(--color-raisin-black);
 }

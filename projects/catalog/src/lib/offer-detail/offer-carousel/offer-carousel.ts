@@ -1,12 +1,12 @@
 import { Component, computed, input, signal } from '@angular/core';
-import { OFFER_DETAIL_CONTENT } from '../../../content/offer-detail.content';
+import { OFFER_DETAIL_CONTENT } from '../../offer-detail-content';
 
 /**
  * Carrusel de la ficha (Figma): imagen a todo lo ancho con flechas a los
  * lados y puntos debajo (el activo, alargado y dorado). Sin pase automático.
  */
 @Component({
-  selector: 'pub-offer-carousel',
+  selector: 'cat-offer-carousel',
   template: `
     @let list = images();
     <section

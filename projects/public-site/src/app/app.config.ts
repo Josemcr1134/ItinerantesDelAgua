@@ -1,9 +1,11 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
+import { provideCatalog } from 'catalog';
 import { apiErrorInterceptor, cacheInterceptor, provideApi } from 'data-access';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
+import { LANDING_CATALOG } from './content/portal-links';
 import { providePageScroll } from './shared/page-scroll/page-scroll';
 
 export const appConfig: ApplicationConfig = {
@@ -23,5 +25,7 @@ export const appConfig: ApplicationConfig = {
     // caché evita repetir llamadas a datos que casi no cambian (cifras).
     provideHttpClient(withFetch(), withInterceptors([cacheInterceptor, apiErrorInterceptor])),
     provideApi({ baseUrl: environment.apiBaseUrl }),
+    // Catálogo compartido con el Portal: aquí las acciones van al Portal.
+    provideCatalog(LANDING_CATALOG),
   ],
 };

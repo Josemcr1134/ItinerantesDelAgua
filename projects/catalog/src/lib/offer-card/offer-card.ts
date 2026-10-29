@@ -1,9 +1,9 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { OfferSummaryDto } from 'data-access';
 import { Button } from 'ui-kit';
-import { OFFER_CARD_CONTENT } from '../../../content/catalog.content';
-import { PAGE_PATHS } from '../../../content/page-paths';
+import { CATALOG_CONFIG } from '../catalog-config';
+import { OFFER_CARD_CONTENT } from '../catalog-content';
 import { dateRange, formatMoney, percentRange, scheduleLines, shortDate } from '../catalog-format';
 
 /**
@@ -12,7 +12,7 @@ import { dateRange, formatMoney, percentRange, scheduleLines, shortDate } from '
  * CDMX y en tu zona, costo en tu moneda, beca y [Ver detalle].
  */
 @Component({
-  selector: 'pub-offer-card',
+  selector: 'cat-offer-card',
   imports: [RouterLink, Button],
   templateUrl: './offer-card.html',
   styleUrl: './offer-card.scss',
@@ -22,7 +22,8 @@ export class OfferCard {
   readonly timezone = input.required<string>();
 
   protected readonly t = OFFER_CARD_CONTENT;
-  protected readonly detailLink = computed(() => `${PAGE_PATHS.catalog}/${this.offer().slug}`);
+  private readonly catalogPath = inject(CATALOG_CONFIG).catalogPath;
+  protected readonly detailLink = computed(() => `${this.catalogPath}/${this.offer().slug}`);
   protected readonly image = computed(
     () => this.offer().coverImageUrl ?? this.t.fallbackImages[this.offer().type],
   );

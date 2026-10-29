@@ -2,7 +2,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideCatalog } from 'catalog';
 import { provideApi } from 'data-access';
+import { LANDING_CATALOG } from '../../content/portal-links';
 import OfferDetailPage from './offer-detail-page';
 
 const API = 'https://api.test/api/v1/offers/eco';
@@ -129,6 +131,7 @@ describe('OfferDetailPage', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideApi({ baseUrl: 'https://api.test' }),
+        provideCatalog(LANDING_CATALOG),
       ],
     });
     const fixture = TestBed.createComponent(OfferDetailPage);

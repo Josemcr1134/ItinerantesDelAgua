@@ -1,7 +1,8 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { OfferActionDto, OfferDetailDto } from 'data-access';
-import { OFFER_DETAIL_CONTENT, SCHEDULE_ZONES } from '../../../content/offer-detail.content';
-import { portalActionUrl } from '../../../content/portal-links';
+import { CATALOG_CONFIG, CatalogActionLink } from '../../catalog-config';
+import { OFFER_DETAIL_CONTENT, SCHEDULE_ZONES } from '../../offer-detail-content';
 import {
   CDMX,
   dateRange,
@@ -12,12 +13,15 @@ import {
   utcOffset,
   weekdaysLabel,
   zoneName,
-} from '../../catalog/catalog-format';
+} from '../../catalog-format';
 
 interface ActionView {
   readonly type: OfferActionDto['type'];
   readonly label: string;
-  readonly href: string;
+  /** Otra app (URL completa) o, si es `null`, una ruta de esta (`route`). */
+  readonly href: string | null;
+  readonly route: readonly string[] | null;
+  readonly queryParams: Readonly<Record<string, string>> | null;
   readonly enabled: boolean;
   readonly primary: boolean;
   readonly note: string | null;
@@ -27,10 +31,12 @@ interface ActionView {
  * Resumen de la ficha (Figma, columna derecha): fechas, horario por zonas con
  * la de quien visita resaltada, lugar, costo en su moneda (por módulo y en
  * cuotas), el bloque de beca y las acciones que calcula la API. Cada acción
- * lleva al Portal, que pide la sesión y la ejecuta.
+ * lleva a donde diga la app (`CATALOG_CONFIG`): desde la landing, al Portal,
+ * que pide la sesión y la ejecuta; dentro del Portal, a su ruta.
  */
 @Component({
-  selector: 'pub-offer-summary',
+  selector: 'cat-offer-summary',
+  imports: [RouterLink],
   templateUrl: './offer-summary.html',
   styleUrls: ['./offer-summary.scss', './offer-actions.scss'],
 })
@@ -39,6 +45,7 @@ export class OfferSummary {
   readonly timezone = input.required<string>();
 
   protected readonly t = OFFER_DETAIL_CONTENT;
+  protected readonly config = inject(CATALOG_CONFIG);
 
   protected readonly dates = computed(() => {
     const o = this.offer();
@@ -151,7 +158,7 @@ export class OfferSummary {
     return o.actions.map((action) => ({
       type: action.type,
       label: this.t.actions[action.type],
-      href: portalActionUrl(o.slug, action.type),
+      ...linkParts(this.config.actionLink(o.slug, action.type)),
       enabled: action.enabled,
       primary: action.primary,
       note: action.enabled
@@ -171,3 +178,8 @@ export class OfferSummary {
     this.actionViews().filter((a) => !(a.type === 'APPLY_SCHOLARSHIP' && this.scholarship())),
   );
 }
+
+const linkParts = (link: CatalogActionLink) =>
+  'href' in link
+    ? { href: link.href, route: null, queryParams: null }
+    : { href: null, route: link.route, queryParams: link.queryParams };

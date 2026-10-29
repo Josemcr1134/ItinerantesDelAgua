@@ -1,0 +1,137 @@
+<div class="catalog">
+  <!-- Tipo: pastillas (enlaces, para compartir la vista filtrada). -->
+  <nav class="types" aria-label="Tipo de oferta">
+    <a
+      class="type"
+      [class.type--on]="!type()"
+      routerLink="."
+      [queryParams]="{ tipo: null, pagina: null }"
+      queryParamsHandling="merge"
+      replaceUrl
+      [attr.aria-current]="!type() ? 'page' : null"
+    >
+      {{ c.allTypes }}
+    </a>
+    @for (option of types; track option.slug) {
+      <a
+        class="type"
+        [class.type--on]="type()?.slug === option.slug"
+        routerLink="."
+        [queryParams]="{ tipo: option.slug, pagina: null }"
+        queryParamsHandling="merge"
+        replaceUrl
+        [attr.aria-current]="type()?.slug === option.slug ? 'page' : null"
+      >
+        {{ option.label }}
+      </a>
+    }
+  </nav>
+
+  <div class="filters" role="group" [attr.aria-label]="c.filtersLabel">
+    <label class="filter">
+      <span class="filter__label">{{ c.modality.label }}</span>
+      <span class="select">
+        <select
+          [value]="modality()?.slug ?? ''"
+          (change)="setParam('modalidad', $any($event.target).value)"
+        >
+          <option value="">{{ c.modality.all }}</option>
+          @for (option of modalities; track option.slug) {
+            <option [value]="option.slug">{{ option.label }}</option>
+          }
+        </select>
+      </span>
+    </label>
+
+    <label class="filter">
+      <span class="filter__label">{{ c.status.label }}</span>
+      <span class="select">
+        <select
+          [value]="status().slug"
+          (change)="
+            setParam(
+              'estado',
+              $any($event.target).value === statuses[0].slug ? null : $any($event.target).value
+            )
+          "
+        >
+          @for (option of statuses; track option.slug) {
+            <option [value]="option.slug">{{ option.label }}</option>
+          }
+        </select>
+      </span>
+    </label>
+
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="withScholarship()"
+        (change)="setParam('beca', $any($event.target).checked ? '1' : null)"
+      />
+      <span>{{ c.scholarship }}</span>
+    </label>
+
+    <label class="filter filter--search">
+      <span class="filter__label">{{ c.search.label }}</span>
+      <input
+        class="search"
+        type="search"
+        enterkeyhint="search"
+        [placeholder]="c.search.placeholder"
+        [value]="searchText()"
+        (input)="searchText.set($any($event.target).value)"
+        [attr.aria-describedby]="searchTooShort() ? 'catalog-search-hint' : null"
+      />
+      @if (searchTooShort()) {
+        <span id="catalog-search-hint" class="filter__hint">{{ c.searchHint }}</span>
+      }
+    </label>
+  </div>
+
+  <div #results class="results" [attr.aria-busy]="loading()">
+    @if (items().length) {
+      <ul class="grid">
+        @for (offer of items(); track offer.id) {
+          <li>
+            <cat-offer-card [offer]="offer" [timezone]="timezone" />
+          </li>
+        }
+      </ul>
+      @if (meta(); as m) {
+        @if (m.totalPages > 1) {
+          <ui-pagination
+            class="pages"
+            [numbered]="true"
+            [meta]="m"
+            [page]="page()"
+            (pageChange)="goToPage($event)"
+            [loading]="loading()"
+            [noun]="c.noun"
+            [label]="c.paginationLabel"
+          />
+        }
+      }
+    } @else if (failed()) {
+      <div class="empty" role="alert">
+        <p>{{ c.error }}</p>
+        <button uiButton variant="secondary" type="button" (click)="retry()">{{ c.retry }}</button>
+      </div>
+    } @else if (list.hasValue()) {
+      <div class="empty" role="status">
+        <p>{{ c.empty }}</p>
+        @if (hasFilters()) {
+          <button uiButton variant="secondary" type="button" (click)="clearFilters()">
+            {{ c.clearFilters }}
+          </button>
+        }
+      </div>
+    } @else {
+      <!-- Primera carga: tarjetas fantasma con el mismo alto. -->
+      <ul class="grid" aria-hidden="true">
+        @for (n of [1, 2, 3, 4]; track n) {
+          <li class="ghost"></li>
+        }
+      </ul>
+    }
+  </div>
+</div>

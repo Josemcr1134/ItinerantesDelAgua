@@ -16,6 +16,7 @@
     "module": "preserve",
     "paths": {
       "auth": ["./projects/auth/src/public-api.ts"],
+      "catalog": ["./projects/catalog/src/public-api.ts"],
       "data-access": ["./projects/data-access/src/public-api.ts"],
       "ui-kit": ["./projects/ui-kit/src/public-api.ts"],
       "util": ["./projects/util/src/public-api.ts"]
@@ -70,6 +71,12 @@
     },
     {
       "path": "./projects/util/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/catalog/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/catalog/tsconfig.spec.json"
     }
   ]
 }

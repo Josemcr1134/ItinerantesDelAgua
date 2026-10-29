@@ -2,7 +2,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { provideCatalog } from 'catalog';
 import { provideApi } from 'data-access';
+import { LANDING_CATALOG } from '../../content/portal-links';
 import CatalogPage from './catalog-page';
 
 const API = 'https://api.test/api/v1/offers';
@@ -60,6 +62,7 @@ describe('CatalogPage', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideApi({ baseUrl: 'https://api.test' }),
+        provideCatalog(LANDING_CATALOG),
       ],
     });
     const fixture = TestBed.createComponent(CatalogPage);
@@ -98,7 +101,7 @@ describe('CatalogPage', () => {
     );
     await fixture.whenStable();
 
-    const cards = host.querySelectorAll('pub-offer-card');
+    const cards = host.querySelectorAll('cat-offer-card');
     expect(cards).toHaveLength(2);
     const first = cards[0].textContent?.replace(/\s+/g, ' ') ?? '';
     expect(first).toContain('Inscripciones abiertas');
@@ -136,7 +139,7 @@ describe('CatalogPage', () => {
     request.flush(page([offer('i'), offer('j')], 18, 2));
     await fixture.whenStable();
 
-    expect(host.querySelectorAll('pub-offer-card')).toHaveLength(2);
+    expect(host.querySelectorAll('cat-offer-card')).toHaveLength(2);
     const numbers = [...host.querySelectorAll('.ui-pagination__number')].map((b) =>
       b.textContent?.trim(),
     );
