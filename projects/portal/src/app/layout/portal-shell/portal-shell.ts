@@ -20,7 +20,7 @@ import { browserTimezone } from '../../features/dashboard/dashboard-format';
 import { Avatar } from '../../shared/avatar/avatar';
 import { MenuIcon } from './menu-icon';
 import { NotificationBell } from './notification-bell/notification-bell';
-import { NAV_ITEMS, NavItem } from './navigation';
+import { NAV_ITEMS, NavItem, TAB_ITEMS } from './navigation';
 
 const COLLAPSED_KEY = 'portal.sidebar.collapsed';
 
@@ -36,7 +36,8 @@ function readCollapsed(): boolean {
 /**
  * Marco del portal (Figma HU-06): menú lateral que se contrae a solo íconos
  * (se recuerda en este navegador), saludo con el menú de la cuenta y, en
- * móvil, barra superior con el menú desplegable.
+ * móvil, barra inferior flotante con las secciones principales y "Más", que
+ * despliega el menú completo.
  */
 @Component({
   selector: 'portal-shell',
@@ -61,6 +62,7 @@ export default class PortalShell {
   private readonly auth = inject(AuthService);
   private readonly alerts = inject(AlertService);
   protected readonly navItems = NAV_ITEMS;
+  protected readonly tabItems = TAB_ITEMS;
   protected readonly pageHeading = inject(PageHeading);
 
   private readonly user = inject(SessionStore).user;
@@ -107,6 +109,14 @@ export default class PortalShell {
     const path = this.url().split(/[?#]/)[0];
     return path === item.path || path.startsWith(item.path + '/');
   }
+
+  /** "Más" se marca si la sección actual no está en la barra inferior. */
+  protected readonly moreActive = computed(() => {
+    const path = this.url().split(/[?#]/)[0];
+    return !TAB_ITEMS.some((item) =>
+      item.exact ? path === item.path : path === item.path || path.startsWith(item.path + '/'),
+    );
+  });
 
   protected isOpen(item: NavItem): boolean {
     return this.groups()[item.path] ?? this.isActive(item);

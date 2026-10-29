@@ -6,7 +6,7 @@
   </button>
 </ng-template>
 
-<!-- Barra superior (móvil) -->
+<!-- Barra superior (móvil): el logo; la navegación va en la barra inferior. -->
 <header class="topbar">
   <a class="topbar__brand" routerLink="/">
     <img
@@ -16,32 +16,6 @@
       height="62"
     />
   </a>
-  <button
-    #drawerToggle
-    type="button"
-    class="topbar__toggle"
-    aria-controls="portal-sidebar"
-    [attr.aria-expanded]="drawerOpen()"
-    [attr.aria-label]="drawerOpen() ? 'Cerrar menú' : 'Abrir menú'"
-    (click)="toggleDrawer()"
-  >
-    <svg
-      aria-hidden="true"
-      width="26"
-      height="26"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-    >
-      @if (drawerOpen()) {
-        <path d="M6 6l12 12M18 6L6 18" />
-      } @else {
-        <path d="M4 7h16M4 12h16M4 17h16" />
-      }
-    </svg>
-  </button>
 </header>
 
 @if (drawerOpen()) {
@@ -251,3 +225,32 @@
     <router-outlet />
   </main>
 </div>
+
+<!-- Barra inferior flotante (móvil): secciones principales y "Más" (el menú completo). -->
+<nav class="tabbar" aria-label="Accesos rápidos">
+  @for (item of tabItems; track item.path) {
+    <a
+      class="tabbar__item"
+      [routerLink]="item.path"
+      routerLinkActive="tabbar__item--active"
+      ariaCurrentWhenActive="page"
+      [routerLinkActiveOptions]="{ exact: !!item.exact }"
+    >
+      <portal-menu-icon [name]="item.icon" />
+      <span class="tabbar__label">{{ item.label }}</span>
+    </a>
+  }
+  <button
+    #drawerToggle
+    type="button"
+    class="tabbar__item"
+    [class.tabbar__item--active]="drawerOpen() || moreActive()"
+    aria-controls="portal-sidebar"
+    [attr.aria-expanded]="drawerOpen()"
+    [attr.aria-label]="drawerOpen() ? 'Cerrar menú' : 'Más secciones'"
+    (click)="toggleDrawer()"
+  >
+    <portal-menu-icon name="more" />
+    <span class="tabbar__label" aria-hidden="true">Más</span>
+  </button>
+</nav>

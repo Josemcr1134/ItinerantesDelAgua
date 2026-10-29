@@ -97,4 +97,35 @@ describe('PortalShell', () => {
       ['Eventos', '/formacion/eventos'],
     ]);
   });
+
+  it('en móvil, la barra inferior lleva a las secciones principales y "Más" abre el menú', async () => {
+    const { fixture, host } = await render();
+    const items = [...host.querySelectorAll<HTMLElement>('.tabbar .tabbar__item')];
+    expect(items.map((i) => i.textContent?.trim())).toEqual([
+      'Inicio',
+      'Formación',
+      'Catálogo',
+      'Calendario',
+      'Más',
+    ]);
+    expect(items.slice(0, 4).map((i) => i.getAttribute('href'))).toEqual([
+      '/',
+      '/formacion',
+      '/catalogo',
+      '/calendario',
+    ]);
+
+    const more = items[4] as HTMLButtonElement;
+    expect(more.getAttribute('aria-expanded')).toBe('false');
+    more.click();
+    await fixture.whenStable();
+    expect(more.getAttribute('aria-expanded')).toBe('true');
+    expect(host.querySelector('#portal-sidebar')?.classList).toContain('sidebar--open');
+
+    // Escape lo cierra y el foco vuelve a "Más".
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await fixture.whenStable();
+    expect(more.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(more);
+  });
 });

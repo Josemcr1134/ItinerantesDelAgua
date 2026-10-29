@@ -2,7 +2,7 @@
 
 // Figma HU-06 (1440 px): menú de 244 px (74 px contraído) a 49 px de los
 // bordes, 40 px hasta el contenido (68 px contraído). En móvil, barra
-// superior y menú desplegable.
+// superior con el logo, barra inferior flotante y menú desplegable ("Más").
 
 $ink: var(--color-primary);
 $edge: clamp(16px, 3.4vw, 49px);
@@ -59,18 +59,6 @@ $edge: clamp(16px, 3.4vw, 49px);
   }
 }
 
-.topbar__toggle {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 12px;
-  background: none;
-  color: $ink;
-  cursor: pointer;
-}
-
 .backdrop {
   position: fixed;
   inset: 0;
@@ -86,6 +74,8 @@ $edge: clamp(16px, 3.4vw, 49px);
 .main {
   min-width: 0;
   padding: var(--space-3);
+  // Espacio para la barra inferior flotante (móvil).
+  padding-bottom: calc(var(--space-3) + 84px + env(safe-area-inset-bottom));
 
   @include bp.up(lg) {
     padding: 0;
@@ -169,4 +159,75 @@ $edge: clamp(16px, 3.4vw, 49px);
 
 .content {
   display: block;
+}
+
+// --- Barra inferior (móvil) -------------------------------------------------
+// Flotante, como en las apps: verde con el activo resaltado (colores del menú
+// lateral). Debajo del fondo y del menú desplegable (30 y 40).
+.tabbar {
+  position: fixed;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: 12px;
+  z-index: 25;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 520px;
+  margin-inline: auto;
+  padding: 6px;
+  border-radius: 22px;
+  background-color: $ink;
+  box-shadow: 0 10px 30px rgb(63 86 68 / 0.3);
+
+  @include bp.up(lg) {
+    display: none;
+  }
+}
+
+.tabbar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 54px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  color: rgb(255 255 255 / 0.8);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  portal-menu-icon {
+    color: #eaa700;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #eaa700;
+    outline-offset: 2px;
+  }
+}
+
+.tabbar__item--active {
+  background-color: #399f71;
+  color: #fff;
+  font-weight: 600;
+
+  portal-menu-icon {
+    color: #fff;
+  }
+}
+
+.tabbar__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

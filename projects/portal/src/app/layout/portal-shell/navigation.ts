@@ -1,6 +1,13 @@
 /** Ícono de cada sección del menú lateral (Figma HU-06). */
 export type NavIcon =
-  'dashboard' | 'formation' | 'catalog' | 'library' | 'calendar' | 'calls' | 'scholarships';
+  | 'dashboard'
+  | 'formation'
+  | 'catalog'
+  | 'library'
+  | 'calendar'
+  | 'calls'
+  | 'scholarships'
+  | 'more';
 
 export interface NavItem {
   readonly label: string;
@@ -36,4 +43,16 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Calendario', path: '/calendario', icon: 'calendar' },
   { label: 'Convocatorias', path: '/convocatorias', icon: 'calls' },
   { label: 'Becas', path: '/becas', icon: 'scholarships' },
+];
+
+/**
+ * Barra inferior en móvil (como una app): las secciones más usadas. El resto
+ * (Biblioteca, Convocatorias, Becas, los tipos de Formación y la cuenta) está
+ * en "Más", que abre el menú completo.
+ */
+export const TAB_ITEMS: readonly NavItem[] = [
+  { label: 'Inicio', path: '/', icon: 'dashboard', exact: true },
+  { label: 'Formación', path: '/formacion', icon: 'formation' },
+  { label: 'Catálogo', path: '/catalogo', icon: 'catalog' },
+  { label: 'Calendario', path: '/calendario', icon: 'calendar' },
 ];
