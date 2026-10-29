@@ -33,7 +33,7 @@
         @if (v.kind === 'error') {
           <button type="button" class="button" (click)="retry()">{{ text.retry }}</button>
         }
-        <a class="button button--outline" [href]="offerUrl()">{{ text.backToOffer }}</a>
+        <a class="button button--outline" [routerLink]="offerUrl()">{{ text.backToOffer }}</a>
         <a class="link" routerLink="/formacion">{{ text.myFormation }}</a>
       </div>
     }

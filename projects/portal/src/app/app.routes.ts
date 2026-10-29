@@ -121,6 +121,17 @@ export const routes: Routes = [
         title: 'Registro de asistencia · Portal',
         loadComponent: () => import('./features/attendance/attendance-page'),
       },
+      // Catálogo y fichas de la oferta, sin salir a la landing.
+      {
+        path: 'catalogo',
+        title: 'Catálogo · Portal',
+        loadComponent: () => import('./features/catalog/catalog-page'),
+      },
+      {
+        path: 'catalogo/:slug',
+        title: 'Oferta · Portal',
+        loadComponent: () => import('./features/catalog/offer-page'),
+      },
       {
         path: 'calendario',
         title: 'Calendario · Portal',

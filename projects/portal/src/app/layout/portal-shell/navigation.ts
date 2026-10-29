@@ -1,5 +1,6 @@
 /** Ícono de cada sección del menú lateral (Figma HU-06). */
-export type NavIcon = 'dashboard' | 'formation' | 'library' | 'calendar' | 'calls' | 'scholarships';
+export type NavIcon =
+  'dashboard' | 'formation' | 'catalog' | 'library' | 'calendar' | 'calls' | 'scholarships';
 
 export interface NavItem {
   readonly label: string;
@@ -29,6 +30,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
       { label: 'Talleres', path: '/formacion/talleres' },
     ],
   },
+  { label: 'Catálogo', path: '/catalogo', icon: 'catalog' },
   { label: 'Biblioteca', path: '/biblioteca', icon: 'library' },
   { label: 'Calendario', path: '/calendario', icon: 'calendar' },
   { label: 'Convocatorias', path: '/convocatorias', icon: 'calls' },

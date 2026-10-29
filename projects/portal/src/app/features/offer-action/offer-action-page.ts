@@ -13,7 +13,7 @@ import {
   toApiError,
 } from 'data-access';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { offerPath } from '../catalog/portal-catalog';
 import { usePageHeading } from '../../core/page-heading/page-heading';
 import { browserTimezone } from '../dashboard/dashboard-format';
 import { MoodleAccess } from '../moodle-access/moodle-access';
@@ -87,10 +87,7 @@ export default class OfferActionPage {
   protected readonly current = computed(() =>
     this.offer.hasValue() ? this.offer.value() : undefined,
   );
-  protected readonly offerUrl = computed(
-    () =>
-      new URL(`/escuela/oferta/${encodeURIComponent(this.slug())}`, environment.landingUrl).href,
-  );
+  protected readonly offerUrl = computed(() => offerPath(this.slug()));
 
   /** Resultado de ejecutar la acción (si no navegó a otra pantalla). */
   private readonly outcome = signal<View | null>(null);

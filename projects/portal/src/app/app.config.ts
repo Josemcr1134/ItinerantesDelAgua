@@ -2,10 +2,12 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, TitleStrategy, withComponentInputBinding } from '@angular/router';
 import { authInterceptor, provideAuth } from 'auth';
+import { provideCatalog } from 'catalog';
 import { apiErrorInterceptor, cacheInterceptor, loadingInterceptor, provideApi } from 'data-access';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { PortalSeo } from './core/seo/portal-seo';
+import { PORTAL_CATALOG } from './features/catalog/portal-catalog';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,5 +28,7 @@ export const appConfig: ApplicationConfig = {
     provideApi({ baseUrl: environment.apiBaseUrl }),
     // Cualquier cuenta activa entra (participantes y, si quieren, el equipo).
     provideAuth({ platformName: 'Portal' }),
+    // Catálogo compartido con la landing: aquí las fichas y acciones siguen en el Portal.
+    provideCatalog(PORTAL_CATALOG),
   ],
 };

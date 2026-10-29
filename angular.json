@@ -132,6 +132,11 @@
                 "glob": "**/*",
                 "input": "projects/ui-kit/assets/brand",
                 "output": "assets/brand"
+              },
+              {
+                "glob": "{blueLine.svg,ecoBath.webp,ladyOnTheRock.webp,sculpture.webp,ladyAndFlowers.webp,flowerpotAndFlowers.webp}",
+                "input": "projects/public-site/public/assets/images",
+                "output": "assets/images"
               }
             ],
             "styles": [

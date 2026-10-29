@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { SessionStore } from 'auth';
 import { PaymentDto, PaymentMethod, PaymentsApi, toApiError } from 'data-access';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { offerPath } from '../../catalog/portal-catalog';
 import { usePageHeading } from '../../../core/page-heading/page-heading';
 import { dateIn, dateRange, formatMoney } from '../../../shared/applications/application-format';
 import { ExternalNavigation } from '../../../shared/external-navigation';
@@ -102,7 +102,7 @@ export default class CheckoutPage {
   });
   protected readonly offerUrl = computed(() => {
     const slug = this.current()?.offer.slug;
-    return slug ? new URL(`/escuela/oferta/${slug}`, environment.landingUrl).href : null;
+    return slug ? offerPath(slug) : null;
   });
   /** Lo que se paga ahora: el total o la 1.ª cuota. */
   protected readonly payNowAmount = computed(() => {

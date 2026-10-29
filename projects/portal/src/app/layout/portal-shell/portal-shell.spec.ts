@@ -38,13 +38,14 @@ describe('PortalShell', () => {
 
   beforeEach(() => localStorage.removeItem('portal.sidebar.collapsed'));
 
-  it('saluda con nombre y primer apellido y muestra las seis secciones', async () => {
+  it('saluda con nombre y primer apellido y muestra las siete secciones', async () => {
     const { host } = await render();
     expect(host.querySelector('.greeting__text')?.textContent).toContain('Hola, Jesús Pérez');
     const labels = [...host.querySelectorAll('.nav__label')].map((l) => l.textContent?.trim());
     expect(labels).toEqual([
       'Dashboard',
       'Formación',
+      'Catálogo',
       'Biblioteca',
       'Calendario',
       'Convocatorias',

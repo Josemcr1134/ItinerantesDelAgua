@@ -200,7 +200,7 @@
         <p class="summary__due">{{ t.dueAt(due) }}</p>
       }
       @if (offerUrl(); as url) {
-        <a class="link" [href]="url">{{ t.backToOffer }}</a>
+        <a class="link" [routerLink]="url">{{ t.backToOffer }}</a>
       }
     </aside>
   </div>
