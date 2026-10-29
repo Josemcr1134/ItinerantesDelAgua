@@ -20,6 +20,7 @@
         <h2 class="card__title">{{ t.paid }}</h2>
         @if (p) {
           <p class="card__text">{{ t.paidHint(p.conceptLabel) }}</p>
+          <p class="card__folio">{{ t.folio(p.folio) }}</p>
           <div class="card__actions">
             <a class="button" [routerLink]="['/formacion/aula', p.offer.id]">{{
               texts.goToClassroom

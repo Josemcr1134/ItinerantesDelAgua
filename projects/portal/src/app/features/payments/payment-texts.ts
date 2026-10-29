@@ -1,4 +1,5 @@
 import {
+  ApiError,
   InstallmentStatus,
   PaymentAlertType,
   PaymentPlanStatus,
@@ -90,6 +91,8 @@ export const PAYMENT_TEXTS = {
   cancelPayment: 'Cancelar ese pago',
   notConfigured:
     'Los pagos con tarjeta aún no están disponibles. Inténtalo más tarde o escríbenos.',
+  providerError:
+    'No pudimos comunicarnos con el procesador de pagos. No se hizo ningún cargo; inténtalo de nuevo en unos minutos.',
   summary: 'Resumen',
   total: 'Total a pagar',
   original: 'Costo original',
@@ -127,11 +130,12 @@ export const PAYMENT_TEXTS = {
     processingHint: 'No cierres esta página; tarda unos segundos.',
     paid: 'Pago confirmado',
     paidHint: (concept: string) => `${concept}. Te enviamos el comprobante a tu correo.`,
+    folio: (folio: string) => `Folio: ${folio}`,
     cancelled: 'Pago cancelado',
     cancelledHint: 'No se realizó ningún cargo. Puedes intentarlo de nuevo cuando quieras.',
     failed: 'El pago no se completó',
-    slow: 'Tu pago sigue en proceso. Revisa el estado en Mis pagos en unos minutos.',
-    retry: 'Intentar de nuevo',
+    slow: 'Estamos confirmando tu pago, te avisaremos por correo.',
+    retry: 'Reintentar',
     receipt: 'Descargar comprobante',
   },
   mine: {
@@ -154,3 +158,15 @@ export const PAYMENT_TEXTS = {
     paidNow: 'Listo: cobramos las cuotas pendientes y tu plan está al día.',
   },
 } as const;
+
+/** Mensaje de un error de pagos: Stripe sin configurar o sin respuesta, o el de la API. */
+export function paymentErrorMessage(error: ApiError): string {
+  switch (error.code) {
+    case 'PAYMENTS_NOT_CONFIGURED':
+      return PAYMENT_TEXTS.notConfigured;
+    case 'PAYMENT_PROVIDER_ERROR':
+      return PAYMENT_TEXTS.providerError;
+    default:
+      return error.message;
+  }
+}

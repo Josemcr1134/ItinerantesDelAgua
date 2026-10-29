@@ -9,7 +9,7 @@ import { usePageHeading } from '../../../core/page-heading/page-heading';
 import { dateIn, dateRange, formatMoney } from '../../../shared/applications/application-format';
 import { ExternalNavigation } from '../../../shared/external-navigation';
 import { browserTimezone } from '../../dashboard/dashboard-format';
-import { BLOCKER_LABELS, PAYMENT_TEXTS } from '../payment-texts';
+import { BLOCKER_LABELS, PAYMENT_TEXTS, paymentErrorMessage } from '../payment-texts';
 import { TransferForm } from './transfer-form';
 
 /**
@@ -151,10 +151,7 @@ export default class CheckoutPage {
       );
       this.external.go(session.checkoutUrl);
     } catch (error) {
-      const apiError = toApiError(error);
-      this.error.set(
-        apiError.code === 'PAYMENTS_NOT_CONFIGURED' ? this.t.notConfigured : apiError.message,
-      );
+      this.error.set(paymentErrorMessage(toApiError(error)));
       this.paying.set(false);
     }
   }

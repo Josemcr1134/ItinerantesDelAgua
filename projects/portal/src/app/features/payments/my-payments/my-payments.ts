@@ -14,6 +14,7 @@ import {
   INSTALLMENT_STATUS_LABELS,
   PAYMENT_STATUS_LABELS,
   PAYMENT_TEXTS,
+  paymentErrorMessage,
   PLAN_STATUS_LABELS,
 } from '../payment-texts';
 
@@ -96,7 +97,10 @@ export class MyPayments {
       this.external.go(session.checkoutUrl);
     } catch (error) {
       this.busy.set(null);
-      await this.alerts.error('No se pudo abrir el cambio de tarjeta', toApiError(error).message);
+      await this.alerts.error(
+        'No se pudo abrir el cambio de tarjeta',
+        paymentErrorMessage(toApiError(error)),
+      );
     }
   }
 
@@ -110,7 +114,7 @@ export class MyPayments {
       const apiError = toApiError(error);
       await this.alerts.error(
         'No se pudo cobrar',
-        apiError.metaString('failureMessage') ?? apiError.message,
+        apiError.metaString('failureMessage') ?? paymentErrorMessage(apiError),
       );
     } finally {
       this.busy.set(null);

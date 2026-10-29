@@ -14,8 +14,9 @@ type View = 'processing' | 'paid' | 'cancelled' | 'failed' | 'slow' | 'error';
 
 /**
  * Vuelta de Stripe (HU-22/23/24: `/pagos/resultado?paymentId=…&result=…`):
- * "Procesando pago…" hasta que la API confirma (Pagado → al aula y el
- * comprobante) o se cancela ("no se realizó ningún cargo").
+ * "Procesando pago…" hasta que la API confirma (Pagado → folio, al aula y el
+ * comprobante), no se completa (Reintentar) o se cancela ("no se realizó
+ * ningún cargo"). Si tras ~1 min sigue pendiente, se avisará por correo.
  */
 @Component({
   selector: 'portal-payment-result-page',
@@ -93,8 +94,9 @@ export default class PaymentResultPage implements OnInit {
         case 'VALIDATED':
           this.view.set('paid');
           return;
+        // Cancelado al volver con "cancel"; si Stripe dijo "success", no se completó.
         case 'CANCELLED':
-          this.view.set('cancelled');
+          this.view.set(this.result() === 'cancel' ? 'cancelled' : 'failed');
           return;
         case 'FAILED':
           this.view.set('failed');

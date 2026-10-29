@@ -139,6 +139,21 @@ describe('CheckoutPage', () => {
     );
   });
 
+  it('si Stripe no responde, aclara que no hubo cargo', async () => {
+    const { fixture, http, host, check } = await render({ oferta: 'o1' }, quote());
+    await check(0);
+    host.querySelector<HTMLButtonElement>('.panel > .button')!.click();
+    http
+      .expectOne(`${API}/checkout`)
+      .flush(
+        { statusCode: 502, code: 'PAYMENT_PROVIDER_ERROR', message: 'Stripe timeout' },
+        { status: 502, statusText: 'Bad Gateway' },
+      );
+    await new Promise((r) => setTimeout(r));
+    await fixture.whenStable();
+    expect(host.querySelector('.error')?.textContent).toContain('No se hizo ningún cargo');
+  });
+
   it('saldo tras beca en México: ofrece transferencia con los datos bancarios', async () => {
     const { fixture, host } = await render(
       { postulacion: 'a1' },

@@ -53,7 +53,28 @@ describe('PaymentResultPage', () => {
     await vi.waitFor(() => http.expectOne(`${API}/p1`).flush(payment('PAID')));
     await fixture.whenStable();
     expect(host.querySelector('.card__title')?.textContent?.trim()).toBe('Pago confirmado');
+    expect(host.querySelector('.card__folio')?.textContent?.trim()).toBe('Folio: PAG-1');
     expect(host.querySelector('a.button')?.getAttribute('href')).toBe('/formacion/aula/o1');
+  });
+
+  it('éxito pero cancelado en Stripe: "no se completó" con Reintentar', async () => {
+    const { fixture, http, host } = await render('success');
+    await vi.waitFor(() => http.expectOne(`${API}/p1`).flush(payment('CANCELLED')));
+    await fixture.whenStable();
+    expect(host.querySelector('.card__title')?.textContent?.trim()).toBe('El pago no se completó');
+    expect(host.querySelector('a.button')?.textContent?.trim()).toBe('Reintentar');
+    http.expectNone(`${API}/p1/cancel`);
+  });
+
+  it('sigue pendiente tras un minuto: avisaremos por correo', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'Date'] });
+    const { fixture, http, host } = await render('success');
+    await vi.waitFor(() => http.expectOne(`${API}/p1`).flush(payment('PENDING')));
+    vi.setSystemTime(Date.now() + 61_000);
+    vi.advanceTimersByTime(POLL_MS);
+    await vi.waitFor(() => http.expectOne(`${API}/p1`).flush(payment('PENDING')));
+    await fixture.whenStable();
+    expect(host.querySelector('.card__text')?.textContent).toContain('te avisaremos por correo');
   });
 
   it('cancelado: cierra el checkout y dice que no hubo cargo', async () => {
