@@ -30,8 +30,29 @@ export default class OfferDetailPage {
 
   protected readonly closingCta = CLOSING_CTA_CONTENT;
 
+  /**
+   * Título, descripción y etiquetas para compartir de la oferta (para quien
+   * ejecuta JavaScript, como Google; WhatsApp y las redes las reciben en el
+   * HTML desde `api/offer-page.js`). Miniatura: la primera imagen del
+   * carrusel o, si no hay, la portada.
+   */
   protected onLoaded(offer: OfferDetailDto): void {
-    this.title.setTitle(`${offer.name} · Itinerantes del Agua`);
-    this.meta.updateTag({ name: 'description', content: offer.summary || offer.name });
+    const title = `${offer.name} · Itinerantes del Agua`;
+    const description = offer.summary || offer.name;
+    this.title.setTitle(title);
+    this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ property: 'og:title', content: title });
+    this.meta.updateTag({ property: 'og:description', content: description });
+    this.meta.updateTag({ property: 'og:url', content: location.href });
+    this.meta.updateTag({ name: 'twitter:title', content: title });
+    this.meta.updateTag({ name: 'twitter:description', content: description });
+    const image = offer.carouselImageUrls[0] ?? offer.coverImageUrl;
+    if (image) {
+      this.meta.updateTag({ property: 'og:image', content: image });
+      this.meta.updateTag({ property: 'og:image:alt', content: offer.name });
+      this.meta.updateTag({ name: 'twitter:image', content: image });
+      this.meta.removeTag('property="og:image:width"');
+      this.meta.removeTag('property="og:image:height"');
+    }
   }
 }

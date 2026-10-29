@@ -3,6 +3,10 @@
   "ignoreCommand": "node tools/vercel-ignore.mjs",
   "rewrites": [
     {
+      "source": "/escuela/oferta/:slug",
+      "destination": "/api/offer-page?slug=:slug"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

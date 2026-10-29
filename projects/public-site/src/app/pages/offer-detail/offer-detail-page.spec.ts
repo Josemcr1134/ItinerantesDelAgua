@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { Meta } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { provideCatalog } from 'catalog';
 import { provideApi } from 'data-access';
@@ -159,6 +160,16 @@ describe('OfferDetailPage', () => {
     );
     expect(host.querySelector('.grant')?.textContent).toContain(
       'Beca especial: entrevista por Zoom',
+    );
+  });
+
+  it('para compartir usa la primera imagen del carrusel como miniatura', async () => {
+    await render((http) => http.expectOne((r) => r.url === API).flush(detail));
+    const meta = TestBed.inject(Meta);
+    expect(meta.getTag('property="og:image"')?.content).toBe('a.webp');
+    expect(meta.getTag('name="twitter:image"')?.content).toBe('a.webp');
+    expect(meta.getTag('property="og:title"')?.content).toBe(
+      'Diplomado en Ecotecnologías del Agua · Itinerantes del Agua',
     );
   });
 

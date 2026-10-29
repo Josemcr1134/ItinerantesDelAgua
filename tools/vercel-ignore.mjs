@@ -123,6 +123,8 @@ try {
 }
 
 const folders = dependencies(app, angular);
+// La ficha de la landing con sus etiquetas para compartir (función de Vercel).
+if (app === 'public-site') folders.push('api/');
 const relevant = changed.filter(
   (file) => SHARED_FILES.includes(file) || folders.some((folder) => file.startsWith(folder)),
 );
