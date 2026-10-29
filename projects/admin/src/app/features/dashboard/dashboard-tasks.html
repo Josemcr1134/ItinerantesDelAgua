@@ -1,0 +1,49 @@
+<section class="tasks" aria-labelledby="tasks-title">
+  <h2 id="tasks-title" class="section-title">Pendientes de hoy</h2>
+  @if (tasks().length) {
+    <ul class="tasks__list">
+      @for (task of tasks(); track task.key) {
+        @let link = taskLinks[task.key];
+        <li>
+          <a class="task" [routerLink]="link.path" [queryParams]="link.queryParams ?? {}">
+            <span class="task__icon"><adm-icon [name]="link.icon" [size]="20" /></span>
+            <span class="task__count">{{ count(task.count) }}</span>
+            <span class="task__label">{{ task.label }}</span>
+            <svg
+              class="task__arrow"
+              aria-hidden="true"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="tasks__empty">
+      <svg
+        aria-hidden="true"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="9" />
+        <path d="m8 12 3 3 5-6" />
+      </svg>
+      Todo al día: no hay pendientes por ahora.
+    </p>
+  }
+</section>

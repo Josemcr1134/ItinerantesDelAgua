@@ -1,0 +1,37 @@
+<header class="hero">
+  <div class="hero__text">
+    <p class="hero__date">{{ today }}</p>
+    <h1 class="hero__title">Hola, {{ name() }}</h1>
+    <p class="hero__lead">Así va Itinerantes del Agua en {{ period().lead }}.</p>
+    <nav class="periods" aria-label="Periodo del resumen">
+      @for (p of periods; track p.days) {
+        <a
+          class="periods__item"
+          [class.periods__item--active]="p.days === period().days"
+          [attr.aria-current]="p.days === period().days ? 'true' : null"
+          routerLink="."
+          [queryParams]="{ periodo: p.days }"
+          queryParamsHandling="merge"
+          >{{ p.label }}</a
+        >
+      }
+    </nav>
+  </div>
+  @if (people(); as people) {
+    <p class="hero__figure">
+      <span class="hero__number">{{ count(people.total) }}</span>
+      <span class="hero__caption">participantes en la plataforma</span>
+      <span class="hero__delta">+{{ count(people.newInPeriod) }} en {{ period().lead }}</span>
+    </p>
+  }
+  <svg class="hero__waves" aria-hidden="true" viewBox="0 0 1200 120" preserveAspectRatio="none">
+    <path
+      d="M0 70c120-40 240-40 360 0s240 40 360 0 240-40 360 0 120 20 120 20v50H0z"
+      fill="rgb(255 255 255 / 0.06)"
+    />
+    <path
+      d="M0 92c150-34 300-34 450 0s300 34 450 0 300-34 300-34v62H0z"
+      fill="rgb(255 255 255 / 0.08)"
+    />
+  </svg>
+</header>

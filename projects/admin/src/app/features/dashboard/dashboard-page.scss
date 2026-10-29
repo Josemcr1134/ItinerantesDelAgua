@@ -1,0 +1,281 @@
+@use 'breakpoints' as bp;
+
+// Inicio del panel: cabecera verde con ondas, pendientes, tarjetas con la
+// maqueta del Dashboard del Portal (HU-06) y paneles blancos con gráficas.
+
+$shadow: -18.9px 18.9px 27.3px -8.4px rgb(63 86 68 / 0.15);
+$muted: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+
+:host {
+  display: block;
+  max-width: 90rem;
+  color: var(--color-raisin-black);
+}
+
+p {
+  margin: 0;
+}
+
+// --- Contenido ---------------------------------------------------------------
+.dashboard {
+  display: grid;
+  gap: var(--space-5);
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: opacity 0.2s ease;
+  }
+}
+
+// Recargando con otro periodo: se queda lo anterior, atenuado.
+.dashboard--loading {
+  opacity: 0.6;
+}
+
+// --- Tarjetas (maqueta del Portal) ---
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 20px clamp(16px, 2.4vw, 28px);
+}
+
+// --- Paneles con gráficas ---
+.panels {
+  display: grid;
+  gap: var(--space-4);
+
+  @include bp.up(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.panel {
+  min-width: 0;
+  padding: var(--space-4);
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: $shadow;
+}
+
+.panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+
+  .panel__lead {
+    margin-bottom: 0;
+  }
+}
+
+.panel__title {
+  color: var(--color-primary);
+  font-family: var(--font-family-body);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.panel__subtitle {
+  margin-bottom: var(--space-2);
+  color: var(--color-raisin-black);
+  font-family: var(--font-family-body);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.panel__subtitle--spaced {
+  margin-top: var(--space-4);
+}
+
+.panel__lead {
+  margin: 2px 0 var(--space-3);
+  color: $muted;
+  font-size: 0.875rem;
+}
+
+.panel__empty {
+  color: $muted;
+}
+
+.toggle {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background-color: #f1eee4;
+}
+
+.toggle__item {
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-sun);
+    outline-offset: 2px;
+  }
+
+  &:hover {
+    background-color: rgb(255 255 255 / 0.7);
+  }
+}
+
+.toggle__item--active,
+.toggle__item--active:hover {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.money {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid #ece8dc;
+
+  @include bp.up(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.money__chart {
+  min-width: 0;
+}
+
+// Postulaciones por tipo.
+.kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.kinds__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 4px 4px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.kinds__count {
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-primary);
+  color: #fff;
+  font-family: var(--font-family-numeric);
+}
+
+// Ofertas con más inscripciones: ocupación del cupo.
+.offers {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  font-size: 0.875rem;
+}
+
+.offer__head {
+  display: grid;
+  min-width: 0;
+}
+
+.offer__type {
+  color: $muted;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.offer__name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.offer__numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  align-self: end;
+  font-variant-numeric: tabular-nums;
+
+  strong {
+    font-family: var(--font-family-numeric);
+    font-size: 1rem;
+  }
+}
+
+.muted {
+  color: $muted;
+}
+
+.offer__tag {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.offer__tag--ok {
+  background-color: color-mix(in srgb, #399f71 14%, #fff);
+  color: #23674a;
+}
+
+.offer__tag--warning {
+  background-color: color-mix(in srgb, #c48a00 18%, #fff);
+  color: #7a5600;
+}
+
+.offer__tag--full {
+  background-color: color-mix(in srgb, #b5452b 15%, #fff);
+  color: #8a3320;
+}
+
+.meter {
+  grid-column: 1 / -1;
+  height: 10px;
+  border-radius: 4px;
+  background-color: color-mix(in srgb, #399f71 16%, #fff);
+}
+
+.meter__fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.meter__fill--ok {
+  background-color: #399f71;
+}
+
+.meter__fill--warning {
+  background-color: #c48a00;
+}
+
+.meter__fill--full {
+  background-color: #b5452b;
+}

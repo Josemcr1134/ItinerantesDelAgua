@@ -1,0 +1,257 @@
+@let d = overview.data();
+
+<adm-dashboard-hero [name]="firstName()" [period]="period()" [people]="d?.people ?? null" />
+
+<adm-request-state
+  [error]="overview.error()"
+  [loaded]="!!d"
+  loadingText="Cargando tu resumen…"
+  (retry)="loadOverview()"
+>
+  @if (d) {
+    <div class="dashboard" [class.dashboard--loading]="overview.loading()">
+      <!-- Pendientes (la foto de hoy: no dependen del periodo). -->
+      <adm-dashboard-tasks [tasks]="d.tasks" />
+
+      <!-- Un bloque por permiso (los que llegan en null no se pintan). -->
+      <div class="cards">
+        <adm-dashboard-card
+          headingId="card-people"
+          title="Personas"
+          icon="accounts"
+          [value]="count(d.people.total)"
+          caption="participantes"
+          [link]="access.can('users.manage') ? '/usuarios' : undefined"
+          linkLabel="Ver usuarios"
+        >
+          <adm-dashboard-metric label="Activas" [value]="count(d.people.active)" />
+          <adm-dashboard-metric
+            label="Sin verificar el correo"
+            [value]="d.people.pendingVerification"
+            [alert]="true"
+          />
+          <adm-dashboard-metric label="Deshabilitadas" [value]="d.people.disabled" />
+          <adm-dashboard-metric label="Nuevas en el periodo" [value]="d.people.newInPeriod" />
+        </adm-dashboard-card>
+
+        @if (d.training; as t) {
+          <adm-dashboard-card
+            headingId="card-training"
+            title="Formación"
+            icon="offers"
+            [value]="count(t.enrollments.active)"
+            caption="inscripciones activas"
+            link="/ofertas"
+            linkLabel="Ver oferta formativa"
+          >
+            <adm-dashboard-metric label="Ofertas publicadas" [value]="t.publishedOffers" />
+            <adm-dashboard-metric label="Ofertas en curso" [value]="t.offersInProgress" />
+            <adm-dashboard-metric
+              label="Inscripciones en el periodo"
+              [value]="t.newEnrollmentsInPeriod"
+            />
+            <adm-dashboard-metric label="Sesiones en 7 días" [value]="t.upcomingSessions7d" />
+          </adm-dashboard-card>
+        }
+
+        @if (d.applications; as a) {
+          <adm-dashboard-card
+            headingId="card-applications"
+            title="Postulaciones"
+            icon="applications"
+            [value]="count(a.toReview)"
+            caption="por revisar"
+            link="/postulaciones"
+            linkLabel="Ver postulaciones"
+          >
+            <adm-dashboard-metric label="Entrevistas agendadas" [value]="a.interviewsScheduled" />
+            <adm-dashboard-metric
+              label="Aprobadas sin pagar o confirmar"
+              [value]="a.approvedPending"
+              [alert]="true"
+            />
+            <adm-dashboard-metric label="Enviadas en el periodo" [value]="a.submittedInPeriod" />
+          </adm-dashboard-card>
+        }
+
+        @if (d.payments; as p) {
+          <adm-dashboard-card
+            headingId="card-payments"
+            title="Pagos"
+            icon="payments"
+            [value]="count(paymentsCount())"
+            caption="pagos en el periodo"
+            link="/pagos"
+            linkLabel="Ver pagos"
+          >
+            @for (c of p.currencies; track c.currency) {
+              <adm-dashboard-metric [label]="'Neto ' + c.currency" [value]="net(c)" />
+            }
+            <adm-dashboard-metric
+              label="Transferencias por validar"
+              [value]="p.pendingTransfers"
+              [alert]="true"
+            />
+            <adm-dashboard-metric
+              label="Planes con cobro fallido"
+              [value]="p.plans.pastDue"
+              [alert]="true"
+            />
+            <adm-dashboard-metric
+              label="Planes en mora"
+              [value]="p.plans.delinquent"
+              [alert]="true"
+            />
+          </adm-dashboard-card>
+        }
+
+        @if (d.contact; as c) {
+          <adm-dashboard-card
+            headingId="card-contact"
+            title="Mensajes"
+            icon="contact"
+            [value]="count(c.unread)"
+            [caption]="c.unread === 1 ? 'mensaje nuevo' : 'mensajes nuevos'"
+            link="/mensajes"
+            linkLabel="Ir a mensajes"
+            [inline]="true"
+          />
+        }
+      </div>
+
+      <!-- Evolución por mes (independiente del periodo). -->
+      <section class="panel panel--wide" aria-labelledby="trends-title">
+        <div class="panel__head">
+          <div>
+            <h2 id="trends-title" class="panel__title">Evolución por mes</h2>
+            <p class="panel__lead">Altas de cada mes, en hora de Ciudad de México.</p>
+          </div>
+          <nav class="toggle" aria-label="Meses de la evolución">
+            @for (m of [6, 12]; track m) {
+              <a
+                class="toggle__item"
+                [class.toggle__item--active]="months() === m"
+                [attr.aria-current]="months() === m ? 'true' : null"
+                routerLink="."
+                [queryParams]="{ meses: m }"
+                queryParamsHandling="merge"
+                >{{ m }} meses</a
+              >
+            }
+          </nav>
+        </div>
+        <adm-request-state
+          [error]="trends.error()"
+          [loaded]="!!trendView()"
+          loadingText="Cargando la evolución…"
+          (retry)="reloadTrends()"
+        >
+          @if (trendView(); as view) {
+            <adm-column-chart
+              [labels]="view.labels"
+              [fullLabels]="view.fullLabels"
+              [series]="view.series"
+              caption="Altas por mes"
+            />
+            @if (view.money.length) {
+              <div class="money">
+                @for (chart of view.money; track chart.currency) {
+                  <div class="money__chart">
+                    <h3 class="panel__subtitle">Neto cobrado en {{ chart.currency }}</h3>
+                    <adm-column-chart
+                      [labels]="view.labels"
+                      [fullLabels]="view.fullLabels"
+                      [series]="chart.series"
+                      [format]="chart.format"
+                      [axisFormat]="chart.axisFormat"
+                      [caption]="'Neto cobrado por mes en ' + chart.currency"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          }
+        </adm-request-state>
+      </section>
+
+      <div class="panels">
+        @if (d.training; as t) {
+          <section class="panel" aria-labelledby="enrollments-title">
+            <h2 id="enrollments-title" class="panel__title">Inscripciones</h2>
+            <p class="panel__lead">Estado actual de todas las inscripciones.</p>
+            <adm-stacked-bar [segments]="enrollmentSegments()" />
+            @if (sources().length) {
+              <h3 class="panel__subtitle panel__subtitle--spaced">Por origen</h3>
+              <adm-bar-list [items]="sources()" />
+            }
+          </section>
+        }
+
+        @if (d.applications) {
+          <section class="panel" aria-labelledby="applications-title">
+            <h2 id="applications-title" class="panel__title">Postulaciones</h2>
+            <p class="panel__lead">Enviadas, por estado actual.</p>
+            <ul class="kinds">
+              @for (k of applicationKinds(); track k.label) {
+                <li class="kinds__item">
+                  <span class="kinds__count">{{ count(k.count) }}</span>
+                  {{ k.label }}
+                </li>
+              }
+            </ul>
+            @if (applicationStatuses().length) {
+              <adm-bar-list [items]="applicationStatuses()" color="#0067ff" />
+            } @else {
+              <p class="panel__empty">Aún no hay postulaciones enviadas.</p>
+            }
+          </section>
+        }
+
+        @if (d.training?.topOffers?.length) {
+          <section class="panel" aria-labelledby="offers-title">
+            <h2 id="offers-title" class="panel__title">Ofertas con más inscripciones</h2>
+            <p class="panel__lead">Inscripciones activas y completadas frente al cupo.</p>
+            <ol class="offers">
+              @for (offer of d.training!.topOffers; track offer.id) {
+                @let occ = occupancy(offer);
+                <li class="offer">
+                  <div class="offer__head">
+                    <span class="offer__type">{{ typeLabels[offer.type] }}</span>
+                    <span class="offer__name">{{ offer.name }}</span>
+                  </div>
+                  <div class="offer__numbers">
+                    <strong>{{ count(offer.enrolled) }}</strong>
+                    @if (offer.capacity) {
+                      / {{ count(offer.capacity) }}
+                    } @else {
+                      <span class="muted">· sin cupo</span>
+                    }
+                    @if (occ) {
+                      <span class="offer__tag offer__tag--{{ occ.tone }}">{{ occ.text }}</span>
+                    }
+                  </div>
+                  @if (occ) {
+                    <span class="meter" aria-hidden="true">
+                      <span
+                        class="meter__fill meter__fill--{{ occ.tone }}"
+                        [style.width.%]="occ.percent"
+                      ></span>
+                    </span>
+                  }
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
+        @if (countries().length) {
+          <section class="panel" aria-labelledby="countries-title">
+            <h2 id="countries-title" class="panel__title">Países con más participantes</h2>
+            <p class="panel__lead">Los 5 países con más cuentas.</p>
+            <adm-bar-list [items]="countries()" color="#c48a00" />
+          </section>
+        }
+      </div>
+    </div>
+  }
+</adm-request-state>

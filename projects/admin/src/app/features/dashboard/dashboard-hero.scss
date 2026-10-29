@@ -1,0 +1,131 @@
+@use 'breakpoints' as bp;
+
+// Cabecera verde del inicio: saludo, periodo y la cifra principal, con ondas.
+
+:host {
+  display: block;
+  margin-bottom: var(--space-5);
+}
+
+p {
+  margin: 0;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  overflow: hidden;
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  border-radius: 24px;
+  background: linear-gradient(135deg, #3f5644 0%, #2e4033 60%, #364f84 140%);
+  color: var(--color-on-primary);
+
+  @include bp.up(md) {
+    padding: var(--space-5) var(--space-5) calc(var(--space-6) + 8px);
+  }
+}
+
+.hero__text,
+.hero__figure {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__date {
+  color: #f3d27a;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero__title {
+  margin-top: 4px;
+  font-family: var(--font-family-display);
+  font-size: clamp(2.75rem, 2rem + 3vw, 4rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.hero__lead {
+  margin-top: var(--space-2);
+  font-size: 1.0625rem;
+}
+
+.periods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--space-3);
+}
+
+.periods__item {
+  padding: 6px 16px;
+  border: 1.5px solid rgb(251 248 240 / 0.55);
+  border-radius: var(--radius-pill);
+  color: var(--color-on-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-sun);
+    outline-offset: 2px;
+  }
+
+  &:hover {
+    background-color: rgb(251 248 240 / 0.12);
+  }
+}
+
+.periods__item--active,
+.periods__item--active:hover {
+  border-color: var(--color-sun);
+  background-color: var(--color-sun);
+  color: var(--color-raisin-black);
+}
+
+.hero__figure {
+  display: grid;
+  justify-items: start;
+
+  @include bp.up(md) {
+    justify-items: end;
+    text-align: right;
+  }
+}
+
+.hero__number {
+  font-family: var(--font-family-numeric);
+  font-size: clamp(3rem, 2.2rem + 3vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hero__caption {
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.hero__delta {
+  margin-top: var(--space-2);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background-color: rgb(251 248 240 / 0.14);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.hero__waves {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 90px;
+}

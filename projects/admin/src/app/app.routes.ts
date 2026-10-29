@@ -20,7 +20,7 @@ export const routes: Routes = [
       {
         path: '',
         title: 'Inicio · Administrador',
-        loadComponent: () => import('./pages/home/home'),
+        loadComponent: () => import('./features/dashboard/dashboard-page'),
       },
       {
         path: 'ofertas',
