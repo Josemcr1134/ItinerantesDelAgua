@@ -15,10 +15,10 @@ import { FilterSelect, optionsFrom } from '../../shared/filters/filter-select';
 import { SearchField } from '../../shared/filters/search-field';
 import { listController } from '../../shared/list/list-controller';
 import { ListStates } from '../../shared/list/list-states';
-import { rowActions } from '../../shared/list/row-actions';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { Person } from '../../shared/person/person';
 import { RowMenu } from '../../shared/row-menu/row-menu';
+import { accountActions } from './account-actions';
 import { AddAdministratorDialog } from './add-administrator/add-administrator-dialog';
 import { EditRolesDialog } from './edit-roles-dialog';
 import { formatDateTime, staffRolesOf, STATUS_LABELS, teamRoles } from './team-roles';
@@ -84,7 +84,12 @@ export default class AdministratorsPage {
     }),
     notFilters: ['staffOnly', 'sort'],
   });
-  protected readonly rows = rowActions();
+  /** Deshabilitar/habilitar y verificar el correo; `rows` sirve para las demás acciones. */
+  protected readonly accounts = accountActions((updated, message) => {
+    this.list.replace((u) => u.id === updated.id, updated);
+    this.notice.set(message);
+  });
+  protected readonly rows = this.accounts.rows;
 
   /** Aviso del resultado de la última acción (se anuncia a lectores de pantalla). */
   protected readonly notice = signal('');
@@ -141,55 +146,6 @@ export default class AdministratorsPage {
     if (done) {
       this.notice.set(`${user.fullName} ya no forma parte del equipo.`);
       this.list.reload();
-    }
-  }
-
-  // --- Deshabilitar / habilitar ---
-  protected async toggleStatus(user: AdminUserDto): Promise<void> {
-    const disabling = user.status !== 'DISABLED';
-    const updated = await this.rows.confirmRun(
-      user.id,
-      disabling
-        ? {
-            title: `¿Deshabilitar la cuenta de ${user.fullName}?`,
-            message:
-              'No podrá iniciar sesión y se cerrarán todas sus sesiones. Puedes volver a habilitarla después.',
-            confirmLabel: 'Deshabilitar',
-            variant: 'error',
-          }
-        : {
-            title: `¿Habilitar la cuenta de ${user.fullName}?`,
-            message: 'Podrá volver a iniciar sesión con sus roles actuales.',
-            confirmLabel: 'Habilitar',
-            variant: 'info',
-          },
-      () => firstValueFrom(disabling ? this.api.disable(user.id) : this.api.enable(user.id)),
-    );
-    if (updated) {
-      this.list.replace((u) => u.id === updated.id, updated);
-      this.notice.set(
-        disabling
-          ? `Se deshabilitó la cuenta de ${updated.fullName}.`
-          : `Se habilitó la cuenta de ${updated.fullName}.`,
-      );
-    }
-  }
-
-  // --- Verificar el correo (soporte) ---
-  protected async verifyEmail(user: AdminUserDto): Promise<void> {
-    const updated = await this.rows.confirmRun(
-      user.id,
-      {
-        title: `¿Marcar como verificado el correo de ${user.fullName}?`,
-        message: `Úsalo solo si confirmaste que ${user.email} le pertenece y no le llega el código. Podrá iniciar sesión sin verificarlo.`,
-        confirmLabel: 'Marcar como verificado',
-        variant: 'info',
-      },
-      () => firstValueFrom(this.api.verifyEmail(user.id)),
-    );
-    if (updated) {
-      this.list.replace((u) => u.id === updated.id, updated);
-      this.notice.set(`Se marcó como verificado el correo de ${updated.fullName}.`);
     }
   }
 

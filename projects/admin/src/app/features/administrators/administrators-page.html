@@ -119,7 +119,7 @@
                       role="menuitem"
                       type="button"
                       [disabled]="busy"
-                      (click)="verifyEmail(user)"
+                      (click)="accounts.verifyEmail(user)"
                     >
                       Marcar correo como verificado
                     </button>
@@ -129,7 +129,7 @@
                     role="menuitem"
                     type="button"
                     [disabled]="busy"
-                    (click)="toggleStatus(user)"
+                    (click)="accounts.toggleStatus(user)"
                   >
                     {{ user.status === 'DISABLED' ? 'Habilitar cuenta' : 'Deshabilitar cuenta' }}
                   </button>
