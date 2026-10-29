@@ -1,6 +1,6 @@
 <adm-page-header
   title="Mensajes"
-  lead="Lo que escriben desde la página de Contacto y la landing. Abrir un mensaje no cambia su estado."
+  lead="Lo que escriben desde el formulario de contacto de la landing. Abrir un mensaje no cambia su estado."
 />
 
 <nav class="tabs" aria-label="Mensajes por estado">
@@ -39,13 +39,6 @@
     allLabel="Todos"
     [options]="options.subject"
     [(value)]="subject"
-  />
-  <adm-filter-select
-    inputId="contact-origin"
-    label="Origen"
-    allLabel="Todos"
-    [options]="options.origin"
-    [(value)]="origin"
   />
   <adm-filter-date inputId="contact-from" label="Desde" [max]="to()" [(value)]="from" />
   <adm-filter-date inputId="contact-to" label="Hasta" [min]="from()" [(value)]="to" />
@@ -87,7 +80,7 @@
           </td>
           <td data-label="Asunto">
             <p class="strong">{{ m.subjectLabel }}</p>
-            <p class="muted">{{ m.originLabel }} · {{ formatDateTime(m.createdAt) }}</p>
+            <p class="muted">{{ formatDateTime(m.createdAt) }}</p>
             <p class="preview">{{ m.message }}</p>
           </td>
           <td data-label="Estado">

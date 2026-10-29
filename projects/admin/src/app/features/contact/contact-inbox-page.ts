@@ -2,11 +2,9 @@ import { Component, computed, inject, input, OnInit, signal } from '@angular/cor
 import { RouterLink } from '@angular/router';
 import {
   AdminContactApi,
-  CONTACT_ORIGIN_VALUES,
   CONTACT_STATUS_VALUES,
   CONTACT_SUBJECT_VALUES,
   ContactMessageSort,
-  ContactOrigin,
   ContactStatus,
   ContactSubject,
 } from 'data-access';
@@ -22,7 +20,6 @@ import { ListStates } from '../../shared/list/list-states';
 import { PageHeader } from '../../shared/page-header/page-header';
 import { Person } from '../../shared/person/person';
 import {
-  CONTACT_ORIGIN_LABELS,
   CONTACT_STATUS_LABELS,
   CONTACT_STATUS_TONES,
   CONTACT_SUBJECT_LABELS,
@@ -30,8 +27,9 @@ import {
 import { ContactInbox } from './contact-inbox';
 
 /**
- * Mensajes (HU-38 / HU-01): bandeja del formulario de Contacto y de la
- * landing, con pestañas por estado (`?estado=`), búsqueda y filtros.
+ * Mensajes (HU-38 / HU-01): bandeja del formulario de contacto de la landing,
+ * con pestañas por estado (`?estado=`), búsqueda y filtros. Hoy todos llegan
+ * con origen `LANDING`, por eso no se filtra por origen.
  */
 @Component({
   selector: 'adm-contact-inbox-page',
@@ -78,14 +76,12 @@ export default class ContactInboxPage implements OnInit {
   });
 
   protected readonly subject = signal<ContactSubject | ''>('');
-  protected readonly origin = signal<ContactOrigin | ''>('');
   protected readonly from = signal('');
   protected readonly to = signal('');
   protected readonly sort = signal<ContactMessageSort>('CREATED_DESC');
 
   protected readonly options = {
     subject: optionsFrom(CONTACT_SUBJECT_VALUES, CONTACT_SUBJECT_LABELS),
-    origin: optionsFrom(CONTACT_ORIGIN_VALUES, CONTACT_ORIGIN_LABELS),
     sort: [
       { value: 'CREATED_DESC', label: 'Más recientes' },
       { value: 'CREATED_ASC', label: 'Más antiguos' },
@@ -102,7 +98,6 @@ export default class ContactInboxPage implements OnInit {
     filters: () => ({
       status: this.status(),
       subject: this.subject(),
-      origin: this.origin(),
       from: this.from(),
       to: this.to(),
       sort: this.sort(),
@@ -118,7 +113,6 @@ export default class ContactInboxPage implements OnInit {
   protected clearFilters(): void {
     this.list.clearSearch();
     this.subject.set('');
-    this.origin.set('');
     this.from.set('');
     this.to.set('');
   }

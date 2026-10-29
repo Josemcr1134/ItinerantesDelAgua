@@ -1,14 +1,7 @@
-import {
-  ContactOrigin,
-  ContactProjectType,
-  ContactService,
-  ContactStatus,
-  ContactSubject,
-} from 'data-access';
+import { ContactProjectType, ContactService, ContactStatus, ContactSubject } from 'data-access';
 
 // Los mensajes ya traen `statusLabel`, `subjectLabel` y `originLabel` de la API;
 // estas etiquetas son para los filtros y el cambio de estado.
-// TODO(contenido): confirmar los textos de origen.
 
 export const CONTACT_STATUS_LABELS: Readonly<Record<ContactStatus, string>> = {
   NEW: 'Nuevo',
@@ -31,14 +24,6 @@ export const CONTACT_SUBJECT_LABELS: Readonly<Record<ContactSubject, string>> = 
   REGENERATIVE_TECH_HAWA: 'Tecnologías regenerativas (HAWA)',
   SCHOLARSHIPS_CALLS: 'Becas y convocatorias',
   OTHER: 'Otro',
-};
-
-export const CONTACT_ORIGIN_LABELS: Readonly<Record<ContactOrigin, string>> = {
-  CONTACT_PAGE: 'Página de Contacto',
-  LANDING: 'Landing',
-  DESIGN_CONSULTING_PAGE: 'Página de Diseño y consultoría',
-  REGENERATIVE_TECH_PAGE: 'Página de Tecnologías regenerativas',
-  ABOUT_PAGE: 'Página Nosotros',
 };
 
 /** Como en el formulario de la landing. */

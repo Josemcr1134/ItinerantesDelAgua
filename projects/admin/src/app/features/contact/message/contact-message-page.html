@@ -23,7 +23,7 @@
 >
   @if (message.data(); as m) {
     <header class="head">
-      <p class="eyebrow">{{ m.subjectLabel }} · {{ m.originLabel }}</p>
+      <p class="eyebrow">{{ m.subjectLabel }}</p>
       <h1 class="title title--name">{{ m.name }}</h1>
       <p class="status">
         <span [class]="'adm-badge adm-badge--' + statusTones[m.status]">{{ m.statusLabel }}</span>
