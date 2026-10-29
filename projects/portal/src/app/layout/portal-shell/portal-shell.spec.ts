@@ -128,4 +128,28 @@ describe('PortalShell', () => {
     expect(more.getAttribute('aria-expanded')).toBe('false');
     expect(document.activeElement).toBe(more);
   });
+
+  it('en móvil, la campana y el saludo van en la barra superior (no en el encabezado)', async () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }));
+    try {
+      const { fixture, host } = await render();
+      const topbar = host.querySelector('.topbar')!;
+      expect(topbar.querySelector('portal-notification-bell')).not.toBeNull();
+      expect(topbar.querySelector('.greeting__text')?.textContent).toContain('Hola, Jesús Pérez');
+      expect(host.querySelector('.header__end')).toBeNull();
+      expect(host.querySelectorAll('portal-notification-bell')).toHaveLength(1);
+
+      // El menú de la cuenta se abre desde ahí.
+      topbar.querySelector<HTMLButtonElement>('.greeting__button')!.click();
+      await fixture.whenStable();
+      expect(topbar.querySelector('#account-menu-header')?.textContent).toContain('Mi perfil');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

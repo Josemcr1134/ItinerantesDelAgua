@@ -3,6 +3,7 @@ import {
   afterNextRender,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
   inject,
   Injector,
@@ -24,6 +25,18 @@ import { NAV_ITEMS, NavItem, TAB_ITEMS } from './navigation';
 
 const COLLAPSED_KEY = 'portal.sidebar.collapsed';
 
+/** Por debajo de `lg` (64rem, como `bp.up(lg)`): barra superior e inferior. */
+function mobileLayout() {
+  const query = typeof matchMedia === 'function' ? matchMedia('(max-width: 63.99rem)') : null;
+  const mobile = signal(query?.matches ?? false);
+  if (query) {
+    const update = (event: MediaQueryListEvent) => mobile.set(event.matches);
+    query.addEventListener('change', update);
+    inject(DestroyRef).onDestroy(() => query.removeEventListener('change', update));
+  }
+  return mobile.asReadonly();
+}
+
 /** Preferencia del menú en este navegador (si el almacenamiento falla, expandido). */
 function readCollapsed(): boolean {
   try {
@@ -36,8 +49,9 @@ function readCollapsed(): boolean {
 /**
  * Marco del portal (Figma HU-06): menú lateral que se contrae a solo íconos
  * (se recuerda en este navegador), saludo con el menú de la cuenta y, en
- * móvil, barra inferior flotante con las secciones principales y "Más", que
- * despliega el menú completo.
+ * móvil, la campana y el saludo en la barra superior y una barra inferior
+ * flotante con las secciones principales y "Más", que despliega el menú
+ * completo.
  */
 @Component({
   selector: 'portal-shell',
@@ -74,6 +88,8 @@ export default class PortalShell {
     this.fullName().trim().split(/\s+/).slice(0, 2).join(' '),
   );
 
+  /** En móvil, la campana y el saludo van en la barra superior (no en el encabezado). */
+  protected readonly mobile = mobileLayout();
   protected readonly collapsed = signal(readCollapsed());
   /** Menú lateral desplegado en móvil. */
   protected readonly drawerOpen = signal(false);

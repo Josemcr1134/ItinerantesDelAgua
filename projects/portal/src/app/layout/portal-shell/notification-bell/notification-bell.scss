@@ -11,8 +11,9 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  // 44 px en la barra superior móvil (`--bell-size`).
+  width: var(--bell-size, 52px);
+  height: var(--bell-size, 52px);
   border: 0;
   border-radius: 50%;
   background: linear-gradient(90deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.7));
