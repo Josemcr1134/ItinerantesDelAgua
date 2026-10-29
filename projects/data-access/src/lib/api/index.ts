@@ -37,6 +37,7 @@ export * from './services/admin-calendar.api';
 export * from './services/admin-moodle.api';
 export * from './services/admin-audit.api';
 export * from './services/admin-contact.api';
+export * from './services/admin-dashboard.api';
 export * from './services/scholarship-types.api';
 export * from './services/payments.api';
 export * from './services/moodle-access.api';
