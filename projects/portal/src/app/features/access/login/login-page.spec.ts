@@ -53,13 +53,19 @@ describe('LoginPage (portal)', () => {
       .query((el) => el.name === 'auth-login-form')
       .triggerEventHandler('emailNotVerified', {
         email: 'ana@correo.com',
+        rememberMe: false,
         otpSent: true,
+        maskedEmail: 'a***@correo.com',
+        codeLength: 6,
         expiresAt: '2026-10-27T00:10:00.000Z',
         resendAvailableAt: '2026-10-27T00:00:30.000Z',
       });
     expect(navigate).toHaveBeenCalledWith(['/verificar-correo'], {
       state: {
         email: 'ana@correo.com',
+        maskedEmail: 'a***@correo.com',
+        rememberMe: false,
+        resendAvailableAt: '2026-10-27T00:00:30.000Z',
         otp: {
           maskedEmail: 'a***@correo.com',
           codeLength: 6,

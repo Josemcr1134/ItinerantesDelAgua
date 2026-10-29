@@ -87,6 +87,37 @@ describe('AuthService y guards', () => {
     expect(session.isAuthenticated()).toBe(false);
   });
 
+  it('verifica el correo e inicia la sesión que devuelve la API', async () => {
+    const { http, auth, session, stored } = setup();
+    const result = firstValueFrom(
+      auth.verifyEmail({ email: 'ana@x.com', code: '123456', rememberMe: true }),
+    );
+    const request = http.expectOne(`${API}/auth/verify-email`);
+    expect(request.request.body).toEqual({
+      email: 'ana@x.com',
+      code: '123456',
+      rememberMe: true,
+      startSession: true,
+    });
+    request.flush({ verified: true, email: 'ana@x.com', session: loginResponse(['FINANCE']) });
+
+    expect((await result)?.fullName).toBe('Ana Pérez');
+    expect(session.isAuthenticated()).toBe(true);
+    expect(stored()?.refreshToken).toBe('refresh-1');
+  });
+
+  it('al verificar, rechaza a los participantes como el login', async () => {
+    const { http, auth, session } = setup();
+    const result = firstValueFrom(auth.verifyEmail({ email: 'p@x.com', code: '123456' }));
+    http
+      .expectOne(`${API}/auth/verify-email`)
+      .flush({ verified: true, email: 'p@x.com', session: loginResponse(['PARTICIPANT']) });
+    http.expectOne(`${API}/auth/logout`).flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(((await result.catch((e: unknown) => e)) as ApiError).code).toBe('FORBIDDEN');
+    expect(session.isAuthenticated()).toBe(false);
+  });
+
   it('authGuard recupera el usuario con los tokens guardados', async () => {
     const { http } = setup(tokens);
     const result = runGuard(authGuard);

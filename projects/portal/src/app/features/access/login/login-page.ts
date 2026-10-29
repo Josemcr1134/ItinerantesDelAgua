@@ -1,9 +1,8 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { LoginForm, UnverifiedLogin } from 'auth';
+import { LoginForm, UnverifiedLogin, verifyEmailState } from 'auth';
 import { AccessLayout } from '../access-layout/access-layout';
 import { returnParams } from '../return-url';
-import { maskEmail, VerifyEmailState } from '../verify-email/verify-email-state';
 
 /** Login de participantes (Figma HU-04 "Ingresar al Portal"). */
 @Component({
@@ -26,18 +25,9 @@ export default class LoginPage {
    * que la API acaba de reenviar (si lo hizo), conservando el destino.
    */
   protected async verifyEmail(login: UnverifiedLogin): Promise<void> {
-    const state: VerifyEmailState = {
-      email: login.email,
-      otp:
-        login.otpSent && login.expiresAt
-          ? {
-              maskedEmail: maskEmail(login.email),
-              codeLength: 6,
-              expiresAt: login.expiresAt,
-              resendAvailableAt: login.resendAvailableAt ?? login.expiresAt,
-            }
-          : null,
-    };
-    await this.router.navigate(['/verificar-correo'], { state, queryParams: this.back() });
+    await this.router.navigate(['/verificar-correo'], {
+      state: verifyEmailState(login),
+      queryParams: this.back(),
+    });
   }
 }

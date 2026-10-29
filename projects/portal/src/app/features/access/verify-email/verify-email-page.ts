@@ -9,20 +9,34 @@ import {
 } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AUTH_CONFIG, AUTH_TEXTS, countdown, formatTime } from 'auth';
-import { ApiError, AuthApi, OtpDeliveryDto, requestState, toApiError } from 'data-access';
+import {
+  AUTH_CONFIG,
+  AUTH_TEXTS,
+  AuthService,
+  countdown,
+  formatTime,
+  maskEmail,
+  VerifyEmailState,
+} from 'auth';
+import {
+  ApiError,
+  AuthApi,
+  OtpDeliveryDto,
+  requestState,
+  toApiError,
+  UserProfileDto,
+} from 'data-access';
 import { firstValueFrom } from 'rxjs';
 import { AlertService, Button } from 'ui-kit';
 import { AccessLayout } from '../access-layout/access-layout';
 import { CodeInput } from '../code-input/code-input';
-import { returnParams } from '../return-url';
-import { maskEmail, VerifyEmailState } from './verify-email-state';
+import { returnParams, safeReturnUrl } from '../return-url';
 import { formatClock, VERIFY_TEXTS } from './verify-email-texts';
 
 /**
  * Verificación del correo tras el registro (HU-03, Figma "Verifica tu
- * Correo"): código de 6 dígitos en casillas, reenvío con cuenta regresiva y,
- * al confirmar, vuelta al login.
+ * Correo"): código de 6 dígitos en casillas y reenvío con cuenta regresiva.
+ * Al confirmar, la API devuelve la sesión y se entra directo al destino.
  */
 @Component({
   selector: 'portal-verify-email-page',
@@ -36,6 +50,7 @@ export default class VerifyEmailPage {
   protected readonly back = computed(() => returnParams(this.returnUrl()));
 
   private readonly api = inject(AuthApi);
+  private readonly auth = inject(AuthService);
   private readonly alerts = inject(AlertService);
   private readonly router = inject(Router);
   protected readonly config = inject(AUTH_CONFIG);
@@ -49,7 +64,7 @@ export default class VerifyEmailPage {
   protected readonly knownEmail = this.state?.email ?? null;
   protected readonly resend = countdown();
   protected readonly resent = signal(false);
-  protected readonly request = requestState<unknown>();
+  protected readonly request = requestState<UserProfileDto | null>();
   /** El último código fue rechazado: casillas en rojo hasta escribir otro. */
   protected readonly rejected = signal(false);
   private readonly injector = inject(Injector);
@@ -66,7 +81,7 @@ export default class VerifyEmailPage {
     const delivery = this.delivery();
     if (delivery) return this.texts.sent(delivery.maskedEmail);
     return this.knownEmail
-      ? this.texts.unverified(maskEmail(this.knownEmail))
+      ? this.texts.unverified(this.state?.maskedEmail ?? maskEmail(this.knownEmail))
       : this.texts.askEmail;
   });
 
@@ -89,8 +104,8 @@ export default class VerifyEmailPage {
   protected readonly resendClock = computed(() => formatClock(this.resend.remaining()));
 
   constructor() {
-    const otp = this.delivery();
-    if (otp) this.resend.start(otp.resendAvailableAt);
+    const availableAt = this.delivery()?.resendAvailableAt ?? this.state?.resendAvailableAt;
+    if (availableAt) this.resend.start(availableAt);
     this.form.controls.code.valueChanges.subscribe((code) => {
       if (code) this.rejected.set(false);
     });
@@ -109,8 +124,14 @@ export default class VerifyEmailPage {
     this.resent.set(false);
     this.resendError.set(null);
     const { code } = this.form.getRawValue();
-    const result = await this.request.run(this.api.verifyEmail({ email: this.email(), code }));
-    if (!result) {
+    const user = await this.request.run(
+      this.auth.verifyEmail({
+        email: this.email(),
+        code,
+        rememberMe: this.state?.rememberMe ?? false,
+      }),
+    );
+    if (this.request.error()) {
       this.form.controls.code.reset();
       this.rejected.set(true);
       afterNextRender(() => document.getElementById('verify-code')?.focus(), {
@@ -120,6 +141,11 @@ export default class VerifyEmailPage {
       if (availableAt) this.resend.start(availableAt);
       return;
     }
+    if (user) {
+      await this.router.navigateByUrl(safeReturnUrl(this.returnUrl()) ?? this.config.homeUrl);
+      return;
+    }
+    // Sin sesión en la respuesta: se inicia desde el login.
     const done = this.texts.done;
     await this.alerts.success(done.title, done.message, {
       confirmLabel: this.authTexts.forgot.done.confirm,

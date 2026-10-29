@@ -5,6 +5,7 @@ import {
   AuthApi,
   isApiError,
   LoginRequestDto,
+  LoginResponseDto,
   ProfileApi,
   UserProfileDto,
 } from 'data-access';
@@ -39,8 +40,8 @@ export class AuthService {
       }
       untracked(() => {
         const url = this.router.url;
-        const { loginUrl, forgotPasswordUrl } = this.config;
-        if (url.startsWith(loginUrl) || url.startsWith(forgotPasswordUrl)) {
+        const { loginUrl, forgotPasswordUrl, verifyEmailUrl } = this.config;
+        if ([loginUrl, forgotPasswordUrl, verifyEmailUrl].some((path) => url.startsWith(path))) {
           return;
         }
         void this.router.navigate([loginUrl], {
@@ -61,19 +62,34 @@ export class AuthService {
    * recién creada y falla con `FORBIDDEN`.
    */
   login(credentials: LoginRequestDto): Observable<UserProfileDto> {
-    return this.api.login(credentials).pipe(
-      switchMap((response) => {
-        if (this.canAccess(response.user)) {
-          this.session.start(response, response.user);
-          return of(response.user);
-        }
-        return this.api.logout({ refreshToken: response.refreshToken }).pipe(
-          catchError(() => of(null)),
-          switchMap(() =>
-            throwError(() => new ApiError('http', 403, 'FORBIDDEN', ACCESS_DENIED_MESSAGE)),
-          ),
-        );
-      }),
+    return this.api.login(credentials).pipe(switchMap((response) => this.startSession(response)));
+  }
+
+  /**
+   * Verifica el correo con el código (HU-03) e inicia la sesión en el mismo
+   * paso (`startSession`), con el mismo control de acceso que el login. `null`
+   * si la API no devolvió la sesión: hay que iniciarla desde el login.
+   */
+  verifyEmail(body: {
+    readonly email: string;
+    readonly code: string;
+    readonly rememberMe?: boolean;
+  }): Observable<UserProfileDto | null> {
+    return this.api
+      .verifyEmail({ ...body, startSession: true })
+      .pipe(switchMap(({ session }) => (session ? this.startSession(session) : of(null))));
+  }
+
+  private startSession(response: LoginResponseDto): Observable<UserProfileDto> {
+    if (this.canAccess(response.user)) {
+      this.session.start(response, response.user);
+      return of(response.user);
+    }
+    return this.api.logout({ refreshToken: response.refreshToken }).pipe(
+      catchError(() => of(null)),
+      switchMap(() =>
+        throwError(() => new ApiError('http', 403, 'FORBIDDEN', ACCESS_DENIED_MESSAGE)),
+      ),
     );
   }
 

@@ -8,6 +8,8 @@ export interface AuthConfig {
   readonly loginUrl: string;
   /** Ruta de recuperación de contraseña. */
   readonly forgotPasswordUrl: string;
+  /** Ruta de la verificación del correo (cuenta sin verificar al iniciar sesión). */
+  readonly verifyEmailUrl: string;
   /** Destino tras iniciar sesión cuando no hay `returnUrl`. */
   readonly homeUrl: string;
   /** Roles con acceso a la app; sin definir, cualquier cuenta activa entra. */
@@ -18,6 +20,7 @@ export const DEFAULT_AUTH_CONFIG: AuthConfig = {
   platformName: '',
   loginUrl: '/login',
   forgotPasswordUrl: '/recuperar-contrasena',
+  verifyEmailUrl: '/verificar-correo',
   homeUrl: '/',
 };
 

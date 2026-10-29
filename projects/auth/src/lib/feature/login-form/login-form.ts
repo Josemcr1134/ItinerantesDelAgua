@@ -17,6 +17,8 @@ import { AuthService } from '../../auth.service';
 import { SessionStore } from '../../session/session.store';
 import { AUTH_TEXTS, formatTime } from '../auth-texts';
 import { PasswordToggle } from '../password-toggle/password-toggle';
+import { safeReturnUrl } from '../return-url';
+import { UnverifiedLogin } from '../verify-email/verify-email-state';
 
 /** Aspecto del formulario: el del panel o el del portal de participantes (Figma HU-04). */
 export type LoginFormAppearance = 'default' | 'portal';
@@ -26,18 +28,6 @@ export type LoginFormAppearance = 'default' | 'portal';
  * plataformas: valida, inicia la sesión, muestra los errores de la API (con
  * el bloqueo por intentos) y vuelve a `returnUrl` o al inicio de la app.
  */
-/**
- * Contraseña correcta pero cuenta sin verificar (`AUTH_EMAIL_NOT_VERIFIED`):
- * la app puede llevar a validar el correo (HU-03). `otpSent`: la API reenvió
- * el código (si el tiempo de espera lo permitía).
- */
-export interface UnverifiedLogin {
-  readonly email: string;
-  readonly otpSent: boolean;
-  readonly expiresAt: string | null;
-  readonly resendAvailableAt: string | null;
-}
-
 @Component({
   selector: 'auth-login-form',
   imports: [ReactiveFormsModule, RouterLink, Button, PasswordToggle],
@@ -124,24 +114,21 @@ export class LoginForm {
     );
     this.failed.set(!user);
     if (user) {
-      await this.router.navigateByUrl(this.safeReturnUrl());
+      await this.router.navigateByUrl(safeReturnUrl(this.returnUrl(), this.config.homeUrl));
       return;
     }
     const error = this.request.error();
     if (error?.code === 'AUTH_EMAIL_NOT_VERIFIED') {
       this.emailNotVerified.emit({
         email: email.trim().toLowerCase(),
+        rememberMe,
         otpSent: error.meta['otpSent'] === true,
+        maskedEmail: error.metaString('maskedEmail'),
+        codeLength: error.metaNumber('codeLength') ?? 6,
         expiresAt: error.metaString('expiresAt'),
         resendAvailableAt: error.metaString('resendAvailableAt'),
       });
     }
     this.form.controls.password.reset();
-  }
-
-  /** Solo rutas internas, para evitar redirecciones abiertas. */
-  private safeReturnUrl(): string {
-    const url = this.returnUrl();
-    return url && url.startsWith('/') && !url.startsWith('//') ? url : this.config.homeUrl;
   }
 }

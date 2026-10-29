@@ -137,6 +137,8 @@ describe('LoginForm', () => {
         code: 'AUTH_EMAIL_NOT_VERIFIED',
         message: 'Verifica tu correo.',
         meta: {
+          maskedEmail: 'a***@correo.com',
+          codeLength: 6,
           otpSent: true,
           expiresAt: '2026-10-27T00:10:00.000Z',
           resendAvailableAt: '2026-10-27T00:00:30.000Z',
@@ -147,7 +149,10 @@ describe('LoginForm', () => {
     await new Promise((r) => setTimeout(r));
     expect(unverified).toHaveBeenCalledWith({
       email: 'ana@correo.com',
+      rememberMe: false,
       otpSent: true,
+      maskedEmail: 'a***@correo.com',
+      codeLength: 6,
       expiresAt: '2026-10-27T00:10:00.000Z',
       resendAvailableAt: '2026-10-27T00:00:30.000Z',
     });

@@ -1,0 +1,60 @@
+@let t = texts.verify;
+@let otp = texts.forgot.code;
+<auth-layout>
+  <a class="back link" [routerLink]="config.loginUrl">
+    <svg
+      aria-hidden="true"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+    {{ t.back }}
+  </a>
+
+  <h1 class="title">{{ t.title }}</h1>
+  <p class="subtitle">{{ subtitle() }}</p>
+
+  <form class="form" novalidate [formGroup]="form" (ngSubmit)="verify()">
+    <p id="verify-error" class="notice" role="alert">{{ errorMessage() }}</p>
+    @if (resent()) {
+      <p class="notice notice--info" role="status">{{ otp.resent }}</p>
+    }
+    <div class="field">
+      <label class="field__label" for="verify-code">{{ otp.label }}</label>
+      <input
+        #code
+        id="verify-code"
+        class="field__input code"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        formControlName="code"
+        required
+        [attr.maxlength]="codeLength()"
+        [attr.aria-invalid]="invalid() || !!request.error()"
+        [attr.aria-describedby]="
+          invalid() ? 'verify-code-error' : request.error() ? 'verify-error' : null
+        "
+        (input)="normalizeCode($event)"
+      />
+      @if (invalid()) {
+        <p id="verify-code-error" class="field__error">{{ texts.errors.code(codeLength()) }}</p>
+      }
+    </div>
+    <button uiButton type="submit" class="submit" [disabled]="request.loading()">
+      {{ request.loading() ? t.submitting : t.submit }}
+    </button>
+    <div class="actions">
+      <button type="button" class="link" [disabled]="resend.remaining() > 0" (click)="resendCode()">
+        {{ resendLabel() }}
+      </button>
+    </div>
+  </form>
+</auth-layout>

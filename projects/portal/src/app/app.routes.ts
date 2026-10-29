@@ -17,7 +17,8 @@ const REGISTER_SEO: PageSeo = {
 };
 
 export const routes: Routes = [
-  // Login propio del portal (Figma HU-04); el resto de las rutas de acceso son las compartidas.
+  // Login y verificación del correo propios del portal (Figma HU-04 y HU-03); el
+  // resto de las rutas de acceso son las compartidas.
   {
     path: 'login',
     title: 'Ingresar al Portal · Itinerantes del Agua',
@@ -25,7 +26,7 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     loadComponent: () => import('./features/access/login/login-page'),
   },
-  ...authRoutes.filter((route) => route.path !== 'login'),
+  ...authRoutes.filter((route) => route.path !== 'login' && route.path !== 'verificar-correo'),
   {
     path: 'registro',
     title: 'Crear cuenta en el Portal · Itinerantes del Agua',

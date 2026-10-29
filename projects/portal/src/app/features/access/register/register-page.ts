@@ -17,7 +17,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AUTH_TEXTS, passwordRules, PasswordToggle } from 'auth';
+import { AUTH_TEXTS, passwordRules, PasswordToggle, VerifyEmailState } from 'auth';
 import {
   ApiError,
   AuthApi,
@@ -29,7 +29,6 @@ import { catchError, map, of } from 'rxjs';
 import { Button } from 'ui-kit';
 import { AccessLayout } from '../access-layout/access-layout';
 import { returnParams } from '../return-url';
-import { VerifyEmailState } from '../verify-email/verify-email-state';
 import {
   detectTimezone,
   locationForm,

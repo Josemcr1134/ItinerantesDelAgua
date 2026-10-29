@@ -3,5 +3,5 @@
   <h1 class="title">{{ t.title }}</h1>
   <p class="subtitle">{{ t.subtitle }}</p>
 
-  <auth-login-form [returnUrl]="returnUrl()" />
+  <auth-login-form [returnUrl]="returnUrl()" (emailNotVerified)="verifyEmail($event)" />
 </auth-layout>

@@ -69,6 +69,17 @@ export const AUTH_TEXTS = {
       confirm: 'Ir a iniciar sesión',
     },
   },
+  /** Cuenta sin verificar al iniciar sesión (HU-03). TODO(contenido): validar. */
+  verify: {
+    title: 'Verifica tu correo',
+    back: 'Volver a iniciar sesión',
+    sent: (email: string) =>
+      `Tu cuenta aún no está verificada. Escribe el código que enviamos a ${email}.`,
+    notSent: (email: string) =>
+      `Tu cuenta aún no está verificada. Escribe el código que enviamos a ${email} o pide uno nuevo.`,
+    submit: 'Verificar e ingresar',
+    submitting: 'Verificando…',
+  },
 } as const;
 
 const timeFormat = new Intl.DateTimeFormat('es', { hour: '2-digit', minute: '2-digit' });
