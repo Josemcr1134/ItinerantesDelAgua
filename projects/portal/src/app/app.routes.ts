@@ -148,6 +148,31 @@ export const routes: Routes = [
           },
         ],
       },
+      // Rutas de los correos y de `action.path` de las notificaciones (backend) que
+      // aquí tienen otro nombre: se redirigen conservando la query.
+      {
+        path: 'aula/:offerId',
+        redirectTo: ({ params, queryParams }) =>
+          inject(Router).createUrlTree(['/formacion/aula', params['offerId']], { queryParams }),
+      },
+      {
+        path: 'aula/:offerId/materiales',
+        redirectTo: ({ params, queryParams }) =>
+          inject(Router).createUrlTree(['/formacion/aula', params['offerId']], {
+            queryParams: { ...queryParams, seccion: null },
+          }),
+      },
+      { path: 'sesiones', redirectTo: 'calendario' },
+      { path: 'mi-formacion', redirectTo: 'formacion' },
+      // Pagar desde la ficha: la pantalla de acciones resuelve la oferta por slug
+      // (si ya pagó, lleva a su aula o a su postulación).
+      {
+        path: 'pagar/:slug',
+        redirectTo: ({ params }) =>
+          inject(Router).createUrlTree(['/inscripcion', params['slug']], {
+            queryParams: { accion: 'ENROLL_AND_PAY' },
+          }),
+      },
     ],
   },
   { path: '**', redirectTo: '' },
