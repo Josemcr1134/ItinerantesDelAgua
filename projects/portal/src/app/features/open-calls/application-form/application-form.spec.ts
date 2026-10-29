@@ -122,4 +122,35 @@ describe('ApplicationForm', () => {
     expect(host.querySelector('#app-experience')?.getAttribute('aria-invalid')).toBe('true');
     expect(host.querySelector<HTMLInputElement>('#app-role')?.value).toBe('Promotora');
   });
+
+  it('si no es elegible por su país, dice por qué y ofrece revisar el perfil', async () => {
+    const { fixture, host, http } = await render();
+    host.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    http.expectOne(`${API}/me/applications/a1`).flush(draft());
+    await fixture.whenStable();
+    http.expectOne(`${API}/me/applications/a1/submit`).flush(
+      {
+        statusCode: 422,
+        code: 'APPLICATION_NOT_ELIGIBLE',
+        message: 'No cumples con la elegibilidad de esta convocatoria.',
+        meta: {
+          reasons: ['COUNTRY_NOT_ELIGIBLE'],
+          eligibilityText:
+            'Jóvenes de 18 a 30 años de México y Centroamérica vinculados a una organización o colectivo.',
+        },
+      },
+      { status: 422, statusText: 'Unprocessable Entity' },
+    );
+    await new Promise((r) => setTimeout(r));
+    await fixture.whenStable();
+
+    const alert = host.querySelector('.ineligible')!;
+    expect(alert.getAttribute('role')).toBe('alert');
+    expect(alert.textContent).toContain('No cumples con la elegibilidad de esta convocatoria.');
+    expect([...alert.querySelectorAll('li')].map((li) => li.textContent?.trim())).toEqual([
+      'Tu país no está entre los de esta convocatoria.',
+      'Está dirigida a: Jóvenes de 18 a 30 años de México y Centroamérica vinculados a una organización o colectivo.',
+    ]);
+    expect(alert.querySelector('a')?.getAttribute('href')).toBe('/perfil');
+  });
 });

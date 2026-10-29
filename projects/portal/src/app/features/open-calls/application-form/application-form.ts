@@ -9,6 +9,7 @@ import {
   untracked,
 } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   ApiError,
   ApplicationDetailDto,
@@ -21,6 +22,14 @@ import { AlertService } from 'ui-kit';
 import { ApplicationEvidence } from '../../../shared/applications/application-evidence/application-evidence';
 import { ApplicationSteps } from '../application-steps/application-steps';
 import { timeIn } from '../../calendar/calendar-time';
+
+/** Por qué no se puede enviar la postulación. */
+interface Ineligibility {
+  readonly message: string;
+  readonly reasons: readonly string[];
+  /** El país sale del perfil: se ofrece revisarlo. */
+  readonly checkProfile: boolean;
+}
 
 type Field =
   | 'eligibilityConfirmed'
@@ -41,7 +50,7 @@ type Field =
  */
 @Component({
   selector: 'portal-application-form',
-  imports: [ReactiveFormsModule, ApplicationSteps, ApplicationEvidence],
+  imports: [ReactiveFormsModule, RouterLink, ApplicationSteps, ApplicationEvidence],
   templateUrl: './application-form.html',
   styleUrls: ['./application-form.scss', '../../../shared/applications/application-fields.scss'],
 })
@@ -71,6 +80,8 @@ export class ApplicationForm {
   /** Pendientes o errores por campo (del último guardado o envío). */
   protected readonly issues = signal<Partial<Record<Field, string>>>({});
   protected readonly error = signal<string | null>(null);
+  /** No cumple la elegibilidad (`APPLICATION_NOT_ELIGIBLE`): por qué, motivo por motivo. */
+  protected readonly ineligible = signal<Ineligibility | null>(null);
 
   protected readonly limits = computed(() => this.application().form.limits);
   protected readonly eligibility = computed(() => this.application().form.eligibility);
@@ -105,6 +116,7 @@ export class ApplicationForm {
   protected async save(): Promise<ApplicationDetailDto | null> {
     this.saving.set(true);
     this.error.set(null);
+    this.ineligible.set(null);
     try {
       const saved = await firstValueFrom(this.api.update(this.application().id, this.body()));
       this.issues.set({});
@@ -194,13 +206,39 @@ export class ApplicationForm {
       issues[field] ??= detail.message;
     }
     this.issues.set(issues);
-    const reasons = error.meta['reasons'];
-    this.error.set(
-      error.code === 'APPLICATION_NOT_ELIGIBLE' &&
-        Array.isArray(reasons) &&
-        reasons.includes('TRAVEL_REQUIRED')
-        ? 'Debes poder asistir de forma presencial a las fechas completas.'
-        : error.message,
-    );
+    if (error.code === 'APPLICATION_NOT_ELIGIBLE') {
+      this.error.set(null);
+      this.ineligible.set(this.ineligibility(error));
+    } else {
+      this.error.set(error.message);
+    }
+  }
+
+  /**
+   * Motivos de `meta.reasons`: el país del perfil (con a quién va dirigida y
+   * los países admitidos) o la disponibilidad para viajar.
+   */
+  private ineligibility(error: ApiError): Ineligibility {
+    const reasons = Array.isArray(error.meta['reasons']) ? error.meta['reasons'] : [];
+    const eligibility = this.eligibility();
+    const audience = error.metaString('eligibilityText') ?? eligibility?.text ?? null;
+    const countries = (eligibility?.countries ?? []).map((c) => c.name).join(', ');
+    const lines: string[] = [];
+    if (reasons.includes('COUNTRY_NOT_ELIGIBLE')) {
+      lines.push(
+        countries
+          ? `Tu país no está entre los de esta convocatoria: ${countries}.`
+          : 'Tu país no está entre los de esta convocatoria.',
+      );
+      if (audience) lines.push(`Está dirigida a: ${audience}`);
+    }
+    if (reasons.includes('TRAVEL_REQUIRED')) {
+      lines.push('Debes poder asistir de forma presencial a las fechas completas.');
+    }
+    return {
+      message: error.message,
+      reasons: lines,
+      checkProfile: reasons.includes('COUNTRY_NOT_ELIGIBLE'),
+    };
   }
 }

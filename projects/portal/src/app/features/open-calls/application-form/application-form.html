@@ -175,6 +175,24 @@
     @if (error(); as message) {
       <p class="form__error" role="alert">{{ message }}</p>
     }
+    @if (ineligible(); as reason) {
+      <div class="form__error ineligible" role="alert">
+        <p>{{ reason.message }}</p>
+        @if (reason.reasons.length) {
+          <ul class="ineligible__reasons">
+            @for (line of reason.reasons; track line) {
+              <li>{{ line }}</li>
+            }
+          </ul>
+        }
+        @if (reason.checkProfile) {
+          <p class="ineligible__hint">
+            Tomamos tu país de tu perfil.
+            <a routerLink="/perfil">Revisar mi perfil</a>
+          </p>
+        }
+      </div>
+    }
 
     @if (a.editable) {
       <footer class="actions">

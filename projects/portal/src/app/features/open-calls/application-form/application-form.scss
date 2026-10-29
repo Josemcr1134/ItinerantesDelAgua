@@ -153,3 +153,24 @@ $error: #b5452b;
   text-decoration: underline;
   cursor: pointer;
 }
+
+// No cumple la elegibilidad: el mensaje y, debajo, cada motivo.
+.ineligible {
+  display: grid;
+  gap: 6px;
+}
+
+.ineligible__reasons {
+  margin: 0;
+  padding-left: 1.25em;
+  font-weight: 500;
+}
+
+.ineligible__hint {
+  font-weight: 500;
+
+  a {
+    color: inherit;
+    font-weight: 700;
+  }
+}
