@@ -78,7 +78,7 @@ describe('PortalShell', () => {
     expect(host.querySelector('#account-menu-header')).toBeNull();
   });
 
-  it('Formación se despliega con Diplomados, Cursos y Talleres', async () => {
+  it('Formación se despliega con Diplomados, Cursos, Talleres y Eventos', async () => {
     const { fixture, host } = await render();
     const group = [...host.querySelectorAll<HTMLButtonElement>('button.nav__link')].find((b) =>
       b.textContent?.includes('Formación'),
@@ -94,6 +94,7 @@ describe('PortalShell', () => {
       ['Diplomados', '/formacion/diplomados'],
       ['Cursos', '/formacion/cursos'],
       ['Talleres', '/formacion/talleres'],
+      ['Eventos', '/formacion/eventos'],
     ]);
   });
 });

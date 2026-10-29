@@ -17,7 +17,7 @@ import { FORMATION_COVERS, FormationTile } from './formation-tile/formation-tile
 const BATCH = 12;
 
 /**
- * Mi formación (HU-07, Figma): diplomados, cursos o talleres inscritos según
+ * Mi formación (HU-07, Figma): diplomados, cursos, talleres o eventos inscritos según
  * el sub-ítem del menú, con las pestañas Activos / Completados / Todos.
  * Al final, "¿No ves tu formación?" para activar el acceso de Moodle (HU-25).
  */

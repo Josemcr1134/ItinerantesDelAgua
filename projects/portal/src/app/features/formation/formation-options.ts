@@ -6,6 +6,7 @@ export const FORMATION_TYPES = {
   diplomados: { type: 'DIPLOMA', label: 'Diplomados' },
   cursos: { type: 'COURSE', label: 'Cursos' },
   talleres: { type: 'WORKSHOP', label: 'Talleres' },
+  eventos: { type: 'EVENT', label: 'Eventos' },
 } as const satisfies Record<string, { type: OfferType; label: string }>;
 export type FormationSlug = keyof typeof FORMATION_TYPES;
 
@@ -23,7 +24,7 @@ export const isFormationSlug = (value: string): value is FormationSlug =>
 export const isPhaseSlug = (value: string | undefined): value is FormationPhaseSlug =>
   !!value && Object.hasOwn(FORMATION_PHASES, value);
 
-/** Ruta del sub-ítem de una oferta (los eventos y convocatorias caen en Diplomados). */
+/** Ruta del sub-ítem de una oferta (los programas por convocatoria caen en Diplomados). */
 export function formationPath(type: OfferType): string {
   const slug = (Object.keys(FORMATION_TYPES) as FormationSlug[]).find(
     (key) => FORMATION_TYPES[key].type === type,
@@ -31,6 +32,6 @@ export function formationPath(type: OfferType): string {
   return `/formacion/${slug ?? 'diplomados'}`;
 }
 
-/** Solo /formacion/diplomados, /cursos y /talleres. */
+/** Solo /formacion/diplomados, /cursos, /talleres y /eventos. */
 export const formationTypeMatch: CanMatchFn = (_route, segments: UrlSegment[]) =>
   isFormationSlug(segments[0]?.path ?? '');

@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 import { provideAuth } from 'auth';
 import { apiErrorInterceptor, provideApi } from 'data-access';
 import { PageHeading } from '../../core/page-heading/page-heading';
+import { formationPath } from './formation-options';
 import FormationPage from './formation-page';
 
 const API = 'https://api.test/api/v1';
@@ -76,6 +77,33 @@ describe('FormationPage', () => {
     expect(
       [...host.querySelectorAll('.progress__value')].map((v) => v.textContent?.trim()),
     ).toEqual(['50%', '50%']);
+  });
+
+  it('Eventos: pide solo los eventos inscritos y es la pestaña de vuelta de un evento', async () => {
+    const { fixture, http, host } = await render({ tipo: 'eventos' });
+    const request = http.expectOne((r) => r.url === `${API}/me/enrollments`);
+    expect(request.request.params.getAll('type')).toEqual(['EVENT']);
+    request.flush({
+      data: [
+        card('e1', 'Foro del Agua', {
+          offer: {
+            id: 'o-e1',
+            slug: 'foro',
+            name: 'Foro del Agua',
+            type: 'EVENT',
+            coverImageUrl: null,
+          },
+        }),
+      ],
+      meta: { page: 1, pageSize: 12, total: 1, totalPages: 1 },
+    });
+    await fixture.whenStable();
+
+    expect(TestBed.inject(PageHeading).current().subtitle).toBe(
+      'Eventos en los que estoy inscrito',
+    );
+    expect(host.textContent).toContain('Foro del Agua');
+    expect(formationPath('EVENT')).toBe('/formacion/eventos');
   });
 
   it('al salir de la página el encabezado vuelve al de la Escuela', async () => {

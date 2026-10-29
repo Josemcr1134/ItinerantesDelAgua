@@ -8,7 +8,7 @@ export interface NavItem {
   readonly icon: NavIcon;
   /** Activo solo con la ruta exacta. */
   readonly exact?: boolean;
-  /** Sub-ítems: el ítem se despliega (Formación → Diplomados, Cursos, Talleres). */
+  /** Sub-ítems: el ítem se despliega (Formación → Diplomados, Cursos, Talleres, Eventos). */
   readonly children?: readonly NavChild[];
 }
 
@@ -28,6 +28,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
       { label: 'Diplomados', path: '/formacion/diplomados' },
       { label: 'Cursos', path: '/formacion/cursos' },
       { label: 'Talleres', path: '/formacion/talleres' },
+      { label: 'Eventos', path: '/formacion/eventos' },
     ],
   },
   { label: 'Catálogo', path: '/catalogo', icon: 'catalog' },
