@@ -12,6 +12,8 @@ import type {
   AdminCalendarDto,
   AdminCalendarEventDto,
   AdminContactMessageDto,
+  AdminDashboardDto,
+  AdminDashboardTrendsDto,
   AdminMeDto,
   AdminModuleDto,
   AdminModulesDto,
@@ -317,6 +319,19 @@ export interface AdminContactListQuery {
   readonly to?: string;
   /** Orden por fecha de recepción. */
   readonly sort?: ContactMessageSort;
+}
+
+/** Query de `GET /api/v1/admin/dashboard`. */
+export interface AdminDashboardOverviewQuery {
+  /** Inicio del periodo (ISO 8601). Por defecto: 30 días antes de `to`. */
+  readonly from?: string;
+  /** Fin del periodo (ISO 8601). Por defecto: ahora. */
+  readonly to?: string;
+}
+
+/** Query de `GET /api/v1/admin/dashboard/trends`. */
+export interface AdminDashboardTrendsQuery {
+  readonly months?: number;
 }
 
 /** Query de `GET /api/v1/offers`. */
@@ -1100,6 +1115,24 @@ export interface ApiOperations {
     readonly query: never;
     readonly body: UpdateContactMessageRequestDto;
     readonly response: AdminContactMessageDto;
+  };
+  /** Cifras del inicio del panel */
+  readonly AdminDashboard_overview: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/dashboard';
+    readonly pathParams: never;
+    readonly query: AdminDashboardOverviewQuery;
+    readonly body: never;
+    readonly response: AdminDashboardDto;
+  };
+  /** Series por mes para las gráficas del inicio */
+  readonly AdminDashboard_trends: {
+    readonly method: 'GET';
+    readonly path: '/api/v1/admin/dashboard/trends';
+    readonly pathParams: never;
+    readonly query: AdminDashboardTrendsQuery;
+    readonly body: never;
+    readonly response: AdminDashboardTrendsDto;
   };
   /** Cifras de impacto de la landing */
   readonly SiteMetrics_list: {

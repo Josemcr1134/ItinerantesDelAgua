@@ -93,24 +93,8 @@ export const APPLICATION_INELIGIBILITY_REASON_VALUES = [
 export type ApplicationIneligibilityReason =
   (typeof APPLICATION_INELIGIBILITY_REASON_VALUES)[number];
 
-export const APPLICATION_KIND_VALUES = ['SCHOLARSHIP', 'OPEN_CALL'] as const;
-export type ApplicationKind = (typeof APPLICATION_KIND_VALUES)[number];
-
 export const APPLICATION_SORT_VALUES = ['SUBMITTED_ASC', 'SUBMITTED_DESC', 'DUE_ASC'] as const;
 export type ApplicationSort = (typeof APPLICATION_SORT_VALUES)[number];
-
-export const APPLICATION_STATUS_VALUES = [
-  'DRAFT',
-  'SUBMITTED',
-  'IN_REVIEW',
-  'INTERVIEW_SCHEDULED',
-  'APPROVED_PENDING_PAYMENT',
-  'APPROVED_PENDING_CONFIRMATION',
-  'ENROLLED',
-  'NOT_SELECTED',
-  'EXPIRED',
-] as const;
-export type ApplicationStatus = (typeof APPLICATION_STATUS_VALUES)[number];
 
 export const APPLICATION_TIMELINE_STEP_VALUES = [
   'SUBMITTED',
@@ -195,6 +179,18 @@ export const DASHBOARD_BLOCK_VALUES = [
   'payments',
 ] as const;
 export type DashboardBlock = (typeof DASHBOARD_BLOCK_VALUES)[number];
+
+export const DASHBOARD_TASK_KEY_VALUES = [
+  'APPLICATIONS_TO_REVIEW',
+  'INTERVIEWS_SCHEDULED',
+  'APPROVED_PENDING',
+  'TRANSFERS_TO_VALIDATE',
+  'PLANS_DELINQUENT',
+  'REFUNDS_PENDING',
+  'CONTACT_UNREAD',
+  'SESSIONS_NEXT_7_DAYS',
+] as const;
+export type DashboardTaskKey = (typeof DASHBOARD_TASK_KEY_VALUES)[number];
 
 export const EMAIL_STATUS_VALUES = ['NOT_REQUESTED', 'PENDING', 'SENT', 'FAILED'] as const;
 export type EmailStatus = (typeof EMAIL_STATUS_VALUES)[number];
@@ -517,9 +513,6 @@ export const OFFER_TOPIC_VALUES = [
   'FIELD_VISITS',
 ] as const;
 export type OfferTopic = (typeof OFFER_TOPIC_VALUES)[number];
-
-export const OFFER_TYPE_VALUES = ['DIPLOMA', 'COURSE', 'WORKSHOP', 'EVENT', 'OPEN_CALL'] as const;
-export type OfferType = (typeof OFFER_TYPE_VALUES)[number];
 
 export const PAYMENT_ALERT_TYPE_VALUES = [
   'INSTALLMENT_FAILED',
@@ -1475,6 +1468,198 @@ export interface UpdateContactMessageRequestDto {
   readonly internalNote?: string | null;
 }
 
+export interface DashboardPeriodDto {
+  readonly from: IsoDateTime;
+  readonly to: IsoDateTime;
+}
+
+export interface CountryCountDto {
+  readonly countryCode: string;
+  readonly count: number;
+}
+
+export interface DashboardPeopleDto {
+  /** Cuentas de participantes (sin el equipo). */
+  readonly total: number;
+  readonly active: number;
+  /** Registradas sin verificar el correo. */
+  readonly pendingVerification: number;
+  readonly disabled: number;
+  /** Registradas dentro del periodo. */
+  readonly newInPeriod: number;
+  /** Los 5 países con más personas. */
+  readonly topCountries: CountryCountDto[];
+}
+
+export interface EnrollmentStatusCountsDto {
+  readonly active: number;
+  readonly pendingPayment: number;
+  readonly completed: number;
+  readonly suspended: number;
+  readonly cancelled: number;
+}
+
+export const ENROLLMENT_SOURCE_VALUES = [
+  'FREE_SIGNUP',
+  'PAYMENT',
+  'INSTALLMENTS',
+  'SCHOLARSHIP',
+  'OPEN_CALL',
+  'MOODLE_LIST',
+  'MOODLE_ACCESS_CODE',
+  'MANUAL',
+] as const;
+export type EnrollmentSource = (typeof ENROLLMENT_SOURCE_VALUES)[number];
+
+export interface EnrollmentSourceCountDto {
+  readonly source: EnrollmentSource;
+  readonly count: number;
+}
+
+export const OFFER_TYPE_VALUES = ['DIPLOMA', 'COURSE', 'WORKSHOP', 'EVENT', 'OPEN_CALL'] as const;
+export type OfferType = (typeof OFFER_TYPE_VALUES)[number];
+
+export interface TopOfferDto {
+  readonly id: Uuid;
+  readonly name: string;
+  readonly type: OfferType;
+  /** Inscripciones activas + completadas. */
+  readonly enrolled: number;
+  /** null = sin cupo. */
+  readonly capacity: number | null;
+}
+
+export interface DashboardTrainingDto {
+  readonly publishedOffers: number;
+  /** Publicadas que ya empezaron y no han terminado. */
+  readonly offersInProgress: number;
+  readonly enrollments: EnrollmentStatusCountsDto;
+  /** Inscripciones creadas dentro del periodo. */
+  readonly newEnrollmentsInPeriod: number;
+  /** Inscripciones por origen. */
+  readonly bySource: EnrollmentSourceCountDto[];
+  /** Sesiones programadas en los próximos 7 días. */
+  readonly upcomingSessions7d: number;
+  /** Las 5 ofertas con más inscripciones. */
+  readonly topOffers: TopOfferDto[];
+}
+
+export const APPLICATION_STATUS_VALUES = [
+  'DRAFT',
+  'SUBMITTED',
+  'IN_REVIEW',
+  'INTERVIEW_SCHEDULED',
+  'APPROVED_PENDING_PAYMENT',
+  'APPROVED_PENDING_CONFIRMATION',
+  'ENROLLED',
+  'NOT_SELECTED',
+  'EXPIRED',
+] as const;
+export type ApplicationStatus = (typeof APPLICATION_STATUS_VALUES)[number];
+
+export interface ApplicationStatusCountDto {
+  readonly status: ApplicationStatus;
+  readonly count: number;
+}
+
+export const APPLICATION_KIND_VALUES = ['SCHOLARSHIP', 'OPEN_CALL'] as const;
+export type ApplicationKind = (typeof APPLICATION_KIND_VALUES)[number];
+
+export interface ApplicationKindCountDto {
+  readonly kind: ApplicationKind;
+  readonly count: number;
+}
+
+export interface DashboardApplicationsDto {
+  /** Un elemento por estado (incluye 0, sin DRAFT). */
+  readonly byStatus: ApplicationStatusCountDto[];
+  /** Enviadas, por tipo (sin DRAFT). */
+  readonly byKind: ApplicationKindCountDto[];
+  /** SUBMITTED + IN_REVIEW: esperan revisión. */
+  readonly toReview: number;
+  readonly interviewsScheduled: number;
+  /** Aprobadas que aún no pagan o no confirman. */
+  readonly approvedPending: number;
+  /** Enviadas dentro del periodo. */
+  readonly submittedInPeriod: number;
+}
+
+export interface MoneyDto {
+  /** Centavos enteros. */
+  readonly amountCents: number;
+  readonly currency: Currency;
+}
+
+export interface CurrencyTotalsDto {
+  readonly currency: Currency;
+  /** Pagos con tarjeta pagados + transferencias validadas. */
+  readonly collected: MoneyDto;
+  readonly refunded: MoneyDto;
+  /** Cobrado − reembolsado. */
+  readonly net: MoneyDto;
+  readonly paymentCount: number;
+}
+
+export interface DashboardPlansDto {
+  /** Planes con cobro fallido (en reintento). */
+  readonly pastDue: number;
+  /** Planes en mora. */
+  readonly delinquent: number;
+}
+
+export interface DashboardPaymentsDto {
+  /** Cuotas que se cobrarán en los próximos 7 días (monto, fecha y tarjeta): aviso informativo. */
+  readonly upcomingInstallments: PaymentAlertDto[];
+  /** Cobro fallido / En mora / transferencia rechazada: banner destacado → Mis pagos. */
+  readonly alerts: PaymentAlertDto[];
+}
+
+export interface DashboardContactDto {
+  /** Mensajes de Contacto nuevos (NEW). */
+  readonly unread: number;
+}
+
+export interface DashboardTaskDto {
+  readonly key: DashboardTaskKey;
+  readonly label: string;
+  readonly count: number;
+}
+
+export interface AdminDashboardDto {
+  readonly period: DashboardPeriodDto;
+  /** Cualquier integrante del equipo. */
+  readonly people: DashboardPeopleDto;
+  /** `offers.read`. */
+  readonly training: DashboardTrainingDto | null;
+  /** `applications.read`; null sin ese permiso. */
+  readonly applications: DashboardApplicationsDto | null;
+  /** `payments.read`; null sin ese permiso. */
+  readonly payments: AdminDashboardPaymentsDto | null;
+  /** `contact.read`; null sin ese permiso. */
+  readonly contact: DashboardContactDto | null;
+  /** Pendientes con count > 0 según los permisos de quien consulta (no dependen del periodo). */
+  readonly tasks: DashboardTaskDto[];
+}
+
+export interface TrendMonthDto {
+  /** Mes (hora de Ciudad de México). */
+  readonly month: string;
+  readonly newParticipants: number;
+  /** null sin `offers.read`. */
+  readonly newEnrollments: number | null;
+  /** null sin `applications.read`. */
+  readonly submittedApplications: number | null;
+  /** Neto cobrado en MXN (centavos); null sin `payments.read`. */
+  readonly netMxnCents: number | null;
+  /** Neto cobrado en USD (centavos); null sin `payments.read`. */
+  readonly netUsdCents: number | null;
+}
+
+export interface AdminDashboardTrendsDto {
+  /** Del mes más antiguo al actual. */
+  readonly months: TrendMonthDto[];
+}
+
 export interface SiteMetricDto {
   /** Clave estable. Iniciales: WATER_LITERS_REVITALIZED, PEOPLE_TRAINED, TERRITORIES_ACCOMPANIED, YOUTH_TRAINED. */
   readonly key: string;
@@ -1652,12 +1837,6 @@ export interface OfferScheduleDto {
 export interface OfferVenueSummaryDto {
   readonly name: string;
   readonly city: string | null;
-}
-
-export interface MoneyDto {
-  /** Centavos enteros. */
-  readonly amountCents: number;
-  readonly currency: Currency;
 }
 
 export interface OfferInstallmentsDto {
@@ -4069,42 +4248,6 @@ export interface ApplicationsWidgetDto {
   readonly newCount: number;
 }
 
-export interface PaymentOfferRefDto {
-  readonly id: Uuid;
-  readonly slug: string;
-  readonly name: string;
-  readonly type: OfferType;
-  readonly cohortLabel: string | null;
-  readonly startsAt: IsoDateTime | null;
-  readonly endsAt: IsoDateTime | null;
-}
-
-export interface CardDto {
-  readonly brand: string | null;
-  /** Últimos 4 dígitos. */
-  readonly last4: string | null;
-}
-
-export interface PaymentAlertDto {
-  /** INSTALLMENT_FAILED "Cobro fallido" ([Actualizar tarjeta] / [Pagar ahora]) · PLAN_DELINQUENT "En mora" · TRANSFER_REJECTED "Rechazada" ([Subir comprobante]) · TRANSFER_PENDING "Pendiente de validación" · INSTALLMENT_UPCOMING "Próximo cobro" (informativo). */
-  readonly type: PaymentAlertType;
-  readonly offer: PaymentOfferRefDto;
-  readonly amount: MoneyDto;
-  /** Fecha del cobro / fecha límite / fallo. */
-  readonly date: IsoDateTime | null;
-  readonly planId: Uuid | null;
-  readonly paymentId: Uuid | null;
-  readonly applicationId: Uuid | null;
-  readonly card: CardDto | null;
-}
-
-export interface DashboardPaymentsDto {
-  /** Cuotas que se cobrarán en los próximos 7 días (monto, fecha y tarjeta): aviso informativo. */
-  readonly upcomingInstallments: PaymentAlertDto[];
-  /** Cobro fallido / En mora / transferencia rechazada: banner destacado → Mis pagos. */
-  readonly alerts: PaymentAlertDto[];
-}
-
 export interface DashboardDto {
   /** "Próxima actividad": la siguiente sesión o evento (en curso o futuro, no cancelado, sin fechas importantes) en los próximos 62 días, con `join` (HU-12). null → mensaje orientador. */
   readonly nextActivity: CalendarItemDto | null;
@@ -4122,6 +4265,16 @@ export interface DashboardDto {
   readonly payments: DashboardPaymentsDto | null;
   /** Bloques que no se pudieron cargar: muestra "No se pudo cargar esta información" + reintento (el reintento puede usar el endpoint propio del bloque: /me/enrollments, /me/calendar, /library, /me/notifications/unread-count, /me/applications?kind=…, /me/payments/summary). */
   readonly failedBlocks: DashboardBlock[];
+}
+
+export interface PaymentOfferRefDto {
+  readonly id: Uuid;
+  readonly slug: string;
+  readonly name: string;
+  readonly type: OfferType;
+  readonly cohortLabel: string | null;
+  readonly startsAt: IsoDateTime | null;
+  readonly endsAt: IsoDateTime | null;
 }
 
 export interface QuoteApplicationDto {
@@ -4201,6 +4354,12 @@ export interface QuoteBlockerDto {
 export interface InstallmentRefDto {
   readonly sequence: number;
   readonly count: number;
+}
+
+export interface CardDto {
+  readonly brand: string | null;
+  /** Últimos 4 dígitos. */
+  readonly last4: string | null;
 }
 
 export interface TransferInfoDto {
@@ -4331,6 +4490,19 @@ export interface PaymentPlanDto {
   readonly activatedAt: IsoDateTime | null;
 }
 
+export interface PaymentAlertDto {
+  /** INSTALLMENT_FAILED "Cobro fallido" ([Actualizar tarjeta] / [Pagar ahora]) · PLAN_DELINQUENT "En mora" · TRANSFER_REJECTED "Rechazada" ([Subir comprobante]) · TRANSFER_PENDING "Pendiente de validación" · INSTALLMENT_UPCOMING "Próximo cobro" (informativo). */
+  readonly type: PaymentAlertType;
+  readonly offer: PaymentOfferRefDto;
+  readonly amount: MoneyDto;
+  /** Fecha del cobro / fecha límite / fallo. */
+  readonly date: IsoDateTime | null;
+  readonly planId: Uuid | null;
+  readonly paymentId: Uuid | null;
+  readonly applicationId: Uuid | null;
+  readonly card: CardDto | null;
+}
+
 export interface PaymentsSummaryDto {
   /** Planes vigentes (arriba en Mis pagos). */
   readonly activePlans: PaymentPlanDto[];
@@ -4455,16 +4627,6 @@ export interface AdminPaymentDto {
   readonly paidAt: IsoDateTime | null;
   readonly failedAt: IsoDateTime | null;
   readonly refundedAt: IsoDateTime | null;
-}
-
-export interface CurrencyTotalsDto {
-  readonly currency: Currency;
-  /** Pagos con tarjeta pagados + transferencias validadas. */
-  readonly collected: MoneyDto;
-  readonly refunded: MoneyDto;
-  /** Cobrado − reembolsado. */
-  readonly net: MoneyDto;
-  readonly paymentCount: number;
 }
 
 export interface PendingTransfersSummaryDto {
@@ -4683,4 +4845,13 @@ export interface MeetingHostUrlDto {
   readonly externalId: string;
   /** Enlace de anfitrión vigente (Zoom: `start_url` recién emitido). */
   readonly hostUrl: string;
+}
+
+export interface AdminDashboardPaymentsDto {
+  /** Cobrado, reembolsado y neto dentro del periodo, por moneda (nunca se suman). */
+  readonly currencies: CurrencyTotalsDto[];
+  /** Transferencias esperando validación. */
+  readonly pendingTransfers: number;
+  readonly plans: DashboardPlansDto;
+  readonly pendingRefunds: number;
 }
