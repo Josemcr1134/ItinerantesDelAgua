@@ -1,4 +1,3 @@
-import { NgTemplateOutlet } from '@angular/common';
 import {
   Component,
   computed,
@@ -14,6 +13,7 @@ import { AuthService } from 'auth';
 import { AlertService } from 'ui-kit';
 import { filter } from 'rxjs';
 import { AdminAccess } from '../../core/access/admin-access';
+import { Icon } from '../../shared/icon/icon';
 import { Person } from '../../shared/person/person';
 import { NAV_ITEMS, NavItem } from '../../core/navigation';
 import { ContactInbox } from '../../features/contact/contact-inbox';
@@ -25,7 +25,7 @@ import { ContactInbox } from '../../features/contact/contact-inbox';
  */
 @Component({
   selector: 'adm-admin-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Person],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, Person],
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.scss',
   host: { '(document:keydown.escape)': 'closeMenu()' },
