@@ -131,7 +131,7 @@ describe('Mensajes de Contacto', () => {
     expect(host.querySelector('#contact-status')).toBeNull();
   });
 
-  it('con contact.manage cambia el estado y la nota, y actualiza el contador', async () => {
+  it('con contact.manage cambia el estado y guarda la nota aparte del formulario', async () => {
     const { http, host, settle } = await setup(
       ContactMessagePage,
       ['contact.read', 'contact.manage'],
@@ -139,46 +139,86 @@ describe('Mensajes de Contacto', () => {
     );
     http.expectOne(`${API}/contact-messages/m1`).flush(message());
     await settle();
+    const submit = (form: string) =>
+      host.querySelector<HTMLButtonElement>(`${form} button[type="submit"]`)!;
+    const me = { id: 'me', fullName: 'Ana López', email: 'ana@x.org' };
 
+    // Estado: se envía solo el estado.
     const status = host.querySelector<HTMLSelectElement>('#contact-status')!;
     status.value = 'ANSWERED';
     status.dispatchEvent(new Event('change'));
-    const note = host.querySelector<HTMLTextAreaElement>('#contact-note')!;
-    note.value = '  Les enviamos la propuesta.  ';
-    note.dispatchEvent(new Event('input'));
-    host.querySelector<HTMLButtonElement>('form button[type="submit"]')!.click();
     await settle();
-
-    const patch = http.expectOne(`${API}/contact-messages/m1`);
-    expect(patch.request.method).toBe('PATCH');
-    expect(patch.request.body).toEqual({
-      status: 'ANSWERED',
-      internalNote: 'Les enviamos la propuesta.',
-    });
-    patch.flush(
+    submit('.status-form').click();
+    await settle();
+    const patchStatus = http.expectOne(`${API}/contact-messages/m1`);
+    expect(patchStatus.request.body).toEqual({ status: 'ANSWERED' });
+    patchStatus.flush(
       message({
         status: 'ANSWERED',
         statusLabel: 'Respondido',
-        internalNote: 'Les enviamos la propuesta.',
-        handledBy: { id: 'me', fullName: 'Ana', email: 'ana@x.org' },
+        handledBy: me,
         handledAt: '2026-10-29T10:00:00.000Z',
       }),
     );
     await settle();
     http.expectOne(`${API}/contact-messages/summary`).flush({ ...summary, unread: 2 });
     await settle();
+    expect(host.querySelector('.answered')?.textContent).toContain('Respondió Ana López');
+    expect(host.querySelector('.note')).toBeNull();
 
-    expect(host.textContent).toContain('Respondido');
-    expect(host.textContent).toContain('Último cambio: Ana');
-    expect(host.textContent).toContain('Se guardaron los cambios.');
+    // Nota: se envía sola, se muestra aparte y el formulario queda vacío.
+    const note = host.querySelector<HTMLTextAreaElement>('#contact-note')!;
+    note.value = '  Les enviamos la propuesta.  ';
+    note.dispatchEvent(new Event('input'));
+    await settle();
+    submit('.note-form').click();
+    await settle();
+    const patchNote = http.expectOne(`${API}/contact-messages/m1`);
+    expect(patchNote.request.body).toEqual({ internalNote: 'Les enviamos la propuesta.' });
+    patchNote.flush(
+      message({
+        status: 'ANSWERED',
+        statusLabel: 'Respondido',
+        internalNote: 'Les enviamos la propuesta.',
+        handledBy: me,
+        handledAt: '2026-10-29T10:05:00.000Z',
+      }),
+    );
+    await settle();
+    http.expectOne(`${API}/contact-messages/summary`).flush(summary);
+    await settle();
+    expect(host.querySelector('.note')?.textContent).toContain('Les enviamos la propuesta.');
+    expect(host.querySelector<HTMLTextAreaElement>('#contact-note')!.value).toBe('');
+    expect(host.querySelector('label[for="contact-note"]')?.textContent).toContain(
+      'Reemplazar la nota',
+    );
+    expect(host.textContent).toContain('Último cambio: Ana López');
 
     // "Borrar nota" envía `internalNote: null`.
-    const clear = [...host.querySelectorAll<HTMLButtonElement>('button')].find((b) =>
-      b.textContent?.includes('Borrar nota'),
-    )!;
-    clear.click();
+    host.querySelector<HTMLButtonElement>('.note__clear')!.click();
     await settle();
-    const remove = http.expectOne(`${API}/contact-messages/m1`);
-    expect(remove.request.body).toEqual({ internalNote: null });
+    expect(http.expectOne(`${API}/contact-messages/m1`).request.body).toEqual({
+      internalNote: null,
+    });
+  });
+
+  it('la lista muestra quién respondió', async () => {
+    const { http, host, settle } = await setup(ContactInboxPage, ['contact.read']);
+    http.expectOne(`${API}/contact-messages/summary`).flush(summary);
+    http
+      .expectOne((r) => r.url === `${API}/contact-messages`)
+      .flush({
+        data: [
+          message({
+            status: 'ANSWERED',
+            statusLabel: 'Respondido',
+            handledBy: { id: 'me', fullName: 'Ana López', email: 'ana@x.org' },
+            handledAt: '2026-10-29T10:00:00.000Z',
+          }),
+        ],
+        meta: { page: 1, pageSize: 20, total: 1, totalPages: 1 },
+      });
+    await settle();
+    expect(host.querySelector('tbody tr')?.textContent).toContain('Respondió Ana López');
   });
 });

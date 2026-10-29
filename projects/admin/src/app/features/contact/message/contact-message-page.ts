@@ -1,4 +1,5 @@
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
@@ -26,8 +27,9 @@ import {
 
 /**
  * Detalle de un mensaje de Contacto (HU-38): datos de la persona, asunto y
- * origen (y, en Diseño y consultoría, el proyecto), responder por correo y,
- * con `contact.manage`, cambiar el estado o la nota interna. Abrirlo no
+ * origen (y, en Diseño y consultoría, el proyecto), responder por correo y
+ * quién lo atendió. Con `contact.manage`, cambiar el estado y escribir la nota
+ * interna (la guardada se ve aparte, no dentro del formulario). Abrirlo no
  * cambia su estado.
  */
 @Component({
@@ -60,9 +62,27 @@ export default class ContactMessagePage {
   protected readonly serviceLabels = CONTACT_SERVICE_LABELS;
   protected readonly formatDateTime = formatDateTime;
 
-  protected readonly form = this.fb.group({
+  protected readonly statusForm = this.fb.group({
     status: this.fb.control<ContactStatus>('NEW'),
-    internalNote: [''],
+  });
+  /** Nota nueva: se vacía al guardarla (la guardada se muestra aparte). */
+  protected readonly noteForm = this.fb.group({ note: [''] });
+  private readonly status = this.statusForm.controls.status;
+  private readonly note = this.noteForm.controls.note;
+  private readonly statusValue = toSignal(this.status.valueChanges, {
+    initialValue: this.status.value,
+  });
+  private readonly noteValue = toSignal(this.note.valueChanges, { initialValue: '' });
+  /** El estado elegido es distinto del guardado. */
+  protected readonly statusChanged = computed(
+    () => this.statusValue() !== this.message.data()?.status,
+  );
+  protected readonly hasNote = computed(() => !!this.noteValue().trim());
+
+  /** Quién cambió por última vez el estado o la nota (`handledBy`). */
+  protected readonly handler = computed(() => {
+    const by = this.message.data()?.handledBy;
+    return by ? (by.fullName ?? by.email) : null;
   });
 
   /** "Responder por correo": abre el cliente de correo con el asunto. */
@@ -84,28 +104,26 @@ export default class ContactMessagePage {
     void this.load(this.id());
   }
 
-  /** Guarda solo lo que cambió (nota vacía = se borra). */
-  protected async save(): Promise<void> {
-    const current = this.message.data();
-    if (!current) return;
-    const { status, internalNote } = this.form.getRawValue();
-    const note = internalNote.trim() || null;
-    const body: UpdateContactMessageRequestDto = {
-      ...(status !== current.status ? { status } : {}),
-      ...(note !== current.internalNote ? { internalNote: note } : {}),
-    };
-    if (!Object.keys(body).length) {
-      this.notice.set('No hay cambios para guardar.');
-      return;
+  protected async saveStatus(): Promise<void> {
+    const status = this.status.value;
+    if (status === this.message.data()?.status) return;
+    await this.update({ status }, `Estado cambiado a «${CONTACT_STATUS_LABELS[status]}».`);
+  }
+
+  protected async saveNote(): Promise<void> {
+    const note = this.note.value.trim();
+    if (!note) return;
+    if (await this.update({ internalNote: note }, 'Se guardó la nota interna.')) {
+      this.note.reset();
     }
-    await this.update(body, 'Se guardaron los cambios.');
   }
 
   protected async clearNote(): Promise<void> {
     await this.update({ internalNote: null }, 'Se borró la nota interna.');
   }
 
-  private async update(body: UpdateContactMessageRequestDto, done: string): Promise<void> {
+  /** `true` si se guardó (si falla, se presenta el error y se conserva lo escrito). */
+  private async update(body: UpdateContactMessageRequestDto, done: string): Promise<boolean> {
     this.saving.set(true);
     try {
       const updated = await firstValueFrom(this.api.update(this.id(), body));
@@ -113,8 +131,10 @@ export default class ContactMessagePage {
       this.fill(updated);
       this.notice.set(done);
       this.inbox.refresh();
+      return true;
     } catch (error) {
       void this.errors.present(error);
+      return false;
     } finally {
       this.saving.set(false);
     }
@@ -126,6 +146,6 @@ export default class ContactMessagePage {
   }
 
   private fill(message: AdminContactMessageDto): void {
-    this.form.setValue({ status: message.status, internalNote: message.internalNote ?? '' });
+    this.status.setValue(message.status);
   }
 }

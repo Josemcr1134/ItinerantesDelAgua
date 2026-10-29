@@ -29,6 +29,14 @@
         <span [class]="'adm-badge adm-badge--' + statusTones[m.status]">{{ m.statusLabel }}</span>
         <span class="muted">Recibido el {{ formatDateTime(m.createdAt) }}</span>
       </p>
+      @if (m.status === 'ANSWERED' && handler(); as name) {
+        <p class="answered">
+          Respondió <strong>{{ name }}</strong>
+          @if (m.handledAt) {
+            · {{ formatDateTime(m.handledAt) }}
+          }
+        </p>
+      }
       <div class="actions">
         <a uiButton [href]="mailto()">
           Responder por correo<span class="visually-hidden"> a {{ m.email }}</span>
@@ -96,12 +104,13 @@
         <h2 id="contact-handling" class="adm-section__title">Seguimiento interno</h2>
         @if (m.handledAt) {
           <p class="muted handled">
-            Último cambio: {{ m.handledBy?.fullName ?? m.handledBy?.email ?? '—' }} ·
+            Último cambio: <strong>{{ handler() ?? '—' }}</strong> ·
             {{ formatDateTime(m.handledAt) }}
           </p>
         }
+
         @if (canManage()) {
-          <form class="handling" novalidate [formGroup]="form" (ngSubmit)="save()">
+          <form class="status-form" novalidate [formGroup]="statusForm" (ngSubmit)="saveStatus()">
             <div class="adm-field">
               <label class="adm-field__label" for="contact-status">Estado</label>
               <select id="contact-status" class="adm-field__input" formControlName="status">
@@ -110,43 +119,59 @@
                 }
               </select>
             </div>
+            <button
+              uiButton
+              variant="secondary"
+              type="submit"
+              [disabled]="saving() || !statusChanged()"
+            >
+              Cambiar estado
+            </button>
+          </form>
+        }
+
+        <h3 class="subtitle">Nota interna</h3>
+        @if (m.internalNote) {
+          <div class="note">
+            <p class="message">{{ m.internalNote }}</p>
+            @if (canManage()) {
+              <button
+                type="button"
+                class="adm-link note__clear"
+                [disabled]="saving()"
+                (click)="clearNote()"
+              >
+                Borrar nota
+              </button>
+            }
+          </div>
+        } @else {
+          <p class="muted">Sin nota interna.</p>
+        }
+
+        @if (canManage()) {
+          <form class="note-form" novalidate [formGroup]="noteForm" (ngSubmit)="saveNote()">
             <div class="adm-field">
-              <label class="adm-field__label" for="contact-note">Nota interna</label>
+              <label class="adm-field__label" for="contact-note">{{
+                m.internalNote ? 'Reemplazar la nota' : 'Agregar una nota'
+              }}</label>
               <textarea
                 id="contact-note"
                 class="adm-field__input"
-                rows="4"
-                formControlName="internalNote"
+                rows="3"
+                formControlName="note"
                 aria-describedby="contact-note-hint"
               ></textarea>
               <p id="contact-note-hint" class="adm-field__hint">
-                Solo la ve el equipo. Déjala vacía para borrarla.
+                Solo la ve el equipo.{{ m.internalNote ? ' Reemplaza la nota actual.' : '' }}
               </p>
             </div>
             <div class="actions">
-              <button uiButton type="submit" [disabled]="saving()">
-                {{ saving() ? 'Guardando…' : 'Guardar cambios' }}
+              <button uiButton type="submit" [disabled]="saving() || !hasNote()">
+                {{ saving() ? 'Guardando…' : 'Guardar nota' }}
               </button>
-              @if (m.internalNote) {
-                <button
-                  uiButton
-                  variant="secondary"
-                  type="button"
-                  [disabled]="saving()"
-                  (click)="clearNote()"
-                >
-                  Borrar nota
-                </button>
-              }
             </div>
           </form>
-        } @else {
-          <dl class="facts">
-            <div>
-              <dt>Nota interna</dt>
-              <dd class="message">{{ m.internalNote ?? '—' }}</dd>
-            </div>
-          </dl>
         }
       </section>
     </div>

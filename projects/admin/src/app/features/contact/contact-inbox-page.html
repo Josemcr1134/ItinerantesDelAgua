@@ -87,6 +87,12 @@
             <span [class]="'adm-badge adm-badge--' + statusTones[m.status]">{{
               m.statusLabel
             }}</span>
+            @if (m.handledBy; as by) {
+              <p class="muted">
+                {{ m.status === 'ANSWERED' ? 'Respondió' : 'Atiende' }}
+                {{ by.fullName ?? by.email }}
+              </p>
+            }
           </td>
           <td class="adm-table__actions">
             <div class="adm-actions">
