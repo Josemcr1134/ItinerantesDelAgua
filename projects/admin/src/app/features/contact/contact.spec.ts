@@ -91,10 +91,8 @@ describe('Mensajes de Contacto', () => {
     return { fixture, http, host, settle };
   }
 
-  it('la bandeja filtra por la pestaña de la URL y muestra los contadores', async () => {
-    const { http, host, settle } = await setup(ContactInboxPage, ['contact.read'], {
-      estado: 'NEW',
-    });
+  it('la bandeja abre en "Nuevo" y muestra los contadores', async () => {
+    const { http, host, settle } = await setup(ContactInboxPage, ['contact.read']);
     http.expectOne(`${API}/contact-messages/summary`).flush(summary);
     const list = http.expectOne((r) => r.url === `${API}/contact-messages`);
     expect(list.request.params.get('status')).toBe('NEW');
@@ -200,6 +198,23 @@ describe('Mensajes de Contacto', () => {
     expect(http.expectOne(`${API}/contact-messages/m1`).request.body).toEqual({
       internalNote: null,
     });
+  });
+
+  it('"Todos" no filtra por estado y queda al final', async () => {
+    const { http, host, settle } = await setup(ContactInboxPage, ['contact.read'], {
+      estado: 'todos',
+    });
+    http.expectOne(`${API}/contact-messages/summary`).flush(summary);
+    const list = http.expectOne((r) => r.url === `${API}/contact-messages`);
+    expect(list.request.params.has('status')).toBe(false);
+    list.flush({ data: [], meta: { page: 1, pageSize: 20, total: 0, totalPages: 0 } });
+    await settle();
+    const tabs = [...host.querySelectorAll<HTMLAnchorElement>('.tabs__tab')];
+    expect(tabs.at(-1)?.textContent).toContain('Todos');
+    expect(tabs.at(-1)?.classList).toContain('tabs__tab--active');
+    // "Nuevo" es la entrada: su enlace no lleva `?estado=`.
+    expect(tabs[0].textContent).toContain('Nuevo');
+    expect(tabs[0].getAttribute('href')).toBe('/');
   });
 
   it('la lista muestra quién respondió', async () => {

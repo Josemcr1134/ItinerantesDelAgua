@@ -28,7 +28,7 @@ import { ContactInbox } from './contact-inbox';
 
 /**
  * Mensajes (HU-38 / HU-01): bandeja del formulario de contacto de la landing,
- * con pestañas por estado (`?estado=`), búsqueda y filtros. Hoy todos llegan
+ * con pestañas por estado (`?estado=`; abre en "Nuevo"), búsqueda y filtros. Hoy todos llegan
  * con origen `LANDING`, por eso no se filtra por origen.
  */
 @Component({
@@ -48,7 +48,7 @@ import { ContactInbox } from './contact-inbox';
   styleUrl: './contact-inbox-page.scss',
 })
 export default class ContactInboxPage implements OnInit {
-  /** `?estado=NEW|IN_PROGRESS|ANSWERED|ARCHIVED` (sin él, todos). */
+  /** `?estado=IN_PROGRESS|ANSWERED|ARCHIVED|todos`; sin él, los nuevos (`NEW`). */
   readonly estado = input<string>();
 
   private readonly api = inject(AdminContactApi);
@@ -59,19 +59,24 @@ export default class ContactInboxPage implements OnInit {
 
   protected readonly status = computed<ContactStatus | ''>(() => {
     const estado = this.estado();
-    return CONTACT_STATUS_VALUES.find((s) => s === estado) ?? '';
+    if (estado === 'todos') return '';
+    return CONTACT_STATUS_VALUES.find((s) => s === estado) ?? 'NEW';
   });
 
-  /** Pestañas con el total de cada estado (nombre de la API si ya cargó). */
+  /**
+   * Pestañas con el total de cada estado (nombre de la API si ya cargó) y, al
+   * final, "Todos". "Nuevo" es la de entrada: su enlace no lleva `?estado=`.
+   */
   protected readonly tabs = computed(() => {
     const byStatus = this.inbox.summary()?.byStatus ?? [];
     return [
-      { status: '' as const, label: 'Todos', count: 0 },
       ...CONTACT_STATUS_VALUES.map((status) => ({
-        status,
+        status: status as ContactStatus | '',
+        param: status === 'NEW' ? null : status,
         label: byStatus.find((s) => s.status === status)?.label ?? CONTACT_STATUS_LABELS[status],
         count: this.inbox.count(status),
       })),
+      { status: '' as const, param: 'todos', label: 'Todos', count: 0 },
     ];
   });
 

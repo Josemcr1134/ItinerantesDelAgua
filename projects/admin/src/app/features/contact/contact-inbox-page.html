@@ -10,7 +10,7 @@
       [class.tabs__tab--active]="status() === t.status"
       [attr.aria-current]="status() === t.status ? 'page' : null"
       routerLink="."
-      [queryParams]="{ estado: t.status || null }"
+      [queryParams]="{ estado: t.param }"
     >
       {{ t.label }}
       @if (t.count) {
