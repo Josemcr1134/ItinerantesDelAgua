@@ -21,8 +21,6 @@ export const appConfig: ApplicationConfig = {
         loadingInterceptor,
         authInterceptor,
         apiErrorInterceptor,
-        // Desarrollo: datos de prueba (responden en lugar de la API).
-        ...environment.devInterceptors,
       ]),
     ),
     provideApi({ baseUrl: environment.apiBaseUrl }),

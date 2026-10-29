@@ -1,5 +1,3 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-
 /** Configuración de producción del portal de participantes. */
 export const environment = {
   production: true,
@@ -8,6 +6,4 @@ export const environment = {
   siteUrl: 'https://portal.itinerantesdelagua.com',
   /** Landing (catálogo y fichas de la oferta). */
   landingUrl: 'https://itinerantesdelagua.com',
-  /** Interceptores de desarrollo (datos de prueba): ninguno en producción. */
-  devInterceptors: [] as readonly HttpInterceptorFn[],
 };
