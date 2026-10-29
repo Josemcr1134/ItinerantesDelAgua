@@ -99,6 +99,9 @@
             <span [class]="'adm-status adm-status--' + user.status">
               {{ statusLabels[user.status] }}
             </span>
+            @if (user.emailVerifiedAt === null) {
+              <span class="unverified">Correo sin verificar</span>
+            }
             <p class="last-login">
               Último acceso: {{ formatDateTime(user.lastLoginAt) ?? 'nunca' }}
             </p>
@@ -110,6 +113,17 @@
               </button>
               @if (!me) {
                 <adm-row-menu [label]="'Más acciones de ' + user.fullName">
+                  @if (user.emailVerifiedAt === null) {
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="verifyEmail(user)"
+                    >
+                      Marcar correo como verificado
+                    </button>
+                  }
                   <button
                     class="adm-menuitem"
                     role="menuitem"

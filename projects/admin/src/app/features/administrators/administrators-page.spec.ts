@@ -28,7 +28,7 @@ const user = (id: string, fullName: string, roles: AdminUserDto['roles']): Admin
 describe('AdministratorsPage', () => {
   let confirmAnswer: boolean;
 
-  async function setup() {
+  async function setup(laura: Partial<AdminUserDto> = {}) {
     confirmAnswer = true;
     TestBed.configureTestingModule({
       providers: [
@@ -68,7 +68,7 @@ describe('AdministratorsPage', () => {
     const list = http.expectOne((req) => req.url === `${API}/admin/users`);
     expect(list.request.params.get('staffOnly')).toBe('true');
     list.flush({
-      data: [user('me', 'Ana', ['SUPER_ADMIN']), user('u2', 'Laura', ['FINANCE'])],
+      data: [user('me', 'Ana', ['SUPER_ADMIN']), { ...user('u2', 'Laura', ['FINANCE']), ...laura }],
       meta: { page: 1, pageSize: 20, total: 2, totalPages: 1 },
     });
     await fixture.whenStable();
@@ -90,6 +90,28 @@ describe('AdministratorsPage', () => {
     expect(host.querySelectorAll('tbody tr')[0].querySelector('adm-row-menu')).toBeNull();
     expect(menuItem(1, 'Deshabilitar cuenta')?.disabled).toBe(false);
     expect(menuItem(1, 'Quitar del equipo')?.disabled).toBe(false);
+    expect(host.querySelector('.unverified')).toBeNull();
+    expect(menuItem(1, 'Marcar correo como verificado')).toBeUndefined();
+  });
+
+  it('correo sin verificar: lo marca como verificado tras confirmar', async () => {
+    const { fixture, http, host, menuItem } = await setup({
+      status: 'PENDING_VERIFICATION',
+      emailVerifiedAt: null,
+    });
+    expect(host.querySelectorAll('tbody tr')[1].textContent).toContain('Correo sin verificar');
+    menuItem(1, 'Marcar correo como verificado')!.click();
+    await fixture.whenStable();
+    const request = http.expectOne(`${API}/admin/users/u2/verify-email`);
+    expect(request.request.method).toBe('POST');
+    request.flush({
+      ...user('u2', 'Laura', ['FINANCE']),
+      emailVerifiedAt: '2026-10-29T12:00:00.000Z',
+    });
+    await new Promise((r) => setTimeout(r));
+    await fixture.whenStable();
+    expect(host.querySelector('.unverified')).toBeNull();
+    expect(host.textContent).toContain('Se marcó como verificado el correo de Laura.');
   });
 
   it('quitar del equipo deja la cuenta sin roles del equipo y recarga la lista', async () => {

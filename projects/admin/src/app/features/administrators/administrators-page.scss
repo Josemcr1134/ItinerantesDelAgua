@@ -30,3 +30,16 @@
   color: var(--color-deep-blue);
   font-size: 0.75rem;
 }
+
+// Correo sin verificar: no puede iniciar sesión hasta verificarlo.
+.unverified {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, #8a6400 14%, transparent);
+  color: #6b4e00;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}

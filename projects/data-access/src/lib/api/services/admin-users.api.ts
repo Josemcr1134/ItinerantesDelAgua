@@ -49,4 +49,15 @@ export class AdminUsersApi {
       body,
     );
   }
+
+  /**
+   * Marca el correo como verificado (soporte, cuando no llega el código):
+   * `PENDING_VERIFICATION` pasa a `ACTIVE`. Ya verificado → 409 `AUTH_ALREADY_VERIFIED`.
+   */
+  verifyEmail(id: Uuid, body: ApiBody<'AdminUsers_verifyEmail'> = {}) {
+    return this.api.post<ApiResponse<'AdminUsers_verifyEmail'>>(
+      `/api/v1/admin/users/${encodeURIComponent(id)}/verify-email`,
+      body,
+    );
+  }
 }

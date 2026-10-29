@@ -29,7 +29,8 @@ import { FilterBar } from '../../shared/filters/filter-bar';
  * Administradores (solo con `users.manage`): el equipo con sus roles y
  * estado. Agregar = asignar roles a una cuenta registrada; editar roles;
  * quitar del equipo (conserva su cuenta de participante); deshabilitar o
- * habilitar la cuenta.
+ * habilitar la cuenta, y marcar el correo como verificado si no le llega el
+ * código.
  */
 @Component({
   selector: 'adm-administrators-page',
@@ -171,6 +172,24 @@ export default class AdministratorsPage {
           ? `Se deshabilitó la cuenta de ${updated.fullName}.`
           : `Se habilitó la cuenta de ${updated.fullName}.`,
       );
+    }
+  }
+
+  // --- Verificar el correo (soporte) ---
+  protected async verifyEmail(user: AdminUserDto): Promise<void> {
+    const updated = await this.rows.confirmRun(
+      user.id,
+      {
+        title: `¿Marcar como verificado el correo de ${user.fullName}?`,
+        message: `Úsalo solo si confirmaste que ${user.email} le pertenece y no le llega el código. Podrá iniciar sesión sin verificarlo.`,
+        confirmLabel: 'Marcar como verificado',
+        variant: 'info',
+      },
+      () => firstValueFrom(this.api.verifyEmail(user.id)),
+    );
+    if (updated) {
+      this.list.replace((u) => u.id === updated.id, updated);
+      this.notice.set(`Se marcó como verificado el correo de ${updated.fullName}.`);
     }
   }
 
