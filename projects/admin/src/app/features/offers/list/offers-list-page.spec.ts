@@ -62,8 +62,8 @@ describe('OffersListPage', () => {
   it('solo lectura: sin "Nueva oferta" ni acciones de estado, y "Ver" en lugar de "Editar"', async () => {
     const { host, menuItems } = await setup(['admin.access', 'offers.read']);
     expect(host.textContent).not.toContain('Nueva oferta');
-    // Solo puede ir al contenido del aula y a las sesiones (en lectura).
-    expect(menuItems(0)).toEqual(['Contenido del aula', 'Sesiones']);
+    // Solo puede ir al contenido del aula, a las sesiones (en lectura) y a la ficha.
+    expect(menuItems(0)).toEqual(['Contenido del aula', 'Sesiones', 'Vista previa']);
     expect(host.querySelector('tbody .adm-action')?.textContent).toContain('Ver');
   });
 
@@ -78,6 +78,7 @@ describe('OffersListPage', () => {
     expect(menuItems(0)).toEqual([
       'Contenido del aula',
       'Sesiones',
+      'Vista previa',
       'Publicar',
       'Archivar',
       'Duplicar (nueva cohorte)',
@@ -86,6 +87,7 @@ describe('OffersListPage', () => {
     expect(menuItems(1)).toEqual([
       'Contenido del aula',
       'Sesiones',
+      'Vista previa',
       'Volver a borrador',
       'Archivar',
       'Duplicar (nueva cohorte)',

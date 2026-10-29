@@ -5,10 +5,8 @@ export const environment = {
   // (levantar en uno de esos puertos).
   apiBaseUrl: 'https://itinerantes-backend-production.up.railway.app',
   /**
-   * Sitio público donde viven las fichas de las ofertas ("Vista previa").
-   * TODO(landing): activar con `https://itinerantesdelagua.com` (o localhost:4200
-   * en desarrollo) cuando la landing tenga las fichas `/escuela/oferta/:slug`;
-   * hoy solo tiene la portada. Sin dominio no se muestra el enlace.
+   * Sitio público donde viven las fichas de las ofertas ("Vista previa"). En
+   * local, la landing con `npm run start:landing`.
    */
-  publicSiteUrl: null as string | null,
+  publicSiteUrl: 'http://localhost:4200' as string | null,
 };
