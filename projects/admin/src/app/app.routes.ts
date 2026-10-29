@@ -67,6 +67,12 @@ export const routes: Routes = [
         loadChildren: () => import('./features/contact/contact.routes'),
       },
       {
+        path: 'usuarios',
+        title: 'Usuarios · Administrador',
+        canActivate: [permissionGuard('users.manage')],
+        loadComponent: () => import('./features/users/users-page'),
+      },
+      {
         path: 'administradores',
         title: 'Administradores · Administrador',
         canActivate: [permissionGuard('users.manage')],

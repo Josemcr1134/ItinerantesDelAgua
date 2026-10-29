@@ -1,0 +1,55 @@
+@use 'breakpoints' as bp;
+
+// TODO(diseño): reemplazar por el diseño del Figma (como Administradores).
+:host {
+  display: block;
+  color: var(--color-raisin-black);
+}
+
+p {
+  margin: 0;
+}
+
+.row--disabled adm-person,
+.row--disabled .adm-chips {
+  opacity: 0.6;
+}
+
+.person-cell {
+  @include bp.up(xl) {
+    min-width: 15rem;
+  }
+}
+
+.muted {
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--color-raisin-black) 65%, transparent);
+  font-size: 0.8125rem;
+}
+
+.you {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-columbia-blue);
+  color: var(--color-deep-blue);
+  font-size: 0.75rem;
+}
+
+// Solo participante: chip neutro (los del equipo van en verde).
+.adm-chip--participant {
+  background-color: color-mix(in srgb, var(--color-raisin-black) 8%, transparent);
+  color: var(--color-raisin-black);
+}
+
+// Correo sin verificar: no puede iniciar sesión hasta verificarlo.
+.unverified {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, #8a6400 14%, transparent);
+  color: #6b4e00;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}

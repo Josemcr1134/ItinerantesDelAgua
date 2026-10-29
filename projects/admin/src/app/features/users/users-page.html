@@ -1,0 +1,146 @@
+<adm-page-header
+  title="Usuarios"
+  lead="Todas las cuentas registradas: participantes y equipo. Asignar un rol del equipo da acceso al panel."
+/>
+
+<adm-notice [(message)]="notice" />
+
+<adm-filter-bar
+  label="Filtrar usuarios"
+  [activeCount]="list.activeFilterCount()"
+  (clear)="clearFilters()"
+>
+  <adm-search-field
+    admFilterSearch
+    inputId="users-search"
+    placeholder="Nombre, correo o usuario"
+    [(value)]="list.searchText"
+  />
+  <adm-filter-select
+    inputId="users-role"
+    label="Rol"
+    allLabel="Todos los roles"
+    [options]="options.role()"
+    [(value)]="role"
+  />
+  <adm-filter-select
+    inputId="users-status"
+    label="Estado"
+    allLabel="Todos"
+    [options]="options.status"
+    [(value)]="status"
+  />
+  <adm-filter-select
+    inputId="users-sort"
+    label="Ordenar por"
+    [options]="options.sort"
+    [(value)]="sort"
+  />
+</adm-filter-bar>
+
+<adm-list-states
+  [list]="list"
+  heading="Resultados"
+  headingId="users-results"
+  loadingText="Cargando usuarios…"
+  emptyText="Aún no hay cuentas registradas."
+  filteredText="No hay usuarios con esos filtros."
+  (clearFilters)="clearFilters()"
+>
+  <table class="adm-table adm-table--cards-2">
+    <thead>
+      <tr>
+        <th scope="col">Persona</th>
+        <th scope="col">Roles</th>
+        <th scope="col">Estado</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (user of list.items(); track user.id) {
+        @let me = isMe(user);
+        @let busy = rows.isBusy(user.id);
+        @let staff = staffRoles(user);
+        <tr [class.row--disabled]="user.status === 'DISABLED'">
+          <td class="person-cell" data-label="Persona">
+            <adm-person [name]="user.fullName" [detail]="user.email + ' · @' + user.username">
+              @if (me) {
+                <span class="you">Tú</span>
+              }
+            </adm-person>
+            <p class="muted">
+              {{ country(user.countryCode) }} · Registro: {{ formatDateTime(user.createdAt) }}
+            </p>
+          </td>
+          <td data-label="Roles">
+            <ul class="adm-chips">
+              @for (role of staff; track role) {
+                <li class="adm-chip" [class.adm-chip--super]="role === 'SUPER_ADMIN'">
+                  {{ access.roleLabel(role) }}
+                </li>
+              } @empty {
+                <li class="adm-chip adm-chip--participant">Participante</li>
+              }
+            </ul>
+          </td>
+          <td data-label="Estado">
+            <span [class]="'adm-status adm-status--' + user.status">
+              {{ statusLabels[user.status] }}
+            </span>
+            @if (user.emailVerifiedAt === null) {
+              <span class="unverified">Correo sin verificar</span>
+            }
+            <p class="muted">Último acceso: {{ formatDateTime(user.lastLoginAt) ?? 'nunca' }}</p>
+          </td>
+          <td class="adm-table__actions">
+            <div class="adm-actions">
+              <button type="button" class="adm-action" [disabled]="busy" (click)="openEdit(user)">
+                Editar roles<span class="visually-hidden"> de {{ user.fullName }}</span>
+              </button>
+              @if (!me) {
+                <adm-row-menu [label]="'Más acciones de ' + user.fullName">
+                  @if (user.emailVerifiedAt === null) {
+                    <button
+                      class="adm-menuitem"
+                      role="menuitem"
+                      type="button"
+                      [disabled]="busy"
+                      (click)="accounts.verifyEmail(user)"
+                    >
+                      Marcar correo como verificado
+                    </button>
+                  }
+                  <button
+                    class="adm-menuitem"
+                    [class.adm-menuitem--danger]="user.status !== 'DISABLED'"
+                    role="menuitem"
+                    type="button"
+                    [disabled]="busy"
+                    (click)="accounts.toggleStatus(user)"
+                  >
+                    {{ user.status === 'DISABLED' ? 'Habilitar cuenta' : 'Deshabilitar cuenta' }}
+                  </button>
+                </adm-row-menu>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <ui-pagination
+    [meta]="list.meta()"
+    [(page)]="list.page"
+    [loading]="list.loading()"
+    [noun]="['cuenta', 'cuentas']"
+  />
+</adm-list-states>
+
+<adm-edit-roles-dialog
+  [(open)]="editOpen"
+  [user]="editing()"
+  [roles]="teamRoles()"
+  [locked]="lockedRoles(editing())"
+  (saved)="onRolesSaved($event)"
+  (removeRequested)="removeFromTeam($event)"
+/>
