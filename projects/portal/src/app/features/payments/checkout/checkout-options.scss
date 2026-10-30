@@ -134,6 +134,23 @@
   font-size: 0.8125rem;
 }
 
+// Recordatorio del correo: discreto, separado del pago por una línea.
+.email-notice {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: #5a6b60;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+
+  svg {
+    flex: none;
+    margin-top: 1px;
+    color: var(--color-primary);
+  }
+}
+
 .button {
   justify-self: start;
   min-height: 50px;

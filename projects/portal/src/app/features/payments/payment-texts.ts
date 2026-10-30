@@ -79,6 +79,15 @@ export const PAYMENT_TEXTS = {
   method: 'Método de pago',
   card: 'Tarjeta de crédito o débito',
   cardHint: 'Pagas en la página segura de Stripe; el portal no ve los datos de tu tarjeta.',
+  /** Recordatorio discreto: los avisos del pago llegan por correo. */
+  emailNotice: (email: string, kind: 'single' | 'installments' | 'transfer') =>
+    `${
+      kind === 'installments'
+        ? `Te enviaremos el comprobante y el recordatorio de cada cuota a ${email}.`
+        : kind === 'transfer'
+          ? `Te avisaremos a ${email} cuando validemos tu comprobante.`
+          : `Te enviaremos el comprobante a ${email}.`
+    } Revisa que tu bandeja tenga espacio y, si no lo ves, busca en correo no deseado.`,
   transfer: 'Transferencia bancaria (SPEI)',
   transferHint: 'Solo en México. Subes tu comprobante y el equipo lo valida en 1–2 días hábiles.',
   terms: 'Acepto los términos de inscripción y la política de cancelación y reembolso.',

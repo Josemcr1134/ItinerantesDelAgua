@@ -108,6 +108,14 @@ $error-border: #ff383c;
   font-weight: 600;
 }
 
+// Ayuda discreta bajo un campo (p. ej. el correo del registro).
+.field__hint {
+  margin-top: 4px;
+  color: #5a6b60;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
 // Select nativo sin flecha propia; la del Figma va encima (girada hacia abajo).
 .select__input {
   appearance: none;

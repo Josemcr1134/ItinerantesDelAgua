@@ -2,8 +2,8 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { provideAuth } from 'auth';
-import { apiErrorInterceptor, provideApi } from 'data-access';
+import { provideAuth, SessionStore } from 'auth';
+import { apiErrorInterceptor, provideApi, UserProfileDto } from 'data-access';
 import { ExternalNavigation } from '../../../shared/external-navigation';
 import CheckoutPage from './checkout-page';
 
@@ -66,6 +66,7 @@ describe('CheckoutPage', () => {
         { provide: ExternalNavigation, useValue: { go, save: vi.fn() } },
       ],
     });
+    TestBed.inject(SessionStore).setUser({ email: 'maria@correo.com' } as UserProfileDto);
     const fixture = TestBed.createComponent(CheckoutPage);
     for (const [name, value] of Object.entries(inputs)) fixture.componentRef.setInput(name, value);
     TestBed.tick();
@@ -97,6 +98,10 @@ describe('CheckoutPage', () => {
 
     const pay = () => host.querySelector<HTMLButtonElement>('.panel > .button')!;
     expect(pay().textContent?.trim()).toBe('Pagar la 1.ª cuota ($292.50 USD)');
+    // Recordatorio discreto: a qué correo llegan el comprobante y los recordatorios.
+    const notice = host.querySelector('.email-notice')?.textContent ?? '';
+    expect(notice).toContain('el recordatorio de cada cuota a maria@correo.com');
+    expect(notice).toContain('Revisa que tu bandeja tenga espacio');
     expect(pay().disabled).toBe(true);
     await check(0);
     expect(pay().disabled).toBe(true);
@@ -198,6 +203,9 @@ describe('CheckoutPage', () => {
     await fixture.whenStable();
     expect(host.querySelector('portal-transfer-form')?.textContent).toContain('012345678901234567');
     expect(host.querySelector('portal-transfer-form')?.textContent).toContain('EIA-BEC-1');
+    expect(host.querySelector('.email-notice')?.textContent).toContain(
+      'Te avisaremos a maria@correo.com cuando validemos tu comprobante.',
+    );
   });
 
   it('ya inscrito: no deja pagar y lleva al aula', async () => {

@@ -82,6 +82,9 @@ describe('RegisterPage', () => {
     $('.submit').click();
     await settle();
     expect(host.querySelectorAll('.field__error').length).toBe(7);
+    // Recordatorio discreto bajo el correo (también para lectores de pantalla).
+    expect($('#reg-email').getAttribute('aria-describedby')).toContain('reg-email-hint');
+    expect($('#reg-email-hint').textContent).toContain('Ten espacio en tu bandeja');
     http.expectNone(`${API}/auth/register`);
   });
 

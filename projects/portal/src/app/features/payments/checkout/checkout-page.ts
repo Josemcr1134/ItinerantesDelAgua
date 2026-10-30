@@ -81,6 +81,18 @@ export default class CheckoutPage {
     () => this.current()?.methods.find((m) => m.method === 'CARD')?.available ?? false,
   );
 
+  /** A qué correo llegan el comprobante y los recordatorios (y que haya espacio). */
+  protected readonly emailNotice = computed(() => {
+    const email = this.user()?.email;
+    if (!email) return null;
+    const kind = this.option()
+      ? 'installments'
+      : this.method() === 'BANK_TRANSFER'
+        ? 'transfer'
+        : 'single';
+    return PAYMENT_TEXTS.emailNotice(email, kind);
+  });
+
   protected readonly terms = signal(false);
   protected readonly autoDebit = signal(false);
   protected readonly paying = signal(false);

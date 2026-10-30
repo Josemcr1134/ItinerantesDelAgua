@@ -9,6 +9,8 @@ export const REGISTER_TEXTS = {
   fullName: 'Nombre Completo',
   username: 'Nombre de Usuario',
   email: 'Email',
+  emailHint:
+    'Aquí recibirás tu código, comprobantes y recordatorios de pago. Ten espacio en tu bandeja.',
   phone: 'Número de Teléfono',
   phoneCode: 'Indicativo del país',
   country: 'País',
