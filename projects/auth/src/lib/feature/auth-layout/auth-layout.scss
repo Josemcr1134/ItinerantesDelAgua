@@ -1,7 +1,8 @@
 @use 'breakpoints' as bp;
 
 // Móvil: franja verde con el logo y el formulario debajo. Escritorio: panel de
-// marca a la izquierda y formulario centrado a la derecha.
+// marca a la izquierda y formulario centrado a la derecha. Cada app puede
+// cambiar el verde del panel con `--auth-brand-bg`.
 :host {
   display: block;
 }
@@ -24,7 +25,7 @@
   gap: var(--space-3);
   padding: var(--space-4) var(--space-3);
   overflow: hidden;
-  background-color: var(--color-primary);
+  background-color: var(--auth-brand-bg, var(--color-primary));
   color: var(--color-on-primary);
 
   @include bp.up(lg) {

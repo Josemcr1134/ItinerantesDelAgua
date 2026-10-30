@@ -3,3 +3,10 @@
 @use 'tokens';
 @use 'base';
 @use 'styles/panel';
+
+:root {
+  // Panel del login: verde más claro que el de marca para que resalte la
+  // ilustración (la figura azul y las hojas se perdían en #3f5644). El logo
+  // blanco y "Administrador" mantienen contraste ≥ 3:1.
+  --auth-brand-bg: #76977e;
+}
