@@ -20,7 +20,13 @@
   <ul class="footer__social">
     @for (social of c.socialLinks; track social.href) {
       <li>
-        <a class="footer__social-link" [href]="social.href" [attr.aria-label]="social.label">
+        <a
+          class="footer__social-link"
+          [href]="social.href"
+          [attr.aria-label]="social.label"
+          target="_blank"
+          rel="noopener"
+        >
           @switch (social.network) {
             @case ('instagram') {
               <svg

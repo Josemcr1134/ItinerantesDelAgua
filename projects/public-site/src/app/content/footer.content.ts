@@ -7,7 +7,7 @@ export const FOOTER_CONTENT: FooterContent = {
   socialLinks: [
     {
       label: 'Instagram de Itinerantes del Agua',
-      href: '#', // TODO: URL del perfil de Instagram
+      href: 'https://www.instagram.com/itinerantes_delagua/',
       network: 'instagram',
     },
   ],
