@@ -201,6 +201,13 @@ $edge: clamp(16px, 3.4vw, 49px);
   display: block;
 }
 
+// Firma ("Hecho por DJR Solutions") al final del contenido.
+.signature {
+  margin-top: var(--space-5);
+  color: #5a6b60;
+  text-align: center;
+}
+
 // --- Barra inferior (móvil) -------------------------------------------------
 // Flotante, como en las apps: verde con el activo resaltado (colores del menú
 // lateral). Debajo del fondo y del menú desplegable (30 y 40).

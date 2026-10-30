@@ -10,6 +10,7 @@
 }
 
 .footer {
+  position: relative;
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
@@ -101,5 +102,21 @@
 
   svg {
     display: block;
+  }
+}
+
+// Firma ("Hecho por DJR Solutions"): última fila en móvil; en escritorio,
+// centrada al pie, dentro del margen inferior de la fila.
+.footer__signature {
+  grid-area: 3 / 1 / 4 / -1;
+  margin-top: -24px;
+
+  @include bp.up(xl) {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    margin: 0;
+    translate: -50% 0;
+    white-space: nowrap;
   }
 }

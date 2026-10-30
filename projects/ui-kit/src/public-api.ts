@@ -17,3 +17,4 @@ export * from './lib/alert/alert.service';
 export * from './lib/loading-overlay/loading-overlay';
 export * from './lib/dialog/dialog';
 export * from './lib/pagination/pagination';
+export * from './lib/signature/signature';

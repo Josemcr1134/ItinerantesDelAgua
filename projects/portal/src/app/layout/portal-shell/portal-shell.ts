@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService, SessionStore } from 'auth';
 import { filter } from 'rxjs';
-import { AlertService } from 'ui-kit';
+import { AlertService, Signature } from 'ui-kit';
 import { NotificationCenter } from '../../core/notifications/notification-center';
 import { PageHeading } from '../../core/page-heading/page-heading';
 import { browserTimezone } from '../../features/dashboard/dashboard-format';
@@ -63,6 +63,7 @@ function readCollapsed(): boolean {
     MenuIcon,
     Avatar,
     NotificationBell,
+    Signature,
   ],
   templateUrl: './portal-shell.html',
   styleUrls: ['./portal-shell.scss', './portal-sidebar.scss', './account-menu.scss'],
